@@ -4,7 +4,22 @@ import type {
   RecommendationCategory,
   Severity,
 } from "@/generated/prisma/client";
+import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import {
+  findArtifactProblems,
+  MAX_MODEL_OUTPUT_CHARS,
+} from "@/lib/artifact-paths";
+
+/**
+ * Model-supplied file maps must not contain traversing or absolute paths and
+ * must stay within size limits (see lib/artifact-paths).
+ */
+const artifactRecordSchema = z
+  .record(z.string())
+  .refine((value) => findArtifactProblems(value).length === 0, {
+    message: "code artifacts contain unsafe paths or exceed the size limits",
+  });
 
 export const recommendationSchema = z.object({
   category: z.string().optional(),
@@ -35,8 +50,8 @@ export const stageResultSchema = z
     erdDiagram: z.string().optional(),
     authFlowDiagram: z.string().optional(),
     mermaid: z.array(z.string()).optional(),
-    codeArtifacts: z.record(z.string()).optional(),
-    fixedArtifacts: z.record(z.string()).optional(),
+    codeArtifacts: artifactRecordSchema.optional(),
+    fixedArtifacts: artifactRecordSchema.optional(),
     findings: z.array(recommendationSchema).optional(),
     securityScore: z.number().optional(),
     manualBook: z.string().optional(),
@@ -163,16 +178,35 @@ export function normalizeSeverity(value: string | undefined): Severity {
 }
 
 export function parseStageResult(text: string): StageResult | null {
+  // Refuse to parse implausibly large payloads before allocating anything else.
+  if (text.length > MAX_MODEL_OUTPUT_CHARS) {
+    console.warn(
+      `[ai/result] Discarding oversized model output: ${text.length} chars > ${MAX_MODEL_OUTPUT_CHARS}`,
+    );
+    return null;
+  }
   const parsed = extractJson(text);
   if (!parsed) return null;
   const validated = stageResultSchema.safeParse(parsed);
-  return validated.success ? validated.data : null;
+  if (!validated.success) {
+    // Surface WHY a structured response was rejected; otherwise a rejected
+    // artifact path looks identical to a malformed response.
+    const first = validated.error.issues[0];
+    console.warn(
+      `[ai/result] Stage result rejected at ${first?.path.join(".") || "<root>"}: ${first?.message}`,
+    );
+    return null;
+  }
+  return validated.data;
 }
 
-async function lookupNistIds(taskCodes: string[]): Promise<Map<string, number>> {
+async function lookupNistIds(
+  taskCodes: string[],
+  client: DbClient = prisma,
+): Promise<Map<string, number>> {
   const unique = [...new Set(taskCodes.filter(Boolean))];
   if (unique.length === 0) return new Map();
-  const rows = await prisma.nistSsdfControl.findMany({
+  const rows = await client.nistSsdfControl.findMany({
     where: { taskCode: { in: unique } },
     select: { id: true, taskCode: true },
   });
@@ -192,6 +226,12 @@ export interface PersistedRecommendation {
   isoMappings: string[];
 }
 
+/** Either the base client or an interactive-transaction client. */
+type DbClient = Omit<
+  PrismaClient,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+>;
+
 export interface PersistedResult {
   securityScore: number | null;
   recommendationsSaved: number;
@@ -203,6 +243,10 @@ export interface PersistedResult {
  * Persists a parsed stage result: code artifacts (merged, without applying
  * `fixedArtifacts`), snapshot, language plan, cross-stage knowledge, and
  * recommendations. Reused by live chat turns and the "reparse" endpoint.
+ *
+ * The whole write runs in one transaction and takes a row lock on the project
+ * first: `globalSpec` is read-modify-written, so two concurrent turns would
+ * otherwise silently drop each other's artifacts or stage knowledge.
  */
 export async function persistStageResult(input: {
   projectStageId: string;
@@ -210,48 +254,15 @@ export async function persistStageResult(input: {
   result: StageResult;
 }): Promise<PersistedResult> {
   const { result } = input;
+
   const projectStage = await prisma.projectStage.findUnique({
     where: { id: input.projectStageId },
-    include: { stage: true, project: true },
+    include: { stage: true },
   });
-  if (!projectStage || projectStage.project.userId !== input.userId) {
+  if (!projectStage) {
     throw new Error("Project stage not found or forbidden.");
   }
-  const project = projectStage.project;
-  const globalSpec = (project.globalSpec as Record<string, unknown> | null) ?? {};
-  const codeArtifacts =
-    (globalSpec.codeArtifacts as Record<string, string> | null) ?? null;
-
-  const newArtifacts: Record<string, string> = {};
-  if (result.codeArtifacts) {
-    for (const [path, content] of Object.entries(result.codeArtifacts)) {
-      newArtifacts[path] = content;
-    }
-  }
-
-  let snapshotSaved = false;
-  if (Object.keys(newArtifacts).length > 0) {
-    const merged = { ...(codeArtifacts ?? {}), ...newArtifacts };
-    await prisma.websiteSnapshot.create({
-      data: {
-        projectStageId: projectStage.id,
-        version: project.currentVersion,
-        codeArtifacts: merged,
-        diffSummary: result.summary ?? `Stage ${projectStage.stage.code} update`,
-      },
-    });
-    snapshotSaved = true;
-
-    await prisma.project.update({
-      where: { id: project.id },
-      data: {
-        globalSpec: {
-          ...globalSpec,
-          codeArtifacts: merged,
-        } as unknown as Prisma.InputJsonValue,
-      },
-    });
-  }
+  const stageCode = projectStage.stage.code;
 
   // Keep stage progress separate from the AI security score.
   const securityScore =
@@ -259,129 +270,168 @@ export async function persistStageResult(input: {
       ? undefined
       : Math.max(0, Math.min(100, Math.round(result.securityScore)));
 
-  if (projectStage.stage.code === "analysis" && result.recommendedStack) {
-    await prisma.project.update({
-      where: { id: project.id },
-      data: {
-        languagePlan: {
-          recommendedStack: result.recommendedStack,
-          securityRequirements: result.securityRequirements ?? [],
-          decidedByUser: false,
-        },
-      },
-    });
-  }
-
-  // Persist stage-specific knowledge into the cross-stage context.
-  const stageKnowledge: Record<string, unknown> = {};
-  if (result.summary) stageKnowledge.summary = result.summary;
-  if (projectStage.stage.code === "analysis") {
-    stageKnowledge.recommendedStack = result.recommendedStack ?? null;
-    stageKnowledge.securityRequirements = result.securityRequirements ?? [];
-    stageKnowledge.dataClassification = result.dataClassification ?? [];
-  }
-  if (projectStage.stage.code === "design" && result.uiDesign) {
-    stageKnowledge.uiDesign = result.uiDesign;
-  }
-  if (result.architecture) stageKnowledge.architecture = result.architecture;
-  if (result.threatModel) stageKnowledge.threatModel = result.threatModel;
-  if (result.databaseSchema) stageKnowledge.databaseSchema = result.databaseSchema;
-  if (result.erdDiagram) stageKnowledge.erdDiagram = result.erdDiagram;
-  if (result.authFlowDiagram) stageKnowledge.authFlowDiagram = result.authFlowDiagram;
-  if (result.mermaid) stageKnowledge.mermaid = result.mermaid;
-  if (result.findings) stageKnowledge.findings = result.findings;
-  if (result.fixedArtifacts) stageKnowledge.fixedArtifacts = result.fixedArtifacts;
-  if (securityScore !== undefined) stageKnowledge.securityScore = securityScore;
-  if (result.manualBook) stageKnowledge.manualBook = result.manualBook;
-  if (result.complianceReport) stageKnowledge.complianceReport = result.complianceReport;
-  if (result.releaseChecklist) stageKnowledge.releaseChecklist = result.releaseChecklist;
-
-  if (Object.keys(stageKnowledge).length > 0) {
-    // Re-read the project so the earlier codeArtifacts update is not
-    // overwritten by a stale in-memory copy of globalSpec.
-    const freshProject = await prisma.project.findUnique({
-      where: { id: project.id },
-    });
-    const freshSpec =
-      (freshProject?.globalSpec as Record<string, unknown> | null) ?? {};
-    await prisma.project.update({
-      where: { id: project.id },
-      data: {
-        globalSpec: {
-          ...freshSpec,
-          [projectStage.stage.code]: {
-            ...((freshSpec[projectStage.stage.code] as Record<string, unknown>) ?? {}),
-            ...stageKnowledge,
-          },
-        } as unknown as Prisma.InputJsonValue,
-      },
-    });
-  }
-
+  const newArtifacts: Record<string, string> = { ...(result.codeArtifacts ?? {}) };
   const recs = result.recommendations ?? [];
-  const taskCodes = recs.map((r) => r.nistTask ?? "").filter(Boolean);
-  const nistMap = await lookupNistIds(taskCodes);
+  const nistMap = await lookupNistIds(recs.map((r) => r.nistTask ?? "").filter(Boolean));
 
-  const assistantMessage = await prisma.message.findFirst({
-    where: { chat: { projectStageId: projectStage.id }, role: "assistant" },
-    orderBy: { createdAt: "desc" },
-  });
+  return prisma.$transaction(async (tx) => {
+    // Lock the project row so a concurrent persist cannot interleave its
+    // read-modify-write of globalSpec with ours.
+    const locked = await tx.$queryRaw<{ id: string; userId: string }[]>`
+      SELECT "id", "userId" FROM "projects" WHERE "id" = ${projectStage.projectId} FOR UPDATE
+    `;
+    const owner = locked[0];
+    if (!owner || owner.userId !== input.userId) {
+      throw new Error("Project stage not found or forbidden.");
+    }
 
-  let recommendationsSaved = 0;
-  if (recs.length > 0) {
-    if (assistantMessage) {
-      // Avoid duplicates when the same assistant message is parsed again
-      // (reparse, repeated runs): replace instead of appending.
-      await prisma.aiRecommendation.deleteMany({
-        where: {
+    // Read fresh, inside the transaction and after the lock.
+    const project = await tx.project.findUniqueOrThrow({
+      where: { id: projectStage.projectId },
+    });
+
+    const globalSpec = (project.globalSpec as Record<string, unknown> | null) ?? {};
+    const existingArtifacts =
+      (globalSpec.codeArtifacts as Record<string, string> | null) ?? null;
+
+    let snapshotSaved = false;
+    if (Object.keys(newArtifacts).length > 0) {
+      const merged = { ...(existingArtifacts ?? {}), ...newArtifacts };
+      await tx.websiteSnapshot.create({
+        data: {
           projectStageId: projectStage.id,
-          originMessageId: assistantMessage.id,
+          version: project.currentVersion,
+          codeArtifacts: merged,
+          diffSummary: result.summary ?? `Stage ${stageCode} update`,
         },
       });
+      snapshotSaved = true;
     }
-    await prisma.aiRecommendation.createMany({
-      data: recs.map((r) => ({
+
+    // Build the next globalSpec once, so there is exactly one write.
+    let nextSpec: Record<string, unknown> = { ...globalSpec };
+    if (Object.keys(newArtifacts).length > 0) {
+      nextSpec.codeArtifacts = {
+        ...(existingArtifacts ?? {}),
+        ...newArtifacts,
+      };
+    }
+
+    const stageKnowledge: Record<string, unknown> = {};
+    if (result.summary) stageKnowledge.summary = result.summary;
+    if (stageCode === "analysis") {
+      stageKnowledge.recommendedStack = result.recommendedStack ?? null;
+      stageKnowledge.securityRequirements = result.securityRequirements ?? [];
+      stageKnowledge.dataClassification = result.dataClassification ?? [];
+    }
+    if (stageCode === "design" && result.uiDesign) {
+      stageKnowledge.uiDesign = result.uiDesign;
+    }
+    if (result.architecture) stageKnowledge.architecture = result.architecture;
+    if (result.threatModel) stageKnowledge.threatModel = result.threatModel;
+    if (result.databaseSchema) stageKnowledge.databaseSchema = result.databaseSchema;
+    if (result.erdDiagram) stageKnowledge.erdDiagram = result.erdDiagram;
+    if (result.authFlowDiagram) stageKnowledge.authFlowDiagram = result.authFlowDiagram;
+    if (result.mermaid) stageKnowledge.mermaid = result.mermaid;
+    if (result.findings) stageKnowledge.findings = result.findings;
+    if (result.fixedArtifacts) stageKnowledge.fixedArtifacts = result.fixedArtifacts;
+    if (securityScore !== undefined) stageKnowledge.securityScore = securityScore;
+    if (result.manualBook) stageKnowledge.manualBook = result.manualBook;
+    if (result.complianceReport) stageKnowledge.complianceReport = result.complianceReport;
+    if (result.releaseChecklist) stageKnowledge.releaseChecklist = result.releaseChecklist;
+
+    if (Object.keys(stageKnowledge).length > 0) {
+      nextSpec = {
+        ...nextSpec,
+        [stageCode]: {
+          ...((nextSpec[stageCode] as Record<string, unknown>) ?? {}),
+          ...stageKnowledge,
+        },
+      };
+    }
+
+    await tx.project.update({
+      where: { id: project.id },
+      data: {
+        globalSpec: nextSpec as unknown as Prisma.InputJsonValue,
+        // The plan is only replaced when the model actually proposed a stack.
+        ...(stageCode === "analysis" && result.recommendedStack
+          ? {
+              languagePlan: {
+                recommendedStack: result.recommendedStack,
+                securityRequirements: result.securityRequirements ?? [],
+                decidedByUser: false,
+              } as unknown as Prisma.InputJsonValue,
+            }
+          : {}),
+      },
+    });
+
+    const assistantMessage = await tx.message.findFirst({
+      where: { chat: { projectStageId: projectStage.id }, role: "assistant" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    let recommendationsSaved = 0;
+    if (recs.length > 0) {
+      // When no assistant message exists the rows are stored with a NULL
+      // originMessageId. A sentinel string can never match NULL, so the scope
+      // switches to "the NULL-origin rows of this stage" instead — otherwise the
+      // rows are written but reported as 0 and never read back.
+      const scope = {
         projectStageId: projectStage.id,
         originMessageId: assistantMessage?.id ?? null,
-        category: normalizeCategory(r.category ?? "compliance"),
-        severity: normalizeSeverity(r.severity),
-        nistControlId: r.nistTask ? nistMap.get(r.nistTask) ?? null : null,
-        title: r.title ?? r.threat ?? "Recommendation",
-        content: r.content ?? r.description ?? r.mitigation ?? r.fix ?? "",
-        suggestedCode: r.suggestedCode ?? null,
-        filePath: r.file ?? null,
-      })),
+      };
+
+      if (assistantMessage) {
+        // Avoid duplicates when the same assistant message is parsed again
+        // (reparse, repeated runs): replace instead of appending.
+        await tx.aiRecommendation.deleteMany({ where: scope });
+      }
+
+      await tx.aiRecommendation.createMany({
+        data: recs.map((r) => ({
+          projectStageId: projectStage.id,
+          originMessageId: assistantMessage?.id ?? null,
+          category: normalizeCategory(r.category ?? "compliance"),
+          severity: normalizeSeverity(r.severity),
+          nistControlId: r.nistTask ? nistMap.get(r.nistTask) ?? null : null,
+          title: r.title ?? r.threat ?? "Recommendation",
+          content: r.content ?? r.description ?? r.mitigation ?? r.fix ?? "",
+          suggestedCode: r.suggestedCode ?? null,
+          filePath: r.file ?? null,
+        })),
+      });
+      recommendationsSaved = recs.length;
+    }
+
+    const created = await tx.aiRecommendation.findMany({
+      where: {
+        projectStageId: projectStage.id,
+        originMessageId: assistantMessage?.id ?? null,
+      },
+      include: { nistControl: true },
+      orderBy: { createdAt: "desc" },
     });
-    recommendationsSaved = recs.length;
-  }
 
-  const created = await prisma.aiRecommendation.findMany({
-    where: {
-      projectStageId: projectStage.id,
-      originMessageId: assistantMessage?.id ?? "__none__",
-    },
-    include: { nistControl: true },
-    orderBy: { createdAt: "desc" },
+    const recommendations: PersistedRecommendation[] = created.map((r) => ({
+      id: r.id,
+      category: r.category,
+      severity: r.severity,
+      title: r.title,
+      content: r.content,
+      suggestedCode: r.suggestedCode,
+      filePath: r.filePath,
+      isApplied: r.isApplied,
+      nistTask: r.nistControl?.taskCode ?? null,
+      isoMappings: (r.nistControl?.iso27001Mapping as string[] | null) ?? [],
+    }));
+
+    return {
+      securityScore: securityScore ?? null,
+      recommendationsSaved,
+      snapshotSaved,
+      recommendations,
+    };
   });
-
-  const recommendations: PersistedRecommendation[] = created.map((r) => ({
-    id: r.id,
-    category: r.category,
-    severity: r.severity,
-    title: r.title,
-    content: r.content,
-    suggestedCode: r.suggestedCode,
-    filePath: r.filePath,
-    isApplied: r.isApplied,
-    nistTask: r.nistControl?.taskCode ?? null,
-    isoMappings: (r.nistControl?.iso27001Mapping as string[] | null) ?? [],
-  }));
-
-  return {
-    securityScore:
-      securityScore === undefined ? null : Math.max(0, Math.min(100, Math.round(securityScore))),
-    recommendationsSaved,
-    snapshotSaved,
-    recommendations,
-  };
 }

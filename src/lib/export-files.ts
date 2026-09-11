@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { filterSafeArtifacts } from "@/lib/artifact-paths";
 import { buildComplianceReport, buildManualBook, buildReadme, buildSecurityWorkflowYaml } from "@/lib/docs";
 
 /**
@@ -22,7 +23,16 @@ export async function buildProjectFiles(projectId: string, userId: string) {
     | Record<string, string>
     | undefined;
 
-  const files: Record<string, string> = { ...(codeArtifacts ?? {}) };
+  // Defense in depth: rows written before path validation existed may still hold
+  // traversing names, so drop anything unsafe before it reaches a ZIP or a git tree.
+  const { files: safeArtifacts, rejected } = filterSafeArtifacts(codeArtifacts ?? {});
+  if (rejected.length > 0) {
+    console.warn(
+      `[export] Skipped ${rejected.length} unsafe artifact path(s): ${rejected.join(", ")}`,
+    );
+  }
+
+  const files: Record<string, string> = { ...safeArtifacts };
   files["README.md"] = buildReadme(project);
   files["docs/MANUAL-BOOK.md"] = buildManualBook(project);
   files["docs/ISO-27001-COMPLIANCE.md"] = buildComplianceReport(project);

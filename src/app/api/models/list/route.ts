@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { decryptSecret } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 import { rateLimited } from "@/lib/rate-limit";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 const bodySchema = z.object({
   providerCode: z.string().min(1),
@@ -17,9 +18,14 @@ interface ModelEntry {
 }
 
 async function fetchGeminiModels(apiKey: string): Promise<ModelEntry[]> {
+  // The key travels in a header, never in the query string: URLs are recorded by
+  // proxies, CDNs and error messages, which would leak the credential.
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`,
-    { signal: AbortSignal.timeout(10000) },
+    "https://generativelanguage.googleapis.com/v1beta/models",
+    {
+      headers: { "x-goog-api-key": apiKey },
+      signal: AbortSignal.timeout(10000),
+    },
   );
   if (!res.ok) throw new Error(`Gemini API ${res.status}`);
   const data = await res.json();
@@ -97,6 +103,9 @@ async function fetchOllamaModels(): Promise<ModelEntry[]> {
 }
 
 export async function POST(request: Request) {
+  const csrfError = await validateCsrfRequest(request, "/api/models/list");
+  if (csrfError) return csrfError;
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

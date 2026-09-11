@@ -176,22 +176,28 @@ export function ByokManager({
     e.preventDefault();
     setBusy(true);
     setKeyError(null);
-    const res = await csrfFetch("/api/keys", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ providerCode: keyProvider, apiKey: keyValue, label: keyLabel }),
-    });
-    if (!res.ok) {
-      setKeyError(((await res.json()) as { error?: string }).error ?? dict.settings.failedAddKey);
+    try {
+      const res = await csrfFetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ providerCode: keyProvider, apiKey: keyValue, label: keyLabel }),
+      });
+      if (!res.ok) {
+        setKeyError(((await res.json()) as { error?: string }).error ?? dict.settings.failedAddKey);
+        return;
+      }
+      const key = (await res.json()) as ApiKeyRow;
+      setKeys((prev) => [key, ...prev]);
+      setKeyValue("");
+      setKeyLabel("");
+      setShowKeyForm(false);
+    } catch {
+      // Without this the rejection is unhandled and `busy` stays true forever,
+      // leaving the Save button permanently disabled.
+      setKeyError(dict.studio.networkError);
+    } finally {
       setBusy(false);
-      return;
     }
-    const key = (await res.json()) as ApiKeyRow;
-    setKeys((prev) => [key, ...prev]);
-    setKeyValue("");
-    setKeyLabel("");
-    setShowKeyForm(false);
-    setBusy(false);
   }
 
   async function testKey() {
@@ -223,28 +229,32 @@ export function ByokManager({
     e.preventDefault();
     setBusy(true);
     setModelError(null);
-    const provider = providers.find((p) => p.code === modelProvider);
-    const res = await csrfFetch("/api/models", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        providerCode: modelProvider,
-        apiKeyId: provider?.requiresKey ? modelKey || null : null,
-        modelName: modelName.trim().toLowerCase(),
-        temperature: Number.isNaN(parseFloat(modelTemp)) ? 0.7 : parseFloat(modelTemp),
-        maxTokens: Number.isNaN(parseInt(modelMaxTokens, 10)) ? 16384 : parseInt(modelMaxTokens, 10),
-      }),
-    });
-    if (!res.ok) {
-      setModelError(((await res.json()) as { error?: string }).error ?? dict.settings.failedAddModel);
+    try {
+      const provider = providers.find((p) => p.code === modelProvider);
+      const res = await csrfFetch("/api/models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          providerCode: modelProvider,
+          apiKeyId: provider?.requiresKey ? modelKey || null : null,
+          modelName: modelName.trim().toLowerCase(),
+          temperature: Number.isNaN(parseFloat(modelTemp)) ? 0.7 : parseFloat(modelTemp),
+          maxTokens: Number.isNaN(parseInt(modelMaxTokens, 10)) ? 16384 : parseInt(modelMaxTokens, 10),
+        }),
+      });
+      if (!res.ok) {
+        setModelError(((await res.json()) as { error?: string }).error ?? dict.settings.failedAddModel);
+        return;
+      }
+      const model = (await res.json()).model as ModelRow;
+      setModelRows((prev) => [model, ...prev.map((m) => (m.isDefault ? { ...m, isDefault: false } : m))]);
+      setModelName("");
+      setShowModelForm(false);
+    } catch {
+      setModelError(dict.studio.networkError);
+    } finally {
       setBusy(false);
-      return;
     }
-    const model = (await res.json()).model as ModelRow;
-    setModelRows((prev) => [model, ...prev.map((m) => (m.isDefault ? { ...m, isDefault: false } : m))]);
-    setModelName("");
-    setShowModelForm(false);
-    setBusy(false);
   }
 
   async function deleteKey(id: string) {

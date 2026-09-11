@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { runStageTurn } from "@/lib/ai/engine";
 import { NoModelConfiguredError } from "@/lib/ai/resolve-model";
-import { rateLimited } from "@/lib/rate-limit";
+import { rateLimitedAny } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/audit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 export async function POST(request: Request) {
@@ -14,7 +15,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (rateLimited(session.user.id)) {
+  // Bound both the user's own budget and a per-IP ceiling: these calls spend the
+  // user's AI credits, so a compromised session must not be able to drain them.
+  const ip = requestIp(request) ?? "unknown";
+  if (
+    rateLimitedAny([
+      { key: session.user.id, limit: 20 },
+      { key: `chat-ip:${ip}`, limit: 40 },
+    ])
+  ) {
     return NextResponse.json({ error: "Rate limit exceeded. Slow down." }, { status: 429 });
   }
 

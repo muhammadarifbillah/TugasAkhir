@@ -6,6 +6,32 @@ import { NextResponse } from "next/server";
 import { validateCsrfToken, requiresCsrf, isCsrfExempt } from "@/lib/csrf";
 
 /**
+ * Rejects cross-origin state-changing requests by comparing the `Origin` header
+ * with the request host. This is an independent second check: even if the
+ * double-submit token were replayed, a browser sends `Origin` on cross-site
+ * requests and the hosts will not match.
+ *
+ * A missing `Origin` is allowed — non-browser clients (curl, server-to-server,
+ * tests) do not send it and are not subject to browser CSRF.
+ */
+function originMismatch(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+
+  let originHost: string;
+  try {
+    originHost = new URL(origin).host;
+  } catch {
+    return true;
+  }
+
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+  if (!host) return false; // cannot verify; the token check still applies
+
+  return originHost !== host;
+}
+
+/**
  * Validate CSRF token for the request. Returns null if valid, or NextResponse with error if invalid.
  * Skip validation for GET/HEAD/OPTIONS requests and exempt paths.
  */
@@ -19,12 +45,11 @@ export async function validateCsrfRequest(
   // Skip exempt paths
   if (isCsrfExempt(pathname)) return null;
 
-  // Skip CSRF for development credentials login (no token set yet)
-  if (
-    pathname === "/api/auth/callback/credentials" &&
-    process.env.NODE_ENV !== "production"
-  ) {
-    return null;
+  if (originMismatch(request)) {
+    return NextResponse.json(
+      { error: "Cross-origin request rejected" },
+      { status: 403 },
+    );
   }
 
   // In development, skip CSRF if no cookie is present (allows first-load requests)

@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 /** Unlinks the GitHub account: clears the stored OAuth/PAT token & profile. */
 export async function DELETE(request: Request) {
+  const csrfError = await validateCsrfRequest(request, "/api/user/github");
+  if (csrfError) return csrfError;
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

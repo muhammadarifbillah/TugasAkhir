@@ -1,6 +1,7 @@
 import { decryptSecret } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 import { buildModel } from "@/lib/ai/provider";
+import { NoModelConfiguredError } from "@/lib/ai/errors";
 import type { LanguageModel } from "ai";
 
 export interface ResolvedModel {
@@ -11,12 +12,7 @@ export interface ResolvedModel {
   maxTokens: number;
 }
 
-export class NoModelConfiguredError extends Error {
-  constructor() {
-    super("NO_MODEL_CONFIGURED");
-    this.name = "NoModelConfiguredError";
-  }
-}
+export { NoModelConfiguredError };
 
 /**
  * Resolves the user's default BYOK model. Falls back to env-configured
@@ -30,9 +26,26 @@ export async function resolveUserModel(userId: string): Promise<ResolvedModel> {
   });
 
   if (userModel) {
-    const apiKey = userModel.apiKey
-      ? decryptSecret(userModel.apiKey.keyEncrypted)
-      : undefined;
+    // A deactivated key must not be used, even if a model still references it.
+    if (userModel.apiKey && !userModel.apiKey.isActive) {
+      throw new NoModelConfiguredError(
+        "The API key for the default model is deactivated. Activate it or pick another key in Settings.",
+      );
+    }
+
+    let apiKey: string | undefined;
+    if (userModel.apiKey) {
+      try {
+        apiKey = decryptSecret(userModel.apiKey.keyEncrypted);
+      } catch {
+        // A key that cannot be decrypted (e.g. after a master-key rotation) is
+        // unusable; report it instead of falling through to another credential.
+        throw new NoModelConfiguredError(
+          "The stored API key could not be decrypted. Re-add it in Settings.",
+        );
+      }
+    }
+
     return {
       model: buildModel(
         userModel.providerCode,

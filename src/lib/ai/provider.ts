@@ -2,12 +2,21 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOllama } from "ollama-ai-provider";
 import type { LanguageModel } from "ai";
+import { NoModelConfiguredError } from "@/lib/ai/errors";
+
+/** Providers that can run without a credential. */
+const KEYLESS_PROVIDERS = new Set(["ollama"]);
 
 /**
  * Builds an AI SDK LanguageModel from the user's BYOK configuration.
  * - OpenAI + OpenRouter + Gemini use the OpenAI-compatible client.
  * - Anthropic uses its native client.
  * - Ollama uses the local provider (no API key required).
+ *
+ * A missing key is a hard error for every other provider. Passing `undefined`
+ * through to the SDK would make it fall back to `process.env.OPENAI_API_KEY`
+ * (and `ANTHROPIC_API_KEY`), which for the `gemini`/`openrouter` branches would
+ * send the OPERATOR's key to a third-party endpoint.
  */
 export function buildModel(
   providerCode: string,
@@ -15,6 +24,10 @@ export function buildModel(
   apiKey?: string,
   baseUrl?: string,
 ): LanguageModel {
+  if (!KEYLESS_PROVIDERS.has(providerCode) && !apiKey) {
+    throw new NoModelConfiguredError();
+  }
+
   let model: unknown;
   switch (providerCode) {
     case "anthropic":

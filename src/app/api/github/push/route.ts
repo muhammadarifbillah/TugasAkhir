@@ -6,6 +6,7 @@ import { decryptSecret, encryptSecret } from "@/lib/crypto";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { buildProjectFiles } from "@/lib/export-files";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 const bodySchema = z.object({
   projectId: z.string().min(1),
@@ -92,6 +93,9 @@ async function pushFiles(
 }
 
 export async function POST(request: Request) {
+  const csrfError = await validateCsrfRequest(request, "/api/github/push");
+  if (csrfError) return csrfError;
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

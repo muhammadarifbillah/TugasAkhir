@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { rateLimited } from "@/lib/rate-limit";
+import { requestIp } from "@/lib/audit";
+import { rateLimitedByIp } from "@/lib/rate-limit";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 const registerSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -11,7 +13,13 @@ const registerSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (rateLimited("register", 5, 60_000)) {
+  const csrfError = await validateCsrfRequest(request, "/api/auth/register");
+  if (csrfError) return csrfError;
+
+  // Keyed per client IP: a single shared counter would let one caller block
+  // registration for everybody while doing nothing against a real flood.
+  const ip = requestIp(request) ?? "unknown";
+  if (rateLimitedByIp(`register:${ip}`, 5, 10 * 60_000)) {
     return NextResponse.json(
       { error: "Too many registration attempts. Please try again later." },
       { status: 429 },

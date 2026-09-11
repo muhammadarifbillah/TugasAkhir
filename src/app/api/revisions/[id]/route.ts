@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 const bodySchema = z.object({
   status: z.enum(["merged", "cancelled"]),
@@ -13,6 +14,9 @@ interface RouteProps {
 }
 
 export async function PATCH(request: Request, { params }: RouteProps) {
+  const csrfError = await validateCsrfRequest(request, "/api/revisions/[id]");
+  if (csrfError) return csrfError;
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

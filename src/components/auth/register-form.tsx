@@ -8,6 +8,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { csrfFetch } from "@/lib/csrf-client";
 
 interface RegisterFormProps {
   lang: string;
@@ -42,7 +43,7 @@ export function RegisterForm({ lang }: RegisterFormProps) {
     }
 
     try {
-      const res = await fetch("/api/auth/register", {
+      const res = await csrfFetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

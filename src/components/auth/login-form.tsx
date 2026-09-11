@@ -28,20 +28,28 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
     setLoading(true);
     setErrorMsg("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-      callbackUrl: callbackUrl ?? `/${lang}/dashboard`,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl: callbackUrl ?? `/${lang}/dashboard`,
+      });
 
-    setLoading(false);
-
-    if (result?.error) {
-      setErrorMsg("Invalid email or password.");
-    } else if (result?.url) {
-      router.push(result.url);
-      router.refresh();
+      if (result?.error) {
+        setErrorMsg("Invalid email or password.");
+        return;
+      }
+      if (result?.url) {
+        router.push(result.url);
+        router.refresh();
+      }
+    } catch {
+      // Without this the rejection is unhandled and the submit button stays
+      // disabled for the rest of the session.
+      setErrorMsg("Network error. Check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -7,6 +7,9 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Without this, `prisma migrate reset` / `prisma db seed` leave the database
+    // empty and project creation fails with "Stage master data not seeded".
+    seed: "tsx prisma/seed.ts",
   },
   datasource: {
     url: process.env["DATABASE_URL"],

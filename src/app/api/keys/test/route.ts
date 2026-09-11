@@ -6,6 +6,7 @@ import { buildModel } from "@/lib/ai/provider";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { rateLimited } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
+import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 const bodySchema = z.object({
   providerCode: z.string().min(1),
@@ -29,6 +30,9 @@ function safeBaseUrl(input: string | undefined, providerBaseUrl: string | null):
 }
 
 export async function POST(request: Request) {
+  const csrfError = await validateCsrfRequest(request, "/api/keys/test");
+  if (csrfError) return csrfError;
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

@@ -42,8 +42,15 @@ export function GithubActions({
 
   async function connect() {
     setBusy(true);
-    await signIn("github", { redirectTo: `/${lang}/settings` });
-    setBusy(false);
+    setError(null);
+    try {
+      await signIn("github", { redirectTo: `/${lang}/settings` });
+      // A successful OAuth start navigates away; only reset on failure.
+      setBusy(false);
+    } catch {
+      setError(dict.studio.networkError);
+      setBusy(false);
+    }
   }
 
   return (
