@@ -1,0 +1,453 @@
+{
+  "app": {
+    "name": "SecureSDLC",
+    "tagline": "AI-powered secure website generator",
+    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept)."
+  },
+  "landing": {
+    "badge": "NIST SP 800-218 · ISO 27001:2022",
+    "hero1": "Generate secure websites",
+    "hero2": "guided by AI",
+    "intro": "walks programmers through a 5-stage secure software development lifecycle. Each stage combines an AI prompt engine with NIST SP 800-218 and produces ISO 27001-ready documentation — source code, manual book, and compliance report.",
+    "featSdlcTitle": "5-Stage Secure SDLC",
+    "featSdlcDesc": "Analysis → Design → Development → Testing → Handover, each stage enforced by NIST SP 800-218.",
+    "featIsoTitle": "ISO 27001 Crosswalk",
+    "featIsoDesc": "Every stage maps automatically to ISO 27001:2022 Annex A for audit-ready compliance reports.",
+    "featByokTitle": "Bring Your Own Key",
+    "featByokDesc": "Connect your own AI provider (OpenAI, OpenRouter, Anthropic, Ollama). Keys stay encrypted.",
+    "featGithubTitle": "GitHub Native",
+    "featGithubDesc": "Push finished code straight to your repository with a DevSecOps CI/CD pipeline included.",
+    "featPromptTitle": "Prompt-Driven",
+    "featPromptDesc": "Chat with the AI at every stage to generate, review, and revise your website.",
+    "featSecureTitle": "Secure by Design",
+    "featSecureDesc": "Threat models, secure coding, vulnerability scanning and auto-fix as a built-in workflow."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "settings": "Settings",
+    "newProject": "New Project",
+    "signOut": "Sign out",
+    "profile": "Profile",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu"
+  },
+  "errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while rendering this page. You can try again, or head back to the dashboard.",
+    "tryAgain": "Try again",
+    "backToDashboard": "Back to dashboard",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or may have been moved.",
+    "backHome": "Back to home"
+  },
+  "dashboard": {
+    "title": "Projects Dashboard",
+    "subtitle": "Create, manage, and monitor security compliance for your AI-generated websites.",
+    "newProject": "+ New Project",
+    "all": "All Projects",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "inRevision": "In Revision",
+    "search": "Search projects...",
+    "empty": "No projects yet. Create your first AI-generated secure website!",
+    "securityScore": "Security Score",
+    "openStudio": "Open Studio",
+    "revise": "Revise",
+    "docs": "Docs",
+    "version": "Version",
+    "stack": "Stack",
+    "status": "Status",
+    "name": "Name",
+    "template": "Template",
+    "description": "Description",
+    "requirements": "Requirements",
+    "uiPreferences": "Desired Website Appearance",
+    "contentLanguage": "Website Content Language",
+    "contentLanguageHint": "Language for generated pages, text, and documentation.",
+    "phName": "My Secure Website",
+    "phDescription": "Short description of the website...",
+    "phRequirements": "Describe what the website must do, target users, data handled, integrations...",
+    "phUiPreferences": "Describe desired layout, color palette, required pages (home, login, dashboard, etc.), visual style, site references...",
+    "templateCustom": "Custom",
+    "templateEcommerce": "E-Commerce Storefront",
+    "templateSaas": "SaaS Dashboard",
+    "templateRestApi": "REST API Backend",
+    "templateLms": "LMS / Learning Portal",
+    "failedCreateProject": "Failed to create project.",
+    "statusCompleted": "Completed",
+    "statusInRevision": "In Revision",
+    "statusInProgress": "In Progress",
+    "statusDraft": "Draft",
+    "stageLabel": "Stage",
+    "revisionSummary": "Iterative revision of {name}",
+    "templateEcommerceDesc": "An online store with product catalog, cart, checkout, and order management.",
+    "templateEcommerceReq": "Public product catalog, customer accounts, cart + checkout with payment, admin order management, order history, payment data handling (PCI awareness), CSRF and injection protection.",
+    "templateSaasDesc": "A multi-tenant SaaS dashboard with billing and role-based access.",
+    "templateSaasReq": "Tenant isolation, user roles (admin/member), dashboard with metrics, subscription billing, API endpoints with rate limiting, audit logging of sensitive actions.",
+    "templateRestApiDesc": "A REST API backend with auth, rate limiting, and secure data access.",
+    "templateRestApiReq": "JWT or OAuth2 authentication, role-based access control, input validation, rate limiting, structured error responses, SQL-injection/XSS-safe data access, API documentation.",
+    "templateLmsDesc": "A learning portal with courses, lessons, enrollments, and progress tracking.",
+    "templateLmsReq": "Instructor and learner roles, course & lesson management, enrollment flow, progress tracking, file upload with type/size validation, PII protection for learner data.",
+    "languages": {
+      "en": "English",
+      "id": "Bahasa Indonesia"
+    }
+  },
+  "auth": {
+    "signInTitle": "Welcome back",
+    "signInSubtitle": "Sign in to start building secure websites with AI.",
+    "signInWithGithub": "Continue with GitHub",
+    "signInWithDev": "Sign in with Dev Account (local)",
+    "devModeNote": "GitHub OAuth is not configured. Use the dev account to explore, then connect your own GitHub token in the deliverables panel.",
+    "signOut": "Sign out",
+    "byokTitle": "Bring Your Own AI Key",
+    "byokSubtitle": "You keep full control. Connect your own AI provider key — we only provide the tools & orchestration.",
+    "featEncryption": "AES-256-GCM encryption",
+    "featEngine": "5-stage NIST SSDF engine",
+    "featPush": "Direct repo push",
+    "user": "User",
+    "errorDefault": "Unable to sign in. Try again.",
+    "errorAccessDenied": "Sign-in was denied or your session expired.",
+    "errorOAuth": "GitHub sign-in failed. Try again.",
+    "registerTitle": "Create an account",
+    "registerSubtitle": "Get started with SecureSDLC in minutes.",
+    "noAccount": "Don't have an account?",
+    "createAccount": "Sign up"
+  },
+  "settings": {
+    "title": "Settings",
+    "aiModels": "AI Models & API Keys",
+    "aiModelsCard": "AI Models",
+    "aiModelsSubtitle": "Bring Your Own Key (BYOK). Your keys are encrypted with AES-256-GCM and never sent to the browser.",
+    "addKey": "Add API Key",
+    "provider": "Provider",
+    "modelName": "Model name",
+    "temperature": "Temperature",
+    "maxTokens": "Max tokens",
+    "testConnection": "Test connection",
+    "connected": "Connected",
+    "testFailed": "Connection failed",
+    "tokenUsage": "Token usage",
+    "promptTokens": "Prompt tokens",
+    "completionTokens": "Completion tokens",
+    "usageByDay": "Tokens per day",
+    "save": "Save",
+    "delete": "Delete",
+    "language": "App Interface Language",
+    "outputLanguage": "AI Output & Documentation Language",
+    "projectAdded": "Project created successfully",
+    "noModels": "No AI models configured. Add one to use the studio.",
+    "apiKey": "API Key",
+    "noApiKeys": "No API keys yet.",
+    "phApiKey": "sk-...",
+    "phKeyLabel": "my-openai-key",
+    "phModelName": "gpt-4o-mini, deepseek-v3, llama3...",
+    "fetchingModels": "Fetching models...",
+    "fetchModelsFailed": "Failed to fetch model list",
+    "selectModel": "Select a model",
+    "customModelLabel": "Type custom model name...",
+    "cancel": "Cancel",
+    "githubTitle": "GitHub",
+    "githubConnected": "Connected",
+    "githubNotLinked": "No GitHub account linked yet. In the project's deliverables panel you can paste a Personal Access Token (repo scope) to push — it will be saved here after the first push.",
+    "failedAddKey": "Failed to add key",
+    "connectionFailed": "Connection failed",
+    "failedAddModel": "Failed to add model",
+    "inactive": "Inactive",
+    "defaultModel": "Default",
+    "setDefault": "Set as default",
+    "temperatureTokens": "temp {temperature} · {tokens} tok",
+    "toggleTheme": "Toggle theme",
+    "deactivate": "Deactivate",
+    "activate": "Activate",
+    "githubConnect": "Connect GitHub",
+    "githubDisconnect": "Disconnect"
+  },
+  "studio": {
+    "back": "Back",
+    "stage": "Stage",
+    "chatTitle": "AI Prompt Engine",
+    "chatPlaceholder": "Describe what you want...",
+    "send": "Send",
+    "stop": "Stop",
+    "codeWorkspace": "Workspace",
+    "securityPanel": "Security & Compliance",
+    "score": "Score",
+    "nistChecks": "NIST SSDF Checks",
+    "isoMapping": "ISO 27001 Mapping",
+    "recommendations": "Recommended Fixes",
+    "autoFix": "Auto-Fix",
+    "viewReport": "View Draft Report",
+    "completeStage": "Complete Stage",
+    "startStage": "Start Stage",
+    "stageComplete": "Stage completed",
+    "stageSecurityParams": "Stage Security Parameters",
+    "secureParams": "Secure parameters for this stage",
+    "downloadArtifacts": "Download artifacts",
+    "thinking": "Thinking...",
+    "shortcutHint": "Ctrl/⌘ + Enter",
+    "requestFailed": "Request failed",
+    "networkError": "Network error. Check your connection and try again.",
+    "revisionBadge": "Revision",
+    "analysisEmpty": "Describe the website you want to build. The AI will recommend a stack and define scope requirements (NIST PO.1 / PW.1 → ISO A.8.26).",
+    "designEmpty": "Ask for UI layout, architecture, threat model & Mermaid diagrams (NIST PW.1–PW.3 → ISO A.8.25–A.8.27).",
+    "codeEmpty": "Ask the AI to generate or improve secure source code and frontend pages (NIST PW.5 → ISO A.8.28).",
+    "handoverEmpty": "Review final deliverables before exporting (NIST PW.9 → ISO A.8.9/A.8.30).",
+    "stackTitle": "Recommended Stack (NIST PW.1.1 → ISO A.8.26)",
+    "architectureTitle": "Architecture",
+    "securityRequirementsTitle": "Security Requirements",
+    "noFilesHint": "No files yet. Ask the AI to generate secure source code.",
+    "suggestedFixTitle": "Suggested secure fix — ",
+    "close": "Close",
+    "noRecommendations": "No security recommendations yet.",
+    "markApplied": "Mark as applied",
+    "markNotApplied": "Mark as not applied",
+    "emptyFiller": "Select a file or run the AI to generate source code.",
+    "diagram": "Diagram",
+    "askAnalyze": "Ask the AI to analyze requirements, recommend stack, and define security scope.",
+    "askThreatModel": "Ask the AI to produce UI layout, threat model, architecture diagram & schema.",
+    "loadingEditor": "Loading editor...",
+    "finishProject": "Finish Project",
+    "structuredFailed": "The AI response contained no structured data, so nothing was saved.",
+    "reparse": "Parse last response",
+    "truncatedWarning": "The AI response was cut off by the token limit, so results may be incomplete.",
+    "threatModelTitle": "Threat Model (STRIDE)",
+    "snapshots": "Versions",
+    "files": "files",
+    "applyFix": "Apply",
+    "rejectFix": "Reject",
+    "criteriaTitle": "Stage Completion Requirements",
+    "notScored": "Not scored yet",
+    "lockHint": "Complete the previous stage first",
+    "subSteps": "Sub-steps & Deliverables",
+    "stageResults": "Stage Output Deliverables",
+    "actionSteps": "Steps to Take:",
+    "nextStage": "Next Stage:",
+    "stepLocked": "Complete the previous step first",
+    "advanceCriteria": "Requirements to advance to next stage",
+    "outputLanguage": "Website Content Language",
+    "uiDesignTitle": "UI/UX Layout & Visual Design",
+    "frontendFilesTitle": "Frontend Pages & UI Components"
+  },
+  "stages": {
+    "analysis": {
+      "name": "Analysis & Requirements",
+      "desc": "Scope the website, recommend language/stack, define security requirements & data classification.",
+      "secureParams": [
+        "scope refinement",
+        "security & privacy requirements",
+        "data classification",
+        "regulatory obligations"
+      ],
+      "steps": {
+        "scope": {
+          "label": "Project Scope & Objectives",
+          "detail": "Define website goals, target audience, and functional scope."
+        },
+        "stack": {
+          "label": "Stack Recommendation",
+          "detail": "Select language, framework, database, and hosting with security justification."
+        },
+        "security": {
+          "label": "Security & Privacy Requirements",
+          "detail": "Specify authentication, data privacy, and regulatory constraints."
+        },
+        "data": {
+          "label": "Data Classification",
+          "detail": "Classify data types handled by the application (public, sensitive, PII)."
+        },
+        "recommendations": {
+          "label": "Security Recommendations (≥3)",
+          "detail": "Provide at least 3 actionable security recommendations with step-by-step guidance."
+        }
+      }
+    },
+    "design": {
+      "name": "Design & Architecture",
+      "desc": "UI/UX layout, threat model, architecture diagram, database schema and auth flow design.",
+      "secureParams": [
+        "UI/UX layout",
+        "threat model STRIDE",
+        "trust boundaries",
+        "encryption",
+        "auth flow"
+      ],
+      "steps": {
+        "ui": {
+          "label": "UI/UX Design & Page Layout",
+          "detail": "Design page layout, wireframes, color palette, and component structure."
+        },
+        "architecture": {
+          "label": "Architecture & Data Flow",
+          "detail": "Define component architecture, trust boundaries, and system interactions."
+        },
+        "stride": {
+          "label": "STRIDE Threat Model",
+          "detail": "Identify threats, impact, likelihood, and mitigation strategies."
+        },
+        "diagram": {
+          "label": "Mermaid Architecture Diagram",
+          "detail": "Generate visual architecture and data flow diagrams."
+        },
+        "schema": {
+          "label": "Database Schema & Auth Flow",
+          "detail": "Design database models, relationships, and authentication/authorization flow."
+        },
+        "recommendations": {
+          "label": "Architecture Security Recommendations (≥3)",
+          "detail": "Provide at least 3 architecture security recommendations with actionable steps."
+        }
+      }
+    },
+    "development": {
+      "name": "Secure Development",
+      "desc": "Implement UI/frontend pages and generate secure source code with NIST PW.5 secure coding.",
+      "secureParams": [
+        "frontend implementation",
+        "parameterized queries",
+        "output encoding",
+        "password hashing",
+        "CSRF protection",
+        "secrets handling"
+      ],
+      "steps": {
+        "frontend": {
+          "label": "Frontend & UI Implementation",
+          "detail": "Generate responsive page layouts, UI components, and styling based on design."
+        },
+        "scaffold": {
+          "label": "Project Scaffolding & Config",
+          "detail": "Set up project structure, configuration, environment templates, and CI security."
+        },
+        "auth": {
+          "label": "Authentication & Authorization",
+          "detail": "Implement secure user authentication, password hashing, and session management."
+        },
+        "antiInjection": {
+          "label": "Anti-Injection & Output Encoding",
+          "detail": "Implement parameterized queries/ORM and XSS output encoding."
+        },
+        "secrets": {
+          "label": "Secrets Handling & CSRF Protection",
+          "detail": "Implement CSRF protection, environment secrets management, and safe error handling."
+        },
+        "recommendations": {
+          "label": "Secure Coding Recommendations (≥3)",
+          "detail": "Provide at least 3 secure coding recommendations with action steps."
+        }
+      }
+    },
+    "testing": {
+      "name": "Security Testing & Audit",
+      "desc": "Scan for vulnerabilities, assess security score, and auto-fix issues.",
+      "secureParams": [
+        "OWASP review",
+        "findings severity",
+        "affected file/line",
+        "concrete fix",
+        "security score"
+      ],
+      "steps": {
+        "owasp": {
+          "label": "OWASP Top 10 Review",
+          "detail": "Audit generated source code files for OWASP Top 10 security vulnerabilities."
+        },
+        "score": {
+          "label": "Security Score Assessment",
+          "detail": "Calculate security score (0–100) based on vulnerability findings and compliance."
+        },
+        "remediation": {
+          "label": "Remediation & Fix Suggestions",
+          "detail": "Generate code fixes for identified security findings for user review."
+        },
+        "recommendations": {
+          "label": "Security Audit Recommendations (≥3)",
+          "detail": "Provide at least 3 security audit recommendations with actionable steps."
+        }
+      }
+    },
+    "handover": {
+      "name": "Handover & Deliverables",
+      "desc": "Export source code to ZIP or push to GitHub with full documentation and ISO report.",
+      "secureParams": [
+        "secure defaults",
+        "deploy instructions",
+        "manual book",
+        "ISO report",
+        "release checklist"
+      ],
+      "steps": {
+        "manual": {
+          "label": "Manual Book & Documentation",
+          "detail": "Generate deployment guide, environment setup, endpoints, and page documentation."
+        },
+        "compliance": {
+          "label": "ISO 27001 Compliance Report",
+          "detail": "Generate ISO 27001 Annex A crosswalk report and NIST SSDF compliance summary."
+        },
+        "checklist": {
+          "label": "Release Security Checklist",
+          "detail": "Verify secure defaults, backup configuration, audit logging, and deployment readiness."
+        },
+        "export": {
+          "label": "Source Code Export & GitHub Push",
+          "detail": "Prepare source code bundle (ZIP) or push to connected GitHub repository."
+        },
+        "recommendations": {
+          "label": "Final Release Recommendations (≥3)",
+          "detail": "Provide at least 3 release security recommendations with actionable steps."
+        }
+      }
+    }
+  },
+  "deliverables": {
+    "title": "Final Deliverables",
+    "congrats": "Your website passed all 5 Secure SDLC stages.",
+    "pushGithub": "Push directly to your GitHub repository",
+    "repoName": "Repository name",
+    "visibility": "Visibility",
+    "commitMessage": "Commit message",
+    "push": "Push to GitHub",
+    "private": "Private",
+    "public": "Public",
+    "downloadZip": "Download ZIP",
+    "downloadManual": "Download Manual Book",
+    "downloadIso": "Download ISO 27001 Report",
+    "asPdf": "PDF",
+    "asMarkdown": "MD",
+    "githubPat": "Personal Access Token (optional)",
+    "existingRepo": "Or push to an existing repo (URL)",
+    "existingRepoHint": "Leave empty to create a new repository with the name above.",
+    "githubPatHint": "No GitHub OAuth connected? Paste a fine-grained or classic PAT with \"repo\" scope. It is encrypted before storage.",
+    "newRevision": "Start a New Revision",
+    "revisionSummary": "What should the AI improve?",
+    "startRevision": "Start Revision v1.x",
+    "revisionStarted": "Revision started",
+    "merged": "Merged",
+    "cancelled": "Cancelled",
+    "inProgressRev": "In progress",
+    "mergeRevision": "Merge revision",
+    "cancelRevision": "Cancel revision",
+    "badge": "Project status badge",
+    "badgeHint": "Paste this badge into your README to show the SecureSDLC compliance pipeline.",
+    "badgeCopied": "Badge copied!",
+    "copy": "Copy",
+    "ok": "OK",
+    "downloadsTitle": "Downloads",
+    "downloadsDesc": "Source code bundle & documentation",
+    "filesReady": "{count} files · {version} · ready for handover",
+    "errPushPat": "Push failed. Provide a Personal Access Token with repo scope, or re-authenticate with GitHub.",
+    "errPush": "Push failed.",
+    "errStartRevision": "Failed to start revision.",
+    "errUpdateRevision": "Failed to update revision.",
+    "phRepoName": "my-secure-website",
+    "phExistingRepo": "https://github.com/owner/repo",
+    "phPat": "github_pat_... or ghp_...",
+    "phCommit": "feat: initial release",
+    "phRevSummary": "e.g. Add input validation, upgrade auth to OAuth2, improve mobile layout...",
+    "badgePublic": "Show public compliance badge",
+    "badgeLocked": "Finish the project to publish the badge.",
+    "incompleteNotice": "Project in progress — {completed}/{total} stages completed. Finish all stages to unlock badge & revision."
+  }
+}

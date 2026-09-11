@@ -1,0 +1,453 @@
+{
+  "app": {
+    "name": "SecureSDLC",
+    "tagline": "Generator website aman bertenaga AI",
+    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept)."
+  },
+  "landing": {
+    "badge": "NIST SP 800-218 · ISO 27001:2022",
+    "hero1": "Hasilkan website aman",
+    "hero2": "dipandu oleh AI",
+    "intro": "mengarahkan pemrogram melalui 5 tahap siklus hidup pengembangan perangkat lunak aman. Setiap tahap menggabungkan mesin prompt AI dengan NIST SP 800-218 dan menghasilkan dokumentasi siap ISO 27001 — kode sumber, buku panduan, dan laporan kepatuhan.",
+    "featSdlcTitle": "Secure SDLC 5 Tahap",
+    "featSdlcDesc": "Analisis → Desain → Pengembangan → Pengujian → Serah Terima, setiap tahap ditegakkan oleh NIST SP 800-218.",
+    "featIsoTitle": "Crosswalk ISO 27001",
+    "featIsoDesc": "Setiap tahap dipetakan otomatis ke ISO 27001:2022 Lampiran A untuk laporan kepatuhan siap audit.",
+    "featByokTitle": "Bawa Kunci Sendiri (BYOK)",
+    "featByokDesc": "Hubungkan penyedia AI Anda sendiri (OpenAI, OpenRouter, Anthropic, Ollama). Kunci tetap terenkripsi.",
+    "featGithubTitle": "Natif GitHub",
+    "featGithubDesc": "Dorong kode selesai langsung ke repositori Anda dengan alur kerja DevSecOps CI/CD bawaan.",
+    "featPromptTitle": "Bertenaga Prompt",
+    "featPromptDesc": "Obrolkan dengan AI di setiap tahap untuk menghasilkan, meninjau, dan merevisi website Anda.",
+    "featSecureTitle": "Aman Secara Desain",
+    "featSecureDesc": "Model ancaman, pemograman aman, pemindaian kerentanan, dan perbaikan otomatis sebagai alur bawaan."
+  },
+  "nav": {
+    "dashboard": "Dasbor",
+    "projects": "Proyek",
+    "settings": "Pengaturan",
+    "newProject": "Proyek Baru",
+    "signOut": "Keluar",
+    "profile": "Profil",
+    "openMenu": "Buka menu navigasi",
+    "closeMenu": "Tutup menu navigasi"
+  },
+  "errors": {
+    "title": "Terjadi kesalahan",
+    "description": "Terjadi kesalahan tak terduga saat memuat halaman ini. Anda dapat mencoba lagi atau kembali ke dasbor.",
+    "tryAgain": "Coba lagi",
+    "backToDashboard": "Kembali ke dasbor",
+    "notFoundTitle": "Halaman tidak ditemukan",
+    "notFoundDescription": "Halaman yang Anda cari tidak ada atau mungkin sudah dipindahkan.",
+    "backHome": "Kembali ke beranda"
+  },
+  "dashboard": {
+    "title": "Dasbor Proyek",
+    "subtitle": "Buat, kelola, dan pantau kepatuhan keamanan untuk website buatan AI Anda.",
+    "newProject": "+ Proyek Baru",
+    "all": "Semua Proyek",
+    "inProgress": "Berjalan",
+    "completed": "Selesai",
+    "inRevision": "Revisi",
+    "search": "Cari proyek...",
+    "empty": "Belum ada proyek. Buat website aman pertama Anda!",
+    "securityScore": "Skor Keamanan",
+    "openStudio": "Buka Studio",
+    "revise": "Revisi",
+    "docs": "Dokumen",
+    "version": "Versi",
+    "stack": "Stack",
+    "status": "Status",
+    "name": "Nama",
+    "template": "Template",
+    "description": "Deskripsi",
+    "requirements": "Kebutuhan",
+    "uiPreferences": "Tampilan Website yang Diinginkan",
+    "contentLanguage": "Bahasa Konten Website",
+    "contentLanguageHint": "Bahasa yang digunakan untuk halaman, teks, dan dokumentasi website hasil.",
+    "phName": "Website Aman Saya",
+    "phDescription": "Deskripsi singkat mengenai website...",
+    "phRequirements": "Jelaskan fungsi website, target pengguna, data yang dikelola, integrasi...",
+    "phUiPreferences": "Jelaskan tata letak yang diinginkan, palet warna, halaman wajib (beranda, login, dasbor, dll), gaya visual, referensi situs...",
+    "templateCustom": "Kustom",
+    "templateEcommerce": "Toko Online / E-Commerce",
+    "templateSaas": "Dasbor SaaS",
+    "templateRestApi": "Backend REST API",
+    "templateLms": "Portal Pembelajaran / LMS",
+    "failedCreateProject": "Gagal membuat proyek.",
+    "statusCompleted": "Selesai",
+    "statusInRevision": "Dalam Revisi",
+    "statusInProgress": "Berjalan",
+    "statusDraft": "Draf",
+    "stageLabel": "Tahap",
+    "revisionSummary": "Revisi iteratif {name}",
+    "templateEcommerceDesc": "Toko online dengan katalog produk, keranjang, checkout, dan manajemen pesanan.",
+    "templateEcommerceReq": "Katalog produk publik, akun pelanggan, keranjang + checkout pembayaran, manajemen pesanan admin, riwayat pesanan, penanganan data pembayaran (kesadaran PCI), perlindungan CSRF dan injeksi.",
+    "templateSaasDesc": "Dasbor SaaS multi-tenant dengan penagihan dan akses berbasis peran.",
+    "templateSaasReq": "Isolasi tenant, peran pengguna (admin/anggota), dasbor dengan metrik, berlangganan, endpoint API dengan pembatasan laju, pencatatan audit tindakan sensitif.",
+    "templateRestApiDesc": "Backend REST API dengan autentikasi, pembatasan laju, dan akses data aman.",
+    "templateRestApiReq": "Autentikasi JWT atau OAuth2, kontrol akses berbasis peran, validasi input, pembatasan laju, respons error terstruktur, akses data aman SQLi/XSS, dokumentasi API.",
+    "templateLmsDesc": "Portal belajar dengan kursus, pelajaran, pendaftaran, dan pelacakan kemajuan.",
+    "templateLmsReq": "Peran instruktur dan pelajar, manajemen kursus & pelajaran, alur pendaftaran, pelacakan kemajuan, unggah file dengan validasi tipe/ukuran, perlindungan PII untuk data pelajar.",
+    "languages": {
+      "en": "English",
+      "id": "Bahasa Indonesia"
+    }
+  },
+  "auth": {
+    "signInTitle": "Selamat datang kembali",
+    "signInSubtitle": "Masuk untuk mulai membuat website aman dengan AI.",
+    "signInWithGithub": "Lanjutkan dengan GitHub",
+    "signInWithDev": "Masuk dengan Akun Dev (lokal)",
+    "devModeNote": "OAuth GitHub tidak dikonfigurasi. Gunakan akun dev untuk menjelajah, lalu hubungkan token GitHub Anda di panel deliverables.",
+    "signOut": "Keluar",
+    "byokTitle": "Bawa Kunci AI Sendiri",
+    "byokSubtitle": "Anda memegang kendali penuh. Hubungkan kunci penyedia AI Anda — kami hanya menyediakan alat & orkestrasi.",
+    "featEncryption": "Enkripsi AES-256-GCM",
+    "featEngine": "Mesin NIST SSDF 5 tahap",
+    "featPush": "Push repositori langsung",
+    "user": "Pengguna",
+    "errorDefault": "Gagal masuk. Coba lagi.",
+    "errorAccessDenied": "Akses ditolak atau sesi berakhir.",
+    "errorOAuth": "Gagal masuk dengan GitHub. Coba lagi.",
+    "registerTitle": "Buat akun baru",
+    "registerSubtitle": "Mulai dengan SecureSDLC dalam hitungan menit.",
+    "noAccount": "Belum punya akun?",
+    "createAccount": "Daftar"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "aiModels": "Model AI & Kunci API",
+    "aiModelsCard": "Model AI",
+    "aiModelsSubtitle": "Bawa Kunci Sendiri (BYOK). Kunci Anda dienkripsi dengan AES-256-GCM dan tidak pernah dikirim ke browser.",
+    "addKey": "Tambah Kunci API",
+    "provider": "Penyedia",
+    "modelName": "Nama Model",
+    "temperature": "Temperatur",
+    "maxTokens": "Maksimal token",
+    "testConnection": "Uji koneksi",
+    "connected": "Terhubung",
+    "testFailed": "Koneksi gagal",
+    "tokenUsage": "Penggunaan token",
+    "promptTokens": "Token prompt",
+    "completionTokens": "Token komplesi",
+    "usageByDay": "Token per hari",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "language": "Bahasa Antarmuka Aplikasi",
+    "outputLanguage": "Bahasa Output AI & Dokumentasi",
+    "projectAdded": "Proyek berhasil dibuat",
+    "noModels": "Belum ada model AI. Tambahkan satu untuk menggunakan studio.",
+    "apiKey": "Kunci API",
+    "noApiKeys": "Belum ada kunci API.",
+    "phApiKey": "sk-...",
+    "phKeyLabel": "kunci-openai-saya",
+    "phModelName": "gpt-4o-mini, deepseek-v3, llama3...",
+    "fetchingModels": "Mengambil daftar model...",
+    "fetchModelsFailed": "Gagal mengambil daftar model",
+    "selectModel": "Pilih model",
+    "customModelLabel": "Ketik nama model custom...",
+    "cancel": "Batal",
+    "githubTitle": "GitHub",
+    "githubConnected": "Terhubung",
+    "githubNotLinked": "Belum ada akun GitHub terhubung. Di panel deliverables Anda dapat menempelkan Personal Access Token (scope repo) untuk melakukan push — ini akan disimpan setelah push pertama.",
+    "failedAddKey": "Gagal menambahkan kunci",
+    "connectionFailed": "Koneksi gagal",
+    "failedAddModel": "Gagal menambahkan model",
+    "inactive": "Nonaktif",
+    "defaultModel": "Default",
+    "setDefault": "Jadikan default",
+    "temperatureTokens": "temp {temperature} · {tokens} tok",
+    "toggleTheme": "Ganti tema",
+    "deactivate": "Nonaktifkan",
+    "activate": "Aktifkan",
+    "githubConnect": "Hubungkan GitHub",
+    "githubDisconnect": "Putuskan"
+  },
+  "studio": {
+    "back": "Kembali",
+    "stage": "Tahap",
+    "chatTitle": "Mesin Prompt AI",
+    "chatPlaceholder": "Jelaskan apa yang ingin dibuat...",
+    "send": "Kirim",
+    "stop": "Hentikan",
+    "codeWorkspace": "Ruang Kerja Kode",
+    "securityPanel": "Keamanan & Kepatuhan",
+    "score": "Skor",
+    "nistChecks": "Cek NIST SSDF",
+    "isoMapping": "Pemetaan ISO 27001",
+    "recommendations": "Rekomendasi Perbaikan",
+    "autoFix": "Auto-Fix",
+    "viewReport": "Lihat Draf Laporan",
+    "completeStage": "Selesaikan Tahap",
+    "startStage": "Mulai Tahap",
+    "stageComplete": "Tahap selesai",
+    "stageSecurityParams": "Parameter Keamanan Tahap",
+    "secureParams": "Parameter aman untuk tahap ini",
+    "downloadArtifacts": "Unduh hasil",
+    "thinking": "Berpikir...",
+    "shortcutHint": "Ctrl/⌘ + Enter",
+    "requestFailed": "Permintaan gagal",
+    "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
+    "revisionBadge": "Revisi",
+    "analysisEmpty": "Jelaskan website yang ingin dibuat. AI akan merekomendasikan stack dan menetapkan kebutuhan (NIST PO.1 / PW.1 → ISO A.8.26).",
+    "designEmpty": "Minta tata letak UI, arsitektur, threat model & diagram Mermaid (NIST PW.1–PW.3 → ISO A.8.25–A.8.27).",
+    "codeEmpty": "Minta AI menghasilkan atau memperbarui kode sumber aman dan halaman frontend (NIST PW.5 → ISO A.8.28).",
+    "handoverEmpty": "Tinjau hasil akhir sebelum diekspor (NIST PW.9 → ISO A.8.9/A.8.30).",
+    "stackTitle": "Rekomendasi Stack (NIST PW.1.1 → ISO A.8.26)",
+    "architectureTitle": "Arsitektur",
+    "securityRequirementsTitle": "Kebutuhan Keamanan",
+    "noFilesHint": "Belum ada file. Minta AI menghasilkan kode sumber aman.",
+    "suggestedFixTitle": "Usulan perbaikan aman — ",
+    "close": "Tutup",
+    "noRecommendations": "Belum ada rekomendasi keamanan.",
+    "markApplied": "Tandai sudah diterapkan",
+    "markNotApplied": "Tandai belum diterapkan",
+    "emptyFiller": "Pilih file atau jalankan AI untuk menghasilkan kode.",
+    "diagram": "Diagram",
+    "askAnalyze": "Minta AI menganalisis kebutuhan, merekomendasikan stack, dan menentukan ruang lingkup keamanan.",
+    "askThreatModel": "Minta AI menghasilkan tata letak UI, threat model, diagram arsitektur & skema.",
+    "loadingEditor": "Memuat editor...",
+    "finishProject": "Selesaikan Proyek",
+    "structuredFailed": "Respons AI tidak memuat data terstruktur, tidak ada yang disimpan.",
+    "reparse": "Parse ulang respons terakhir",
+    "truncatedWarning": "Respons AI terpotong oleh batas token, hasil mungkin tidak lengkap.",
+    "threatModelTitle": "Threat Model (STRIDE)",
+    "snapshots": "Versi",
+    "files": "file",
+    "applyFix": "Terapkan",
+    "rejectFix": "Tolak",
+    "criteriaTitle": "Syarat Lanjut ke Tahap Berikutnya",
+    "notScored": "Belum dinilai",
+    "lockHint": "Selesaikan tahap sebelumnya terlebih dahulu",
+    "subSteps": "Sub-langkah & Syarat Selesai",
+    "stageResults": "Hasil Deliverable Tahap Ini",
+    "actionSteps": "Langkah Aksi yang Harus Dilakukan:",
+    "nextStage": "Tahap Berikutnya:",
+    "stepLocked": "Selesaikan sub-langkah sebelumnya terlebih dahulu",
+    "advanceCriteria": "Syarat lanjut ke tahap berikutnya",
+    "outputLanguage": "Bahasa Konten Website",
+    "uiDesignTitle": "Desain Tampilan & Tata Letak UI/UX",
+    "frontendFilesTitle": "Halaman Frontend & Komponen UI"
+  },
+  "stages": {
+    "analysis": {
+      "name": "Analisis & Kebutuhan",
+      "desc": "Tentukan ruang lingkup website, rekomendasikan bahasa/stack, serta tetapkan kebutuhan keamanan & klasifikasi data.",
+      "secureParams": [
+        "penajaman ruang lingkup",
+        "kebutuhan keamanan & privasi",
+        "klasifikasi data",
+        "obligasi regulasi"
+      ],
+      "steps": {
+        "scope": {
+          "label": "Ruang Lingkup & Tujuan Proyek",
+          "detail": "Tentukan tujuan website, target pengguna, dan cakupan fungsional."
+        },
+        "stack": {
+          "label": "Rekomendasi Stack Teknologi",
+          "detail": "Pilih bahasa, framework, database, dan hosting beserta justifikasi keamanannya."
+        },
+        "security": {
+          "label": "Kebutuhan Keamanan & Privasi",
+          "detail": "Tetapkan autentikasi, privasi data, dan batasan regulasi."
+        },
+        "data": {
+          "label": "Klasifikasi Data",
+          "detail": "Klasifikasikan tipe data yang dikelola aplikasi (publik, sensitif, PII)."
+        },
+        "recommendations": {
+          "label": "Rekomendasi Keamanan (≥3)",
+          "detail": "Berikan minimal 3 rekomendasi keamanan konkret beserta langkah aksinya."
+        }
+      }
+    },
+    "design": {
+      "name": "Desain & Arsitektur",
+      "desc": "Desain tata letak UI/UX, threat model, diagram arsitektur, skema database dan alur autentikasi.",
+      "secureParams": [
+        "tata letak UI/UX",
+        "threat model STRIDE",
+        "batas kepercayaan",
+        "enkripsi",
+        "alur autentikasi"
+      ],
+      "steps": {
+        "ui": {
+          "label": "Desain Tampilan & Tata Letak UI/UX",
+          "detail": "Desain tata letak halaman, wireframe, palet warna, dan struktur komponen."
+        },
+        "architecture": {
+          "label": "Arsitektur & Alur Data",
+          "detail": "Tetapkan arsitektur komponen, batas kepercayaan, dan interaksi sistem."
+        },
+        "stride": {
+          "label": "Threat Model STRIDE",
+          "detail": "Identifikasi ancaman, dampak, kemungkinan, dan strategi mitigasinya."
+        },
+        "diagram": {
+          "label": "Diagram Arsitektur Mermaid",
+          "detail": "Hasilkan diagram arsitektur visual dan alur data."
+        },
+        "schema": {
+          "label": "Skema Database & Alur Auth",
+          "detail": "Desain model database, relasi, dan alur autentikasi/otorisasi."
+        },
+        "recommendations": {
+          "label": "Rekomendasi Keamanan Desain (≥3)",
+          "detail": "Berikan minimal 3 rekomendasi keamanan arsitektur beserta langkah aksinya."
+        }
+      }
+    },
+    "development": {
+      "name": "Pengembangan Aman",
+      "desc": "Implementasikan halaman UI/frontend dan hasilkan kode sumber aman dengan pemrograman aman NIST PW.5.",
+      "secureParams": [
+        "implementasi frontend",
+        "parameterized queries",
+        "output encoding",
+        "hashing password",
+        "proteksi CSRF",
+        "penanganan rahasia"
+      ],
+      "steps": {
+        "frontend": {
+          "label": "Implementasi Frontend & Tampilan UI",
+          "detail": "Hasilkan tata letak halaman responsif, komponen UI, dan styling berdasarkan desain."
+        },
+        "scaffold": {
+          "label": "Scaffold Proyek & Konfigurasi",
+          "detail": "Siapkan struktur proyek, konfigurasi, template lingkungan, dan keamanan CI."
+        },
+        "auth": {
+          "label": "Autentikasi & Otorisasi Aman",
+          "detail": "Implementasikan autentikasi pengguna aman, hashing password, dan manajemen sesi."
+        },
+        "antiInjection": {
+          "label": "Anti-Injeksi & Output Encoding",
+          "detail": "Implementasikan parameterized queries/ORM dan output encoding XSS."
+        },
+        "secrets": {
+          "label": "Penanganan Rahasia & Proteksi CSRF",
+          "detail": "Implementasikan proteksi CSRF, manajemen rahasia lingkungan, dan penanganan error aman."
+        },
+        "recommendations": {
+          "label": "Rekomendasi Pemrograman Aman (≥3)",
+          "detail": "Berikan minimal 3 rekomendasi pemrograman aman beserta langkah aksinya."
+        }
+      }
+    },
+    "testing": {
+      "name": "Pengujian & Audit Keamanan",
+      "desc": "Pindai kerentanan, nilai skor keamanan, dan perbaiki masalah secara otomatis.",
+      "secureParams": [
+        "review OWASP",
+        "severitas temuan",
+        "file/baris terdampak",
+        "perbaikan konkret",
+        "skor keamanan"
+      ],
+      "steps": {
+        "owasp": {
+          "label": "Review OWASP Top 10",
+          "detail": "Audit file kode sumber buatan AI terhadap kerentanan keamanan OWASP Top 10."
+        },
+        "score": {
+          "label": "Penilaian Skor Keamanan",
+          "detail": "Hitung skor keamanan (0–100) berdasarkan temuan kerentanan dan kepatuhan."
+        },
+        "remediation": {
+          "label": "Remediasi & Saran Perbaikan",
+          "detail": "Hasilkan perbaikan kode untuk temuan keamanan yang teridentifikasi untuk ditinjau pengguna."
+        },
+        "recommendations": {
+          "label": "Rekomendasi Audit Keamanan (≥3)",
+          "detail": "Berikan minimal 3 rekomendasi audit keamanan beserta langkah aksinya."
+        }
+      }
+    },
+    "handover": {
+      "name": "Serah Terima & Hasil Akhir",
+      "desc": "Ekspor kode sumber ke ZIP atau dorong ke GitHub beserta dokumentasi lengkap dan laporan ISO.",
+      "secureParams": [
+        "default aman",
+        "petunjuk deploy",
+        "buku panduan",
+        "laporan ISO",
+        "checklist rilis"
+      ],
+      "steps": {
+        "manual": {
+          "label": "Buku Panduan & Dokumentasi",
+          "detail": "Hasilkan panduan deployment, pengaturan lingkungan, endpoint, dan dokumentasi halaman."
+        },
+        "compliance": {
+          "label": "Laporan Kepatuhan ISO 27001",
+          "detail": "Hasilkan laporan crosswalk ISO 27001 Lampiran A dan ringkasan kepatuhan NIST SSDF."
+        },
+        "checklist": {
+          "label": "Checklist Keamanan Rilis",
+          "detail": "Verifikasi default aman, konfigurasi cadangan, pencatatan audit, dan kesiapan deploy."
+        },
+        "export": {
+          "label": "Ekspor Kode Sumber & Push GitHub",
+          "detail": "Siapkan paket kode sumber (ZIP) atau dorong ke repositori GitHub terhubung."
+        },
+        "recommendations": {
+          "label": "Rekomendasi Rilis Akhir (≥3)",
+          "detail": "Berikan minimal 3 rekomendasi keamanan rilis beserta langkah aksinya."
+        }
+      }
+    }
+  },
+  "deliverables": {
+    "title": "Hasil Akhir Proyek",
+    "congrats": "Website Anda telah lolos kelima tahap Secure SDLC.",
+    "pushGithub": "Dorong langsung ke repositori GitHub Anda",
+    "repoName": "Nama repositori",
+    "visibility": "Visibilitas",
+    "commitMessage": "Pesan komit",
+    "push": "Push ke GitHub",
+    "private": "Pribadi",
+    "public": "Publik",
+    "downloadZip": "Unduh ZIP",
+    "downloadManual": "Unduh Buku Panduan",
+    "downloadIso": "Unduh Laporan ISO 27001",
+    "asPdf": "PDF",
+    "asMarkdown": "MD",
+    "githubPat": "Personal Access Token (opsional)",
+    "existingRepo": "Atau push ke repositori yang sudah ada (URL)",
+    "existingRepoHint": "Biarkan kosong untuk membuat repositori baru dengan nama di atas.",
+    "githubPatHint": "Belum terhubung OAuth GitHub? Tempelkan PAT fine-grained atau classic dengan scope \"repo\". PAT dienkripsi sebelum disimpan.",
+    "newRevision": "Mulai Revisi Baru",
+    "revisionSummary": "Apa yang perlu ditingkatkan oleh AI?",
+    "startRevision": "Mulai Revisi v1.x",
+    "revisionStarted": "Revisi dimulai",
+    "merged": "Digabung",
+    "cancelled": "Dibatalkan",
+    "inProgressRev": "Berjalan",
+    "mergeRevision": "Gabungkan revisi",
+    "cancelRevision": "Batalkan revisi",
+    "badge": "Lencana status proyek",
+    "badgeHint": "Tempelkan lencana ini ke README Anda untuk menampilkan pipa kepatuhan SecureSDLC.",
+    "badgeCopied": "Lencana tersalin!",
+    "copy": "Salin",
+    "ok": "OK",
+    "downloadsTitle": "Unduhan",
+    "downloadsDesc": "Paket kode sumber & dokumentasi",
+    "filesReady": "{count} file · {version} · siap serah terima",
+    "errPushPat": "Push gagal. Sediakan Personal Access Token dengan scope repo, atau autentikasi ulang dengan GitHub.",
+    "errPush": "Push gagal.",
+    "errStartRevision": "Gagal memulai revisi.",
+    "errUpdateRevision": "Gagal memperbarui revisi.",
+    "phRepoName": "website-aman-saya",
+    "phExistingRepo": "https://github.com/pemilik/repo",
+    "phPat": "github_pat_... atau ghp_...",
+    "phCommit": "feat: rilis awal",
+    "phRevSummary": "misal: Tambah validasi input, tingkatkan auth ke OAuth2, perbaiki tata letak seluler...",
+    "badgePublic": "Tampilkan lencana kepatuhan publik",
+    "badgeLocked": "Selesaikan proyek untuk mempublikasikan lencana.",
+    "incompleteNotice": "Proyek berjalan — {completed}/{total} tahap selesai. Selesaikan semua tahap untuk membuka lencana & revisi."
+  }
+}

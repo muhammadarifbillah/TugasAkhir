@@ -1,0 +1,395 @@
+// ─────────────────────────────────────────────────────────────
+// SECURE-SDLC AI WEBSITE GENERATOR — Prisma Schema (PostgreSQL)
+// NIST SP 800-218 engine + ISO 27001:2022 crosswalk
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ── Enums ────────────────────────────────────────────────────
+
+enum ProjectStatus {
+  draft
+  in_progress
+  completed
+  in_revision
+}
+
+enum StageStatus {
+  not_started
+  active
+  review
+  completed
+  skipped
+}
+
+enum RevisionStatus {
+  in_progress
+  merged
+  cancelled
+}
+
+enum MessageRole {
+  user
+  assistant
+  system
+}
+
+enum RecommendationCategory {
+  stack
+  architecture
+  secure_coding
+  vulnerability
+  compliance
+}
+
+enum Severity {
+  low
+  medium
+  high
+  critical
+}
+
+enum DeliverableType {
+  source_code_zip
+  github_repo
+  manual_book_pdf
+  manual_book_md
+  iso_compliance_pdf
+  iso_compliance_md
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  ADD_API_KEY
+  REMOVE_API_KEY
+  TEST_CONNECTION
+  CREATE_PROJECT
+  UPDATE_PROJECT
+  START_STAGE
+  COMPLETE_STAGE
+  START_REVISION
+  PUSH_GITHUB
+  GENERATE_DELIVERABLE
+  ADD_MODEL
+  UPDATE_MODEL
+  REMOVE_MODEL
+  SET_DEFAULT_MODEL
+}
+
+// ── Identity & BYOK ──────────────────────────────────────────
+
+model User {
+  id                         String    @id @default(cuid())
+  email                      String?   @unique
+  username                   String?
+  name                       String?
+  image                      String?
+  emailVerified              DateTime?
+  passwordHash               String?   // bcrypt hashed password (email/password auth)
+
+  githubId                   String?   @unique
+  githubUsername             String?
+  githubAvatarUrl            String?
+  githubAccessTokenEncrypted Bytes? // AES-256-GCM encrypted GitHub OAuth token
+
+  preferredLanguage          String    @default("en")
+  role                       String    @default("developer")
+
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+
+  accounts                   Account[]
+  sessions                   Session[]
+  apiKeys                    UserApiKey[]
+  models                     UserModel[]
+  projects                   Project[]
+  chats                      Chat[]
+  auditLogs                  AuditLog[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model ModelProvider {
+  code          String        @id // 'openai' | 'openrouter' | 'anthropic' | 'ollama' | 'gemini'
+  name          String
+  baseUrl       String?
+  requiresKey   Boolean       @default(true)
+  defaultModel  String? // default model id used by "test connection"
+
+  apiKeys       UserApiKey[]
+  models        UserModel[]
+
+  @@map("model_providers")
+}
+
+model UserApiKey {
+  id           String        @id @default(cuid())
+  userId       String
+  providerCode String
+  keyEncrypted Bytes         // AES-256-GCM encrypted API key
+  keyMasked    String // e.g. "sk-proj-...a8f1"
+  label        String?
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     ModelProvider @relation(fields: [providerCode], references: [code])
+  models       UserModel[]
+
+  @@map("user_api_keys")
+}
+
+model UserModel {
+  id           String       @id @default(cuid())
+  userId       String
+  apiKeyId     String?
+  providerCode String
+  modelName    String // 'gpt-4o', 'deepseek-v3', 'llama3', dst.
+  temperature  Float        @default(0.7)
+  maxTokens    Int          @default(8192)
+  isDefault    Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKey       UserApiKey?  @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  provider     ModelProvider @relation(fields: [providerCode], references: [code])
+
+  @@map("user_models")
+}
+
+// ── Master reference: NIST SSDF & ISO 27001 crosswalk ────────
+
+model NistSsdfControl {
+  id             Int    @id @default(autoincrement())
+  groupCode      String // 'PO' | 'PS' | 'PW' | 'RV'
+  taskCode       String @unique // 'PW.5.1', 'PW.1.1', dst.
+  title          String
+  description    String
+  iso27001Mapping Json // e.g. ["A.8.28", "A.8.26"]
+
+  recommendations AiRecommendation[]
+
+  @@map("nist_ssdf_controls")
+}
+
+model Stage {
+  id                  Int            @id @default(autoincrement())
+  code                String         @unique // 'analysis' | 'design' | 'development' | 'testing' | 'handover'
+  name                String
+  description         String?
+  orderIndex          Int            @unique
+  nistGroups          String[]       // NIST SSDF groups emphasized in this stage, e.g. ["PO","PW"]
+  systemPromptTemplate String
+
+  projectStages       ProjectStage[]
+
+  @@map("stages")
+}
+
+// ── Projects & stages ────────────────────────────────────────
+
+model Project {
+  id                String        @id @default(cuid())
+  userId            String
+  name              String
+  description       String?
+  status            ProjectStatus @default(in_progress)
+  currentStageIndex Int           @default(0)
+  currentVersion    String        @default("v1.0")
+  outputLanguage    String        @default("en") // language of AI output & docs
+  template          String? // 'e-commerce' | 'saas' | 'rest-api' | 'lms' | 'custom'
+  scopeRequirements String?
+  uiPreferences     String? // desired website visual look, colors, pages, references
+  badgePublic       Boolean       @default(false) // user opt-in for the public badge
+  languagePlan      Json? // recommended stack + final user decision
+  globalSpec        Json? // accumulated cross-stage context
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectStages     ProjectStage[]
+  revisions         ProjectRevision[]
+  deliverables      Deliverable[]
+
+  @@map("projects")
+}
+
+model ProjectStage {
+  id                   String    @id @default(cuid())
+  projectId            String
+  stageId              Int
+  status               StageStatus @default(not_started)
+  startedAt            DateTime?
+  completedAt          DateTime?
+  completionPercentage Int       @default(0)
+
+  project         Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  stage           Stage            @relation(fields: [stageId], references: [id])
+  chats           Chat[]
+  recommendations AiRecommendation[]
+  snapshots       WebsiteSnapshot[]
+
+  @@unique([projectId, stageId])
+  @@map("project_stages")
+}
+
+model ProjectRevision {
+  id              String         @id @default(cuid())
+  projectId       String
+  version         String         // 'v1.1', 'v1.2', dst.
+  revisionSummary String
+  targetStageKey  String? // stage.code that this revision touches
+  githubBranch    String?
+  githubPrUrl     String?
+  status          RevisionStatus @default(in_progress)
+  createdAt       DateTime       @default(now())
+  completedAt     DateTime?
+
+  project         Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  snapshots       WebsiteSnapshot[]
+
+  @@map("project_revisions")
+}
+
+// ── Chat, AI recommendations, snapshots ──────────────────────
+
+model Chat {
+  id             String   @id @default(cuid())
+  projectStageId String
+  userId         String
+  title          String?
+  createdAt      DateTime @default(now())
+
+  projectStage ProjectStage @relation(fields: [projectStageId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     Message[]
+
+  @@map("chats")
+}
+
+model Message {
+  id         String      @id @default(cuid())
+  chatId     String
+  role       MessageRole
+  content    String
+  promptMeta Json?
+  createdAt  DateTime    @default(now())
+
+  chat            Chat               @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  recommendations AiRecommendation[]
+
+  @@map("messages")
+}
+
+model AiRecommendation {
+  id              String                @id @default(cuid())
+  projectStageId  String
+  originMessageId String?
+  category        RecommendationCategory
+  severity        Severity              @default(medium)
+  nistControlId   Int?
+  title           String
+  content         String
+  suggestedCode   String?
+  filePath        String? // source file the suggested fix applies to
+  isApplied       Boolean               @default(false)
+  createdAt       DateTime              @default(now())
+
+  projectStage ProjectStage     @relation(fields: [projectStageId], references: [id], onDelete: Cascade)
+  message      Message?         @relation(fields: [originMessageId], references: [id], onDelete: SetNull)
+  nistControl  NistSsdfControl? @relation(fields: [nistControlId], references: [id])
+
+  @@map("ai_recommendations")
+}
+
+model WebsiteSnapshot {
+  id             String   @id @default(cuid())
+  projectStageId String
+  revisionId     String?
+  version        String   @default("v1.0")
+  pageTree       Json?
+  codeArtifacts  Json // Map<filePath, content> of generated website
+  diffSummary    String?
+  createdAt      DateTime @default(now())
+
+  projectStage ProjectStage     @relation(fields: [projectStageId], references: [id], onDelete: Cascade)
+  revision     ProjectRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
+
+  @@map("website_snapshots")
+}
+
+model Deliverable {
+  id            String         @id @default(cuid())
+  projectId     String
+  type          DeliverableType
+  title         String
+  filePath      String?
+  githubRepoUrl String?
+  version       String         @default("v1.0")
+  createdAt     DateTime       @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("deliverables")
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  userId    String?
+  action    AuditAction
+  ipAddress String?
+  details   Json?
+  createdAt DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
