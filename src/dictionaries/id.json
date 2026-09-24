@@ -1,8 +1,37 @@
 {
+  "a11y": {
+    "skipToContent": "Lewati ke konten",
+    "title": "Aksesibilitas",
+    "fontSize": "Ukuran font",
+    "contrast": "Kontras",
+    "contrastHigh": "Tinggi",
+    "contrastNormal": "Normal"
+  },
+  "audit": {
+    "title": "Log audit",
+    "subtitle": "Aktivitas terkait keamanan terbaru pada akun Anda.",
+    "recent": "Aktivitas terbaru",
+    "action": "Aksi",
+    "details": "Detail",
+    "ip": "Alamat IP",
+    "time": "Waktu",
+    "empty": "Belum ada aktivitas tercatat.",
+    "back": "Kembali ke pengaturan"
+  },
+  "databases": {
+    "title": "Database",
+    "subtitle": "Database persisten yang dibuat untuk proyek yang sudah fix.",
+    "provisioned": "Database tersedia",
+    "empty": "Belum ada database dibuat.",
+    "delete": "Hapus",
+    "deleteFailed": "Gagal menghapus database.",
+    "back": "Kembali ke pengaturan"
+  },
   "app": {
-    "name": "SecureSDLC",
+    "name": "ShieldForge",
     "tagline": "Generator website aman bertenaga AI",
-    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept)."
+    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept).",
+    "offline": "Anda sedang offline. Beberapa fitur mungkin tidak berfungsi."
   },
   "landing": {
     "badge": "NIST SP 800-218 · ISO 27001:2022",
@@ -20,7 +49,49 @@
     "featPromptTitle": "Bertenaga Prompt",
     "featPromptDesc": "Obrolkan dengan AI di setiap tahap untuk menghasilkan, meninjau, dan merevisi website Anda.",
     "featSecureTitle": "Aman Secara Desain",
-    "featSecureDesc": "Model ancaman, pemograman aman, pemindaian kerentanan, dan perbaikan otomatis sebagai alur bawaan."
+    "featSecureDesc": "Model ancaman, pemograman aman, pemindaian kerentanan, dan perbaikan otomatis sebagai alur bawaan.",
+    "howTitle": "Cara kerjanya",
+    "howSubtitle": "Lima tahap yang ditegakkan, dari ide sampai siap audit.",
+    "steps": [
+      {
+        "title": "Analisis & Kebutuhan",
+        "desc": "Tentukan lingkup, rekomendasikan stack, definisikan kebutuhan keamanan."
+      },
+      {
+        "title": "Desain & Arsitektur",
+        "desc": "Threat model, diagram arsitektur, skema database, dan alur autentikasi."
+      },
+      {
+        "title": "Pengembangan Aman",
+        "desc": "Hasilkan kode sumber aman dengan secure coding NIST PW.5."
+      },
+      {
+        "title": "Pengujian & Audit Keamanan",
+        "desc": "Pindai kerentanan, nilai risiko, dan perbaiki otomatis."
+      },
+      {
+        "title": "Serah Terima & Deliverables",
+        "desc": "Manual book, laporan ISO 27001, ekspor ZIP, dan push GitHub."
+      }
+    ],
+    "stats": [
+      {
+        "value": "5",
+        "label": "Tahap SDLC"
+      },
+      {
+        "value": "NIST + ISO",
+        "label": "Kerangka kerja"
+      },
+      {
+        "value": "BYOK",
+        "label": "Provider AI apa pun"
+      },
+      {
+        "value": "Docker",
+        "label": "Jalankan & pratinjau"
+      }
+    ]
   },
   "nav": {
     "dashboard": "Dasbor",
@@ -51,6 +122,11 @@
     "inRevision": "Revisi",
     "search": "Cari proyek...",
     "empty": "Belum ada proyek. Buat website aman pertama Anda!",
+    "noMatches": "Tidak ada proyek yang cocok dengan pencarian atau filter Anda.",
+    "onboardingTitle": "Mulai",
+    "onboardingStep1": "Buat proyek dan jelaskan website yang Anda inginkan.",
+    "onboardingStep2": "Jalankan lima tahap Secure SDLC dengan mesin AI.",
+    "onboardingStep3": "Pratinjau, jalankan, buat database, lalu ekspor atau push.",
     "securityScore": "Skor Keamanan",
     "openStudio": "Buka Studio",
     "revise": "Revisi",
@@ -111,9 +187,28 @@
     "errorAccessDenied": "Akses ditolak atau sesi berakhir.",
     "errorOAuth": "Gagal masuk dengan GitHub. Coba lagi.",
     "registerTitle": "Buat akun baru",
-    "registerSubtitle": "Mulai dengan SecureSDLC dalam hitungan menit.",
+    "registerSubtitle": "Mulai dengan ShieldForge dalam hitungan menit.",
     "noAccount": "Belum punya akun?",
-    "createAccount": "Daftar"
+    "createAccount": "Daftar",
+    "emailLabel": "Email",
+    "emailPlaceholder": "anda@contoh.com",
+    "passwordLabel": "Kata Sandi",
+    "passwordPlaceholder": "Minimal 8 karakter",
+    "signInWithEmail": "Masuk dengan Email",
+    "invalidCredentials": "Email atau kata sandi salah.",
+    "nameLabel": "Nama Lengkap",
+    "namePlaceholder": "Nama Anda",
+    "confirmPasswordLabel": "Konfirmasi kata sandi",
+    "confirmPasswordPlaceholder": "Ulangi kata sandi Anda",
+    "createAccountButton": "Buat akun",
+    "creatingAccount": "Membuat akun...",
+    "passwordsDoNotMatch": "Kata sandi tidak cocok.",
+    "passwordTooShort": "Kata sandi minimal 8 karakter.",
+    "registerSuccess": "Akun berhasil dibuat! Mengalihkan ke halaman masuk...",
+    "registerFailed": "Pendaftaran gagal. Coba lagi.",
+    "unexpectedError": "Terjadi kesalahan. Silakan coba lagi.",
+    "haveAccount": "Sudah punya akun?",
+    "signInLink": "Masuk"
   },
   "settings": {
     "title": "Pengaturan",
@@ -121,6 +216,7 @@
     "aiModelsCard": "Model AI",
     "aiModelsSubtitle": "Bawa Kunci Sendiri (BYOK). Kunci Anda dienkripsi dengan AES-256-GCM dan tidak pernah dikirim ke browser.",
     "addKey": "Tambah Kunci API",
+    "addModel": "Tambah model",
     "provider": "Penyedia",
     "modelName": "Nama Model",
     "temperature": "Temperatur",
@@ -139,12 +235,14 @@
     "projectAdded": "Proyek berhasil dibuat",
     "noModels": "Belum ada model AI. Tambahkan satu untuk menggunakan studio.",
     "apiKey": "Kunci API",
+    "keyLabel": "Label (opsional)",
     "noApiKeys": "Belum ada kunci API.",
     "phApiKey": "sk-...",
     "phKeyLabel": "kunci-openai-saya",
     "phModelName": "gpt-4o-mini, deepseek-v3, llama3...",
     "fetchingModels": "Mengambil daftar model...",
     "fetchModelsFailed": "Gagal mengambil daftar model",
+    "fetchModelsFallback": "Daftar model live tidak tersedia (provider tidak terjangkau). Menampilkan daftar usulan — Anda juga bisa mengetik nama model sendiri.",
     "selectModel": "Pilih model",
     "customModelLabel": "Ketik nama model custom...",
     "cancel": "Batal",
@@ -191,7 +289,17 @@
     "networkError": "Kesalahan jaringan. Periksa koneksi Anda dan coba lagi.",
     "revisionBadge": "Revisi",
     "analysisEmpty": "Jelaskan website yang ingin dibuat. AI akan merekomendasikan stack dan menetapkan kebutuhan (NIST PO.1 / PW.1 → ISO A.8.26).",
-    "designEmpty": "Minta tata letak UI, arsitektur, threat model & diagram Mermaid (NIST PW.1–PW.3 → ISO A.8.25–A.8.27).",
+    "designEmpty": "Belum ada layar. Jelaskan layar lalu klik Generate.",
+    "designStudioOpen": "Studio Desain",
+    "designStudioTitle": "Studio Desain",
+    "designPromptPlaceholder": "Jelaskan layar yang Anda inginkan, mis. \"Halaman login modern untuk toko fashion online\"",
+    "designRefine": "Sempurnakan",
+    "designRefinePlaceholder": "Jelaskan perubahan, mis. \"buat hero lebar penuh dan tema gelap\"",
+    "designKeep": "Simpan",
+    "designDiscard": "Buang",
+    "designDraft": "Draf",
+    "designGenerate": "Buat desain",
+    "designGenerating": "Membuat desain...",
     "codeEmpty": "Minta AI menghasilkan atau memperbarui kode sumber aman dan halaman frontend (NIST PW.5 → ISO A.8.28).",
     "handoverEmpty": "Tinjau hasil akhir sebelum diekspor (NIST PW.9 → ISO A.8.9/A.8.30).",
     "stackTitle": "Rekomendasi Stack (NIST PW.1.1 → ISO A.8.26)",
@@ -201,6 +309,13 @@
     "suggestedFixTitle": "Usulan perbaikan aman — ",
     "close": "Tutup",
     "noRecommendations": "Belum ada rekomendasi keamanan.",
+    "scanTitle": "Pindai Keamanan",
+    "scanRun": "Jalankan pindai keamanan",
+    "scanRunning": "Memindai…",
+    "scanEmpty": "Belum ada temuan. Jalankan pindai untuk memeriksa kode hasil generate.",
+    "scanFailed": "Pindai gagal.",
+    "scanNeedCode": "Hasilkan kode sumber sebelum memindai.",
+    "scanSkipped": "Alat dilewati",
     "markApplied": "Tandai sudah diterapkan",
     "markNotApplied": "Tandai belum diterapkan",
     "emptyFiller": "Pilih file atau jalankan AI untuk menghasilkan kode.",
@@ -215,6 +330,36 @@
     "threatModelTitle": "Threat Model (STRIDE)",
     "snapshots": "Versi",
     "files": "file",
+    "save": "Simpan",
+    "saveAll": "Simpan Semua",
+    "allSaved": "Tersimpan",
+    "unsavedFiles": "belum disimpan",
+    "confirmDiscard": "Ada perubahan belum disimpan. Buang?",
+    "restore": "Pulihkan",
+    "snapshotRestored": "Snapshot dipulihkan",
+    "filesSaved": "Perubahan tersimpan",
+    "terminal": "Terminal",
+    "explorer": "Penjelajah",
+    "preview": "Pratinjau",
+    "runApp": "Jalankan",
+    "stopApp": "Hentikan",
+    "runStarting": "Memulai...",
+    "runRunning": "Berjalan",
+    "runError": "Error",
+    "runStopped": "Berhenti",
+    "runNotRunning": "Aplikasi tidak berjalan.",
+    "runNoLogs": "Belum ada log.",
+    "runLogs": "Log build & run",
+    "markFixed": "Tandai Fix",
+    "unmarkFixed": "Batalkan Fix",
+    "fixed": "Sudah Fix",
+    "markedFixed": "Proyek ditandai sudah fix",
+    "unmarkedFixed": "Tanda fix dibatalkan",
+    "createDatabase": "Buat Database",
+    "deleteDatabase": "Hapus database",
+    "databaseCreated": "Database dibuat",
+    "databaseDeleted": "Database dihapus",
+    "designPages": "Halaman",
     "applyFix": "Terapkan",
     "rejectFix": "Tolak",
     "criteriaTitle": "Syarat Lanjut ke Tahap Berikutnya",
@@ -414,6 +559,7 @@
     "downloadZip": "Unduh ZIP",
     "downloadManual": "Unduh Buku Panduan",
     "downloadIso": "Unduh Laporan ISO 27001",
+    "downloadTraceability": "Unduh Matriks Ketertelusuran",
     "asPdf": "PDF",
     "asMarkdown": "MD",
     "githubPat": "Personal Access Token (opsional)",
@@ -430,7 +576,7 @@
     "mergeRevision": "Gabungkan revisi",
     "cancelRevision": "Batalkan revisi",
     "badge": "Lencana status proyek",
-    "badgeHint": "Tempelkan lencana ini ke README Anda untuk menampilkan pipa kepatuhan SecureSDLC.",
+    "badgeHint": "Tempelkan lencana ini ke README Anda untuk menampilkan pipa kepatuhan ShieldForge.",
     "badgeCopied": "Lencana tersalin!",
     "copy": "Salin",
     "ok": "OK",

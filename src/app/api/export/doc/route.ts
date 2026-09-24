@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
-import { buildManualBook, buildComplianceReport } from "@/lib/docs";
+import { buildManualBook, buildComplianceReport, buildTraceabilityMatrix } from "@/lib/docs";
 import { manualBookPdfBuffer, complianceReportPdfBuffer } from "@/lib/pdf";
 
 export async function GET(request: Request) {
@@ -17,8 +17,11 @@ export async function GET(request: Request) {
     const type = url.searchParams.get("type");
     const format = url.searchParams.get("format") ?? "md";
 
-    if (!projectId || (type !== "manual" && type !== "iso")) {
-      return NextResponse.json({ error: "projectId & type (manual|iso) required" }, { status: 400 });
+    if (!projectId || (type !== "manual" && type !== "iso" && type !== "traceability")) {
+      return NextResponse.json(
+        { error: "projectId & type (manual|iso|traceability) required" },
+        { status: 400 },
+      );
     }
     if (format !== "pdf" && format !== "md") {
       return NextResponse.json({ error: "format must be pdf or md" }, { status: 400 });
@@ -29,6 +32,12 @@ export async function GET(request: Request) {
       include: {
         projectStages: {
           include: { stage: true, recommendations: { include: { nistControl: true } } },
+        },
+        requirements: {
+          include: {
+            nistControl: true,
+            links: { include: { recommendation: { include: { nistControl: true } } } },
+          },
         },
       },
     });
@@ -46,8 +55,16 @@ export async function GET(request: Request) {
     }
 
     const isManual = type === "manual";
-    const filename =
-      format === "pdf"
+    const isTrace = type === "traceability";
+    if (isTrace && format === "pdf") {
+      return NextResponse.json(
+        { error: "Traceability matrix is available as Markdown only." },
+        { status: 400 },
+      );
+    }
+    const filename = isTrace
+      ? "TRACEABILITY-MATRIX.md"
+      : format === "pdf"
         ? isManual
           ? "MANUAL-BOOK.pdf"
           : "ISO-27001-COMPLIANCE.pdf"
@@ -77,15 +94,25 @@ export async function GET(request: Request) {
       });
     }
 
-    const content = isManual ? buildManualBook(project) : buildComplianceReport(project);
+    const content = isManual
+      ? buildManualBook(project)
+      : isTrace
+        ? buildTraceabilityMatrix({
+            name: project.name,
+            currentVersion: project.currentVersion,
+            requirements: project.requirements,
+          })
+        : buildComplianceReport(project);
 
     await writeAudit(session.user.id, "GENERATE_DELIVERABLE", {
       projectId,
-      type: isManual ? "manual_book_md" : "iso_compliance_md",
+      type: isTrace ? "traceability_md" : isManual ? "manual_book_md" : "iso_compliance_md",
       version: project.currentVersion,
   }, requestIp(request));
 
-    await ensureDeliverable(projectId, isManual ? "manual_book_md" : "iso_compliance_md", project.currentVersion);
+    if (!isTrace) {
+      await ensureDeliverable(projectId, isManual ? "manual_book_md" : "iso_compliance_md", project.currentVersion);
+    }
 
     return new NextResponse(content, {
       headers: {

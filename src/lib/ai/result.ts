@@ -28,6 +28,7 @@ export const recommendationSchema = z.object({
   content: z.string().optional(),
   suggestedCode: z.string().optional(),
   nistTask: z.string().optional(),
+  requirementIds: z.array(z.string()).optional(),
   file: z.string().optional(),
   description: z.string().optional(),
   fix: z.string().optional(),
@@ -224,6 +225,7 @@ export interface PersistedRecommendation {
   isApplied: boolean;
   nistTask: string | null;
   isoMappings: string[];
+  requirementIds: string[];
 }
 
 /** Either the base client or an interactive-transaction client. */
@@ -322,11 +324,15 @@ export async function persistStageResult(input: {
     if (stageCode === "analysis") {
       stageKnowledge.recommendedStack = result.recommendedStack ?? null;
       stageKnowledge.securityRequirements = result.securityRequirements ?? [];
+      stageKnowledge.requirementItems = (result.securityRequirements ?? []).map(
+        (text, i) => ({ id: `REQ-SEC-${String(i + 1).padStart(3, "0")}`, text }),
+      );
       stageKnowledge.dataClassification = result.dataClassification ?? [];
     }
     if (stageCode === "design" && result.uiDesign) {
       stageKnowledge.uiDesign = result.uiDesign;
     }
+
     if (result.architecture) stageKnowledge.architecture = result.architecture;
     if (result.threatModel) stageKnowledge.threatModel = result.threatModel;
     if (result.databaseSchema) stageKnowledge.databaseSchema = result.databaseSchema;
@@ -372,6 +378,28 @@ export async function persistStageResult(input: {
       orderBy: { createdAt: "desc" },
     });
 
+    // Traceability: resolve (and, for the analysis stage, create) the project's
+    // security requirements so recommendations can be linked to what they satisfy.
+    const requirementIdByReqId = new Map<string, string>();
+    const existingReqs = await tx.securityRequirement.findMany({
+      where: { projectId: project.id },
+      select: { id: true, reqId: true },
+    });
+    for (const r of existingReqs) requirementIdByReqId.set(r.reqId, r.id);
+
+    if (stageCode === "analysis") {
+      const texts = (stageKnowledge.securityRequirements as string[] | undefined) ?? [];
+      for (let i = 0; i < texts.length; i++) {
+        const reqId = `REQ-SEC-${String(i + 1).padStart(3, "0")}`;
+        const row = await tx.securityRequirement.upsert({
+          where: { projectId_reqId: { projectId: project.id, reqId } },
+          update: { text: texts[i] },
+          create: { projectId: project.id, reqId, text: texts[i] },
+        });
+        requirementIdByReqId.set(reqId, row.id);
+      }
+    }
+
     let recommendationsSaved = 0;
     if (recs.length > 0) {
       // When no assistant message exists the rows are stored with a NULL
@@ -389,20 +417,48 @@ export async function persistStageResult(input: {
         await tx.aiRecommendation.deleteMany({ where: scope });
       }
 
-      await tx.aiRecommendation.createMany({
-        data: recs.map((r) => ({
-          projectStageId: projectStage.id,
-          originMessageId: assistantMessage?.id ?? null,
-          category: normalizeCategory(r.category ?? "compliance"),
-          severity: normalizeSeverity(r.severity),
-          nistControlId: r.nistTask ? nistMap.get(r.nistTask) ?? null : null,
-          title: r.title ?? r.threat ?? "Recommendation",
-          content: r.content ?? r.description ?? r.mitigation ?? r.fix ?? "",
-          suggestedCode: r.suggestedCode ?? null,
-          filePath: r.file ?? null,
-        })),
-      });
-      recommendationsSaved = recs.length;
+      // Create one-by-one so each row's id is available to build requirement links.
+      const createdRecs: {
+        id: string;
+        requirementIds: string[];
+        isApplied: boolean;
+        filePath: string | null;
+      }[] = [];
+      for (const r of recs) {
+        const row = await tx.aiRecommendation.create({
+          data: {
+            projectStageId: projectStage.id,
+            originMessageId: assistantMessage?.id ?? null,
+            category: normalizeCategory(r.category ?? "compliance"),
+            severity: normalizeSeverity(r.severity),
+            nistControlId: r.nistTask ? nistMap.get(r.nistTask) ?? null : null,
+            title: r.title ?? r.threat ?? "Recommendation",
+            content: r.content ?? r.description ?? r.mitigation ?? r.fix ?? "",
+            suggestedCode: r.suggestedCode ?? null,
+            filePath: r.file ?? null,
+            requirementIds: r.requirementIds ?? [],
+          },
+          select: { id: true, requirementIds: true, isApplied: true, filePath: true },
+        });
+        createdRecs.push(row);
+      }
+      recommendationsSaved = createdRecs.length;
+
+      const links = createdRecs.flatMap((rec) =>
+        rec.requirementIds
+          .map((reqId) => requirementIdByReqId.get(reqId))
+          .filter((requirementId): requirementId is string => Boolean(requirementId))
+          .map((requirementId) => ({
+            requirementId,
+            recommendationId: rec.id,
+            filePath: rec.filePath,
+            stageCode,
+            status: rec.isApplied ? "implemented" : "recommended",
+          })),
+      );
+      if (links.length > 0) {
+        await tx.requirementLink.createMany({ data: links });
+      }
     }
 
     const created = await tx.aiRecommendation.findMany({
@@ -425,6 +481,7 @@ export async function persistStageResult(input: {
       isApplied: r.isApplied,
       nistTask: r.nistControl?.taskCode ?? null,
       isoMappings: (r.nistControl?.iso27001Mapping as string[] | null) ?? [],
+      requirementIds: r.requirementIds,
     }));
 
     return {

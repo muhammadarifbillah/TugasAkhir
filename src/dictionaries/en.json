@@ -1,8 +1,37 @@
 {
+  "a11y": {
+    "skipToContent": "Skip to content",
+    "title": "Accessibility",
+    "fontSize": "Font size",
+    "contrast": "Contrast",
+    "contrastHigh": "High",
+    "contrastNormal": "Normal"
+  },
+  "audit": {
+    "title": "Audit log",
+    "subtitle": "Recent security-relevant activity on your account.",
+    "recent": "Recent activity",
+    "action": "Action",
+    "details": "Details",
+    "ip": "IP address",
+    "time": "Time",
+    "empty": "No activity recorded yet.",
+    "back": "Back to settings"
+  },
+  "databases": {
+    "title": "Databases",
+    "subtitle": "Persistent databases provisioned for finalized projects.",
+    "provisioned": "Provisioned databases",
+    "empty": "No databases provisioned yet.",
+    "delete": "Delete",
+    "deleteFailed": "Failed to delete database.",
+    "back": "Back to settings"
+  },
   "app": {
-    "name": "SecureSDLC",
+    "name": "ShieldForge",
     "tagline": "AI-powered secure website generator",
-    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept)."
+    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept).",
+    "offline": "You are offline. Some features may not work."
   },
   "landing": {
     "badge": "NIST SP 800-218 · ISO 27001:2022",
@@ -20,7 +49,49 @@
     "featPromptTitle": "Prompt-Driven",
     "featPromptDesc": "Chat with the AI at every stage to generate, review, and revise your website.",
     "featSecureTitle": "Secure by Design",
-    "featSecureDesc": "Threat models, secure coding, vulnerability scanning and auto-fix as a built-in workflow."
+    "featSecureDesc": "Threat models, secure coding, vulnerability scanning and auto-fix as a built-in workflow.",
+    "howTitle": "How it works",
+    "howSubtitle": "Five enforced stages, from idea to audit-ready delivery.",
+    "steps": [
+      {
+        "title": "Analysis & Requirements",
+        "desc": "Scope the site, recommend a stack, define security requirements."
+      },
+      {
+        "title": "Design & Architecture",
+        "desc": "Threat model, architecture diagram, database schema and auth flow."
+      },
+      {
+        "title": "Secure Development",
+        "desc": "Generate secure source code with NIST PW.5 secure coding."
+      },
+      {
+        "title": "Security Testing & Audit",
+        "desc": "Scan for vulnerabilities, score risk and auto-fix issues."
+      },
+      {
+        "title": "Handover & Deliverables",
+        "desc": "Manual book, ISO 27001 report, ZIP export and GitHub push."
+      }
+    ],
+    "stats": [
+      {
+        "value": "5",
+        "label": "SDLC stages"
+      },
+      {
+        "value": "NIST + ISO",
+        "label": "Frameworks"
+      },
+      {
+        "value": "BYOK",
+        "label": "Any AI provider"
+      },
+      {
+        "value": "Docker",
+        "label": "Run & preview"
+      }
+    ]
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -51,6 +122,11 @@
     "inRevision": "In Revision",
     "search": "Search projects...",
     "empty": "No projects yet. Create your first AI-generated secure website!",
+    "noMatches": "No projects match your search or filter.",
+    "onboardingTitle": "Get started",
+    "onboardingStep1": "Create a project and describe the website you want.",
+    "onboardingStep2": "Run the five Secure SDLC stages with the AI engine.",
+    "onboardingStep3": "Preview, run, provision a database, then export or push.",
     "securityScore": "Security Score",
     "openStudio": "Open Studio",
     "revise": "Revise",
@@ -111,9 +187,28 @@
     "errorAccessDenied": "Sign-in was denied or your session expired.",
     "errorOAuth": "GitHub sign-in failed. Try again.",
     "registerTitle": "Create an account",
-    "registerSubtitle": "Get started with SecureSDLC in minutes.",
+    "registerSubtitle": "Get started with ShieldForge in minutes.",
     "noAccount": "Don't have an account?",
-    "createAccount": "Sign up"
+    "createAccount": "Sign up",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "signInWithEmail": "Sign in with Email",
+    "invalidCredentials": "Invalid email or password.",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Your name",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Repeat your password",
+    "createAccountButton": "Create account",
+    "creatingAccount": "Creating account...",
+    "passwordsDoNotMatch": "Passwords do not match.",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "registerSuccess": "Account created! Redirecting to login...",
+    "registerFailed": "Registration failed. Try again.",
+    "unexpectedError": "An error occurred. Please try again.",
+    "haveAccount": "Already have an account?",
+    "signInLink": "Sign in"
   },
   "settings": {
     "title": "Settings",
@@ -121,6 +216,7 @@
     "aiModelsCard": "AI Models",
     "aiModelsSubtitle": "Bring Your Own Key (BYOK). Your keys are encrypted with AES-256-GCM and never sent to the browser.",
     "addKey": "Add API Key",
+    "addModel": "Add model",
     "provider": "Provider",
     "modelName": "Model name",
     "temperature": "Temperature",
@@ -139,12 +235,14 @@
     "projectAdded": "Project created successfully",
     "noModels": "No AI models configured. Add one to use the studio.",
     "apiKey": "API Key",
+    "keyLabel": "Label (optional)",
     "noApiKeys": "No API keys yet.",
     "phApiKey": "sk-...",
     "phKeyLabel": "my-openai-key",
     "phModelName": "gpt-4o-mini, deepseek-v3, llama3...",
     "fetchingModels": "Fetching models...",
     "fetchModelsFailed": "Failed to fetch model list",
+    "fetchModelsFallback": "Live model list unavailable (provider unreachable). Showing a suggested list — you can also type a custom model name.",
     "selectModel": "Select a model",
     "customModelLabel": "Type custom model name...",
     "cancel": "Cancel",
@@ -191,7 +289,17 @@
     "networkError": "Network error. Check your connection and try again.",
     "revisionBadge": "Revision",
     "analysisEmpty": "Describe the website you want to build. The AI will recommend a stack and define scope requirements (NIST PO.1 / PW.1 → ISO A.8.26).",
-    "designEmpty": "Ask for UI layout, architecture, threat model & Mermaid diagrams (NIST PW.1–PW.3 → ISO A.8.25–A.8.27).",
+    "designEmpty": "No screens yet. Describe a screen and click Generate.",
+    "designStudioOpen": "Design Studio",
+    "designStudioTitle": "Design Studio",
+    "designPromptPlaceholder": "Describe the screen you want, e.g. \"A modern login page for an online fashion store\"",
+    "designRefine": "Refine",
+    "designRefinePlaceholder": "Describe a change, e.g. \"make the hero full-width and use a dark theme\"",
+    "designKeep": "Keep",
+    "designDiscard": "Discard",
+    "designDraft": "Draft",
+    "designGenerate": "Generate design",
+    "designGenerating": "Generating...",
     "codeEmpty": "Ask the AI to generate or improve secure source code and frontend pages (NIST PW.5 → ISO A.8.28).",
     "handoverEmpty": "Review final deliverables before exporting (NIST PW.9 → ISO A.8.9/A.8.30).",
     "stackTitle": "Recommended Stack (NIST PW.1.1 → ISO A.8.26)",
@@ -201,6 +309,13 @@
     "suggestedFixTitle": "Suggested secure fix — ",
     "close": "Close",
     "noRecommendations": "No security recommendations yet.",
+    "scanTitle": "Security Scan",
+    "scanRun": "Run security scan",
+    "scanRunning": "Scanning…",
+    "scanEmpty": "No findings yet. Run a scan to check the generated code.",
+    "scanFailed": "Scan failed.",
+    "scanNeedCode": "Generate source code before scanning.",
+    "scanSkipped": "Tools skipped",
     "markApplied": "Mark as applied",
     "markNotApplied": "Mark as not applied",
     "emptyFiller": "Select a file or run the AI to generate source code.",
@@ -215,6 +330,36 @@
     "threatModelTitle": "Threat Model (STRIDE)",
     "snapshots": "Versions",
     "files": "files",
+    "save": "Save",
+    "saveAll": "Save All",
+    "allSaved": "Saved",
+    "unsavedFiles": "unsaved",
+    "confirmDiscard": "You have unsaved changes. Discard them?",
+    "restore": "Restore",
+    "snapshotRestored": "Snapshot restored",
+    "filesSaved": "Changes saved",
+    "terminal": "Terminal",
+    "explorer": "Explorer",
+    "preview": "Preview",
+    "runApp": "Run",
+    "stopApp": "Stop",
+    "runStarting": "Starting...",
+    "runRunning": "Running",
+    "runError": "Error",
+    "runStopped": "Stopped",
+    "runNotRunning": "App is not running.",
+    "runNoLogs": "No logs yet.",
+    "runLogs": "Build & run logs",
+    "markFixed": "Mark as fixed",
+    "unmarkFixed": "Unmark fixed",
+    "fixed": "Fixed",
+    "markedFixed": "Project marked as fixed",
+    "unmarkedFixed": "Project marked as not fixed",
+    "createDatabase": "Create Database",
+    "deleteDatabase": "Delete database",
+    "databaseCreated": "Database created",
+    "databaseDeleted": "Database deleted",
+    "designPages": "Pages",
     "applyFix": "Apply",
     "rejectFix": "Reject",
     "criteriaTitle": "Stage Completion Requirements",
@@ -414,6 +559,7 @@
     "downloadZip": "Download ZIP",
     "downloadManual": "Download Manual Book",
     "downloadIso": "Download ISO 27001 Report",
+    "downloadTraceability": "Download Traceability Matrix",
     "asPdf": "PDF",
     "asMarkdown": "MD",
     "githubPat": "Personal Access Token (optional)",
@@ -430,7 +576,7 @@
     "mergeRevision": "Merge revision",
     "cancelRevision": "Cancel revision",
     "badge": "Project status badge",
-    "badgeHint": "Paste this badge into your README to show the SecureSDLC compliance pipeline.",
+    "badgeHint": "Paste this badge into your README to show the ShieldForge compliance pipeline.",
     "badgeCopied": "Badge copied!",
     "copy": "Copy",
     "ok": "OK",

@@ -56,35 +56,61 @@ const STAGES = [
   },
 ] as const;
 
-// NIST SP 800-218 (SSDF rev 1.1) tasks used by the engine + ISO 27001:2022 Annex A crosswalk
+// NIST SP 800-218 (SSDF v1.1) — full practice/task set with an ISO 27001:2022
+// Annex A crosswalk. Task codes and titles follow the official SSDF table
+// (nist.sp.800-218.ssdf-table.xlsx); descriptions are condensed paraphrases.
 const NIST_CONTROLS = [
-  { taskCode: "PO.1.1", groupCode: "PO", title: "Gather information from work producers", description: "Collect and store info needed to implement the SDLCA, including the software development workflow and security requirements.", iso: ["A.5.1", "A.5.8"] },
-  { taskCode: "PO.3.1", groupCode: "PO", title: "Risk management plan", description: "Implement and document a software development risk management plan that includes security and privacy risks.", iso: ["A.5.1", "A.5.8", "A.5.24"] },
-  { taskCode: "PO.4.1", groupCode: "PO", title: "Security training", description: "Provide security and privacy training for personnel who have development-related roles.", iso: ["A.6.3"] },
-  { taskCode: "PW.1.1", groupCode: "PW", title: "Secure architecture & design", description: "Create and maintain secure architecture and design, aligning with security requirements and using threat modeling.", iso: ["A.8.26", "A.8.27"] },
-  { taskCode: "PW.2.1", groupCode: "PW", title: "Assess software security", description: "Determine whether the software is developed in-house or procured; identify and document security requirements for either case.", iso: ["A.8.26", "A.8.30"] },
-  { taskCode: "PW.3.1", groupCode: "PW", title: "Threat modeling", description: "Use threat modeling to identify and prioritize potential threats and threat mitigations.", iso: ["A.8.26", "A.8.27"] },
-  { taskCode: "PW.3.2", groupCode: "PW", title: "Threat modeling for response", description: "Use threat modeling to inform the review of event and incident response plans.", iso: ["A.5.24", "A.5.26"] },
-  { taskCode: "PW.4.1", groupCode: "PW", title: "Secure coding practices", description: "Follow all secure coding practices that are appropriate to the development environment and language.", iso: ["A.8.28"] },
-  { taskCode: "PW.4.3", groupCode: "PW", title: "Code review", description: "Perform code review on both human-written and generated code to identify and fix issues.", iso: ["A.8.28", "A.8.29"] },
-  { taskCode: "PW.5.1", groupCode: "PW", title: "Integrity of source code", description: "Check in code to a version control system and ensure code integrity with secure settings.", iso: ["A.8.28", "A.8.33"] },
-  { taskCode: "PW.5.2", groupCode: "PW", title: "Secure build process", description: "Configure the build process to take advantage of compiler/interpreter security features and verify dependencies.", iso: ["A.8.28", "A.8.29"] },
-  { taskCode: "PW.5.3", groupCode: "PW", title: "Build artifacts", description: "Generate and verify build artifacts (binaries, SBOM, manifests) so their integrity is assured.", iso: ["A.8.28", "A.5.19"] },
-  { taskCode: "PW.6.1", groupCode: "PW", title: "Re-evaluate artifacts", description: "Re-evaluate build artifacts after each code change to detect tampering and newly introduced vulnerabilities.", iso: ["A.8.29", "A.8.32"] },
-  { taskCode: "PW.7.1", groupCode: "PW", title: "Root-cause analysis", description: "Perform and record root-cause analysis on vulnerabilities and defects.", iso: ["A.8.29", "A.5.25"] },
-  { taskCode: "PW.7.2", groupCode: "PW", title: "Identify & remediate", description: "Identify and remediate vulnerabilities before release, using automated and manual testing.", iso: ["A.8.8", "A.8.29"] },
-  { taskCode: "PW.8.1", groupCode: "PW", title: "Confirm remediation", description: "Confirm that vulnerabilities are remediated and re-test to verify.", iso: ["A.8.8", "A.8.29"] },
-  { taskCode: "PW.8.2", groupCode: "PW", title: "Documentation review", description: "Review human-readable documentation and confirm it does not contain sensitive information.", iso: ["A.8.10", "A.8.2"] },
-  { taskCode: "PW.9.1", groupCode: "PW", title: "Secure distribution plan", description: "Design, document, and maintain a plan for distributing and updating the software securely.", iso: ["A.8.9", "A.8.30"] },
-  { taskCode: "PW.9.2", groupCode: "PW", title: "Secure deployment", description: "Configure the software and environment to run securely in production (secure defaults).", iso: ["A.8.9", "A.8.31"] },
-  { taskCode: "PS.1.1", groupCode: "PS", title: "Protect code integrity", description: "Protect all forms of code (source, executables, config) from unauthorized access and tampering.", iso: ["A.8.2", "A.8.3", "A.8.33"] },
-  { taskCode: "PS.2.1", groupCode: "PS", title: "Controlled deployment", description: "Ensure a controlled, auditable process for deploying code to production (separation of envs).", iso: ["A.8.31", "A.8.32"] },
-  { taskCode: "PS.3.1", groupCode: "PS", title: "Secure artifact storage", description: "Store artifacts securely with controlled access, including backups.", iso: ["A.8.13", "A.8.2"] },
-  { taskCode: "PS.4.1", groupCode: "PS", title: "Confidentiality of information", description: "Support the integrity and confidential storage of application information and secrets.", iso: ["A.8.12", "A.5.17"] },
-  { taskCode: "RV.1.1", groupCode: "RV", title: "Identify & document vulnerabilities", description: "Identify and document potential vulnerabilities and their causes in all components.", iso: ["A.5.25", "A.8.8"] },
-  { taskCode: "RV.2.1", groupCode: "RV", title: "Assess vulnerability severity", description: "Assess each vulnerability for severity and prioritize remediation.", iso: ["A.5.25", "A.8.8"] },
-  { taskCode: "RV.3.1", groupCode: "RV", title: "Communicate & remediate", description: "Communicate vulnerability information to relevant parties and remediate in a timely manner.", iso: ["A.5.24", "A.5.26", "A.5.27"] },
+  // PO — Prepare the Organization
+  { taskCode: "PO.1.1", groupCode: "PO", title: "Define security requirements for software development", description: "Identify and document security requirements for the organization's software development infrastructure and processes, and maintain them over time.", iso: ["A.5.1", "A.5.8"] },
+  { taskCode: "PO.1.2", groupCode: "PO", title: "Define security requirements for software", description: "Identify, document and maintain all security requirements for organization-developed software, including security architecture and functionality.", iso: ["A.5.8", "A.8.26", "A.5.34"] },
+  { taskCode: "PO.1.3", groupCode: "PO", title: "Communicate requirements to third parties", description: "Communicate software security requirements to all third parties providing commercial software components.", iso: ["A.5.19", "A.5.20", "A.5.21"] },
+  { taskCode: "PO.2.1", groupCode: "PO", title: "Implement roles and responsibilities", description: "Create roles and alter responsibilities so all parts of the SDLC are covered.", iso: ["A.5.2", "A.5.3"] },
+  { taskCode: "PO.2.2", groupCode: "PO", title: "Provide role-based training", description: "Provide role-based training for personnel whose responsibilities contribute to secure development.", iso: ["A.6.3"] },
+  { taskCode: "PO.2.3", groupCode: "PO", title: "Obtain management commitment", description: "Obtain top-level management commitment to secure software development.", iso: ["A.5.1", "A.5.4"] },
+  { taskCode: "PO.3.1", groupCode: "PO", title: "Specify toolchain tools", description: "Specify which tools or tool types must be included in each toolchain and how components integrate.", iso: ["A.8.25", "A.8.9"] },
+  { taskCode: "PO.3.2", groupCode: "PO", title: "Operate and maintain toolchains", description: "Follow recommended security practices to deploy, operate and maintain tools and toolchains.", iso: ["A.8.9", "A.8.32"] },
+  { taskCode: "PO.3.3", groupCode: "PO", title: "Generate toolchain artifacts", description: "Configure tools to generate artifacts that demonstrate secure development practice support.", iso: ["A.8.15", "A.5.33"] },
+  { taskCode: "PO.4.1", groupCode: "PO", title: "Define security check criteria", description: "Define criteria for software security checks and track them throughout the SDLC.", iso: ["A.8.8", "A.8.29"] },
+  { taskCode: "PO.4.2", groupCode: "PO", title: "Gather and safeguard check data", description: "Implement processes and mechanisms to gather and safeguard information supporting the criteria.", iso: ["A.8.15", "A.5.33"] },
+  { taskCode: "PO.5.1", groupCode: "PO", title: "Separate and protect environments", description: "Separate and protect each environment involved in software development.", iso: ["A.8.22", "A.8.31"] },
+  { taskCode: "PO.5.2", groupCode: "PO", title: "Harden development endpoints", description: "Secure and harden development endpoints using a risk-based approach.", iso: ["A.8.1", "A.5.15"] },
+
+  // PS — Protect the Software
+  { taskCode: "PS.1.1", groupCode: "PS", title: "Protect code from unauthorized access", description: "Store all forms of code based on least privilege so only authorized personnel and tools have access.", iso: ["A.8.2", "A.8.3", "A.8.4"] },
+  { taskCode: "PS.2.1", groupCode: "PS", title: "Verify release integrity", description: "Make software integrity verification information available to acquirers.", iso: ["A.8.24"] },
+  { taskCode: "PS.3.1", groupCode: "PS", title: "Archive each release", description: "Securely archive the files and supporting data required for each software release.", iso: ["A.8.13", "A.8.10"] },
+  { taskCode: "PS.3.2", groupCode: "PS", title: "Share provenance data (SBOM)", description: "Collect, safeguard, maintain and share provenance data for all components of each release.", iso: ["A.5.19", "A.5.21", "A.8.24"] },
+
+  // PW — Produce Well-Secured Software
+  { taskCode: "PW.1.1", groupCode: "PW", title: "Risk modeling (threat modeling)", description: "Use risk modeling such as threat modeling or attack surface mapping to assess security risk.", iso: ["A.8.26", "A.8.27"] },
+  { taskCode: "PW.1.2", groupCode: "PW", title: "Track security requirements and risks", description: "Track and maintain the software's security requirements, risks and design decisions.", iso: ["A.8.26", "A.8.25"] },
+  { taskCode: "PW.1.3", groupCode: "PW", title: "Standardized security features", description: "Build in support for standardized security features and services instead of proprietary implementations.", iso: ["A.8.26", "A.8.24"] },
+  { taskCode: "PW.2.1", groupCode: "PW", title: "Review the software design", description: "Have qualified people or automated processes review the design to confirm it meets security requirements.", iso: ["A.8.26", "A.8.27", "A.8.29"] },
+  { taskCode: "PW.4.1", groupCode: "PW", title: "Acquire well-secured components", description: "Acquire and maintain well-secured third-party software components.", iso: ["A.5.19", "A.5.21", "A.8.24"] },
+  { taskCode: "PW.4.2", groupCode: "PW", title: "Create in-house components securely", description: "Create and maintain in-house components following secure SDLC processes.", iso: ["A.8.25", "A.8.28"] },
+  { taskCode: "PW.4.4", groupCode: "PW", title: "Verify third-party components", description: "Verify that acquired third-party components comply with requirements throughout their lifecycles.", iso: ["A.5.21", "A.8.8", "A.8.29"] },
+  { taskCode: "PW.5.1", groupCode: "PW", title: "Follow secure coding practices", description: "Follow all secure coding practices appropriate to the development languages and environment.", iso: ["A.8.28"] },
+  { taskCode: "PW.6.1", groupCode: "PW", title: "Use secure build tooling", description: "Use compiler, interpreter and build tools that offer features to improve executable security.", iso: ["A.8.9", "A.8.25"] },
+  { taskCode: "PW.6.2", groupCode: "PW", title: "Configure build tool security", description: "Determine and implement approved security-related configurations for build tools.", iso: ["A.8.9", "A.8.28"] },
+  { taskCode: "PW.7.1", groupCode: "PW", title: "Determine code review/analysis approach", description: "Determine whether code review and/or code analysis should be used.", iso: ["A.8.29", "A.8.28"] },
+  { taskCode: "PW.7.2", groupCode: "PW", title: "Perform code review and analysis", description: "Perform code review and analysis and record and triage all issues and remediations.", iso: ["A.8.28", "A.8.29"] },
+  { taskCode: "PW.8.1", groupCode: "PW", title: "Determine executable testing approach", description: "Determine whether executable code testing should be performed and which types to use.", iso: ["A.8.29"] },
+  { taskCode: "PW.8.2", groupCode: "PW", title: "Perform and document testing", description: "Scope, design and perform testing and document the results and remediations.", iso: ["A.8.29", "A.8.8"] },
+  { taskCode: "PW.9.1", groupCode: "PW", title: "Define secure baseline settings", description: "Define a secure baseline for each security-relevant setting so defaults are secure.", iso: ["A.8.9", "A.8.28"] },
+  { taskCode: "PW.9.2", groupCode: "PW", title: "Implement and document default settings", description: "Implement default settings and document each setting for software administrators.", iso: ["A.8.9", "A.8.31"] },
+
+  // RV — Respond to Vulnerabilities
+  { taskCode: "RV.1.1", groupCode: "RV", title: "Gather vulnerability information", description: "Gather information on potential vulnerabilities and investigate all credible reports.", iso: ["A.5.7", "A.8.8"] },
+  { taskCode: "RV.1.2", groupCode: "RV", title: "Review code for vulnerabilities", description: "Review, analyze and/or test code to identify or confirm previously undetected vulnerabilities.", iso: ["A.8.8", "A.8.29"] },
+  { taskCode: "RV.1.3", groupCode: "RV", title: "Vulnerability disclosure policy", description: "Maintain a vulnerability disclosure and remediation policy with the roles and processes to support it.", iso: ["A.5.24", "A.5.26", "A.5.27"] },
+  { taskCode: "RV.2.1", groupCode: "RV", title: "Assess and prioritize vulnerabilities", description: "Analyze each vulnerability to gather enough risk information to plan remediation.", iso: ["A.5.25", "A.8.8"] },
+  { taskCode: "RV.2.2", groupCode: "RV", title: "Plan and implement risk responses", description: "Plan and implement risk-based responses for each vulnerability.", iso: ["A.8.8", "A.8.32"] },
+  { taskCode: "RV.3.1", groupCode: "RV", title: "Root cause analysis", description: "Analyze identified vulnerabilities to determine their root causes.", iso: ["A.5.25", "A.5.27"] },
+  { taskCode: "RV.3.2", groupCode: "RV", title: "Analyze root cause patterns", description: "Analyze root causes over time to identify recurring patterns.", iso: ["A.5.27", "A.8.8"] },
+  { taskCode: "RV.3.3", groupCode: "RV", title: "Eradicate vulnerability classes", description: "Review the software for similar vulnerabilities and proactively fix the class.", iso: ["A.8.8", "A.8.29"] },
+  { taskCode: "RV.3.4", groupCode: "RV", title: "Improve the SDLC process", description: "Review and update the SDLC process to prevent root causes recurring.", iso: ["A.8.25", "A.8.32"] },
 ] as const;
+
 
 async function main() {
   for (const p of PROVIDERS) {

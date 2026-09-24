@@ -1,0 +1,167 @@
+import { mkdtemp, rm, writeFile, mkdir } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import { docker } from "@/lib/runner/docker";
+import { detectStack } from "@/lib/runner/registry";
+import { filterSafeArtifacts } from "@/lib/artifact-paths";
+import type { RawFinding, ScanReport, ScanFinding } from "./types";
+import { parseNpmAudit, parsePipAudit, parseSarif, parseTrivy } from "./parse";
+import { computeSecurityScore, enrichFindings } from "./score";
+
+const SEMGREP_IMAGE = "semgrep/semgrep:latest";
+const TRIVY_IMAGE = "aquasec/trivy:latest";
+const NODE_IMAGE = "node:20-alpine";
+const PYTHON_IMAGE = "python:3.12-alpine";
+
+/** When RUNNER_MODE=disabled, external tooling is skipped (e.g. serverless hosts). */
+function runnerDisabled(): boolean {
+  return process.env.RUNNER_MODE === "disabled";
+}
+
+async function runTool(
+  tool: string,
+  args: string[],
+  parse: (stdout: string) => RawFinding[],
+  timeoutMs: number,
+): Promise<{ tool: string; findings: RawFinding[] } | { tool: string; reason: string }> {
+  try {
+    const res = await docker(args, timeoutMs);
+    if (res.code !== 0) {
+      return { tool, reason: (res.stderr || "tool exited non-zero").trim().slice(0, 300) };
+    }
+    return { tool, findings: parse(res.stdout) };
+  } catch (err) {
+    return { tool, reason: err instanceof Error ? err.message.slice(0, 300) : "docker unavailable" };
+  }
+}
+
+/**
+ * Runs the real security scanners against a project's generated source:
+ * Semgrep (SAST), Trivy (vulnerabilities/secrets/misconfig) and the language's
+ * dependency audit. Tools run in Docker containers; failures are reported as
+ * skipped rather than aborting the whole scan.
+ */
+export async function scanProjectArtifacts(files: Record<string, string>): Promise<ScanReport> {
+  const started = Date.now();
+  const findings: RawFinding[] = [];
+  const toolsRun: string[] = [];
+  const toolsSkipped: { tool: string; reason: string }[] = [];
+
+  const { files: safeFiles } = filterSafeArtifacts(files);
+  const dir = await mkdtemp(path.join(tmpdir(), "shieldforge-scan-"));
+  try {
+    for (const [rel, content] of Object.entries(safeFiles)) {
+      const target = path.join(dir, rel);
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(target, content, "utf8");
+    }
+
+    if (runnerDisabled()) {
+      for (const tool of ["semgrep", "trivy", "dependency-audit"]) {
+        toolsSkipped.push({ tool, reason: "RUNNER_MODE=disabled" });
+      }
+    } else {
+      const semgrep = await runTool(
+        "semgrep",
+        [
+          "run",
+          "--rm",
+          "-v",
+          `${dir}:/src`,
+          "-w",
+          "/src",
+          SEMGREP_IMAGE,
+          "semgrep",
+          "scan",
+          "--config",
+          "p/owasp-top-ten",
+          "--config",
+          "p/security-audit",
+          "--sarif",
+          "--metrics=off",
+          "--quiet",
+        ],
+        parseSarif,
+        300_000,
+      );
+      if ("findings" in semgrep) {
+        toolsRun.push("semgrep");
+        findings.push(...semgrep.findings);
+      } else toolsSkipped.push(semgrep);
+
+      const trivy = await runTool(
+        "trivy",
+        [
+          "run",
+          "--rm",
+          "-v",
+          `${dir}:/src`,
+          TRIVY_IMAGE,
+          "fs",
+          "--scanners",
+          "vuln,secret,misconfig",
+          "--format",
+          "json",
+          "--quiet",
+          "/src",
+        ],
+        parseTrivy,
+        300_000,
+      );
+      if ("findings" in trivy) {
+        toolsRun.push("trivy");
+        findings.push(...trivy.findings);
+      } else toolsSkipped.push(trivy);
+
+      const stack = detectStack(safeFiles);
+      if (stack?.id === "node") {
+        const audit = await runTool(
+          "npm-audit",
+          ["run", "--rm", "-v", `${dir}:/app`, "-w", "/app", NODE_IMAGE, "npm", "audit", "--json"],
+          parseNpmAudit,
+          180_000,
+        );
+        if ("findings" in audit) {
+          toolsRun.push("npm-audit");
+          findings.push(...audit.findings);
+        } else toolsSkipped.push(audit);
+      } else if (stack?.id === "python") {
+        const audit = await runTool(
+          "pip-audit",
+          [
+            "run",
+            "--rm",
+            "-v",
+            `${dir}:/app`,
+            "-w",
+            "/app",
+            PYTHON_IMAGE,
+            "sh",
+            "-c",
+            "pip install --quiet pip-audit && pip-audit -r requirements.txt -f json || true",
+          ],
+          parsePipAudit,
+          300_000,
+        );
+        if ("findings" in audit) {
+          toolsRun.push("pip-audit");
+          findings.push(...audit.findings);
+        } else toolsSkipped.push(audit);
+      } else {
+        toolsSkipped.push({ tool: "dependency-audit", reason: "no supported dependency manifest" });
+      }
+    }
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+
+  const enriched: ScanFinding[] = enrichFindings(findings);
+  return {
+    findings: enriched,
+    score: computeSecurityScore(enriched),
+    toolsRun,
+    toolsSkipped,
+    durationMs: Date.now() - started,
+  };
+}

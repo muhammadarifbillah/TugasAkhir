@@ -86,7 +86,7 @@ export function DeliverablesPanel({
   const projectDone = projectStatus === "completed";
 
   const badgeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/badge/${projectId}`;
-  const badgeMarkdown = `[![SecureSDLC](https://img.shields.io/badge/SecureSDLC-NIST%20SP%20800--218-brightgreen)](${badgeUrl})`;
+  const badgeMarkdown = `[![ShieldForge](https://img.shields.io/badge/ShieldForge-NIST%20SP%20800--218-brightgreen)](${badgeUrl})`;
 
   async function push() {
     const usingExisting = existingRepoUrl.trim().length > 0;
@@ -100,7 +100,7 @@ export function DeliverablesPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
-          repoName: repoName.trim() || "secure-sdlc-website",
+          repoName: repoName.trim() || "shieldforge-website",
           visibility,
           commitMessage,
           pat: pat.trim() || undefined,
@@ -203,15 +203,20 @@ export function DeliverablesPanel({
 
   function downloadZip() {
     if (fileCount === 0) return;
-    void downloadBlob(`/api/export/zip?projectId=${projectId}`, `secure-sdlc-${projectId}.zip`, "zip");
+    void downloadBlob(`/api/export/zip?projectId=${projectId}`, `shieldforge-${projectId}.zip`, "zip");
   }
 
-  function download(kind: "manual" | "iso", format: "pdf" | "md") {
-    const key = `${kind === "manual" ? "manual" : "iso"}-${format === "pdf" ? "pdf" : "md"}`;
+  function download(kind: "manual" | "iso" | "traceability", format: "pdf" | "md") {
+    const name =
+      kind === "manual"
+        ? "MANUAL-BOOK"
+        : kind === "iso"
+          ? "ISO-27001-COMPLIANCE"
+          : "TRACEABILITY-MATRIX";
     void downloadBlob(
       `/api/export/doc?projectId=${projectId}&type=${kind}&format=${format}`,
-      `${kind === "manual" ? "MANUAL-BOOK" : "ISO-27001-COMPLIANCE"}.${format === "pdf" ? "pdf" : "md"}`,
-      key,
+      `${name}.${format}`,
+      `${kind}-${format}`,
     );
   }
 
@@ -432,6 +437,12 @@ export function DeliverablesPanel({
             <span className="flex items-center gap-2">
               {downloading === "iso-md" ? <Loader2 className="animate-spin" /> : <Download className="size-4" />}
               {dict.deliverables.downloadIso} <Badge variant="secondary">{dict.deliverables.asMarkdown}</Badge>
+            </span>
+          </Button>
+          <Button variant="outline" className="justify-between" onClick={() => download("traceability", "md")} disabled={downloading !== null || fileCount === 0}>
+            <span className="flex items-center gap-2">
+              {downloading === "traceability-md" ? <Loader2 className="animate-spin" /> : <Download className="size-4" />}
+              {dict.deliverables.downloadTraceability} <Badge variant="secondary">{dict.deliverables.asMarkdown}</Badge>
             </span>
           </Button>
         </CardContent>

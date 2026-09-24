@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { filterSafeArtifacts } from "@/lib/artifact-paths";
-import { buildComplianceReport, buildManualBook, buildReadme, buildSecurityWorkflowYaml } from "@/lib/docs";
+import {
+  buildComplianceReport,
+  buildManualBook,
+  buildReadme,
+  buildSecurityWorkflowYaml,
+  buildTraceabilityMatrix,
+} from "@/lib/docs";
 
 /**
  * Loads a project (ownership-checked) and assembles the full exportable file set:
@@ -12,6 +18,14 @@ export async function buildProjectFiles(projectId: string, userId: string) {
     include: {
       projectStages: {
         include: { stage: true, recommendations: { include: { nistControl: true } } },
+      },
+      requirements: {
+        include: {
+          nistControl: true,
+          links: {
+            include: { recommendation: { include: { nistControl: true } } },
+          },
+        },
       },
     },
   });
@@ -36,6 +50,11 @@ export async function buildProjectFiles(projectId: string, userId: string) {
   files["README.md"] = buildReadme(project);
   files["docs/MANUAL-BOOK.md"] = buildManualBook(project);
   files["docs/ISO-27001-COMPLIANCE.md"] = buildComplianceReport(project);
+  files["docs/TRACEABILITY-MATRIX.md"] = buildTraceabilityMatrix({
+    name: project.name,
+    currentVersion: project.currentVersion,
+    requirements: project.requirements,
+  });
   files[".github/workflows/security.yml"] = buildSecurityWorkflowYaml();
   files[".env.example"] = files[".env.example"] ?? "# Copy to .env and set your secrets\nDATABASE_URL=postgresql://user:pass@localhost:5432/db\n";
 

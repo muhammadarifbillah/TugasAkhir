@@ -82,6 +82,9 @@ enum AuditAction {
   UPDATE_MODEL
   REMOVE_MODEL
   SET_DEFAULT_MODEL
+  RUN_APP
+  STOP_APP
+  RUN_SCAN
 }
 
 // ── Identity & BYOK ──────────────────────────────────────────
@@ -221,6 +224,7 @@ model NistSsdfControl {
   iso27001Mapping Json // e.g. ["A.8.28", "A.8.26"]
 
   recommendations AiRecommendation[]
+  requirements    SecurityRequirement[]
 
   @@map("nist_ssdf_controls")
 }
@@ -254,6 +258,8 @@ model Project {
   scopeRequirements String?
   uiPreferences     String? // desired website visual look, colors, pages, references
   badgePublic       Boolean       @default(false) // user opt-in for the public badge
+  finalizedAt       DateTime? // user marked the project as final (unlocks DB provisioning)
+  database          Json? // provisioned persistent database (encrypted connection)
   languagePlan      Json? // recommended stack + final user decision
   globalSpec        Json? // accumulated cross-stage context
   createdAt         DateTime      @default(now())
@@ -263,6 +269,8 @@ model Project {
   projectStages     ProjectStage[]
   revisions         ProjectRevision[]
   deliverables      Deliverable[]
+  requirements      SecurityRequirement[]
+  findings          SecurityFinding[]
 
   @@index([userId])
   @@map("projects")
@@ -351,12 +359,14 @@ model AiRecommendation {
   content         String
   suggestedCode   String?
   filePath        String? // source file the suggested fix applies to
+  requirementIds  String[] // traceability: SecurityRequirement.reqId values this addresses
   isApplied       Boolean               @default(false)
   createdAt       DateTime              @default(now())
 
   projectStage ProjectStage     @relation(fields: [projectStageId], references: [id], onDelete: Cascade)
   message      Message?         @relation(fields: [originMessageId], references: [id], onDelete: SetNull)
   nistControl  NistSsdfControl? @relation(fields: [nistControlId], references: [id])
+  links        RequirementLink[]
 
   @@index([projectStageId, originMessageId])
   @@index([nistControlId])
@@ -395,6 +405,71 @@ model Deliverable {
 
   @@index([projectId])
   @@map("deliverables")
+}
+
+// ── Requirement traceability ─────────────────────────────────
+
+model SecurityRequirement {
+  id            String   @id @default(cuid())
+  projectId     String
+  reqId         String // display id, e.g. "REQ-SEC-001"
+  text          String
+  category      String?
+  nistControlId Int?
+  isoControls   String[]
+  createdAt     DateTime @default(now())
+
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  nistControl NistSsdfControl? @relation(fields: [nistControlId], references: [id])
+  links       RequirementLink[]
+
+  @@unique([projectId, reqId])
+  @@index([projectId])
+  @@index([nistControlId])
+  @@map("security_requirements")
+}
+
+model RequirementLink {
+  id               String   @id @default(cuid())
+  requirementId    String
+  recommendationId String?
+  filePath         String?
+  stageCode        String?
+  status           String   @default("recommended") // recommended | implemented | gap | verified
+  createdAt        DateTime @default(now())
+
+  requirement    SecurityRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  recommendation AiRecommendation?   @relation(fields: [recommendationId], references: [id], onDelete: SetNull)
+
+  @@index([requirementId])
+  @@index([recommendationId])
+  @@map("requirement_links")
+}
+
+// ── Real security scanning findings ──────────────────────────
+
+model SecurityFinding {
+  id          String   @id @default(cuid())
+  projectId   String
+  tool        String // semgrep | trivy | npm-audit | pip-audit | composer-audit | govulncheck
+  ruleId      String?
+  severity    Severity
+  title       String
+  description String?
+  filePath    String?
+  line        Int?
+  cwe         String?
+  owasp       String?
+  nistTask    String?
+  isoControls String[]
+  raw         Json?
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([projectId, severity])
+  @@map("security_findings")
 }
 
 model AuditLog {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -17,7 +17,6 @@ import {
   Eye,
   FileCode2,
   FileText,
-  FolderTree,
   GitBranch,
   GitPullRequestArrow,
   Languages,
@@ -27,11 +26,13 @@ import {
   Loader2,
   Lock,
   Network,
+  Play,
   RotateCcw,
   Send,
   ShieldAlert,
   ShieldCheck,
   Terminal,
+  Trash2,
   User,
   Wand2,
   Wrench,
@@ -39,6 +40,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,7 +51,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileEditor, MonacoDiff, inferLanguage } from "@/components/studio/code-editor";
+import { MonacoDiff, inferLanguage } from "@/components/studio/code-editor";
+import { CodeWorkspace } from "@/components/studio/code-workspace";
+import { SecurityScanPanel } from "@/components/studio/security-scan-panel";
+import { RunWorkspace } from "@/components/studio/run-workspace";
+import { DesignStudioDialog } from "@/components/studio/design-studio-dialog";
+import { normalizeScreens } from "@/lib/design";
 import { MermaidDiagram } from "@/components/studio/mermaid-diagram";
 import { DeliverablesPanel } from "@/components/studio/deliverables-panel";
 import { PlanCard, BuildResultCard } from "@/components/studio/plan-card";
@@ -57,6 +64,8 @@ import { StepResultDialog } from "@/components/studio/step-result-dialog";
 import { type VisualCardDef } from "@/components/studio/step-result-dialog";
 import { ToastProvider, useToast } from "@/components/ui/toast";
 import { csrfFetch } from "@/lib/csrf-client";
+import { erdCardinalitySummary, generateErdFromSchema } from "@/lib/erd";
+import { levelBadgeClass } from "@/lib/severity";
 import type { PlanResult } from "@/lib/ai/result";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -129,6 +138,8 @@ export interface StudioWorkspaceProps {
     outputLanguage: string;
     status: string;
     badgePublic: boolean;
+    finalizedAt: string | null;
+    database: { service: string; hostPort: number; url: string; status: string } | null;
   };
   stage: StudioStage;
   completionGaps: string[];
@@ -143,6 +154,7 @@ export interface StudioWorkspaceProps {
   designArchitecture: string[];
   designThreatModel: Record<string, unknown>[];
   designUiDesign: string[];
+  designScreens: unknown;
   analysisDataClassification: string[];
   snapshots: SnapshotRow[];
   analysisStack: {
@@ -179,108 +191,6 @@ function displayAssistantText(content: string): string {
   if (jsonStart >= 0) text = text.slice(0, jsonStart);
   const trimmed = text.trim();
   return trimmed.length > 0 ? trimmed : content;
-}
-
-/** Parse SQL CREATE TABLE statements and generate a Mermaid erDiagram string. */
-function generateErdFromSchema(databaseSchema: string[]): { code: string; tableCount: number; relationshipCount: number } | null {
-  const allSql = databaseSchema.join("\n");
-  // Strip markdown code fences and comments
-  let cleaned = allSql.replace(/```[\s\S]*?```/g, (m) => m.replace(/```sql\n?/gi, "").replace(/```\n?/g, ""));
-  cleaned = cleaned.replace(/--[^\n]*/g, "");
-  // Also strip standalone markdown lines (### headings, bullet points, etc.)
-  cleaned = cleaned.replace(/^###.*$/gm, "").replace(/^-\s.*$/gm, "");
-
-  const tableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["`']?(\w+)["`']?\s*\(([\s\S]*?)\)\s*;/gi;
-  const tables: { name: string; columns: { name: string; type: string; pk: boolean; fk: boolean; fkRef?: string }[] }[] = [];
-  const relationships: { from: string; to: string }[] = [];
-
-  let match: RegExpExecArray | null;
-  while ((match = tableRegex.exec(cleaned)) !== null) {
-    const tableName = match[1].toLowerCase();
-    if (tableName === "usersessions" || tableName === "accounts" || tableName === "verification_tokens") continue;
-    const body = match[2];
-    const columns: { name: string; type: string; pk: boolean; fk: boolean; fkRef?: string }[] = [];
-
-    // Split by comma, but handle nested parens like CHECK (...)
-    const colLines: string[] = [];
-    let depth = 0;
-    let current = "";
-    for (const ch of body) {
-      if (ch === "(") { depth++; current += ch; }
-      else if (ch === ")") { depth--; current += ch; }
-      else if (ch === "," && depth === 0) { colLines.push(current); current = ""; }
-      else { current += ch; }
-    }
-    if (current.trim()) colLines.push(current);
-
-    for (const line of colLines) {
-      const trimmed = line.trim();
-      if (!trimmed || /^(PRIMARY|CONSTRAINT|CHECK|UNIQUE\s*\()/i.test(trimmed)) continue;
-
-      const pk = /\bPRIMARY\s+KEY\b/i.test(trimmed);
-      const fkMatch = /REFERENCES\s+["`']?(\w+)["`']?\s*\(/i.exec(trimmed);
-      const fk = !!fkMatch;
-      const fkRef = fkMatch ? fkMatch[1].toLowerCase() : undefined;
-
-      const colMatch = /^["`']?(\w+)["`']?\s+([\w()., ]+)/i.exec(trimmed);
-      if (colMatch) {
-        const rawType = colMatch[2].trim()
-          .replace(/\s*PRIMARY\s+KEY/i, "")
-          .replace(/\s*UNIQUE/i, "")
-          .replace(/\s*NOT\s+NULL/i, "")
-          .replace(/\s*DEFAULT.*/i, "")
-          .replace(/\s*CHECK.*/i, "")
-          .replace(/\s*REFERENCES.*/i, "")
-          .trim();
-        columns.push({
-          name: colMatch[1].toLowerCase(),
-          type: rawType,
-          pk,
-          fk,
-          fkRef,
-        });
-      }
-
-      if (fk && fkRef && fkRef !== tableName) {
-        if (!relationships.some((r) => (r.from === fkRef && r.to === tableName) || (r.from === tableName && r.to === fkRef))) {
-          relationships.push({ from: fkRef, to: tableName });
-        }
-      }
-    }
-    if (columns.length > 0) {
-      tables.push({ name: tableName, columns });
-    }
-  }
-
-  if (tables.length === 0) return null;
-
-  const lines: string[] = ["erDiagram", "    direction LR"];
-
-  for (const rel of relationships) {
-    lines.push(`    ${rel.from.toUpperCase()} ||--o{ ${rel.to.toUpperCase()} : "has"`);
-  }
-
-  for (const table of tables) {
-    lines.push(`    ${table.name.toUpperCase()} {`);
-    for (const col of table.columns) {
-      const typeStr = col.type.toUpperCase()
-        .replace(/VARCHAR\(\d+\)/g, "string")
-        .replace(/NUMERIC\(\s*[\d.,\s]+\)/g, "float")
-        .replace(/NUMERIC/g, "float")
-        .replace(/TIMESTAMP.*/g, "timestamp")
-        .replace(/TEXT/g, "string")
-        .replace(/UUID/g, "UUID")
-        .replace(/BOOLEAN/g, "boolean")
-        .replace(/INT\b/g, "int")
-        .replace(/DATE\b/g, "date")
-        .slice(0, 20);
-      const marker = col.pk ? "PK" : col.fk ? "FK" : "";
-      lines.push(`        ${typeStr || "string"} ${col.name} ${marker}`.trim());
-    }
-    lines.push("    }");
-  }
-
-  return { code: lines.join("\n"), tableCount: tables.length, relationshipCount: relationships.length };
 }
 
 /** Generate a simple Mermaid auth flow sequenceDiagram from architecture text. */
@@ -386,6 +296,14 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     props.codeArtifacts ? Object.keys(props.codeArtifacts)[0] ?? null : null,
   );
   const [activeFix, setActiveFix] = useState<RecommendationRow | null>(null);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [savingFiles, setSavingFiles] = useState(false);
+  const [showRun, setShowRun] = useState(false);
+  const [showDesignCanvas, setShowDesignCanvas] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+  const [finalizedAt, setFinalizedAt] = useState<string | null>(props.project.finalizedAt);
+  const [database, setDatabase] = useState(props.project.database);
+  const [dbBusy, setDbBusy] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>("plan");
   const [activePlan, setActivePlan] = useState<PlanResult | null>(null);
   const [buildLoading, setBuildLoading] = useState(false);
@@ -399,6 +317,16 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [mobileTab, setMobileTab] = useState<"navigate" | "chat" | "security">("chat");
   const [activeStepResult, setActiveStepResult] = useState<string | null>(null);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
+  const [maximized, setMaximized] = useState(false);
+
+  // Stable identity: StepResultDialog syncs this in an effect, so an inline
+  // callback would re-run it on every render and immediately undo maximize.
+  const handleFullscreenChange = useCallback((open: boolean) => {
+    setFullscreenOpen(open);
+    // Always reset: closing a maximized popup must not leave the underlying
+    // step-result dialog fullscreen, and reopening must start minimized.
+    setMaximized(false);
+  }, []);
 
   // Subscribing to matchMedia instead of calling setState inside an effect keeps
   // the first render correct and avoids a cascading re-render.
@@ -767,6 +695,137 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     }
   }
 
+  const dirtyFiles = useMemo(
+    () => new Set(Object.keys(drafts).filter((f) => drafts[f] !== codeArtifacts?.[f])),
+    [drafts, codeArtifacts],
+  );
+
+  const designScreens = useMemo(() => normalizeScreens(props.designScreens), [props.designScreens]);
+
+  function handleFileChange(file: string, value: string) {
+    setDrafts((prev) => ({ ...prev, [file]: value }));
+  }
+
+  async function saveFiles(files: string[]) {
+    if (files.length === 0) return;
+    const payload: Record<string, string> = {};
+    for (const file of files) payload[file] = drafts[file] ?? codeArtifacts?.[file] ?? "";
+    setSavingFiles(true);
+    setError(null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}/artifacts`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectStageId: stage.projectStageId, files: payload }),
+      });
+      const data = (await res.json()) as { error?: string; problems?: string[] };
+      if (!res.ok) {
+        setError(data.problems?.join("; ") ?? data.error ?? dict.studio.requestFailed);
+        return;
+      }
+      setCodeArtifacts((prev) => ({ ...(prev ?? {}), ...payload }));
+      setDrafts((prev) => {
+        const next = { ...prev };
+        for (const file of files) delete next[file];
+        return next;
+      });
+      addToast("success", dict.studio.filesSaved);
+      router.refresh();
+    } catch {
+      setError(dict.studio.networkError);
+    } finally {
+      setSavingFiles(false);
+    }
+  }
+
+  async function restoreSnapshot(snapshotId: string) {
+    setRestoringId(snapshotId);
+    setError(null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}/snapshots/${snapshotId}/restore`, {
+        method: "POST",
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? dict.studio.requestFailed);
+        return;
+      }
+      addToast("success", dict.studio.snapshotRestored);
+      router.refresh();
+    } catch {
+      setError(dict.studio.networkError);
+    } finally {
+      setRestoringId(null);
+    }
+  }
+
+  async function toggleFinalize() {
+    setDbBusy(true);
+    setError(null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}/finalize`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ finalized: !finalizedAt }),
+      });
+      const data = (await res.json()) as { error?: string; finalizedAt?: string | null };
+      if (!res.ok) {
+        setError(data.error ?? dict.studio.requestFailed);
+        return;
+      }
+      setFinalizedAt(data.finalizedAt ?? null);
+      addToast("success", data.finalizedAt ? dict.studio.markedFixed : dict.studio.unmarkedFixed);
+      router.refresh();
+    } catch {
+      setError(dict.studio.networkError);
+    } finally {
+      setDbBusy(false);
+    }
+  }
+
+  async function createDatabase() {
+    setDbBusy(true);
+    setError(null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}/database`, { method: "POST" });
+      const data = (await res.json()) as {
+        error?: string;
+        database?: { service: string; hostPort: number; url: string; status: string };
+      };
+      if (!res.ok) {
+        setError(data.error ?? dict.studio.requestFailed);
+        return;
+      }
+      setDatabase(data.database ?? null);
+      addToast("success", dict.studio.databaseCreated);
+      router.refresh();
+    } catch {
+      setError(dict.studio.networkError);
+    } finally {
+      setDbBusy(false);
+    }
+  }
+
+  async function deleteDatabase() {
+    setDbBusy(true);
+    setError(null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}/database`, { method: "DELETE" });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setError(data.error ?? dict.studio.requestFailed);
+        return;
+      }
+      setDatabase(null);
+      addToast("success", dict.studio.databaseDeleted);
+      router.refresh();
+    } catch {
+      setError(dict.studio.networkError);
+    } finally {
+      setDbBusy(false);
+    }
+  }
+
   async function changeOutputLanguage(next: string) {
     setOutputLanguage(next);
     setSavingLanguage(true);
@@ -815,8 +874,6 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     return { ...s, met: false, locked: !current, current };
   });
 
-  const sortedFiles = codeArtifacts ? Object.keys(codeArtifacts).sort() : [];
-
   function getStepResultContent(stepId: string): { title: string; overview: React.ReactNode; visual: React.ReactNode; raw: React.ReactNode; visualCards?: VisualCardDef[] } {
     const meta = stepMeta(stepId);
     const label = meta.label || stepId;
@@ -837,7 +894,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "scope-overview",
                 icon: FileText,
-                iconColor: "text-blue-400",
+                iconColor: "text-primary",
                 title: "Project Scope Summary",
                 description: "Ringkasan proyek dan scope",
                 fullscreenTitle: "Project Scope",
@@ -851,8 +908,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             visual: analysisInfo?.summary ? (
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-blue-900 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-blue-400" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
+                    <FileText className="w-4 h-4 text-primary" />
                   </div>
                   <h4 className="font-semibold text-sm">Project Scope Summary</h4>
                 </div>
@@ -874,7 +931,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "stack-recommendations",
                 icon: Terminal,
-                iconColor: "text-gray-400",
+                iconColor: "text-muted-foreground",
                 title: "Tech Stack Recommendations",
                 description: "Daftar teknologi direkomendasikan",
                 fullscreenTitle: "Technology Stack Detail",
@@ -925,7 +982,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "security-requirements",
                 icon: ShieldCheck,
-                iconColor: "text-emerald-400",
+                iconColor: "text-success",
                 title: "Security Requirements",
                 description: `${analysisInfo.securityRequirements.length} persyaratan teridentifikasi`,
                 fullscreenTitle: "Security Requirements Detail",
@@ -933,8 +990,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   <div className="p-4">
                     {analysisInfo.securityRequirements.map((r, i) => (
                       <div key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5 mb-1">
-                        <div className="w-5 h-5 rounded-full bg-emerald-900 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-bold text-emerald-400">{i + 1}</span>
+                        <div className="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center shrink-0">
+                          <span className="text-[10px] font-bold text-success">{i + 1}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">{r}</p>
                       </div>
@@ -947,8 +1004,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               <div className="space-y-2">
                 {analysisInfo.securityRequirements.map((r, i) => (
                   <div key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5">
-                    <div className="w-5 h-5 rounded-full bg-emerald-900 flex items-center justify-center shrink-0 mt-0.5">
-                      <span className="text-[10px] font-bold text-emerald-400">{i + 1}</span>
+                    <div className="w-5 h-5 rounded-full bg-success/15 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-[10px] font-bold text-success">{i + 1}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">{r}</p>
                   </div>
@@ -970,7 +1027,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "data-classification",
                 icon: ShieldCheck,
-                iconColor: "text-red-400",
+                iconColor: "text-danger",
                 title: "Data Classification",
                 description: `${props.analysisDataClassification.length} kategori data teridentifikasi`,
                 fullscreenTitle: "Data Classification Detail",
@@ -990,12 +1047,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                           const level = lower.includes("pii") || lower.includes("personal") ? "Sensitive" :
                                     lower.includes("phi") || lower.includes("health") ? "Restricted" :
                                     lower.includes("public") ? "Public" : "Internal";
-                          const color = level === "Restricted" ? "bg-red-900 text-red-300" :
-                                    level === "Sensitive" ? "bg-yellow-900 text-yellow-300" :
-                                    level === "Public" ? "bg-green-900 text-green-300" :
-                                    "bg-blue-900 text-blue-300";
+                          const color = levelBadgeClass(level);
                           return (
-                            <tr key={i} className="border-b last:border-0">
+                            <tr key={i} className="border-b last:border-0 odd:bg-muted/20">
                               <td className="py-1.5 pr-3 text-muted-foreground">{i + 1}</td>
                               <td className="py-1.5 pr-3 font-medium">{d}</td>
                               <td className="py-1.5"><span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${color}`}>{level}</span></td>
@@ -1024,12 +1078,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       const level = lower.includes("pii") || lower.includes("personal") ? "Sensitive" :
                                     lower.includes("phi") || lower.includes("health") ? "Restricted" :
                                     lower.includes("public") ? "Public" : "Internal";
-                      const color = level === "Restricted" ? "bg-red-900 text-red-300" :
-                                    level === "Sensitive" ? "bg-yellow-900 text-yellow-300" :
-                                    level === "Public" ? "bg-green-900 text-green-300" :
-                                    "bg-blue-900 text-blue-300";
+                      const color = levelBadgeClass(level);
                       return (
-                        <tr key={i} className="border-b last:border-0">
+                        <tr key={i} className="border-b last:border-0 odd:bg-muted/20">
                           <td className="py-1.5 pr-3 text-muted-foreground">{i + 1}</td>
                           <td className="py-1.5 pr-3 font-medium">{d}</td>
                           <td className="py-1.5"><span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium ${color}`}>{level}</span></td>
@@ -1055,7 +1106,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "analysis-recommendations",
                 icon: Lightbulb,
-                iconColor: "text-amber-400",
+                iconColor: "text-warning",
                 title: "Analysis Recommendations",
                 description: `${recommendations.length} rekomendasi dari analisis`,
                 fullscreenTitle: "Recommendations Detail",
@@ -1064,8 +1115,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     {recommendations.map((r, i) => (
                       <div key={i} className="rounded-md border p-3">
                         <div className="mb-1 flex items-center gap-2">
-                          <span className="w-3 h-3 rounded bg-amber-900 flex items-center justify-center shrink-0">
-                            <span className="text-[8px] font-bold text-amber-400">{i + 1}</span>
+                          <span className="w-3 h-3 rounded bg-warning/15 flex items-center justify-center shrink-0">
+                            <span className="text-[8px] font-bold text-warning">{i + 1}</span>
                           </span>
                           <span className="text-sm font-medium">{r.title}</span>
                         </div>
@@ -1202,7 +1253,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "stride-threats",
                 icon: ShieldAlert,
-                iconColor: "text-red-400",
+                iconColor: "text-danger",
                 title: "STRIDE Threat Model",
                 description: `${threatModel.length} ancaman teridentifikasi`,
                 fullscreenTitle: "STRIDE Threat Model Detail",
@@ -1214,7 +1265,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       <div className="grid grid-cols-3 gap-2 mb-4">
                         {["Low", "Medium", "High"].map((level) => {
                           const count = threatModel.filter((t) => String(t.likelihood ?? "").toLowerCase() === level.toLowerCase()).length;
-                          const color = level === "High" ? "bg-red-900 border-red-700" : level === "Medium" ? "bg-yellow-900 border-yellow-700" : "bg-green-900 border-green-700";
+                          const color = levelBadgeClass(level);
                           return (
                             <div key={level} className={`${color} border rounded-lg p-2 text-center`}>
                               <p className="text-lg font-bold">{count}</p>
@@ -1239,20 +1290,16 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                           </thead>
                           <tbody>
                             {threatModel.map((t, i) => (
-                              <tr key={i} className="border-b last:border-0">
+                              <tr key={i} className="border-b last:border-0 odd:bg-muted/20">
                                 <td className="py-1.5 pr-2 align-top">{String(t.threat ?? "")}</td>
                                 <td className="py-1.5 pr-2 align-top">
                                   <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                    String(t.likelihood ?? "").toLowerCase() === "high" ? "bg-red-900 text-red-300" :
-                                    String(t.likelihood ?? "").toLowerCase() === "medium" ? "bg-yellow-900 text-yellow-300" :
-                                    "bg-green-900 text-green-300"
+                                    levelBadgeClass(String(t.likelihood ?? ""))
                                   }`}>{String(t.likelihood ?? "—")}</span>
                                 </td>
                                 <td className="py-1.5 pr-2 align-top">
                                   <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                                    String(t.impact ?? "").toLowerCase() === "high" ? "bg-red-900 text-red-300" :
-                                    String(t.impact ?? "").toLowerCase() === "medium" ? "bg-yellow-900 text-yellow-300" :
-                                    "bg-green-900 text-green-300"
+                                    levelBadgeClass(String(t.impact ?? ""))
                                   }`}>{String(t.impact ?? "—")}</span>
                                 </td>
                                 <td className="py-1.5 align-top">{String(t.mitigation ?? "—")}</td>
@@ -1272,7 +1319,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   {["Low", "Medium", "High"].map((level) => {
                     const count = threatModel.filter((t) => String(t.likelihood ?? "").toLowerCase() === level.toLowerCase()).length;
-                    const color = level === "High" ? "bg-red-900 border-red-700" : level === "Medium" ? "bg-yellow-900 border-yellow-700" : "bg-green-900 border-green-700";
+                    const color = levelBadgeClass(level);
                     return (
                       <div key={level} className={`${color} border rounded-lg p-2 text-center`}>
                         <p className="text-lg font-bold">{count}</p>
@@ -1294,20 +1341,16 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     </thead>
                     <tbody>
                       {threatModel.map((t, i) => (
-                        <tr key={i} className="border-b last:border-0">
+                        <tr key={i} className="border-b last:border-0 odd:bg-muted/20">
                           <td className="py-1.5 pr-2 align-top">{String(t.threat ?? "")}</td>
                           <td className="py-1.5 pr-2 align-top">
                             <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                              String(t.likelihood ?? "").toLowerCase() === "high" ? "bg-red-900 text-red-300" :
-                              String(t.likelihood ?? "").toLowerCase() === "medium" ? "bg-yellow-900 text-yellow-300" :
-                              "bg-green-900 text-green-300"
+                              levelBadgeClass(String(t.likelihood ?? ""))
                             }`}>{String(t.likelihood ?? "—")}</span>
                           </td>
                           <td className="py-1.5 pr-2 align-top">
                             <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                              String(t.impact ?? "").toLowerCase() === "high" ? "bg-red-900 text-red-300" :
-                              String(t.impact ?? "").toLowerCase() === "medium" ? "bg-yellow-900 text-yellow-300" :
-                              "bg-green-900 text-green-300"
+                              levelBadgeClass(String(t.impact ?? ""))
                             }`}>{String(t.impact ?? "—")}</span>
                           </td>
                           <td className="py-1.5 align-top">{String(t.mitigation ?? "—")}</td>
@@ -1336,7 +1379,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               title: `Diagram ${i + 1}`,
               description: "Architecture / Data Flow diagram",
               fullscreenTitle: `Architecture Diagram ${i + 1}`,
-              fullscreenContent: <MermaidDiagram code={d} id={`fullscreen-diagram-${i}`} />,
+              fullscreenContent: <MermaidDiagram code={d} id={`fullscreen-diagram-${i}`} variant="fullscreen" />,
             })) : undefined,
             visual: diagrams.length > 0 ? (
               <div className="space-y-4">
@@ -1348,7 +1391,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             raw: <pre className="text-xs bg-muted rounded p-3 overflow-auto">{JSON.stringify(diagrams, null, 2)}</pre>,
           };
         case "schema": {
-          const erdResult = erdDiagram ? { code: erdDiagram, tableCount: 0, relationshipCount: 0 } : generateErdFromSchema(databaseSchema);
+          // Prefer the deterministic, cardinality-aware generator; the AI's own
+          // erDiagram is only a fallback when the schema text yields nothing.
+          const erdResult =
+            generateErdFromSchema(databaseSchema) ??
+            (erdDiagram ? { code: erdDiagram, tableCount: 0, relationshipCount: 0 } : null);
           const autoErdCode = erdResult?.code ?? null;
           const autoAuth = authFlowDiagram || generateAuthFlowFromArchitecture(architecture);
           return {
@@ -1360,12 +1407,21 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               </div>
             ) : empty,
             visualCards: databaseSchema.length > 0 ? [
+              ...(autoErdCode ? [{
+                id: "erd",
+                icon: GitPullRequestArrow,
+                iconColor: "text-primary",
+                title: "ERD Diagram",
+                description: `${erdResult?.tableCount ?? 0} entities, ${erdResult?.relationshipCount ?? 0} relationships (${erdCardinalitySummary(autoErdCode)})`,
+                fullscreenTitle: "Entity Relationship Diagram",
+                fullscreenContent: <MermaidDiagram code={autoErdCode} id="fullscreen-erd" variant="fullscreen" />,
+              }] : []),
               {
                 id: "tables",
                 icon: Database,
-                iconColor: "text-orange-400",
+                iconColor: "text-warning",
                 title: "Table Definitions",
-                description: `${databaseSchema.length} SQL definitions`,
+                description: `${databaseSchema.length} definitions`,
                 fullscreenTitle: "Table Definitions",
                 fullscreenContent: (
                   <pre className="text-sm font-mono whitespace-pre-wrap bg-muted rounded-lg p-6 sm:p-8">
@@ -1373,37 +1429,28 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   </pre>
                 ),
               },
-              ...(autoErdCode ? [{
-                id: "erd",
-                icon: GitPullRequestArrow,
-                iconColor: "text-blue-400",
-                title: "ERD Diagram",
-                description: `${erdResult?.tableCount ?? 0} entities, ${erdResult?.relationshipCount ?? 0} relationships`,
-                fullscreenTitle: "Entity Relationship Diagram",
-                fullscreenContent: <MermaidDiagram code={autoErdCode} id="fullscreen-erd" />,
-              }] : []),
               ...(autoAuth ? [{
                 id: "auth",
                 icon: Lock,
-                iconColor: "text-green-400",
+                iconColor: "text-success",
                 title: "Auth Flow",
                 description: "Sequence diagram",
                 fullscreenTitle: "Authentication Flow",
-                fullscreenContent: <MermaidDiagram code={autoAuth} id="fullscreen-auth" />,
+                fullscreenContent: <MermaidDiagram code={autoAuth} id="fullscreen-auth" variant="fullscreen" />,
               }] : []),
             ] : undefined,
             visual: databaseSchema.length > 0 ? (
               <div className="space-y-4">
-                <div>
-                  <h5 className="font-semibold text-sm mb-2">Table Definitions</h5>
-                  <pre className="text-sm font-mono whitespace-pre-wrap bg-muted rounded-lg p-4">{databaseSchema.map((s, i) => `${i + 1}. ${s}`).join("\n\n")}</pre>
-                </div>
                 {autoErdCode && (
                   <div>
                     <h5 className="font-semibold text-sm mb-2">ERD Diagram</h5>
                     <MermaidDiagram code={autoErdCode} id="popup-erd" />
                   </div>
                 )}
+                <div>
+                  <h5 className="font-semibold text-sm mb-2">Table Definitions</h5>
+                  <pre className="text-sm font-mono whitespace-pre-wrap bg-muted rounded-lg p-4">{databaseSchema.map((s, i) => `${i + 1}. ${s}`).join("\n\n")}</pre>
+                </div>
                 {autoAuth && (
                   <div>
                     <h5 className="font-semibold text-sm mb-2">Auth Flow</h5>
@@ -1487,7 +1534,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             {
               id: "owasp-findings",
               icon: Bug,
-              iconColor: "text-red-400",
+              iconColor: "text-danger",
               title: "OWASP Findings",
               description: `${testingFindings.length} temuan keamanan`,
               fullscreenTitle: "OWASP Findings Detail",
@@ -1513,7 +1560,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               <div className="grid grid-cols-4 gap-2 mb-4">
                 {["critical", "high", "medium", "low"].map((sev) => {
                   const count = testingFindings.filter((f) => String(f.severity ?? "").toLowerCase() === sev).length;
-                  const color = sev === "critical" ? "bg-red-900 border-red-700" : sev === "high" ? "bg-orange-900 border-orange-700" : sev === "medium" ? "bg-yellow-900 border-yellow-700" : "bg-green-900 border-green-700";
+                  const color = levelBadgeClass(sev);
                   return (
                     <div key={sev} className={`${color} border rounded-lg p-2 text-center`}>
                       <p className="text-lg font-bold">{count}</p>
@@ -1539,6 +1586,13 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         };
       }
       if (stepId === "score") {
+        const severityBreakdown = {
+          critical: testingFindings.filter((f) => String(f.severity ?? "").toLowerCase() === "critical").length,
+          high: testingFindings.filter((f) => String(f.severity ?? "").toLowerCase() === "high").length,
+          medium: testingFindings.filter((f) => String(f.severity ?? "").toLowerCase() === "medium").length,
+          low: testingFindings.filter((f) => String(f.severity ?? "").toLowerCase() === "low").length,
+          total: testingFindings.length,
+        };
         return {
           title: label,
           overview: score != null ? (
@@ -1551,7 +1605,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             {
               id: "security-score",
               icon: Layout,
-              iconColor: "text-emerald-400",
+              iconColor: "text-success",
               title: "Security Score",
               description: `Skor ${score} / 100`,
               fullscreenTitle: "Security Score Detail",
@@ -1566,18 +1620,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     </span>
                   </div>
                   <Progress value={score} />
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { label: "Authentication", score: Math.min(100, score + 10) },
-                      { label: "Data Protection", score: Math.max(0, score - 5) },
-                      { label: "Input Validation", score: Math.min(100, score + 5) },
-                    ].map((item) => (
-                      <div key={item.label} className="rounded-lg border bg-card p-2 text-center">
-                        <p className="text-xs text-muted-foreground">{item.label}</p>
-                        <p className="text-lg font-bold">{item.score}</p>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {severityBreakdown.total > 0
+                      ? `Based on ${severityBreakdown.total} finding(s): ${severityBreakdown.critical} critical, ${severityBreakdown.high} high, ${severityBreakdown.medium} medium, ${severityBreakdown.low} low.`
+                      : "No findings recorded for this stage yet."}
+                  </p>
                 </div>
               ),
             },
@@ -1593,19 +1640,12 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </span>
               </div>
               <Progress value={score} />
-              {/* Score breakdown */}
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { label: "Authentication", score: Math.min(100, score + 10) },
-                  { label: "Data Protection", score: Math.max(0, score - 5) },
-                  { label: "Input Validation", score: Math.min(100, score + 5) },
-                ].map((item) => (
-                  <div key={item.label} className="rounded-lg border bg-card p-2 text-center">
-                    <p className="text-xs text-muted-foreground">{item.label}</p>
-                    <p className="text-lg font-bold">{item.score}</p>
-                  </div>
-                ))}
-              </div>
+              {/* Real counts from the model's own findings — no derived numbers. */}
+              <p className="text-xs text-muted-foreground">
+                {severityBreakdown.total > 0
+                  ? `Based on ${severityBreakdown.total} finding(s): ${severityBreakdown.critical} critical, ${severityBreakdown.high} high, ${severityBreakdown.medium} medium, ${severityBreakdown.low} low.`
+                  : "No findings recorded for this stage yet."}
+              </p>
             </div>
           ) : empty,
           raw: <pre className="text-xs bg-muted rounded p-3 overflow-auto">{JSON.stringify({ securityScore: score }, null, 2)}</pre>,
@@ -1624,7 +1664,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             {
               id: "remediation-files",
               icon: Wrench,
-              iconColor: "text-amber-400",
+              iconColor: "text-warning",
               title: "Remediation Files",
               description: `${Object.keys(testingFixedArtifacts).length} file diperbaiki`,
               fullscreenTitle: "Remediation Detail",
@@ -1666,7 +1706,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             {
               id: "dev-recommendations",
               icon: Lightbulb,
-              iconColor: "text-amber-400",
+              iconColor: "text-warning",
               title: "Development Recommendations",
               description: `${recommendations.length} rekomendasi`,
               fullscreenTitle: "Recommendations Detail",
@@ -1675,8 +1715,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   {recommendations.map((r, i) => (
                     <div key={i} className="rounded-md border p-3">
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="w-3 h-3 rounded bg-amber-900 flex items-center justify-center shrink-0">
-                          <span className="text-[8px] font-bold text-amber-400">{i + 1}</span>
+                        <span className="w-3 h-3 rounded bg-warning/15 flex items-center justify-center shrink-0">
+                          <span className="text-[8px] font-bold text-warning">{i + 1}</span>
                         </span>
                         <span className="text-sm font-medium">{r.title}</span>
                       </div>
@@ -1715,7 +1755,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         visualCards: matchingFiles.length > 0 ? matchingFiles.map(([path, content]) => ({
           id: path,
           icon: FileCode2,
-          iconColor: "text-emerald-400",
+          iconColor: "text-success",
           title: path.split("/").pop() || path,
           description: `${content.split("\n").length} lines`,
           fullscreenTitle: path.split("/").pop() || path,
@@ -1756,7 +1796,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "handover-manual",
                 icon: BookOpen,
-                iconColor: "text-amber-400",
+                iconColor: "text-warning",
                 title: "Manual Book",
                 description: "Dokumentasi deployment dan penggunaan",
                 fullscreenTitle: "Manual Book Detail",
@@ -1785,7 +1825,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {
                 id: "handover-compliance",
                 icon: ClipboardCheck,
-                iconColor: "text-emerald-400",
+                iconColor: "text-success",
                 title: "Compliance Report",
                 description: "Laporan kepatuhan terhadap framework keamanan",
                 fullscreenTitle: "Compliance Report Detail",
@@ -1850,7 +1890,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             visualCards: recommendations.length > 0 ? recommendations.map((r) => ({
               id: r.id,
               icon: ShieldCheck,
-              iconColor: r.severity === "critical" || r.severity === "high" ? "text-red-400" : "text-amber-400",
+              iconColor: r.severity === "critical" || r.severity === "high" ? "text-danger" : "text-warning",
               title: r.title,
               description: r.category,
               fullscreenTitle: r.title,
@@ -1898,15 +1938,17 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   return (
     <div className="flex h-[calc(100svh-3.5rem)] flex-col max-md:h-auto max-md:min-h-[calc(100svh-3.5rem)]">
       {/* Top bar + stepper */}
-      <div className="border-b">
+      <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-2 text-sm">
-            <Link href={`/${lang}/dashboard`} className="text-muted-foreground hover:text-foreground">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
+            <Link href={`/${lang}/dashboard`} className="shrink-0 text-muted-foreground hover:text-foreground">
               {dict.studio.back}
             </Link>
-            <ArrowRight className="size-3 text-muted-foreground" />
-            <span className="font-medium">{project.name}</span>
+            <ArrowRight className="size-3 shrink-0 text-muted-foreground" />
+            <span className="truncate font-medium">{project.name}</span>
             <Badge variant="secondary">{project.version}</Badge>
+            <ArrowRight className="size-3 shrink-0 text-muted-foreground" />
+            <span className="truncate text-muted-foreground">{stage.name}</span>
             {project.outputLanguage !== "en" && (
               <Badge variant="outline">{project.outputLanguage.toUpperCase()}</Badge>
             )}
@@ -1968,12 +2010,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       </div>
 
       {/* Mobile tab bar */}
-      <div className="flex border-b md:hidden">
+      <div
+        role="tablist"
+        aria-label="Studio panels"
+        className="sticky top-0 z-20 flex border-b bg-background/95 backdrop-blur md:hidden"
+      >
         {(["navigate", "chat", "security"] as const).map((tab) => (
           <button
             key={tab}
+            role="tab"
+            aria-selected={mobileTab === tab}
             onClick={() => setMobileTab(tab)}
-            className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors ${
+            className={`flex min-h-11 flex-1 items-center justify-center gap-1.5 px-3 py-3 text-xs font-medium transition-colors ${
               mobileTab === tab
                 ? "border-b-2 border-primary text-primary"
                 : "text-muted-foreground hover:text-foreground"
@@ -2090,6 +2138,56 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           <div className="flex items-center justify-between border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <span className="flex items-center gap-2"><Bot className="size-4" /> AI Prompt Engine</span>
             <div className="flex items-center gap-2">
+              {stage.code === "development" && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
+                <Button size="sm" onClick={() => setShowRun(true)}>
+                  <Play className="size-3.5" /> {dict.studio.runApp}
+                </Button>
+              )}
+              {stage.code === "development" && (
+                <>
+                  <Button
+                    size="sm"
+                    variant={finalizedAt ? "secondary" : "outline"}
+                    onClick={toggleFinalize}
+                    disabled={dbBusy}
+                    title={finalizedAt ? dict.studio.unmarkFixed : dict.studio.markFixed}
+                  >
+                    <CheckCircle2 className="size-3.5" />
+                    {finalizedAt ? dict.studio.fixed : dict.studio.markFixed}
+                  </Button>
+                  {finalizedAt && !database && (
+                    <Button size="sm" onClick={createDatabase} disabled={dbBusy}>
+                      {dbBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Database className="size-3.5" />}
+                      {dict.studio.createDatabase}
+                    </Button>
+                  )}
+                  {database && (
+                    <span className="flex items-center gap-1">
+                      <Badge variant="success" title={database.url}>
+                        <Database className="size-3" /> {database.service} :{database.hostPort}
+                      </Badge>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={deleteDatabase}
+                        disabled={dbBusy}
+                        title={dict.studio.deleteDatabase}
+                        aria-label={dict.studio.deleteDatabase}
+                      >
+                        <Trash2 className="size-3.5 text-destructive" />
+                      </Button>
+                    </span>
+                  )}
+                </>
+              )}
+              {isDesign && (
+                <Button size="sm" variant="outline" onClick={() => setShowDesignCanvas(true)}>
+                  <Layout className="size-3.5" /> {dict.studio.designStudioOpen}
+                  {designScreens.length > 0 && (
+                    <Badge variant="secondary" className="ms-1">{designScreens.length}</Badge>
+                  )}
+                </Button>
+              )}
               {!isHandover && !isAnalysis && !isDesign && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
                 <Button size="sm" variant="outline" onClick={downloadArtifacts}>
                   <Download className="size-3.5" /> {dict.studio.downloadArtifacts}
@@ -2199,7 +2297,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                         </thead>
                         <tbody>
                           {threatModel.map((t, i) => (
-                            <tr key={i} className="border-b last:border-0">
+                            <tr key={i} className="border-b last:border-0 odd:bg-muted/20">
                               <td className="py-1.5 pr-2 align-top">{String(t.threat ?? "")}</td>
                               <td className="py-1.5 pr-2 align-top">{String(t.likelihood ?? "—")}</td>
                               <td className="py-1.5 pr-2 align-top">{String(t.impact ?? "—")}</td>
@@ -2229,16 +2327,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             )}
 
             {(isCodeStage || isHandover) && codeArtifacts && (
-              <div className="border-b">
-                <div className="flex gap-1 overflow-x-auto scrollbar-none border-b p-2">
-                  {sortedFiles.map((f) => (
-                    <button key={f} onClick={() => { setActiveFile(f); setActiveFix(null); }} className={`flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-xs transition-colors ${activeFile === f ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-accent"}`}>
-                      <FolderTree className="size-3" />
-                      {f}
-                    </button>
-                  ))}
-                  {sortedFiles.length === 0 && <span className="px-2 py-1 text-xs text-muted-foreground">{dict.studio.noFilesHint}</span>}
-                </div>
+              <div className="flex h-[480px] min-h-0 flex-col border-b">
                 {snapshots.length > 0 && (
                   <details className="border-b px-4 py-2">
                     <summary className="cursor-pointer select-none text-xs font-medium text-muted-foreground">{dict.studio.snapshots} ({snapshots.length})</summary>
@@ -2248,43 +2337,74 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                           <span className="font-mono text-muted-foreground">{s.version}</span>
                           <span className="line-clamp-1 flex-1 text-muted-foreground">{s.diffSummary}</span>
                           <span className="text-muted-foreground">{s.fileCount} {dict.studio.files}</span>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 shrink-0 px-2 text-[11px]"
+                            onClick={() => restoreSnapshot(s.id)}
+                            disabled={restoringId === s.id}
+                          >
+                            {restoringId === s.id ? <Loader2 className="size-3 animate-spin" /> : <RotateCcw className="size-3" />}
+                            {dict.studio.restore}
+                          </Button>
                         </li>
                       ))}
                     </ul>
                   </details>
                 )}
-                <div className="min-h-0" style={{ height: "calc(100% - 40px)" }}>
-                  {activeFix?.suggestedCode && activeFix?.filePath ? (
-                    <div className="flex h-full flex-col">
-                      <div className="flex items-center justify-between gap-2 border-b bg-success/5 px-4 py-2">
-                        <span className="text-xs font-semibold text-success">
-                          {dict.studio.suggestedFixTitle}{activeFix.nistControl?.taskCode ?? "NIST"}
-                          {activeFix.filePath ? ` · ${activeFix.filePath}` : ""}
-                        </span>
-                        <div className="flex items-center gap-1.5">
-                          <Button size="sm" variant="outline" onClick={() => setActiveFix(null)}>
-                            <X className="size-3" /> {dict.studio.rejectFix}
-                          </Button>
-                          <Button size="sm" onClick={() => applyFix(activeFix)}>
-                            <CheckCheck className="size-3" /> {dict.studio.applyFix}
-                          </Button>
+                <div className="min-h-0 flex-1">
+                  <CodeWorkspace
+                    files={codeArtifacts}
+                    activeFile={activeFile}
+                    onSelectFile={(f) => {
+                      setActiveFile(f);
+                      setActiveFix(null);
+                    }}
+                    dirty={dirtyFiles}
+                    onChange={handleFileChange}
+                    onSave={(f) => saveFiles([f])}
+                    onSaveAll={() => saveFiles([...dirtyFiles])}
+                    saving={savingFiles}
+                    variant="studio"
+                    emptyLabel={dict.studio.emptyFiller}
+                    loadingLabel={dict.studio.loadingEditor}
+                    editorOverride={
+                      activeFix?.suggestedCode && activeFix?.filePath ? (
+                        <div className="flex h-full flex-col">
+                          <div className="flex items-center justify-between gap-2 border-b bg-success/5 px-4 py-2">
+                            <span className="text-xs font-semibold text-success">
+                              {dict.studio.suggestedFixTitle}{activeFix.nistControl?.taskCode ?? "NIST"}
+                              {activeFix.filePath ? ` · ${activeFix.filePath}` : ""}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <Button size="sm" variant="outline" onClick={() => setActiveFix(null)}>
+                                <X className="size-3" /> {dict.studio.rejectFix}
+                              </Button>
+                              <Button size="sm" onClick={() => applyFix(activeFix)}>
+                                <CheckCheck className="size-3" /> {dict.studio.applyFix}
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="min-h-0 flex-1">
+                            <MonacoDiff
+                              original={activeFix.filePath ? codeArtifacts?.[activeFix.filePath] ?? "" : activeFix.content}
+                              modified={activeFix.suggestedCode}
+                              language={activeFix.filePath ? inferLanguage(activeFix.filePath) : "javascript"}
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div className="min-h-0 flex-1">
-                        <MonacoDiff
-                          original={activeFix.filePath ? codeArtifacts?.[activeFix.filePath] ?? "" : activeFix.content}
-                          modified={activeFix.suggestedCode}
-                          language={activeFix.filePath ? inferLanguage(activeFix.filePath) : "javascript"}
-                        />
-                      </div>
-                    </div>
-                  ) : activeFile && codeArtifacts?.[activeFile] !== undefined ? (
-                    <FileEditor value={codeArtifacts[activeFile]} language={inferLanguage(activeFile)} readOnly loadingLabel={dict.studio.loadingEditor} />
-                  ) : (
-                    <div className="flex h-full items-center justify-center p-6 text-center text-xs text-muted-foreground">
-                      {dict.studio.emptyFiller}
-                    </div>
-                  )}
+                      ) : undefined
+                    }
+                    labels={{
+                      unsaved: dict.studio.unsavedFiles,
+                      save: dict.studio.save,
+                      saveAll: dict.studio.saveAll,
+                      terminal: dict.studio.terminal,
+                      explorer: dict.studio.explorer,
+                      preview: dict.studio.preview,
+                      saved: dict.studio.allSaved,
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -2292,12 +2412,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             {/* Chat messages */}
             <div className="space-y-3 p-4">
               {messages.length === 0 && (
-                <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center text-xs text-muted-foreground">
-                  <Wand2 className="size-6" />
-                  <span>
-                    {isAnalysis ? dict.studio.analysisEmpty : isDesign ? dict.studio.designEmpty : isCodeStage ? dict.studio.codeEmpty : dict.studio.handoverEmpty}
-                  </span>
-                </div>
+                <EmptyState
+                  icon={Wand2}
+                  description={isAnalysis ? dict.studio.analysisEmpty : isDesign ? dict.studio.designEmpty : isCodeStage ? dict.studio.codeEmpty : dict.studio.handoverEmpty}
+                  className="py-8"
+                />
               )}
               {messages.map((m) => (
                 <div key={m.id} className={`flex gap-2 ${m.role === "user" ? "justify-end" : ""}`}>
@@ -2394,7 +2513,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   onClick={() => setChatMode("plan")}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     chatMode === "plan"
-                      ? "bg-blue-600 text-white shadow-sm"
+                      ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -2404,7 +2523,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   onClick={() => setChatMode("build")}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                     chatMode === "build"
-                      ? "bg-emerald-600 text-white shadow-sm"
+                      ? "bg-success text-white shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -2412,7 +2531,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </button>
               </div>
               {activePlan && chatMode === "build" && (
-                <span className="text-[10px] text-emerald-400">
+                <span className="text-[10px] text-success">
                   {activePlan.actions.length} actions ready
                 </span>
               )}
@@ -2517,6 +2636,21 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               </ul>
             </div>
 
+            {stage.code === "testing" && (
+              <SecurityScanPanel
+                projectId={project.id}
+                hasCode={Object.keys(codeArtifacts ?? {}).length > 0}
+                labels={{
+                  title: dict.studio.scanTitle,
+                  run: dict.studio.scanRun,
+                  empty: dict.studio.scanEmpty,
+                  failed: dict.studio.scanFailed,
+                  needCode: dict.studio.scanNeedCode,
+                  skipped: dict.studio.scanSkipped,
+                }}
+              />
+            )}
+
             {recommendations.length === 0 ? (
               <p className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
                 {dict.studio.noRecommendations}
@@ -2619,18 +2753,25 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         </aside>
       </div>
 
-      <Dialog open={activeStepResult !== null} onOpenChange={(open) => { if (!open) setActiveStepResult(null); }}>
+      <Dialog open={activeStepResult !== null} onOpenChange={(open) => { if (!open) { setActiveStepResult(null); setMaximized(false); } }}>
         <DialogContent
-          className="max-h-[90vh] overflow-y-auto sm:max-w-5xl"
+          hideClose={fullscreenOpen}
+          className={
+            maximized
+              ? "inset-0 left-0 top-0 h-dvh max-h-none w-screen max-w-none translate-x-0 translate-y-0 gap-0 rounded-none border-0 p-0 sm:rounded-none"
+              : "max-h-[90vh] overflow-y-auto sm:max-w-5xl"
+          }
           onEscapeKeyDown={(e) => { if (fullscreenOpen) e.preventDefault(); }}
         >
-          <DialogHeader>
-            <DialogTitle>{activeStepResult ? getStepResultContent(activeStepResult).title : ""}</DialogTitle>
-            <DialogDescription>
-              {stage.name} — {dict.studio.subSteps}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-2">
+          {!fullscreenOpen && (
+            <DialogHeader>
+              <DialogTitle>{activeStepResult ? getStepResultContent(activeStepResult).title : ""}</DialogTitle>
+              <DialogDescription>
+                {stage.name} — {dict.studio.subSteps}
+              </DialogDescription>
+            </DialogHeader>
+          )}
+          <div className={fullscreenOpen ? "h-full min-h-0" : "mt-2"}>
             {activeStepResult && (
               <StepResultDialog
                 title={getStepResultContent(activeStepResult).title}
@@ -2639,12 +2780,75 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 visual={getStepResultContent(activeStepResult).visual}
                 visualCards={getStepResultContent(activeStepResult).visualCards}
                 raw={getStepResultContent(activeStepResult).raw}
-                onFullscreenStateChange={setFullscreenOpen}
+                maximized={maximized}
+                onToggleMaximize={() => setMaximized((v) => !v)}
+                onFullscreenStateChange={handleFullscreenChange}
               />
             )}
           </div>
         </DialogContent>
       </Dialog>
+
+      {showDesignCanvas && (
+        <DesignStudioDialog
+          projectId={project.id}
+          savedScreens={designScreens}
+          onClose={() => setShowDesignCanvas(false)}
+          onSaved={() => router.refresh()}
+          labels={{
+            title: dict.studio.designStudioTitle,
+            promptPlaceholder: dict.studio.designPromptPlaceholder,
+            generate: dict.studio.designGenerate,
+            generating: dict.studio.designGenerating,
+            refine: dict.studio.designRefine,
+            refinePlaceholder: dict.studio.designRefinePlaceholder,
+            keep: dict.studio.designKeep,
+            discard: dict.studio.designDiscard,
+            saved: dict.studio.allSaved,
+            draft: dict.studio.designDraft,
+            empty: dict.studio.designEmpty,
+            savedCount: dict.studio.designPages,
+          }}
+        />
+      )}
+
+      {showRun && codeArtifacts && (
+        <RunWorkspace
+          projectId={project.id}
+          projectName={project.name}
+          files={codeArtifacts}
+          activeFile={activeFile}
+          onSelectFile={(f) => {
+            setActiveFile(f);
+            setActiveFix(null);
+          }}
+          dirty={dirtyFiles}
+          onChange={handleFileChange}
+          onSave={(f) => saveFiles([f])}
+          onSaveAll={() => saveFiles([...dirtyFiles])}
+          saving={savingFiles}
+          onClose={() => setShowRun(false)}
+          labels={{
+            run: dict.studio.runApp,
+            stop: dict.studio.stopApp,
+            starting: dict.studio.runStarting,
+            running: dict.studio.runRunning,
+            error: dict.studio.runError,
+            stopped: dict.studio.runStopped,
+            notRunning: dict.studio.runNotRunning,
+            noLogs: dict.studio.runNoLogs,
+            logs: dict.studio.runLogs,
+            terminal: dict.studio.terminal,
+            explorer: dict.studio.explorer,
+            preview: dict.studio.preview,
+            save: dict.studio.save,
+            saveAll: dict.studio.saveAll,
+            saved: dict.studio.allSaved,
+            unsaved: dict.studio.unsavedFiles,
+            confirmDiscard: dict.studio.confirmDiscard,
+          }}
+        />
+      )}
       </div>
     );
 }
