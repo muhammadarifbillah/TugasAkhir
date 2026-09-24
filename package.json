@@ -1,20 +1,25 @@
 {
-  "name": "secure-sdlc-generator",
+  "name": "shieldforge",
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/copy-monaco.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/copy-monaco.mjs",
     "build": "next build",
     "start": "next start",
+    "postinstall": "node scripts/copy-monaco.mjs",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run lint && npm run check:dictionaries",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm run lint && npm run check:dictionaries && npm run test",
     "check:dictionaries": "tsx scripts/generate-dictionaries.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "docs:tech": "tsx scripts/generate-docs.ts teknologi-shieldforge.md instrumen-pengumpulan-data.md instrumen-wawancara.md"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.38",
@@ -66,6 +71,7 @@
     "eslint-config-next": "16.3.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
