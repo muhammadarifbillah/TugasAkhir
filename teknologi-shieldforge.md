@@ -66,7 +66,8 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 | Anthropic | @ai-sdk/anthropic | 4.0.38 | Claude 3.5 Sonnet |
 | Local AI | ollama-ai-provider | 1.2.0 | Model lokal (offline) |
 | OpenRouter | OpenRouter API | - | Akses 100+ model AI |
-| BYOK | Bring Your Own Key | - | Lima provider dengan kunci terenkripsi |
+| DeepSeek | DeepSeek API | - | deepseek-chat / deepseek-reasoner (OpenAI-compatible) |
+| BYOK | Bring Your Own Key | - | Enam provider dengan kunci terenkripsi |
 
 ### 2.5 Keamanan & Pemindaian
 
@@ -161,7 +162,7 @@ ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. 
 
 - **Multi-Bahasa (i18n)** - English dan Bahasa Indonesia.
 - **Dark/Light Mode** - Theme toggle dengan next-themes.
-- **BYOK** - Lima provider AI: OpenAI, Anthropic, Gemini, OpenRouter, Ollama.
+- **BYOK** - Enam provider AI: OpenAI, Anthropic, Gemini, OpenRouter, DeepSeek, Ollama.
 - **Monaco Code Editor** - Editor kode seperti VS Code, self-hosted (tanpa CDN), mendukung Save/Save All + snapshot.
 - **Design Studio** - Generator mockup UI berbasis prompt (high-fidelity HTML, refine, keep).
 - **ERD & Diagram** - ERD berkardinalitas (1:1, 1:N, M:N), diagram arsitektur & auth flow.
@@ -265,7 +266,7 @@ Fitur utama yang telah diimplementasikan meliputi:
 - 5 tahap Secure SDLC dengan 30+ sub-step
 - 30+ REST API endpoint
 - 42 task NIST SSDF v1.1 dengan crosswalk ISO/IEC 27001:2022 Annex A
-- Multi-provider AI (Gemini, OpenAI, Anthropic, Ollama, OpenRouter) dengan BYOK
+- Multi-provider AI (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, OpenRouter) dengan BYOK
 - Traceability requirement keamanan -> NIST/ISO -> file kode
 - Security scanning nyata (Semgrep + Trivy + audit dependency) dengan skor deterministik
 - Runner Docker sandbox dengan preview dan log live

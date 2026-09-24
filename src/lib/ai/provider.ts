@@ -54,6 +54,13 @@ export function buildModel(
         name: "gemini",
       }).chat(modelName);
       break;
+    case "deepseek":
+      model = createOpenAI({
+        apiKey,
+        baseURL: baseUrl ?? "https://api.deepseek.com/v1",
+        name: "deepseek",
+      }).chat(modelName);
+      break;
     case "openai":
     default:
       model = createOpenAI({

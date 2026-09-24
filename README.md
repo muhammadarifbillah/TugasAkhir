@@ -56,7 +56,7 @@ DEFAULT_AI_MODEL=gemini-flash-latest
 DEFAULT_AI_API_KEY=your-gemini-api-key
 ```
 
-`DEFAULT_AI_API_KEY` hanya dibaca dari `.env` dan tidak pernah di-commit. Provider lain yang didukung: `openai`, `openrouter`, `anthropic`, `ollama` (tanpa key). Provider Gemini/OpenAI/OpenRouter memakai endpoint Chat Completions melalui `@ai-sdk/openai`.
+`DEFAULT_AI_API_KEY` hanya dibaca dari `.env` dan tidak pernah di-commit. Provider lain yang didukung: `openai`, `openrouter`, `anthropic`, `deepseek`, `ollama` (tanpa key). Provider Gemini/OpenAI/OpenRouter/DeepSeek memakai endpoint Chat Completions melalui `@ai-sdk/openai`.
 
 Catatan: model Gemini lawas seperti `gemini-2.5-flash` sudah tidak tersedia untuk pengguna baru; gunakan alias `gemini-flash-latest` atau model yang tampil pada daftar model akunmu.
 

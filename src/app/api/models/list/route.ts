@@ -38,6 +38,10 @@ const STATIC_MODELS: Record<string, ModelEntry[]> = {
     { id: "anthropic/claude-3.5-sonnet", name: "Anthropic Claude 3.5 Sonnet", maxTokens: null },
     { id: "google/gemini-flash-1.5", name: "Google Gemini Flash 1.5", maxTokens: null },
   ],
+  deepseek: [
+    { id: "deepseek-chat", name: "DeepSeek Chat", maxTokens: 8192 },
+    { id: "deepseek-reasoner", name: "DeepSeek Reasoner", maxTokens: 8192 },
+  ],
 };
 
 async function fetchGeminiModels(apiKey: string): Promise<ModelEntry[]> {
@@ -83,6 +87,22 @@ async function fetchOpenAIModels(apiKey: string, baseUrl?: string): Promise<Mode
       maxTokens: null,
     }));
   return models;
+}
+
+async function fetchDeepSeekModels(apiKey: string, baseUrl?: string): Promise<ModelEntry[]> {
+  // DeepSeek is OpenAI-compatible; its /models list only contains deepseek-* ids,
+  // so the OpenAI chat-prefix filter would wrongly drop them all.
+  const res = await fetch(`${baseUrl ?? "https://api.deepseek.com/v1"}/models`, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+    signal: AbortSignal.timeout(10000),
+  });
+  if (!res.ok) throw new Error(`DeepSeek API ${res.status}`);
+  const data = await res.json();
+  return (data.data ?? []).map((m: { id: string }) => ({
+    id: m.id,
+    name: m.id,
+    maxTokens: null,
+  }));
 }
 
 async function fetchOpenRouterModels(apiKey: string): Promise<ModelEntry[]> {
@@ -191,6 +211,9 @@ export async function POST(request: Request) {
         break;
       case "openrouter":
         models = await fetchOpenRouterModels(apiKey);
+        break;
+      case "deepseek":
+        models = await fetchDeepSeekModels(apiKey, baseUrl);
         break;
       default:
         return NextResponse.json({ error: "Unknown provider" }, { status: 400 });
