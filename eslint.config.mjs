@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Self-hosted Monaco assets copied by scripts/copy-monaco.mjs:
+    "public/monaco/**",
+    // Service worker (plain JS, not part of the TS app graph):
+    "public/sw.js",
   ]),
 ]);
 

@@ -5,7 +5,14 @@ import mermaid from "mermaid";
 
 let initialized = false;
 
-export function MermaidDiagram({ code, id }: { code: string; id: string }) {
+interface MermaidDiagramProps {
+  code: string;
+  id: string;
+  /** "fullscreen" makes the rendered SVG scale to fill the available area. */
+  variant?: "inline" | "fullscreen";
+}
+
+export function MermaidDiagram({ code, id, variant = "inline" }: MermaidDiagramProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,14 +31,42 @@ export function MermaidDiagram({ code, id }: { code: string; id: string }) {
     mermaid
       .render(graphId, code)
       .then(({ svg }) => {
-        if (ref.current) ref.current.innerHTML = svg;
+        if (!ref.current) return;
+        ref.current.innerHTML = svg;
+        if (variant === "fullscreen") {
+          // Mermaid ships fixed pixel dimensions and a natural max-width. In
+          // fullscreen we let the SVG fill the area and scale its viewBox to
+          // fit (contain) so the whole diagram stays visible.
+          const svgEl = ref.current.querySelector("svg");
+          if (svgEl) {
+            svgEl.removeAttribute("width");
+            svgEl.removeAttribute("height");
+            svgEl.style.width = "100%";
+            svgEl.style.height = "100%";
+            svgEl.style.maxWidth = "100%";
+            svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+          }
+        }
       })
       .catch(() => {
         if (ref.current) {
           ref.current.textContent = code;
         }
       });
-  }, [code, id]);
+  }, [code, id, variant]);
 
-  return <div ref={ref} className="w-full overflow-auto rounded-lg border bg-card p-4" />;
+  return (
+    <div
+      className={
+        variant === "fullscreen"
+          ? "h-full w-full overflow-auto rounded-lg border bg-card p-2 sm:p-4"
+          : "w-full overflow-auto rounded-lg border bg-card p-4"
+      }
+    >
+      <div
+        ref={ref}
+        className={variant === "fullscreen" ? "flex h-full w-full items-center justify-center" : undefined}
+      />
+    </div>
+  );
 }

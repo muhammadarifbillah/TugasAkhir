@@ -3,6 +3,11 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { ComponentProps } from "react";
+import { loader } from "@monaco-editor/react";
+
+// Serve Monaco from our own origin (copied to public/monaco/vs by
+// scripts/copy-monaco.mjs) instead of the jsdelivr CDN.
+loader.config({ paths: { vs: "/monaco/vs" } });
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 

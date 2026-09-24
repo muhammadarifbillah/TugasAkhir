@@ -39,7 +39,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {/* Email/Password Form */}
-          <LoginForm lang={lang} error={error} />
+          <LoginForm lang={lang} dict={dict} error={error} />
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

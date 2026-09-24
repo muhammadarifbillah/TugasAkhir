@@ -1,35 +1,10 @@
 import type { NextConfig } from "next";
 
 /**
- * Content Security Policy.
- *
- * Notes on the allowances, so they can be tightened deliberately rather than by
- * accident:
- * - `script-src` must allow `cdn.jsdelivr.net`: `@monaco-editor/react` pulls the
- *   editor bundle from the jsdelivr copy of monaco-editor (see the `paths.vs`
- *   default in the @monaco-editor/loader config). Self-hosting Monaco is the way
- *   to remove this third-party origin.
- * - `'unsafe-inline'` for scripts/styles is required by the inline bootstrap
- *   payload Next.js emits and by Mermaid's injected SVG styles. Moving to a
- *   nonce-based policy (proxy.ts can mint the nonce) is the follow-up.
- * - `worker-src blob:` is required by Monaco's web workers.
- * - `frame-ancestors 'none'` duplicates X-Frame-Options for modern browsers.
+ * Static security headers. The Content-Security-Policy is NOT here: it carries a
+ * per-request script nonce and is emitted by `src/proxy.ts` (middleware), which
+ * also lets Next.js stamp its inline bootstrap scripts with that nonce.
  */
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  "worker-src 'self' blob:",
-  "connect-src 'self' https:",
-  "manifest-src 'self'",
-].join("; ");
-
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -42,7 +17,6 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=()",
   },
-  { key: "Content-Security-Policy", value: contentSecurityPolicy },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "X-DNS-Prefetch-Control", value: "off" },
 ];

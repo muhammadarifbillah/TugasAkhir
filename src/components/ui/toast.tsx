@@ -57,7 +57,14 @@ function ToastContainer({
   removeToast: (id: string) => void;
 }) {
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm">
+    <div
+      // Announced by screen readers as toasts appear. `polite` avoids
+      // interrupting the user mid-sentence for a non-critical notification.
+      role="status"
+      aria-live="polite"
+      aria-atomic="false"
+      className="fixed bottom-4 end-4 z-[9999] flex max-w-sm flex-col gap-2"
+    >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
@@ -73,28 +80,27 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     }
   }, [toast.duration, onClose]);
 
-  const icons: Record<ToastType, React.ReactNode> = {
-    success: <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />,
-    error: <XCircle className="w-4 h-4 text-red-400 shrink-0" />,
-    warning: <AlertTriangle className="w-4 h-4 text-yellow-400 shrink-0" />,
-    info: <Info className="w-4 h-4 text-blue-400 shrink-0" />,
+  const styles: Record<ToastType, { Icon: typeof CheckCircle; accent: string; border: string }> = {
+    success: { Icon: CheckCircle, accent: "text-success", border: "border-success/40" },
+    error: { Icon: XCircle, accent: "text-danger", border: "border-danger/40" },
+    warning: { Icon: AlertTriangle, accent: "text-warning", border: "border-warning/40" },
+    info: { Icon: Info, accent: "text-accent-2", border: "border-accent-2/40" },
   };
-
-  const bgColors: Record<ToastType, string> = {
-    success: "bg-emerald-950 border-emerald-700",
-    error: "bg-red-950 border-red-700",
-    warning: "bg-yellow-950 border-yellow-700",
-    info: "bg-blue-950 border-blue-700",
-  };
+  const { Icon, accent, border } = styles[toast.type];
 
   return (
     <div
-      className={`${bgColors[toast.type]} border rounded-lg px-3 py-2.5 shadow-lg flex items-start gap-2 animate-slide-in`}
+      className={`card-elevated flex items-start gap-2 rounded-lg border ${border} bg-card px-3 py-2.5 text-foreground animate-slide-in`}
     >
-      {icons[toast.type]}
-      <p className="text-xs text-zinc-200 flex-1 leading-relaxed">{toast.message}</p>
-      <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 shrink-0 mt-0.5">
-        <X className="w-3 h-3" />
+      <Icon className={`mt-0.5 size-4 shrink-0 ${accent}`} aria-hidden="true" />
+      <p className="flex-1 text-xs leading-relaxed">{toast.message}</p>
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Dismiss notification"
+        className="mt-0.5 shrink-0 rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <X className="size-3" aria-hidden="true" />
       </button>
     </div>
   );

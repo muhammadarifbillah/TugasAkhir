@@ -53,3 +53,6 @@ next-env.d.ts
 # local server logs and Office lock files
 dev-server.log
 ~\$*
+
+# self-hosted Monaco assets (copied by scripts/copy-monaco.mjs)
+/public/monaco/

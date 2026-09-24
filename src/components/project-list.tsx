@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { Dictionary } from "@/lib/i18n";
@@ -47,10 +48,12 @@ export function ProjectList({
   const [filter, setFilter] = useState<FilterKey>("all");
   const [query, setQuery] = useState("");
   const [revisingId, setRevisingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   async function revise(p: ProjectCardData) {
     setRevisingId(p.id);
+    setError(null);
     try {
       const res = await csrfFetch("/api/revisions", {
         method: "POST",
@@ -62,10 +65,11 @@ export function ProjectList({
         router.push(`/${lang}/studio/${p.id}/analysis`);
         router.refresh();
       } else {
-        console.error("[project-list] revise failed:", data.error);
+        // Previously only logged to the console, so the user saw nothing happen.
+        setError(data.error ?? dict.studio.requestFailed);
       }
-    } catch (err) {
-      console.error("[project-list] revise error:", err);
+    } catch {
+      setError(dict.studio.networkError);
     } finally {
       setRevisingId(null);
     }
@@ -130,13 +134,30 @@ export function ProjectList({
         </div>
       </div>
 
+      {error && (
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+        >
+          {error}
+        </p>
+      )}
+
       {filtered.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-3 py-16 text-center">
-            <FolderGit2 className="size-10 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{dict.dashboard.empty}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={FolderGit2}
+          description={
+            /* Distinguish "nothing matches this filter/search" from "no projects". */
+            projects.length > 0 ? dict.dashboard.noMatches : dict.dashboard.empty
+          }
+          action={
+            projects.length === 0 ? (
+              <Button asChild size="sm">
+                <Link href={`/${lang}/projects/new`}>{dict.dashboard.newProject}</Link>
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((p) => {
@@ -148,7 +169,22 @@ export function ProjectList({
                   ? { variant: "default" as const, text: dict.dashboard.statusDraft }
                   : { variant: "muted" as const, text: dict.dashboard.statusInProgress };
             return (
-              <Card key={p.id} className="transition-colors hover:border-primary/50">
+              <Card
+                key={p.id}
+                className="group relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50"
+              >
+                <span
+                  className={`absolute inset-x-0 top-0 h-1 ${
+                    p.status === "completed"
+                      ? "bg-success"
+                      : p.status === "in_revision"
+                        ? "bg-warning"
+                        : p.status === "draft"
+                          ? "bg-muted-foreground/40"
+                          : "bg-primary"
+                  }`}
+                  aria-hidden="true"
+                />
                 <CardHeader>
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -181,6 +217,7 @@ export function ProjectList({
                   </div>
                   <Progress
                     value={p.score ?? 0}
+                    aria-label={`${dict.dashboard.securityScore}: ${p.score ?? 0}%`}
                     indicatorClassName={
                       p.score == null
                         ? "bg-muted"
@@ -193,9 +230,21 @@ export function ProjectList({
                   />
 
                   <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-                    <Badge variant="muted">
-                      {dict.dashboard.stageLabel} {p.stageProgress.completed}/{p.stageProgress.total}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1" aria-hidden="true">
+                        {Array.from({ length: p.stageProgress.total }).map((_, i) => (
+                          <span
+                            key={i}
+                            className={`h-1.5 w-4 rounded-full ${
+                              i < p.stageProgress.completed ? "bg-primary" : "bg-muted"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-[11px] text-muted-foreground">
+                        {dict.dashboard.stageLabel} {p.stageProgress.completed}/{p.stageProgress.total}
+                      </span>
+                    </div>
                     <div className="flex gap-2">
                       {p.status === "completed" && (
                         <Button size="sm" variant="outline" onClick={() => revise(p)} disabled={revisingId === p.id}>

@@ -1,6 +1,7 @@
 import { generateText } from "ai";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
+import { approvedDesignReference } from "@/lib/ai/design-reference";
 import { getStageDefinition } from "@/lib/stages";
 import { sanitizePrompt } from "@/lib/sanitize";
 import { writeAudit } from "@/lib/audit";
@@ -29,11 +30,17 @@ function composeSystemPrompt(opts: {
     ? sanitizePrompt(JSON.stringify(opts.globalSpec, null, 2).slice(0, 20000))
     : "None yet.";
 
+  const approvedDesign =
+    opts.stageCode === "development" ? approvedDesignReference(opts.globalSpec) : null;
+  const uiPreferences = approvedDesign
+    ? `${opts.uiPreferences ?? "Not specified"}\n\n${approvedDesign}`
+    : opts.uiPreferences ?? "Not specified";
+
   return def.systemPromptTemplate
     .replaceAll("{{PROJECT_NAME}}", sanitizePrompt(opts.projectName))
     .replaceAll("{{PROJECT_DESCRIPTION}}", sanitizePrompt(opts.projectDescription ?? "Not specified"))
     .replaceAll("{{OUTPUT_LANGUAGE}}", sanitizePrompt(opts.outputLanguage || "en"))
-    .replaceAll("{{UI_PREFERENCES}}", sanitizePrompt(opts.uiPreferences ?? "Not specified"))
+    .replaceAll("{{UI_PREFERENCES}}", sanitizePrompt(uiPreferences))
     .replaceAll("{{PROJECT_CONTEXT}}", context)
     .replaceAll(
       "{{LATEST_CODE}}",

@@ -33,7 +33,7 @@ export default async function RegisterPage({ params }: RegisterPageProps) {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           {/* Register Form */}
-          <RegisterForm lang={lang} />
+          <RegisterForm lang={lang} dict={dict} />
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

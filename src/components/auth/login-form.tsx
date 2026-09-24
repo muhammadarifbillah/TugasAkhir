@@ -7,20 +7,22 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import type { Dictionary } from "@/lib/i18n";
 
 interface LoginFormProps {
   lang: string;
+  dict: Dictionary;
   callbackUrl?: string;
   error?: string;
 }
 
-export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
+export function LoginForm({ lang, dict, callbackUrl, error }: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(
-    error === "CredentialsSignin" ? "Invalid email or password." : "",
+    error === "CredentialsSignin" ? dict.auth.invalidCredentials : "",
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +39,7 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
       });
 
       if (result?.error) {
-        setErrorMsg("Invalid email or password.");
+        setErrorMsg(dict.auth.invalidCredentials);
         return;
       }
       if (result?.url) {
@@ -47,7 +49,7 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
     } catch {
       // Without this the rejection is unhandled and the submit button stays
       // disabled for the rest of the session.
-      setErrorMsg("Network error. Check your connection and try again.");
+      setErrorMsg(dict.studio.networkError);
     } finally {
       setLoading(false);
     }
@@ -56,11 +58,11 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{dict.auth.emailLabel}</Label>
         <Input
           id="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder={dict.auth.emailPlaceholder}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -68,11 +70,11 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{dict.auth.passwordLabel}</Label>
         <Input
           id="password"
           type="password"
-          placeholder="Min. 8 characters"
+          placeholder={dict.auth.passwordPlaceholder}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -82,18 +84,21 @@ export function LoginForm({ lang, callbackUrl, error }: LoginFormProps) {
       </div>
 
       {errorMsg && (
-        <p className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-center text-xs text-destructive">
+        <p
+          role="alert"
+          className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-center text-xs text-destructive"
+        >
           {errorMsg}
         </p>
       )}
 
       <Button type="submit" className="w-full" size="lg" disabled={loading}>
         {loading ? (
-          <Loader2 className="size-4 animate-spin" />
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
         ) : (
-          <LogIn className="size-4" />
+          <LogIn className="size-4" aria-hidden="true" />
         )}
-        Sign in with Email
+        {dict.auth.signInWithEmail}
       </Button>
     </form>
   );

@@ -134,15 +134,20 @@ export function ByokManager({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ providerCode, apiKeyId }),
       });
-      const data = (await res.json()) as { models?: { id: string; name: string; maxTokens: number | null }[]; error?: string };
+      const data = (await res.json()) as {
+        models?: { id: string; name: string; maxTokens: number | null }[];
+        error?: string;
+        fallback?: boolean;
+      };
       setModelList(data.models ?? []);
-      if (data.error) setModelListError(data.error);
+      if (data.fallback) setModelListError(dict.settings.fetchModelsFallback);
+      else if (data.error) setModelListError(data.error);
     } catch {
       setModelList([]);
       setModelListError(dict.settings.fetchModelsFailed);
     }
     setLoadingModels(false);
-  }, [dict.settings.fetchModelsFailed]);
+  }, [dict.settings.fetchModelsFailed, dict.settings.fetchModelsFallback]);
 
   // Debounced fetch when provider or key changes
   useEffect(() => {
@@ -365,8 +370,13 @@ export function ByokManager({
                 <Input type="password" value={keyValue} onChange={(e) => changeKeyValue(e.target.value)} required placeholder={dict.settings.phApiKey} />
               </div>
               <div className="grid gap-2">
-                <Label>{dict.settings.modelName}</Label>
-                <Input value={keyLabel} onChange={(e) => setKeyLabel(e.target.value)} placeholder={dict.settings.phKeyLabel} />
+                <Label htmlFor="apiKeyLabel">{dict.settings.keyLabel}</Label>
+                <Input
+                  id="apiKeyLabel"
+                  value={keyLabel}
+                  onChange={(e) => setKeyLabel(e.target.value)}
+                  placeholder={dict.settings.phKeyLabel}
+                />
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Button
@@ -439,7 +449,7 @@ export function ByokManager({
           <CardTitle className="flex items-center justify-between">
             <span>{dict.settings.aiModelsCard}</span>
             <Button size="sm" variant="outline" onClick={() => setShowModelForm((v) => !v)}>
-              <Plus /> {dict.settings.modelName}
+              <Plus /> {dict.settings.addModel}
             </Button>
           </CardTitle>
         </CardHeader>

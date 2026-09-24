@@ -20,6 +20,36 @@ function generateCsrfToken(): string {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/** Per-request script nonce (base64) so inline scripts can be allow-listed. */
+function generateNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes));
+}
+
+/**
+ * CSP with a nonce for `script-src` (replacing `'unsafe-inline'`). `'unsafe-eval'`
+ * is still required by Monaco's AMD loader; `style-src` keeps `'unsafe-inline'`
+ * for Mermaid's injected SVG styles.
+ */
+function buildCsp(nonce: string): string {
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "frame-src 'self' http://localhost:* http://127.0.0.1:*",
+    "object-src 'none'",
+    `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https:",
+    "font-src 'self' data:",
+    "worker-src 'self' blob:",
+    "connect-src 'self' https: ws: wss:",
+    "manifest-src 'self'",
+  ].join("; ");
+}
+
 function extractLocale(pathname: string): string | null {
   const segment = pathname.split("/")[1];
   return segment && isLocale(segment) ? segment : null;
@@ -44,6 +74,13 @@ export function proxy(request: NextRequest) {
 
   const { pathname, search } = request.nextUrl;
 
+  const nonce = generateNonce();
+  const csp = buildCsp(nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  // Next.js reads the nonce from this request header and stamps its inline scripts.
+  requestHeaders.set("Content-Security-Policy", csp);
+
   const existingCsrf = request.cookies.get(CSRF_COOKIE_NAME)?.value;
   const needsCsrf = !existingCsrf;
 
@@ -51,13 +88,10 @@ export function proxy(request: NextRequest) {
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
-  // Fast path: already localised and the CSRF cookie is present.
-  if (pathnameHasLocale && !needsCsrf) return NextResponse.next();
-
   let response: NextResponse;
 
   if (pathnameHasLocale) {
-    response = NextResponse.next();
+    response = NextResponse.next({ request: { headers: requestHeaders } });
   } else {
     const locale =
       extractLocale(pathname) ??
@@ -70,6 +104,8 @@ export function proxy(request: NextRequest) {
     );
     response = NextResponse.redirect(redirectTo);
   }
+
+  response.headers.set("Content-Security-Policy", csp);
 
   if (needsCsrf) {
     response.cookies.set(CSRF_COOKIE_NAME, generateCsrfToken(), {

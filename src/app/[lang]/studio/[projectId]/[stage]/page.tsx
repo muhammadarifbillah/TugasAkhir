@@ -4,6 +4,7 @@ import { StudioWorkspace } from "@/components/studio/studio-workspace";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { STAGE_DEFINITIONS, completionGaps } from "@/lib/stages";
+import { decryptSecret } from "@/lib/crypto";
 
 interface StudioPageProps {
   params: Promise<{ lang: string; projectId: string; stage: string }>;
@@ -93,6 +94,21 @@ export default async function StudioPage(props: StudioPageProps) {
         outputLanguage: project.outputLanguage,
         status: project.status,
         badgePublic: project.badgePublic,
+        finalizedAt: project.finalizedAt ? project.finalizedAt.toISOString() : null,
+        database: (() => {
+          const db = project.database as Record<string, unknown> | null;
+          if (!db || typeof db.urlEncrypted !== "string") return null;
+          try {
+            return {
+              service: String(db.service ?? ""),
+              hostPort: Number(db.hostPort ?? 0),
+              status: String(db.status ?? "ready"),
+              url: decryptSecret(Uint8Array.from(Buffer.from(db.urlEncrypted, "base64"))),
+            };
+          } catch {
+            return null;
+          }
+        })(),
       }}
       stage={{
         code: stageDef.code,
@@ -155,6 +171,7 @@ export default async function StudioPage(props: StudioPageProps) {
       designArchitecture={(design?.architecture as string[] | undefined) ?? []}
       designThreatModel={(design?.threatModel as Record<string, unknown>[] | undefined) ?? []}
       designUiDesign={(design?.uiDesign as string[] | undefined) ?? []}
+      designScreens={design?.designScreens ?? []}
       analysisDataClassification={
         (analysis?.dataClassification as string[] | undefined) ?? []
       }

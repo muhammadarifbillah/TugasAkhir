@@ -23,11 +23,13 @@ interface StepResultDialogProps {
   visual: React.ReactNode;
   visualCards?: VisualCardDef[];
   raw: React.ReactNode;
+  maximized: boolean;
+  onToggleMaximize: () => void;
   onFullscreenStateChange?: (open: boolean) => void;
 }
 
 export function StepResultDialog({
-  title, overview, visual, visualCards, raw, onFullscreenStateChange,
+  title, overview, visual, visualCards, raw, maximized, onToggleMaximize, onFullscreenStateChange,
 }: StepResultDialogProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "visual" | "raw">("overview");
   const [fullscreenCard, setFullscreenCard] = useState<VisualCardDef | null>(null);
@@ -96,8 +98,11 @@ export function StepResultDialog({
       {/* Fullscreen viewer — rendered INSIDE dialog, not outside */}
       {fullscreenCard && (
         <FullscreenViewer
+          key={fullscreenCard.id}
           title={fullscreenCard.fullscreenTitle}
           onClose={() => setFullscreenCard(null)}
+          maximized={maximized}
+          onToggleMaximize={onToggleMaximize}
         >
           {fullscreenCard.fullscreenContent}
         </FullscreenViewer>

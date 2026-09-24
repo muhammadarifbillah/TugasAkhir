@@ -17,6 +17,29 @@ interface ModelEntry {
   maxTokens: number | null;
 }
 
+/**
+ * Suggested models used when the live provider call fails (offline/blocked
+ * network). Clearly flagged to the client as a fallback so it can warn the user.
+ */
+const STATIC_MODELS: Record<string, ModelEntry[]> = {
+  gemini: [
+    { id: "gemini-flash-latest", name: "Gemini Flash (latest)", maxTokens: 8192 },
+    { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash", maxTokens: 8192 },
+    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", maxTokens: 8192 },
+  ],
+  openai: [
+    { id: "gpt-4o", name: "GPT-4o", maxTokens: null },
+    { id: "gpt-4o-mini", name: "GPT-4o mini", maxTokens: null },
+    { id: "gpt-4.1", name: "GPT-4.1", maxTokens: null },
+    { id: "o4-mini", name: "o4-mini", maxTokens: null },
+  ],
+  openrouter: [
+    { id: "openai/gpt-4o-mini", name: "OpenAI GPT-4o mini", maxTokens: null },
+    { id: "anthropic/claude-3.5-sonnet", name: "Anthropic Claude 3.5 Sonnet", maxTokens: null },
+    { id: "google/gemini-flash-1.5", name: "Google Gemini Flash 1.5", maxTokens: null },
+  ],
+};
+
 async function fetchGeminiModels(apiKey: string): Promise<ModelEntry[]> {
   // The key travels in a header, never in the query string: URLs are recorded by
   // proxies, CDNs and error messages, which would leak the credential.
@@ -175,6 +198,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ models });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to fetch models";
+    // Fall back to a suggested list so the user can still add a model when the
+    // provider is unreachable (offline, blocked host, proxy, etc.).
+    const fallback = STATIC_MODELS[providerCode];
+    if (fallback) {
+      return NextResponse.json({ models: fallback, fallback: true, error: message });
+    }
     return NextResponse.json({ error: message, models: [] }, { status: 400 });
   }
 }

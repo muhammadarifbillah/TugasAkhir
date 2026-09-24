@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ShieldCheck } from "lucide-react";
+import { Database, ShieldCheck } from "lucide-react";
 import { auth, githubConfigured } from "@/auth";
 import { ByokManager } from "@/components/settings/byok-manager";
 import { GithubActions } from "@/components/settings/github-actions";
@@ -89,6 +90,20 @@ export default async function SettingsPage({ params }: SettingsProps) {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{dict.settings.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{dict.settings.aiModelsSubtitle}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <Link
+            href={`/${lang}/settings/audit`}
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+          >
+            <ShieldCheck className="size-4" /> {dict.audit.title}
+          </Link>
+          <Link
+            href={`/${lang}/settings/databases`}
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+          >
+            <Database className="size-4" /> {dict.databases.title}
+          </Link>
+        </div>
       </div>
 
       <div className="mb-6 grid gap-4 md:grid-cols-2">
