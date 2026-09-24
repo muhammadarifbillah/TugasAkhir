@@ -1,4 +1,4 @@
-# SecureSDLC Design Blueprint
+# ShieldForge Design Blueprint
 
 > Versi: 1.0 | Terakhir diperbarui: September 2026
 > Tools: Next.js 16, Tailwind CSS v4, shadcn/ui, Geist Font
@@ -110,7 +110,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 │ HEADER: Logo | Dashboard | Settings     [Lang] [Theme] │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│              🛡️ SecureSDLC                              │
+│              🛡️ ShieldForge                              │
 │   AI-Powered Secure Development Lifecycle Generator     │
 │                                                         │
 │   [Get Started]  [View on GitHub]                       │
@@ -127,7 +127,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 │  └──────────┘ └──────────┘ └──────────┘               │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
-│ FOOTER: SecureSDLC v1.0 — Built with Next.js 16        │
+│ FOOTER: ShieldForge v1.0 — Built with Next.js 16        │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -254,11 +254,11 @@ Mono: Geist_Mono, ui-monospace, monospace
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                                                         │
-│              🛡️ SecureSDLC                              │
+│              🛡️ ShieldForge                              │
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │ Sign In                                          │   │
-│  │ Welcome back to SecureSDLC                       │   │
+│  │ Welcome back to ShieldForge                       │   │
 │  │                                                  │   │
 │  │ Email                                           │   │
 │  │ [you@example.com________________________]       │   │

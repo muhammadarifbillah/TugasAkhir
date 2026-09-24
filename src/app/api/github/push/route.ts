@@ -47,7 +47,7 @@ async function resolveTarget(
     name: opts.repoName,
     private: opts.visibility === "private",
     auto_init: false,
-    description: `${opts.projectName} — generated with SecureSDLC (NIST SP 800-218 / ISO 27001:2022).`,
+    description: `${opts.projectName} — generated with ShieldForge (NIST SP 800-218 / ISO 27001:2022).`,
   });
   return {
     owner: created.data.owner?.login ?? me.data.login,
@@ -159,7 +159,7 @@ export async function POST(request: Request) {
       target.baseSha,
       files,
       commitMessage?.trim() ||
-        `feat: ${target.baseSha ? `update` : `initial release`} ${project.currentVersion} via SecureSDLC`,
+        `feat: ${target.baseSha ? `update` : `initial release`} ${project.currentVersion} via ShieldForge`,
     );
     const repoUrl = target.repoUrl;
 

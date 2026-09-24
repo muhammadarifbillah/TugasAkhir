@@ -1,6 +1,6 @@
-# SecureSDLC
+# ShieldForge
 
-SecureSDLC adalah generator website berbasis AI dengan alur Secure SDLC lima tahap:
+ShieldForge adalah generator website berbasis AI dengan alur Secure SDLC lima tahap:
 
 1. Analysis and Requirements
 2. Design and Architecture
@@ -127,9 +127,39 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 - `POST /api/revisions` membuat revisi baru (hanya untuk proyek `completed`)
 - `PATCH /api/revisions/:id` merge atau cancel revisi
 - `GET /api/export/doc` mengunduh Manual Book atau laporan ISO PDF/Markdown (hanya jika semua tahap selesai)
+- `GET /api/export/doc?type=traceability` mengunduh matriks ketertelusuran requirement → NIST/ISO → file (Markdown)
 - `GET /api/export/zip` mengunduh source bundle
 - `GET /api/export/artifacts` mengunduh code artifacts antar-tahap
 - `GET /api/badge/:projectId` badge publik — hanya untuk proyek `completed` **dengan opt-in `badgePublic`**
+- `PATCH /api/projects/:id/artifacts` menyimpan hasil edit kode + snapshot
+- `POST /api/projects/:id/snapshots/:snapshotId/restore` memulihkan source dari snapshot
+- `POST /api/projects/:id/design/generate` menghasilkan mockup UI (HTML) dari prompt
+- `PATCH /api/projects/:id/design` menyimpan desain (`designScreens` / `designFrames`)
+- `PATCH /api/projects/:id/finalize` menandai proyek "fix"
+- `POST` / `DELETE /api/projects/:id/database` membuat / menghapus database persisten
+- `POST` / `DELETE /api/run/:projectId` menjalankan / menghentikan app hasil generate di Docker
+- `GET /api/run/:projectId/status` status + statistik container
+- `GET /api/run/:projectId/logs/stream` log container (SSE)
+- `POST /api/projects/:id/scan` menjalankan pemindaian keamanan nyata (Semgrep SAST + Trivy vulnerability/secret/misconfig + audit dependency) di container Docker, menyimpan temuan dan skor keamanan deterministik
+- `GET /api/projects/:id/scan` temuan pemindaian terakhir + ringkasan
+
+## Editor, Run, Desain, dan Database
+
+- **Editor kode editable** — panel kode studio memakai Monaco **self-hosted** (tanpa CDN); bisa diedit dan disimpan per file atau **Save All**, tiap simpan membuat snapshot.
+- **Snapshot restore** — kembalikan source ke versi sebelumnya dari daftar Versions.
+- **Run app (Docker sandbox)** — jalankan hasil generate multi-stack (Node/Next, Python, PHP, Go, static) di container dengan limit resource; preview di popup gaya VS Code (Desktop/Tablet/Mobile), log live (SSE), statistik CPU/RAM.
+- **Database** — DB throwaway saat Run; DB persisten setelah proyek ditandai "Fix" (connection string terenkripsi).
+- **Design Studio (ala Google Stitch)** — popup generator UI berbasis prompt: jelaskan layar → AI menghasilkan mockup HTML high-fidelity (statis, dirender di iframe sandbox) → **Refine** dengan prompt lanjutan → **Keep** untuk menyimpan. Desain terpilih menjadi acuan tahap Development.
+- **ERD berkardinalitas** — relasi 1:1 / 1:N / M:N.
+- **Security scanning nyata** — tahap Testing dapat menjalankan Semgrep (SAST), Trivy (vulnerability/secret/misconfig), dan audit dependency di container; temuan dipetakan ke NIST/ISO dan **security score dihitung deterministik** (bukan estimasi AI).
+- **Traceability requirement → kode** — requirement keamanan ber-ID (`REQ-SEC-*`) dilacak ke rekomendasi, file kode, NIST dan ISO; diekspor sebagai `docs/TRACEABILITY-MATRIX.md`.
+- **Audit log** di `/settings/audit` dan **manajemen database** di `/settings/databases`.
+- **Tema & PWA** — light/dark, motif CSS ringan, manifest + service worker.
+
+### Menjalankan app hasil generate
+1. Buka tahap **Development** → klik **Run**. Container akan `install` lalu `start`.
+2. Preview muncul di popup; log live di panel Terminal; kontrol ukuran perangkat tersedia.
+3. Menutup popup menghentikan container (juga auto-stop setelah 15 menit idle).
 
 ## Verifikasi
 
@@ -149,3 +179,8 @@ Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, expo
 - Badge hanya membuka metadata untuk proyek `completed` yang di-opt-in pemiliknya (`badgePublic`).
 - IP audit hanya mempercayai `x-forwarded-for` saat `TRUSTED_PROXY=1`.
 - Laporan ISO adalah crosswalk konseptual untuk kebutuhan pengembangan dan tugas akhir, bukan bukti sertifikasi.
+- Fitur **Run** membutuhkan host dengan Docker daemon yang aktif (server ShieldForge sendiri; user akhir tidak perlu Docker bila di-host).
+- Fitur **Run** dan **Security Scan** juga membutuhkan Docker; pada host tanpa Docker (mis. serverless), set `RUNNER_MODE=disabled` agar fitur dilewati dengan rapi.
+- Security score berasal dari pemindai nyata (Semgrep/Trivy/audit). Bila Docker tidak tersedia, skor tetap menunggu pemindaian, bukan ditebak AI.
+- Monaco dan font di-self-host: `scripts/copy-monaco.mjs` menyalin aset Monaco ke `public/monaco/vs` (dijalankan otomatis oleh `predev`/`prebuild`/`postinstall`).
+- CSP memakai **nonce per-request** yang dibuat di `src/proxy.ts` (tanpa `'unsafe-inline'` untuk script).

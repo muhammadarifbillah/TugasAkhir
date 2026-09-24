@@ -1,6 +1,6 @@
 # PEDOMAN WAWANCARA
 
-## Penelitian: Pengembangan Aplikasi SecureSDLC
+## Penelitian: Pengembangan Aplikasi ShieldForge
 ### AI-Powered Secure SDLC Website Generator
 
 ---
@@ -13,7 +13,7 @@
 
 ## TENTANG APLIKASI SECURESDLC
 
-**SecureSDLC** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
+**ShieldForge** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
 
 - **5 Tahapan Berurutan:**
   1. **Analysis & Requirements** — Penentuan scope, rekomendasi stack teknologi, identifikasi requirement keamanan & privasi, klasifikasi data
@@ -24,7 +24,7 @@
 
 - **Framework Keamanan:** NIST SP 800-218 (SSDF) dengan crosswalk ke ISO 27001:2022 Annex A
 - **Teknologi AI:** Mendukung berbagai provider (OpenAI, Anthropic, Gemini, Ollama) dengan pendekatan BYOK (Bring Your Own Key)
-- **Fitur Tambahan:** Audit logging, multi-bahasa (14 bahasa), export PDF/dokumen, integrasi GitHub
+- **Fitur Tambahan:** Audit logging, multi-bahasa (Inggris & Indonesia), export PDF/dokumen, integrasi GitHub
 
 **Tujuan Aplikasi:** Membantu tim pengembang menerapkan praktik keamanan sejak awal siklus pengembangan (secure-by-design) tanpa memerlukan ahli keamanan siber khusus di setiap tahapan, sekaligus menghasilkan dokumentasi keamanan yang dibutuhkan untuk kepatuhan terhadap standar internasional.
 

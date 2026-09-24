@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { Header } from "@/components/header";
+import { OfflineBanner } from "@/components/offline-banner";
+import { PwaRegister } from "@/components/pwa-register";
 import { ThemeProvider } from "@/components/theme-provider";
 import { getDictionary, isLocale, locales } from "@/lib/i18n";
 import "../globals.css";
 
-const geistSans = Geist({
+// Self-hosted Geist (latin subset) so the app does not depend on Google Fonts
+// at build/runtime and works fully offline.
+const geistSans = localFont({
+  src: "../fonts/Geist.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "../fonts/GeistMono.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
+  fallback: ["ui-monospace", "monospace"],
 });
 
 /**
@@ -30,12 +38,12 @@ export function generateStaticParams() {
 
 const META: Record<string, { title: string; description: string }> = {
   en: {
-    title: "SecureSDLC — AI-Powered Secure Website Generator",
+    title: "ShieldForge — AI-Powered Secure Website Generator",
     description:
       "Generate secure websites with an AI-guided 5-stage Secure SDLC, grounded in NIST SP 800-218 and ISO 27001:2022.",
   },
   id: {
-    title: "SecureSDLC — Generator Website Aman Bertenaga AI",
+    title: "ShieldForge — Generator Website Aman Bertenaga AI",
     description:
       "Hasilkan website aman dengan Secure SDLC 5 tahap berbasis AI, berlandaskan NIST SP 800-218 dan ISO 27001:2022.",
   },
@@ -76,10 +84,18 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:border focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-foreground focus:shadow-lg"
+        >
+          {dict.a11y.skipToContent}
+        </a>
+        <PwaRegister />
         <ThemeProvider>
           <div className="flex min-h-svh flex-col">
+            <OfflineBanner label={dict.app.offline} />
             <Header lang={lang} />
-            <main className="flex-1">{children}</main>
+            <main id="main" className="flex-1">{children}</main>
             <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">
               {dict.app.name} — {dict.app.tagline}. {dict.app.frameworkNote}
             </footer>
