@@ -56,3 +56,6 @@ dev-server.log
 
 # self-hosted Monaco assets (copied by scripts/copy-monaco.mjs)
 /public/monaco/
+
+# local reference screenshots
+Proxmox.png
