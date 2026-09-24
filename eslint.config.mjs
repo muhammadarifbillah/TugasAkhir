@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "public/monaco/**",
     // Service worker (plain JS, not part of the TS app graph):
     "public/sw.js",
+    // Generated Vitest coverage report:
+    "coverage/**",
   ]),
 ]);
 

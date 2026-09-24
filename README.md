@@ -181,6 +181,18 @@ npm run verify   # typecheck + lint + dictionaries + unit test (Vitest)
 npm run build
 ```
 
+Laporan cakupan tes (output di `coverage/`: teks, HTML, lcov):
+
+```bash
+npm run test:coverage
+```
+
+Uji end-to-end pemindai nyata (Semgrep + Trivy + audit) terhadap proyek contoh rentan — butuh Docker **dan** jaringan, jadi dijalankan terpisah dari suite unit:
+
+```bash
+npm run test:e2e
+```
+
 Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, security scan, traceability, export PDF/Markdown/ZIP, badge, revisi, audit log, dan halaman BYOK.
 
 ## Catatan Produksi
