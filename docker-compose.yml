@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: secure_sdlc
+    volumes:
+      - shieldforge-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d secure_sdlc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/secure_sdlc?schema=public
+      NODE_ENV: production
+      # Run/Scan spawn sibling containers through the host Docker daemon.
+      # Set RUNNER_MODE=disabled to hide those features on hosts without Docker.
+      RUNNER_MODE: local-docker
+    ports:
+      - "3000:3000"
+    volumes:
+      # Expose the host Docker socket to the app so Run/Scan can start containers.
+      # NOTE: the runner bind-mounts a path created *inside* this container; the
+      # host daemon cannot see that path. For fully working Run/Scan, run
+      # ShieldForge directly on the host instead of in a container.
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  shieldforge-db:

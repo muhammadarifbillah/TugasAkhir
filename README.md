@@ -161,6 +161,19 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 2. Preview muncul di popup; log live di panel Terminal; kontrol ukuran perangkat tersedia.
 3. Menutup popup menghentikan container (juga auto-stop setelah 15 menit idle).
 
+## Deploy dengan Docker
+
+Satu perintah untuk menjalankan aplikasi + PostgreSQL:
+
+```bash
+cp .env.example .env   # isi AUTH_SECRET dan ENCRYPTION_MASTER_KEY
+docker compose up --build
+```
+
+Buka `http://localhost:3000`. Container `app` otomatis menjalankan migrasi (`prisma migrate deploy`) dan seed master data sebelum start.
+
+Catatan fitur **Run** & **Security Scan**: keduanya mengeksekusi container lewat Docker daemon host (`/var/run/docker.sock`). Karena runner mem-bind-mount path sementara yang dibuat *di dalam* container `app`, host tidak melihat path itu, sehingga sandbox belum berjalan penuh dari dalam container. Untuk Run/Scan yang berfungsi penuh, jalankan ShieldForge langsung di host (VPS + Docker). Set `RUNNER_MODE=disabled` bila ingin menyembunyikan fitur tersebut saat berjalan di container.
+
 ## Verifikasi
 
 ```bash
