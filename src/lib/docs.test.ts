@@ -96,3 +96,28 @@ test("reports zero gaps when every requirement is implemented", () => {
 
   assert.match(md, /- None\. Every requirement/);
 });
+
+test("marks a requirement Issue when the scanner flags its NIST task", () => {
+  const md = buildTraceabilityMatrix({
+    name: "Demo",
+    currentVersion: "v1.0",
+    requirements: [
+      req({
+        reqId: "REQ-SEC-004",
+        nistControl: { taskCode: "PW.5.1", title: "Secure coding", iso27001Mapping: ["A.8.28"] },
+        links: [
+          {
+            filePath: "src/api.ts",
+            stageCode: "development",
+            status: "issue",
+            recommendation: { isApplied: true, nistControl: { taskCode: "PW.5.1" } },
+          },
+        ],
+      }),
+    ],
+  });
+
+  assert.match(md, /\| Issue \|/);
+  assert.match(md, /REQ-SEC-004/);
+  assert.match(md, /scanner reported high\/critical findings/);
+});

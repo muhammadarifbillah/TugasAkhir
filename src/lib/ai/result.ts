@@ -423,6 +423,7 @@ export async function persistStageResult(input: {
         requirementIds: string[];
         isApplied: boolean;
         filePath: string | null;
+        nistControlId: number | null;
       }[] = [];
       for (const r of recs) {
         const row = await tx.aiRecommendation.create({
@@ -438,7 +439,7 @@ export async function persistStageResult(input: {
             filePath: r.file ?? null,
             requirementIds: r.requirementIds ?? [],
           },
-          select: { id: true, requirementIds: true, isApplied: true, filePath: true },
+          select: { id: true, requirementIds: true, isApplied: true, filePath: true, nistControlId: true },
         });
         createdRecs.push(row);
       }
@@ -458,6 +459,23 @@ export async function persistStageResult(input: {
       );
       if (links.length > 0) {
         await tx.requirementLink.createMany({ data: links });
+      }
+
+      // Propagate the recommendation's NIST task onto the requirement so the
+      // scanner can later verify the requirement against findings for that task.
+      const propagated = new Map<string, number>();
+      for (const rec of createdRecs) {
+        if (!rec.nistControlId) continue;
+        for (const reqId of rec.requirementIds) {
+          const requirementId = requirementIdByReqId.get(reqId);
+          if (requirementId) propagated.set(requirementId, rec.nistControlId);
+        }
+      }
+      for (const [requirementId, nistControlId] of propagated) {
+        await tx.securityRequirement.updateMany({
+          where: { id: requirementId, nistControlId: null },
+          data: { nistControlId },
+        });
       }
     }
 

@@ -393,7 +393,7 @@ export function completionGaps(
         met[step.id] = Array.isArray(stage.findings) && stage.findings.length > 0;
         break;
       case "score":
-        met[step.id] = typeof stage.securityScore === "number";
+        met[step.id] = typeof stage.securityScore === "number" || typeof stage.scanScore === "number";
         break;
       case "remediation":
         met[step.id] = asRecord(stage.fixedArtifacts) !== null;

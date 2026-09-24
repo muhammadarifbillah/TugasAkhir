@@ -316,6 +316,8 @@
     "scanFailed": "Pindai gagal.",
     "scanNeedCode": "Hasilkan kode sumber sebelum memindai.",
     "scanSkipped": "Alat dilewati",
+    "traceTitle": "Ketertelusuran Requirement",
+    "traceEmpty": "Belum ada requirement keamanan. Selesaikan tahap Analysis terlebih dahulu.",
     "markApplied": "Tandai sudah diterapkan",
     "markNotApplied": "Tandai belum diterapkan",
     "emptyFiller": "Pilih file atau jalankan AI untuk menghasilkan kode.",

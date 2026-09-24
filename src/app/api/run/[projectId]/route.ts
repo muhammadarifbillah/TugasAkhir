@@ -5,6 +5,7 @@ import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { startRun, stopRun } from "@/lib/runner/session";
+import { runnerDisabled } from "@/lib/runner/mode";
 
 interface RouteProps {
   params: Promise<{ projectId: string }>;
@@ -27,6 +28,13 @@ export async function POST(request: Request, { params }: RouteProps) {
 
   if (rateLimited(`run:${session.user.id}`, 20)) {
     return NextResponse.json({ error: "Too many run requests. Slow down." }, { status: 429 });
+  }
+
+  if (runnerDisabled()) {
+    return NextResponse.json(
+      { error: "App runner is disabled on this host (RUNNER_MODE=disabled)." },
+      { status: 409 },
+    );
   }
 
   const { projectId } = await params;

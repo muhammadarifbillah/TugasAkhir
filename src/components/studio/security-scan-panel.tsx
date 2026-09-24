@@ -9,6 +9,7 @@ import { csrfFetch } from "@/lib/csrf-client";
 export interface SecurityScanLabels {
   title: string;
   run: string;
+  running: string;
   empty: string;
   failed: string;
   needCode: string;
@@ -125,7 +126,7 @@ export function SecurityScanPanel({
         onClick={run}
       >
         {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Play className="size-3.5" />}
-        {loading ? labels.title : labels.run}
+        {loading ? labels.running : labels.run}
       </Button>
 
       {!hasCode && <p className="mt-2 text-[11px] text-muted-foreground">{labels.needCode}</p>}

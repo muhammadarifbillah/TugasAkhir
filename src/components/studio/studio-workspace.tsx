@@ -54,6 +54,7 @@ import {
 import { MonacoDiff, inferLanguage } from "@/components/studio/code-editor";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
 import { SecurityScanPanel } from "@/components/studio/security-scan-panel";
+import { TraceabilityPanel } from "@/components/studio/traceability-panel";
 import { RunWorkspace } from "@/components/studio/run-workspace";
 import { DesignStudioDialog } from "@/components/studio/design-studio-dialog";
 import { normalizeScreens } from "@/lib/design";
@@ -2643,11 +2644,20 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 labels={{
                   title: dict.studio.scanTitle,
                   run: dict.studio.scanRun,
+                  running: dict.studio.scanRunning,
                   empty: dict.studio.scanEmpty,
                   failed: dict.studio.scanFailed,
                   needCode: dict.studio.scanNeedCode,
                   skipped: dict.studio.scanSkipped,
                 }}
+              />
+            )}
+
+            {(stage.code === "testing" || stage.code === "handover") && (
+              <TraceabilityPanel
+                projectId={project.id}
+                labels={{ title: dict.studio.traceTitle, empty: dict.studio.traceEmpty }}
+                onOpenFile={(f) => setActiveFile(f)}
               />
             )}
 

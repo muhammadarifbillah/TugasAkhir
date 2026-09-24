@@ -176,15 +176,16 @@ ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. 
 - Setiap security requirement dari tahap Analysis diberi ID stabil (mis. `REQ-SEC-001`).
 - Rekomendasi dan perbaikan pada tahap Development/Testing ditandai dengan `requirementIds`.
 - Tabel `SecurityRequirement` dan `RequirementLink` menyimpan relasi requirement -> rekomendasi -> file kode.
-- Hasilnya: **Traceability Matrix** (requirement -> NIST -> ISO -> file -> status Implemented/Partial/Gap), tampil di UI dan diekspor sebagai `docs/TRACEABILITY-MATRIX.md`.
+- Status link diperbarui otomatis dari hasil pemindaian: **Verified** bila tidak ada temuan high/critical untuk task NIST terkait, atau **Issue** bila ditemukan.
+- Hasilnya: **Traceability Matrix** (requirement -> NIST -> ISO -> file -> status Implemented/Partial/Gap/Issue), tampil di UI (panel di tahap Testing & Handover) dan diekspor sebagai `docs/TRACEABILITY-MATRIX.md`.
 
 ### 4.6 Security Scanning Nyata
 
 - **Semgrep** (SAST) menjalankan ruleset `p/owasp-top-ten` dan `p/security-audit` pada source hasil generate.
 - **Trivy** memindai kerentanan dependency, hardcoded secret, dan misconfiguration (Dockerfile/IaC).
 - **Dependency audit** sesuai stack: `npm audit` (Node) atau `pip-audit` (Python).
-- Temuan dinormalisasi (severity, file, line, CWE/OWASP) dan dipetakan ke NIST/ISO.
-- **Security Score** dihitung deterministik: mulai 100, dikurangi bobot per temuan (critical 20, high 10, medium 4, low 1), minimal 0.
+- Temuan dinormalisasi (severity, file, line, CWE/OWASP), dipetakan ke NIST/ISO, dan menandai requirement terkait sebagai **Verified** (tanpa temuan high/critical) atau **Issue**.
+- **Security Score** dihitung deterministik: mulai 100, dikurangi bobot per temuan (critical 20, high 10, medium 4, low 1), minimal 0. Skor scanner disimpan terpisah (`scanScore`) dan tidak dapat ditimpa oleh estimasi AI.
 
 ### 4.7 Runner Docker & Hosting
 

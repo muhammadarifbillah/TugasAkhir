@@ -164,12 +164,11 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 ## Verifikasi
 
 ```bash
-npx tsc --noEmit
-npm run lint
+npm run verify   # typecheck + lint + dictionaries + unit test (Vitest)
 npm run build
 ```
 
-Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, export PDF/Markdown/ZIP, badge, revisi, audit log, dan halaman BYOK.
+Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, security scan, traceability, export PDF/Markdown/ZIP, badge, revisi, audit log, dan halaman BYOK.
 
 ## Catatan Produksi
 
@@ -182,5 +181,6 @@ Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, expo
 - Fitur **Run** membutuhkan host dengan Docker daemon yang aktif (server ShieldForge sendiri; user akhir tidak perlu Docker bila di-host).
 - Fitur **Run** dan **Security Scan** juga membutuhkan Docker; pada host tanpa Docker (mis. serverless), set `RUNNER_MODE=disabled` agar fitur dilewati dengan rapi.
 - Security score berasal dari pemindai nyata (Semgrep/Trivy/audit). Bila Docker tidak tersedia, skor tetap menunggu pemindaian, bukan ditebak AI.
+- Pemindai membutuhkan **jaringan** selain Docker: Semgrep mengunduh ruleset dari registry dan Trivy mengunduh basis data kerentanan saat pertama kali dijalankan.
 - Monaco dan font di-self-host: `scripts/copy-monaco.mjs` menyalin aset Monaco ke `public/monaco/vs` (dijalankan otomatis oleh `predev`/`prebuild`/`postinstall`).
 - CSP memakai **nonce per-request** yang dibuat di `src/proxy.ts` (tanpa `'unsafe-inline'` untuk script).

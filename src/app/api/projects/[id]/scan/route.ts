@@ -39,7 +39,7 @@ export async function GET(_request: Request, { params }: RouteProps) {
 
   return NextResponse.json({
     findings,
-    score: typeof testing.securityScore === "number" ? testing.securityScore : null,
+    score: typeof testing.scanScore === "number" ? testing.scanScore : null,
     scan: testing.scan ?? null,
   });
 }
@@ -85,7 +85,7 @@ export async function POST(request: Request, { params }: RouteProps) {
     ...globalSpec,
     testing: {
       ...((globalSpec.testing as Record<string, unknown> | null) ?? {}),
-      securityScore: report.score,
+      scanScore: report.score,
       scan: {
         scannedAt: new Date().toISOString(),
         toolsRun: report.toolsRun,
@@ -121,6 +121,30 @@ export async function POST(request: Request, { params }: RouteProps) {
       data: { globalSpec: nextSpec as unknown as Prisma.InputJsonValue },
     }),
   ]);
+
+  // Traceability: reflect the scan outcome onto the requirement links so the
+  // matrix can mark a requirement verified (no high/critical finding for its
+  // NIST task) or flagged (issues found).
+  const requirements = await prisma.securityRequirement.findMany({
+    where: { projectId: id, nistControlId: { not: null } },
+    include: { nistControl: true },
+  });
+  if (requirements.length > 0) {
+    const issueTasks = new Set(
+      report.findings
+        .filter((f) => f.severity === "critical" || f.severity === "high")
+        .map((f) => f.nistTask)
+        .filter((task): task is string => Boolean(task)),
+    );
+    for (const requirement of requirements) {
+      const task = requirement.nistControl?.taskCode;
+      if (!task) continue;
+      await prisma.requirementLink.updateMany({
+        where: { requirementId: requirement.id },
+        data: { status: issueTasks.has(task) ? "issue" : "verified" },
+      });
+    }
+  }
 
   await writeAudit(session.user.id, "RUN_SCAN", {
     projectId: id,

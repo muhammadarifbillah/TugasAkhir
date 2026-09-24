@@ -1,17 +1,19 @@
 import type { Prisma } from "@/generated/prisma/client";
 
 /**
- * Security score is the AI audit score from the completed testing stage.
- * Returns null when the audit has not produced a score yet — never falls
- * back to pipeline progress, so the number is never misleading.
+ * Security score. Prefers the deterministic score produced by the scanner
+ * tooling (`testing.scanScore`); falls back to the AI audit score from the
+ * testing stage. Returns null when neither exists, so the number is never
+ * misleading.
  */
 export function getProjectScore(project: {
   globalSpec: Prisma.JsonValue | null;
 }): number | null {
   const gs = (project.globalSpec as Record<string, unknown> | null) ?? {};
   const testing = (gs.testing as Record<string, unknown> | null) ?? {};
-  if (typeof testing.securityScore !== "number") return null;
-  return Math.max(0, Math.min(100, Math.round(testing.securityScore)));
+  const score = typeof testing.scanScore === "number" ? testing.scanScore : testing.securityScore;
+  if (typeof score !== "number") return null;
+  return Math.max(0, Math.min(100, Math.round(score)));
 }
 
 export function getStageProgress(project: {

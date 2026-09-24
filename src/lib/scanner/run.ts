@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { docker } from "@/lib/runner/docker";
 import { detectStack } from "@/lib/runner/registry";
+import { runnerDisabled } from "@/lib/runner/mode";
 import { filterSafeArtifacts } from "@/lib/artifact-paths";
 import type { RawFinding, ScanReport, ScanFinding } from "./types";
 import { parseNpmAudit, parsePipAudit, parseSarif, parseTrivy } from "./parse";
@@ -13,11 +14,6 @@ const SEMGREP_IMAGE = "semgrep/semgrep:latest";
 const TRIVY_IMAGE = "aquasec/trivy:latest";
 const NODE_IMAGE = "node:20-alpine";
 const PYTHON_IMAGE = "python:3.12-alpine";
-
-/** When RUNNER_MODE=disabled, external tooling is skipped (e.g. serverless hosts). */
-function runnerDisabled(): boolean {
-  return process.env.RUNNER_MODE === "disabled";
-}
 
 async function runTool(
   tool: string,

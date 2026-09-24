@@ -316,6 +316,8 @@
     "scanFailed": "Scan failed.",
     "scanNeedCode": "Generate source code before scanning.",
     "scanSkipped": "Tools skipped",
+    "traceTitle": "Requirements Traceability",
+    "traceEmpty": "No security requirements captured yet. Complete the Analysis stage first.",
     "markApplied": "Mark as applied",
     "markNotApplied": "Mark as not applied",
     "emptyFiller": "Select a file or run the AI to generate source code.",

@@ -71,9 +71,11 @@ export default async function StudioPage(props: StudioPageProps) {
     select: { id: true, version: true, diffSummary: true, createdAt: true, codeArtifacts: true },
   });
 
+  const rawScore =
+    typeof testing?.scanScore === "number" ? testing.scanScore : testing?.securityScore;
   const securityScore =
-    typeof testing?.securityScore === "number"
-      ? Math.max(0, Math.min(100, Math.round(testing.securityScore)))
+    typeof rawScore === "number"
+      ? Math.max(0, Math.min(100, Math.round(rawScore)))
       : null;
 
   const deliverableCount = await prisma.deliverable.count({ where: { projectId } });
