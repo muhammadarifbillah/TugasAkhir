@@ -5,8 +5,9 @@ import { auth } from "@/auth";
 import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
-import { NoModelConfiguredError, resolveUserModel } from "@/lib/ai/resolve-model";
-import { createScreen, MAX_SCREEN_HTML } from "@/lib/design";
+import { resolveUserModel } from "@/lib/ai/resolve-model";
+import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
+import { createScreen, hasVisibleContent, MAX_SCREEN_HTML } from "@/lib/design";
 
 const bodySchema = z.object({
   prompt: z.string().min(1).max(4000),
@@ -94,21 +95,34 @@ export async function POST(request: Request, { params }: RouteProps) {
 
   try {
     const resolved = await resolveUserModel(session.user.id);
-    const { text } = await generateText({
-      model: resolved.model,
-      system,
-      prompt: userPrompt,
-      temperature: Math.min(resolved.temperature ?? 0.7, 1),
-      maxOutputTokens: Math.min(resolved.maxTokens ?? 8192, 8192),
-      abortSignal: AbortSignal.timeout(120_000),
-    });
+    const temperature = Math.min(resolved.temperature ?? 0.7, 1);
+    const maxOutputTokens = Math.min(resolved.maxTokens ?? 8192, 8192);
 
-    const html = extractHtml(text);
-    if (!html || html.length > MAX_SCREEN_HTML) {
-      return NextResponse.json(
-        { error: "The model did not return a valid HTML screen." },
-        { status: 502 },
-      );
+    // Up to two content attempts: a retry recovers from an empty/fragment reply
+    // before we surface an error to the user.
+    let html: string | null = null;
+    for (let attempt = 0; attempt < 2 && !html; attempt++) {
+      const { text } = await generateText({
+        model: resolved.model,
+        system:
+          attempt === 0
+            ? system
+            : `${system}\n\nYour previous reply had no visible content. Return a COMPLETE HTML document whose <body> contains visible, styled content.`,
+        prompt: userPrompt,
+        temperature,
+        maxOutputTokens,
+        maxRetries: 3,
+        abortSignal: AbortSignal.timeout(120_000),
+      });
+
+      const candidate = extractHtml(text);
+      if (candidate && candidate.length <= MAX_SCREEN_HTML && hasVisibleContent(candidate)) {
+        html = candidate;
+      }
+    }
+
+    if (!html) {
+      throw new EmptyModelOutputError();
     }
 
     const screen = createScreen({
@@ -119,13 +133,11 @@ export async function POST(request: Request, { params }: RouteProps) {
     });
     return NextResponse.json({ ok: true, screen });
   } catch (err) {
-    if (err instanceof NoModelConfiguredError) {
-      return NextResponse.json({ error: "NO_MODEL_CONFIGURED", message: err.message }, { status: 400 });
-    }
-    if (err instanceof Error && (err.name === "TimeoutError" || err.name === "AbortError")) {
+    const classified = classifyProviderError(err);
+    if (classified) {
       return NextResponse.json(
-        { error: "The model took too long to respond. Please try again." },
-        { status: 504 },
+        { error: classified.code, message: classified.message },
+        { status: classified.status },
       );
     }
     console.error("[api/projects/[id]/design/generate]", err);

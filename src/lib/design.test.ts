@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { MAX_SCREENS, createScreen, normalizeScreens } from "./design";
+import { MAX_SCREENS, createScreen, hasVisibleContent, normalizeScreens } from "./design";
 
 test("createScreen builds a valid screen", () => {
   const screen = createScreen({ html: "<html><body>Hi</body></html>", prompt: "login page" });
@@ -33,4 +33,15 @@ test("normalizeScreens caps the number of screens", () => {
 test("normalizeScreens returns [] for garbage", () => {
   assert.deepEqual(normalizeScreens("nope"), []);
   assert.deepEqual(normalizeScreens([null, 5]), []);
+});
+
+test("hasVisibleContent rejects empty shells and script/style-only documents", () => {
+  assert.equal(hasVisibleContent("<html><head><style>body{color:red}</style></head><body></body></html>"), false);
+  assert.equal(hasVisibleContent("<html><body><script>document.write('x')</script></body></html>"), false);
+  assert.equal(hasVisibleContent("<html><body>   </body></html>"), false);
+});
+
+test("hasVisibleContent accepts text and media", () => {
+  assert.equal(hasVisibleContent("<html><body><h1>Hello</h1></body></html>"), true);
+  assert.equal(hasVisibleContent('<html><body><img src="data:image/png;base64,AAA"></body></html>'), true);
 });

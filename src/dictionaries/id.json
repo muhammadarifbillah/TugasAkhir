@@ -290,6 +290,8 @@
     "revisionBadge": "Revisi",
     "analysisEmpty": "Jelaskan website yang ingin dibuat. AI akan merekomendasikan stack dan menetapkan kebutuhan (NIST PO.1 / PW.1 → ISO A.8.26).",
     "designEmpty": "Belum ada layar. Jelaskan layar lalu klik Generate.",
+    "designError": "Gagal membuat desain. Silakan coba lagi.",
+    "designRetry": "Coba lagi",
     "designStudioOpen": "Studio Desain",
     "designStudioTitle": "Studio Desain",
     "designPromptPlaceholder": "Jelaskan layar yang Anda inginkan, mis. \"Halaman login modern untuk toko fashion online\"",

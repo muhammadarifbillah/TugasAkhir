@@ -290,6 +290,8 @@
     "revisionBadge": "Revision",
     "analysisEmpty": "Describe the website you want to build. The AI will recommend a stack and define scope requirements (NIST PO.1 / PW.1 → ISO A.8.26).",
     "designEmpty": "No screens yet. Describe a screen and click Generate.",
+    "designError": "Could not generate the design. Please try again.",
+    "designRetry": "Try again",
     "designStudioOpen": "Design Studio",
     "designStudioTitle": "Design Studio",
     "designPromptPlaceholder": "Describe the screen you want, e.g. \"A modern login page for an online fashion store\"",

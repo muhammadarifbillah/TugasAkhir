@@ -5,7 +5,7 @@ import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
-import { designScreensSchema } from "@/lib/design";
+import { designScreensSchema, MAX_SCREENS } from "@/lib/design";
 
 interface RouteProps {
   params: Promise<{ id: string }>;
@@ -31,6 +31,8 @@ export async function PATCH(request: Request, { params }: RouteProps) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid design payload" }, { status: 400 });
   }
+  // Enforce the cap server-side so kept screens never silently disappear on read.
+  const nextScreens = parsed.data.slice(0, MAX_SCREENS);
 
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project || project.userId !== session.user.id) {
@@ -53,7 +55,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
       data: {
         globalSpec: {
           ...globalSpec,
-          design: { ...design, designScreens: parsed.data },
+          design: { ...design, designScreens: nextScreens },
         } as unknown as Prisma.InputJsonValue,
         updatedAt: new Date(),
       },
@@ -62,7 +64,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
 
   await writeAudit(session.user.id, "UPDATE_PROJECT", {
     projectId: id,
-    designScreens: parsed.data.length,
+    designScreens: nextScreens.length,
   }, requestIp(request));
 
   return NextResponse.json({ ok: true });

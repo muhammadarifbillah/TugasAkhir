@@ -22,6 +22,20 @@ export type DesignScreen = z.infer<typeof designScreenSchema>;
 export const MAX_SCREEN_HTML = 200 * 1024;
 export const MAX_SCREENS = 12;
 
+/** True when an HTML document has visible content (text or media), not just an empty shell. */
+export function hasVisibleContent(html: string): boolean {
+  const visible = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<head[\s\S]*?<\/head>/gi, "");
+  const text = visible
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > 0 || /<(img|svg|canvas|video|picture)\b/i.test(visible);
+}
+
 function uid(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 8)}`;
 }

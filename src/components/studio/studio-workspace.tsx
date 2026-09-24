@@ -25,6 +25,7 @@ import {
   ListChecks,
   Loader2,
   Lock,
+  Maximize2,
   Network,
   Play,
   RotateCcw,
@@ -55,9 +56,11 @@ import { MonacoDiff, inferLanguage } from "@/components/studio/code-editor";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
 import { SecurityScanPanel } from "@/components/studio/security-scan-panel";
 import { TraceabilityPanel } from "@/components/studio/traceability-panel";
+import { DesignScreen } from "@/components/studio/design-screen";
+import { FullscreenViewer } from "@/components/studio/fullscreen-viewer";
 import { RunWorkspace } from "@/components/studio/run-workspace";
 import { DesignStudioDialog } from "@/components/studio/design-studio-dialog";
-import { normalizeScreens } from "@/lib/design";
+import { normalizeScreens, type DesignScreen as DesignScreenType } from "@/lib/design";
 import { MermaidDiagram } from "@/components/studio/mermaid-diagram";
 import { DeliverablesPanel } from "@/components/studio/deliverables-panel";
 import { PlanCard, BuildResultCard } from "@/components/studio/plan-card";
@@ -301,6 +304,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [savingFiles, setSavingFiles] = useState(false);
   const [showRun, setShowRun] = useState(false);
   const [showDesignCanvas, setShowDesignCanvas] = useState(false);
+  const [designFullscreen, setDesignFullscreen] = useState<DesignScreenType | null>(null);
+  const [designFsMax, setDesignFsMax] = useState(false);
   const [restoringId, setRestoringId] = useState<string | null>(null);
   const [finalizedAt, setFinalizedAt] = useState<string | null>(props.project.finalizedAt);
   const [database, setDatabase] = useState(props.project.database);
@@ -2267,6 +2272,42 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
             {isDesign && (
               <div className="space-y-4 border-b p-4">
+                {designScreens.length > 0 && (
+                  <div className="rounded-lg border p-4">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <h3 className="text-sm font-semibold">{dict.studio.designStudioTitle}</h3>
+                      <Button size="sm" variant="outline" onClick={() => setShowDesignCanvas(true)}>
+                        <Layout className="size-3.5" /> {dict.studio.designStudioOpen}
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                      {designScreens.map((s) => (
+                        <div key={s.id} className="overflow-hidden rounded-lg border bg-card">
+                          <div className="flex items-center justify-between gap-2 border-b px-2 py-1 text-[11px]">
+                            <span className="truncate font-medium">{s.name}</span>
+                            <button
+                              type="button"
+                              aria-label={dict.studio.designStudioOpen}
+                              onClick={() => {
+                                setDesignFsMax(false);
+                                setDesignFullscreen(s);
+                              }}
+                              className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                            >
+                              <Maximize2 className="size-3.5" />
+                            </button>
+                          </div>
+                          <DesignScreen
+                            html={s.html}
+                            title={s.name}
+                            device={s.device}
+                            viewportHeight={180}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {uiDesign.length > 0 && (
                   <div className="rounded-lg border p-4">
                     <h3 className="mb-2 text-sm font-semibold">{dict.studio.uiDesignTitle}</h3>
@@ -2814,12 +2855,30 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             refinePlaceholder: dict.studio.designRefinePlaceholder,
             keep: dict.studio.designKeep,
             discard: dict.studio.designDiscard,
-            saved: dict.studio.allSaved,
             draft: dict.studio.designDraft,
             empty: dict.studio.designEmpty,
             savedCount: dict.studio.designPages,
+            error: dict.studio.designError,
+            retry: dict.studio.designRetry,
           }}
         />
+      )}
+
+      {designFullscreen && (
+        <FullscreenViewer
+          key={designFullscreen.id}
+          title={designFullscreen.name}
+          onClose={() => setDesignFullscreen(null)}
+          maximized={designFsMax}
+          onToggleMaximize={() => setDesignFsMax((v) => !v)}
+        >
+          <DesignScreen
+            html={designFullscreen.html}
+            title={designFullscreen.name}
+            device={designFullscreen.device}
+            scaleToFit={false}
+          />
+        </FullscreenViewer>
       )}
 
       {showRun && codeArtifacts && (
