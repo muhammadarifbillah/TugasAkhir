@@ -163,7 +163,22 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${PROVIDERS.length} providers, ${STAGES.length} stages, ${NIST_CONTROLS.length} NIST SSDF controls.`);
+  // Prune controls that are no longer part of the SSDF set (e.g. codes removed
+  // between versions), but only when nothing references them so we never break
+  // existing projects' recommendations or traceability links.
+  const codes = NIST_CONTROLS.map((c) => c.taskCode);
+  const pruned = await prisma.nistSsdfControl.deleteMany({
+    where: {
+      taskCode: { notIn: codes },
+      recommendations: { none: {} },
+      requirements: { none: {} },
+    },
+  });
+
+  console.log(
+    `Seeded ${PROVIDERS.length} providers, ${STAGES.length} stages, ${NIST_CONTROLS.length} NIST SSDF controls.` +
+      (pruned.count > 0 ? ` Pruned ${pruned.count} obsolete control(s).` : ""),
+  );
 }
 
 main()
