@@ -142,6 +142,7 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 - `GET /api/run/:projectId/logs/stream` log container (SSE)
 - `POST /api/projects/:id/scan` menjalankan pemindaian keamanan nyata (Semgrep SAST + Trivy vulnerability/secret/misconfig + audit dependency) di container Docker, menyimpan temuan dan skor keamanan deterministik
 - `GET /api/projects/:id/scan` temuan pemindaian terakhir + ringkasan
+- `GET /api/projects/:id/traceability` matriks ketertelusuran requirement → NIST/ISO → file kode (data untuk panel UI)
 
 ## Editor, Run, Desain, dan Database
 

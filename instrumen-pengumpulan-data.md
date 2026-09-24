@@ -11,7 +11,7 @@
 
 ---
 
-## TENTANG APLIKASI SECURESDLC
+## TENTANG APLIKASI SHIELDFORGE
 
 **ShieldForge** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
 
@@ -19,12 +19,13 @@
   1. **Analysis & Requirements** — Penentuan scope, rekomendasi stack teknologi, identifikasi requirement keamanan & privasi, klasifikasi data
   2. **Design & Architecture** — Perancangan UI/UX, arsitektur komponen, threat modeling (STRIDE), diagram alur, schema database
   3. **Secure Development** — Generate source code dengan praktik keamanan (parameterized queries, output encoding, autentikasi, CSRF protection, penanganan secrets)
-  4. **Security Testing & Audit** — Review keamanan OWASP Top 10, perhitungan security score 0-100, perbaikan otomatis (remediation)
-  5. **Handover & Deliverables** — Pembuatan Manual Book, Laporan Kepatuhan ISO 27001, Release Checklist, Export ke ZIP/GitHub
+  4. **Security Testing & Audit** — Pemindaian keamanan nyata (Semgrep SAST, Trivy vulnerability/secret/misconfiguration, audit dependency), security score deterministik 0-100, dan perbaikan otomatis (remediation)
+  5. **Handover & Deliverables** — Pembuatan Manual Book, Laporan Kepatuhan ISO 27001, Traceability Matrix, Release Checklist, Export ke ZIP/GitHub
 
-- **Framework Keamanan:** NIST SP 800-218 (SSDF) dengan crosswalk ke ISO 27001:2022 Annex A
-- **Teknologi AI:** Mendukung berbagai provider (OpenAI, Anthropic, Gemini, Ollama) dengan pendekatan BYOK (Bring Your Own Key)
-- **Fitur Tambahan:** Audit logging, multi-bahasa (Inggris & Indonesia), export PDF/dokumen, integrasi GitHub
+- **Framework Keamanan:** 42 task NIST SP 800-218 (SSDF v1.1) dengan crosswalk ke ISO/IEC 27001:2022 Annex A
+- **Traceability:** Requirement keamanan ber-ID (REQ-SEC-*) dilacak dari tahap analisis hingga file kode implementasinya
+- **Teknologi AI:** Mendukung berbagai provider (OpenAI, Anthropic, Gemini, OpenRouter, Ollama) dengan pendekatan BYOK (Bring Your Own Key)
+- **Fitur Tambahan:** Security scanner, Design Studio, Docker runner, audit logging, multi-bahasa (Inggris & Indonesia), export PDF/dokumen, integrasi GitHub, PWA
 
 **Tujuan Aplikasi:** Membantu tim pengembang menerapkan praktik keamanan sejak awal siklus pengembangan (secure-by-design) tanpa memerlukan ahli keamanan siber khusus di setiap tahapan, sekaligus menghasilkan dokumentasi keamanan yang dibutuhkan untuk kepatuhan terhadap standar internasional.
 

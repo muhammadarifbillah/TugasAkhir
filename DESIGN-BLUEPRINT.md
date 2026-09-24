@@ -1,7 +1,7 @@
 # ShieldForge Design Blueprint
 
 > Versi: 1.0 | Terakhir diperbarui: September 2026
-> Tools: Next.js 16, Tailwind CSS v4, shadcn/ui, Geist Font
+> Tools: Next.js 16, Tailwind CSS v4, komponen UI lokal (Radix primitives), Geist Font
 
 ---
 
@@ -715,7 +715,7 @@ src/
 │       ├── register/        ← Register
 │       └── projects/new/    ← New project
 ├── components/
-│   ├── ui/                  ← 11 shadcn components
+│   ├── ui/                  ← komponen UI lokal (Radix primitives)
 │   ├── studio/              ← Studio components
 │   ├── settings/            ← Settings components
 │   ├── auth/                ← Auth forms
