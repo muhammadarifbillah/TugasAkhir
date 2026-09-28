@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { runBuildTurn } from "@/lib/ai/engine";
-import { NoModelConfiguredError } from "@/lib/ai/resolve-model";
+import { classifyProviderError } from "@/lib/ai/errors";
 import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { planResultSchema } from "@/lib/ai/result";
@@ -54,15 +54,16 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(result);
   } catch (err) {
-    if (err instanceof NoModelConfiguredError) {
+    const classified = classifyProviderError(err);
+    if (classified) {
       return NextResponse.json(
-        { error: "NO_MODEL_CONFIGURED", message: "Configure an AI model & API key in Settings first." },
-        { status: 400 },
+        { error: classified.code, message: classified.message },
+        { status: classified.status },
       );
     }
     console.error("[api/chat/build]", err);
     return NextResponse.json(
-      { error: "AI rate limit exceeded. Wait 1 minute or use a different API key." },
+      { error: "AI request failed. Please try again." },
       { status: 500 },
     );
   }

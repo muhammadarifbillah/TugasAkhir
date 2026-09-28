@@ -27,3 +27,19 @@ test("caps the injected html length", () => {
   assert.ok(ref);
   assert.ok(ref.length <= MAX_DESIGN_REFERENCE_CHARS + 200);
 });
+
+test("includes every kept screen, not just the first", () => {
+  const ref = approvedDesignReference({
+    design: {
+      designScreens: [
+        { id: "s1", name: "Login", html: "<html><body>Login page</body></html>" },
+        { id: "s2", name: "Dashboard", html: "<html><body>Dashboard page</body></html>" },
+      ],
+    },
+  });
+  assert.ok(ref);
+  assert.match(ref, /Login/);
+  assert.match(ref, /Login page/);
+  assert.match(ref, /Dashboard/);
+  assert.match(ref, /Dashboard page/);
+});

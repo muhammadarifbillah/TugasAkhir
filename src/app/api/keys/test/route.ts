@@ -3,6 +3,7 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { auth } from "@/auth";
 import { buildModel } from "@/lib/ai/provider";
+import { classifyProviderError } from "@/lib/ai/errors";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { rateLimited } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
@@ -82,7 +83,9 @@ export async function POST(request: Request) {
     await writeAudit(session.user.id, "TEST_CONNECTION", { providerCode, modelName: resolvedModelName, ok: true }, requestIp(request));
     return NextResponse.json({ ok: true, latency });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Connection failed";
+    const classified = classifyProviderError(err);
+    const message =
+      classified?.message ?? (err instanceof Error ? err.message : "Connection failed");
     // Keep the raw message short; it is only shown in the user's own settings UI.
     const safeMessage = message.length > 200 ? `${message.slice(0, 200)}…` : message;
     await writeAudit(session.user.id, "TEST_CONNECTION", { providerCode, modelName: resolvedModelName, ok: false }, requestIp(request));

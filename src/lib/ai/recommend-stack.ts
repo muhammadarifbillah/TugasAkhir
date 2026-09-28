@@ -1,6 +1,7 @@
 import { generateText } from "ai";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel, NoModelConfiguredError } from "@/lib/ai/resolve-model";
+import { classifyProviderError } from "@/lib/ai/errors";
 import { parseStageResult } from "@/lib/ai/result";
 import { sanitizePrompt } from "@/lib/sanitize";
 import type { Prisma } from "@/generated/prisma/client";
@@ -53,7 +54,11 @@ export async function recommendStackForProject(projectId: string): Promise<void>
     if (err instanceof NoModelConfiguredError) {
       console.log("[ai/recommend-stack] no model configured — skipping background recommendation.");
     } else {
-      console.warn("[ai/recommend-stack]", err instanceof Error ? err.message : err);
+      const classified = classifyProviderError(err);
+      console.warn(
+        "[ai/recommend-stack]",
+        classified ? `${classified.code}: ${classified.message}` : err instanceof Error ? err.message : err,
+      );
     }
   }
 }
