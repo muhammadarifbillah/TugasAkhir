@@ -22,7 +22,7 @@ function safeBaseUrl(input: string | undefined, providerBaseUrl: string | null):
   const url = new URL(input.trim());
   if (url.protocol !== "https:" && url.protocol !== "http:") return undefined;
   const providerHost = providerBaseUrl ? new URL(providerBaseUrl).host : null;
-  // Allow the provider's own host, localhost (Ollama), or any https host.
+  // Allow only the provider's own host or localhost (Ollama).
   if (url.host === "localhost" || url.host.endsWith(".localhost")) return url.toString();
   if (providerHost && (url.host === providerHost || url.host.endsWith(`.${providerHost}`))) {
     return url.toString();

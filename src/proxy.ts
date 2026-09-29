@@ -33,19 +33,26 @@ function generateNonce(): string {
  * for Mermaid's injected SVG styles.
  */
 function buildCsp(nonce: string): string {
+  // The Docker "Run" preview embeds the generated app at http://localhost:<port>,
+  // which is only available in development (Run is disabled on the prod stack).
+  const frameSrc =
+    process.env.NODE_ENV === "production"
+      ? "frame-src 'self'"
+      : "frame-src 'self' http://localhost:* http://127.0.0.1:*";
   return [
     "default-src 'self'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "frame-src 'self' http://localhost:* http://127.0.0.1:*",
+    frameSrc,
     "object-src 'none'",
     `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     "worker-src 'self' blob:",
-    "connect-src 'self' https: ws: wss:",
+    // The browser only talks to our own origin (AI calls are server-side).
+    "connect-src 'self'",
     "manifest-src 'self'",
   ].join("; ");
 }
