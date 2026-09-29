@@ -330,7 +330,7 @@
     "finishProject": "Finish Project",
     "structuredFailed": "The AI response contained no structured data, so nothing was saved.",
     "reparse": "Parse last response",
-    "truncatedWarning": "The AI response was cut off by the token limit, so results may be incomplete.",
+    "truncatedWarning": "The AI response was cut off by the output token limit, so the structured result could not be saved. Generate fewer files at a time (use Plan then Build, and apply one file at a time), or pick a model with a larger output limit in Settings.",
     "threatModelTitle": "Threat Model (STRIDE)",
     "snapshots": "Versions",
     "files": "files",

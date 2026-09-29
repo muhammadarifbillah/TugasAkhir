@@ -330,7 +330,7 @@
     "finishProject": "Selesaikan Proyek",
     "structuredFailed": "Respons AI tidak memuat data terstruktur, tidak ada yang disimpan.",
     "reparse": "Parse ulang respons terakhir",
-    "truncatedWarning": "Respons AI terpotong oleh batas token, hasil mungkin tidak lengkap.",
+    "truncatedWarning": "Respons AI terpotong oleh batas token keluaran, sehingga hasil terstruktur tidak tersimpan. Hasilkan lebih sedikit file sekaligus (pakai Plan lalu Build, dan terapkan satu file per waktu), atau pilih model dengan batas keluaran lebih besar di Pengaturan.",
     "threatModelTitle": "Threat Model (STRIDE)",
     "snapshots": "Versi",
     "files": "file",
