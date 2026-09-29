@@ -130,7 +130,7 @@ interface SnapshotRow {
 }
 
 /** Chat interaction mode: plan first, then execute the approved plan. */
-export type ChatMode = "plan" | "build";
+export type ChatMode = "plan" | "build" | "direct";
 
 export interface StudioWorkspaceProps {
   lang: string;
@@ -2200,6 +2200,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   onClick={() =>
                     sendPrompt(
                       "Implement the approved Design Studio designs as real pages/routes in the generated source code. Create one page/component per approved screen and match its layout, sections, colors, typography, and visible copy exactly. Return the full structured stage_result JSON with codeArtifacts.",
+                      "direct",
                     )
                   }
                   disabled={loading}
