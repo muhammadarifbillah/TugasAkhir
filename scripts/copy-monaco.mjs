@@ -1,4 +1,4 @@
-import { cp, mkdir, rm } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 
@@ -18,4 +18,31 @@ if (!existsSync(src)) {
 await rm(dest, { recursive: true, force: true });
 await mkdir(path.dirname(dest), { recursive: true });
 await cp(src, dest, { recursive: true });
+
+/**
+ * Monaco's min files reference source maps under `min-maps/…`, which the package
+ * does not ship. Browsers with DevTools open then request a non-existent map and
+ * log a 404. Stripping the `sourceMappingURL` comments removes that noise (maps
+ * are debug-only and not needed at runtime).
+ */
+async function stripSourceMapReferences(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await stripSourceMapReferences(full);
+      continue;
+    }
+    if (!/\.(js|css)$/i.test(entry.name)) continue;
+    const content = await readFile(full, "utf8");
+    if (!content.includes("sourceMappingURL")) continue;
+    const cleaned = content
+      .replace(/\/\/# sourceMappingURL=.*$/gm, "")
+      .replace(/\/\*# sourceMappingURL=.*?\*\//g, "");
+    if (cleaned !== content) await writeFile(full, cleaned, "utf8");
+  }
+}
+
+await stripSourceMapReferences(dest);
 console.log("[copy-monaco] copied Monaco assets to public/monaco/vs");
+
