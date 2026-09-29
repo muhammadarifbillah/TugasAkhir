@@ -355,9 +355,9 @@ export function ByokManager({
           {showKeyForm && (
             <form onSubmit={addKey} className="flex flex-col gap-3 rounded-lg border p-4">
               <div className="grid gap-2">
-                <Label>{dict.settings.provider}</Label>
-                <Select value={keyProvider} onValueChange={changeKeyProvider}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Label htmlFor="keyProvider">{dict.settings.provider}</Label>
+                <Select name="keyProvider" value={keyProvider} onValueChange={changeKeyProvider}>
+                  <SelectTrigger id="keyProvider"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {providers.map((p) => (
                       <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>
@@ -366,8 +366,8 @@ export function ByokManager({
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label>{dict.settings.apiKey}</Label>
-                <Input type="password" value={keyValue} onChange={(e) => changeKeyValue(e.target.value)} required placeholder={dict.settings.phApiKey} />
+                <Label htmlFor="apiKey">{dict.settings.apiKey}</Label>
+                <Input id="apiKey" name="apiKey" type="password" aria-label={dict.settings.apiKey} value={keyValue} onChange={(e) => changeKeyValue(e.target.value)} required placeholder={dict.settings.phApiKey} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="apiKeyLabel">{dict.settings.keyLabel}</Label>
@@ -457,8 +457,9 @@ export function ByokManager({
           {showModelForm && (
             <form onSubmit={addModel} className="flex flex-col gap-3 rounded-lg border p-4">
               <div className="grid gap-2">
-                <Label>{dict.settings.provider}</Label>
+                <Label htmlFor="modelProvider">{dict.settings.provider}</Label>
                 <Select
+                  name="modelProvider"
                   value={modelProvider}
                   onValueChange={(v) => {
                     setModelProvider(v);
@@ -468,7 +469,7 @@ export function ByokManager({
                     setModelList([]);
                   }}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="modelProvider"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {providers.map((p) => (
                       <SelectItem key={p.code} value={p.code}>{p.name}</SelectItem>
@@ -478,9 +479,9 @@ export function ByokManager({
               </div>
               {providers.find((p) => p.code === modelProvider)?.requiresKey && (
                 <div className="grid gap-2">
-                  <Label>{dict.settings.apiKey}</Label>
-                  <Select value={modelKey} onValueChange={setModelKey}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                  <Label htmlFor="modelKey">{dict.settings.apiKey}</Label>
+                  <Select name="modelKey" value={modelKey} onValueChange={setModelKey}>
+                    <SelectTrigger id="modelKey"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {keys.filter((k) => k.providerCode === modelProvider).map((k) => (
                         <SelectItem key={k.id} value={k.id}>{k.keyMasked}</SelectItem>
@@ -490,10 +491,13 @@ export function ByokManager({
                 </div>
               )}
               <div className="grid gap-2">
-                <Label>{dict.settings.modelName}</Label>
+                <Label htmlFor="modelNameSelect">{dict.settings.modelName}</Label>
                 {customModelMode ? (
                   <div className="flex gap-2">
                     <Input
+                      id="modelNameCustom"
+                      name="modelName"
+                      aria-label={dict.settings.modelName}
                       value={modelName}
                       onChange={(e) => setModelName(e.target.value)}
                       required
@@ -516,6 +520,7 @@ export function ByokManager({
                   <div className="flex flex-col gap-1.5">
                     <div className="flex items-center gap-2">
                       <Select
+                        name="modelName"
                         value={modelName}
                         onValueChange={(v) => {
                           if (v === "__custom__") {
@@ -531,7 +536,7 @@ export function ByokManager({
                         }}
                         disabled={loadingModels}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger id="modelNameSelect" aria-label={dict.settings.modelName}>
                           <SelectValue
                             placeholder={
                               loadingModels
@@ -586,11 +591,11 @@ export function ByokManager({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label>{dict.settings.temperature}</Label>
-                  <Input type="number" step="0.1" min="0" max="2" value={modelTemp} onChange={(e) => setModelTemp(e.target.value)} />
+                  <Input id="modelTemp" name="modelTemp" aria-label={dict.settings.temperature} type="number" step="0.1" min="0" max="2" value={modelTemp} onChange={(e) => setModelTemp(e.target.value)} />
                 </div>
                 <div className="grid gap-2">
                   <Label>{dict.settings.maxTokens}</Label>
-                  <Input type="number" min="256" value={modelMaxTokens} onChange={(e) => setModelMaxTokens(e.target.value)} />
+                  <Input id="modelMaxTokens" name="modelMaxTokens" aria-label={dict.settings.maxTokens} type="number" min="256" value={modelMaxTokens} onChange={(e) => setModelMaxTokens(e.target.value)} />
                 </div>
               </div>
               <Button type="submit" disabled={busy || (!modelName && !customModelMode)} className="w-full">

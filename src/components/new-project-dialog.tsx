@@ -108,7 +108,7 @@ export function NewProjectDialog({
 
           <div className="grid gap-2">
             <Label htmlFor="template">{dict.dashboard.template}</Label>
-            <Select value={template} onValueChange={changeTemplate}>
+            <Select name="template" value={template} onValueChange={changeTemplate}>
               <SelectTrigger id="template">
                 <SelectValue />
               </SelectTrigger>
@@ -124,7 +124,7 @@ export function NewProjectDialog({
 
           <div className="grid gap-2">
             <Label htmlFor="outputLanguage">{dict.dashboard.contentLanguage}</Label>
-            <Select value={outputLanguage} onValueChange={setOutputLanguage}>
+            <Select name="outputLanguage" value={outputLanguage} onValueChange={setOutputLanguage}>
               <SelectTrigger id="outputLanguage">
                 <SelectValue />
               </SelectTrigger>

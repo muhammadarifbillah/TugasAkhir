@@ -1860,7 +1860,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               <div className="space-y-2">
                 {handoverReleaseChecklist.map((item, i) => (
                   <label key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5 cursor-pointer hover:bg-muted/50">
-                    <input type="checkbox" className="mt-1 rounded border-muted-foreground/50" />
+                    <input id={`release-${i}`} name={`release-${i}`} aria-label={item} type="checkbox" className="mt-1 rounded border-muted-foreground/50" />
                     <span className="text-sm text-muted-foreground">{item}</span>
                   </label>
                 ))}
@@ -2216,8 +2216,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     <Languages className="size-4 text-primary" /> {dict.studio.outputLanguage}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Select value={outputLanguage} onValueChange={changeOutputLanguage} disabled={savingLanguage}>
-                      <SelectTrigger className="h-8 w-full max-w-[160px] text-xs">
+                    <Select name="outputLanguage" value={outputLanguage} onValueChange={changeOutputLanguage} disabled={savingLanguage}>
+                      <SelectTrigger id="studioOutputLanguage" aria-label={dict.studio.outputLanguage} className="h-8 w-full max-w-[160px] text-xs">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -2580,6 +2580,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             </div>
             <div className="flex gap-2">
               <Textarea
+                id="chat-input"
+                name="chatInput"
+                aria-label={dict.studio.chatPlaceholder}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {

@@ -297,9 +297,9 @@ export function DeliverablesPanel({
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label>{dict.deliverables.visibility}</Label>
-              <Select value={visibility} onValueChange={(v) => setVisibility(v as "private" | "public")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Label htmlFor="visibility">{dict.deliverables.visibility}</Label>
+              <Select name="visibility" value={visibility} onValueChange={(v) => setVisibility(v as "private" | "public")}>
+                <SelectTrigger id="visibility"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="private">{dict.deliverables.private}</SelectItem>
                   <SelectItem value="public">{dict.deliverables.public}</SelectItem>
@@ -350,6 +350,9 @@ export function DeliverablesPanel({
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           <Textarea
+            id="revSummary"
+            name="revSummary"
+            aria-label={dict.deliverables.revisionSummary}
             value={revSummary}
             onChange={(e) => setRevSummary(e.target.value)}
             placeholder={dict.deliverables.phRevSummary}
@@ -457,6 +460,9 @@ export function DeliverablesPanel({
           <div className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-2">
             <label className="flex flex-1 cursor-pointer items-center gap-2 text-xs">
               <input
+                id="badgePublic"
+                name="badgePublic"
+                aria-label={dict.deliverables.badge}
                 type="checkbox"
                 checked={badgeOn}
                 onChange={toggleBadge}

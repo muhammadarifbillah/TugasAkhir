@@ -114,6 +114,10 @@ export function ProjectList({
         <div className="relative w-full max-w-xs">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            id="project-search"
+            name="projectSearch"
+            type="search"
+            aria-label={dict.dashboard.search}
             placeholder={dict.dashboard.search}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
