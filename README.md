@@ -153,7 +153,7 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 - **Design Studio (ala Google Stitch)** — popup generator UI berbasis prompt: jelaskan layar → AI menghasilkan mockup HTML high-fidelity (statis, dirender di iframe sandbox) → **Refine** dengan prompt lanjutan → **Keep** untuk menyimpan. Desain terpilih menjadi acuan tahap Development.
 - **ERD berkardinalitas** — relasi 1:1 / 1:N / M:N.
 - **Security scanning nyata** — tahap Testing dapat menjalankan Semgrep (SAST), Trivy (vulnerability/secret/misconfig), dan audit dependency di container; temuan dipetakan ke NIST/ISO dan **security score dihitung deterministik** (bukan estimasi AI).
-- **Traceability requirement → kode** — requirement keamanan ber-ID (`REQ-SEC-*`) dilacak ke rekomendasi, file kode, NIST dan ISO; diekspor sebagai `docs/TRACEABILITY-MATRIX.md`.
+- **Traceability requirement → kode** — requirement keamanan ber-ID (`REQ-SEC-*`) dilacak ke rekomendasi, file kode, NIST dan ISO; diekspor sebagai `docs/TRACEABILITY-MATRIX.md`. Proyek lama (Analysis sebelum fitur ini) dapat di-backfill dengan `npm run db:backfill-requirements`.
 - **Audit log** di `/settings/audit` dan **manajemen database** di `/settings/databases`.
 - **Tema & PWA** — light/dark, motif CSS ringan, manifest + service worker.
 

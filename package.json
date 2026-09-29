@@ -21,6 +21,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
+    "db:backfill-requirements": "tsx scripts/backfill-requirements.ts",
     "docs:tech": "tsx scripts/generate-docs.ts teknologi-shieldforge.md instrumen-pengumpulan-data.md instrumen-wawancara.md"
   },
   "dependencies": {

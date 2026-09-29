@@ -6,6 +6,7 @@ import type {
 } from "@/generated/prisma/client";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { requirementIdFor } from "@/lib/requirement-id";
 import {
   findArtifactProblems,
   MAX_MODEL_OUTPUT_CHARS,
@@ -325,7 +326,7 @@ export async function persistStageResult(input: {
       stageKnowledge.recommendedStack = result.recommendedStack ?? null;
       stageKnowledge.securityRequirements = result.securityRequirements ?? [];
       stageKnowledge.requirementItems = (result.securityRequirements ?? []).map(
-        (text, i) => ({ id: `REQ-SEC-${String(i + 1).padStart(3, "0")}`, text }),
+        (text, i) => ({ id: requirementIdFor(i), text }),
       );
       stageKnowledge.dataClassification = result.dataClassification ?? [];
     }
@@ -390,7 +391,7 @@ export async function persistStageResult(input: {
     if (stageCode === "analysis") {
       const texts = (stageKnowledge.securityRequirements as string[] | undefined) ?? [];
       for (let i = 0; i < texts.length; i++) {
-        const reqId = `REQ-SEC-${String(i + 1).padStart(3, "0")}`;
+        const reqId = requirementIdFor(i);
         const row = await tx.securityRequirement.upsert({
           where: { projectId_reqId: { projectId: project.id, reqId } },
           update: { text: texts[i] },
