@@ -96,7 +96,6 @@ export async function POST(request: Request, { params }: RouteProps) {
   try {
     const resolved = await resolveUserModel(session.user.id);
     const temperature = Math.min(resolved.temperature ?? 0.7, 1);
-    const maxOutputTokens = Math.min(resolved.maxTokens ?? 8192, 8192);
 
     // Up to two content attempts: a retry recovers from an empty/fragment reply
     // before we surface an error to the user.
@@ -109,10 +108,10 @@ export async function POST(request: Request, { params }: RouteProps) {
             ? system
             : `${system}\n\nYour previous reply had no visible content. Return a COMPLETE HTML document whose <body> contains visible, styled content.`,
         prompt: userPrompt,
-        temperature,
-        maxOutputTokens,
-        maxRetries: 3,
-        abortSignal: AbortSignal.timeout(120_000),
+          temperature,
+          maxOutputTokens: resolved.maxTokens ?? 393216,
+          maxRetries: 3,
+          abortSignal: AbortSignal.timeout(300_000),
       });
 
       const candidate = extractHtml(text);

@@ -39,8 +39,7 @@ const STATIC_MODELS: Record<string, ModelEntry[]> = {
     { id: "google/gemini-flash-1.5", name: "Google Gemini Flash 1.5", maxTokens: null },
   ],
   deepseek: [
-    { id: "deepseek-chat", name: "DeepSeek Chat", maxTokens: 8192 },
-    { id: "deepseek-reasoner", name: "DeepSeek Reasoner", maxTokens: 8192 },
+    { id: "deepseek-flash", name: "DeepSeek Flash", maxTokens: 393216 },
   ],
 };
 
