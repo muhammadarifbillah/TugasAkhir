@@ -292,6 +292,8 @@
     "designEmpty": "No screens yet. Describe a screen and click Generate.",
     "designError": "Could not generate the design. Please try again.",
     "designRetry": "Try again",
+    "designKeepAll": "Keep all",
+    "parseErrorWarning": "The AI response could not be parsed as the required JSON, so nothing was saved. Try again, or use Plan then Build with fewer files per step.",
     "designStudioOpen": "Design Studio",
     "designStudioTitle": "Design Studio",
     "designPromptPlaceholder": "Describe the screen you want, e.g. \"A modern login page for an online fashion store\"",

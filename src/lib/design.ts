@@ -36,6 +36,68 @@ export function hasVisibleContent(html: string): boolean {
   return text.length > 0 || /<(img|svg|canvas|video|picture)\b/i.test(visible);
 }
 
+/** Tolerant JSON parse from a model reply (direct, fenced, or first {...}/[...] region). */
+function tryParseJson(text: string): unknown | null {
+  const t = text.trim();
+  const parse = (value: string) => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  };
+  const direct = parse(t);
+  if (direct) return direct;
+  const fence = /```(?:json)?\s*([\s\S]*?)```/i.exec(t);
+  if (fence) {
+    const parsed = parse(fence[1]);
+    if (parsed) return parsed;
+  }
+  const objStart = t.indexOf("{");
+  const objEnd = t.lastIndexOf("}");
+  if (objStart >= 0 && objEnd > objStart) {
+    const parsed = parse(t.slice(objStart, objEnd + 1));
+    if (parsed) return parsed;
+  }
+  const arrStart = t.indexOf("[");
+  const arrEnd = t.lastIndexOf("]");
+  if (arrStart >= 0 && arrEnd > arrStart) {
+    const parsed = parse(t.slice(arrStart, arrEnd + 1));
+    if (parsed) return parsed;
+  }
+  return null;
+}
+
+/**
+ * Parses one or many mockups from a design reply: a JSON `{ screens: [...] }`
+ * or array of `{ name, html }`, falling back to raw `<html>…</html>` blocks.
+ */
+export function parseDesignScreens(text: string): { name?: string; html: string }[] {
+  const json = tryParseJson(text);
+  const arr = Array.isArray(json)
+    ? json
+    : json && typeof json === "object" && Array.isArray((json as Record<string, unknown>).screens)
+      ? ((json as Record<string, unknown>).screens as unknown[])
+      : null;
+
+  if (arr) {
+    const out: { name?: string; html: string }[] = [];
+    for (const item of arr) {
+      if (!item || typeof item !== "object") continue;
+      const s = item as Record<string, unknown>;
+      const html = typeof s.html === "string" ? s.html.trim() : "";
+      if (!html) continue;
+      out.push({ name: typeof s.name === "string" ? s.name : undefined, html });
+    }
+    if (out.length > 0) return out;
+  }
+
+  const out: { name?: string; html: string }[] = [];
+  const re = /<!doctype html[\s\S]*?<\/html>|<html[\s\S]*?<\/html>/gi;
+  for (const match of text.matchAll(re)) out.push({ html: match[0].trim() });
+  return out;
+}
+
 function uid(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -57,8 +119,7 @@ export function createScreen(input: {
 }
 
 /** Best-effort normalisation of stored/AI screens, dropping empty/oversized ones. */
-export function normalizeScreens(input: unknown): DesignScreen[] {
-  const parsed = designScreensSchema.safeParse(input);
+export function normalizeScreens(input: unknown): DesignScreen[] {  const parsed = designScreensSchema.safeParse(input);
   if (parsed.success) {
     return parsed.data
       .filter((s) => s.html.trim().length > 0 && s.html.length <= MAX_SCREEN_HTML)

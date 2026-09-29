@@ -7,20 +7,21 @@ import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
-import { createScreen, hasVisibleContent, MAX_SCREEN_HTML } from "@/lib/design";
+import { createScreen, hasVisibleContent, parseDesignScreens, MAX_SCREEN_HTML, MAX_SCREENS } from "@/lib/design";
 
 const bodySchema = z.object({
   prompt: z.string().min(1).max(4000),
   screenId: z.string().optional(),
   html: z.string().max(MAX_SCREEN_HTML).optional(),
   device: z.enum(["desktop", "tablet", "mobile"]).optional(),
+  /** When true (and not refining), generate every implied page at once. */
+  multi: z.boolean().optional(),
 });
 
 interface RouteProps {
   params: Promise<{ id: string }>;
 }
 
-/** Extracts the HTML document from a model reply (strips prose / code fences). */
 function extractHtml(text: string): string | null {
   let t = text.trim();
   const fence = /```(?:html)?\s*([\s\S]*?)```/i.exec(t);
@@ -74,20 +75,33 @@ export async function POST(request: Request, { params }: RouteProps) {
     parsed.data.html ??
     (parsed.data.screenId ? storedScreenHtml(project.globalSpec, parsed.data.screenId) : null);
 
-  const system = [
-    "You are a senior UI designer. Produce ONE high-fidelity website screen as a single self-contained HTML document.",
-    "Rules:",
-    "- Output ONLY the HTML (no prose, no markdown fences).",
-    "- Use inline CSS (a <style> tag is fine). No external stylesheets, scripts, fonts, or images (use CSS or inline SVG only).",
+  const isMulti = Boolean(parsed.data.multi) && !currentHtml;
+
+  const baseRules = [
+    "- Each screen is a COMPLETE, self-contained HTML document (doctype, <head> with inline <style>, <body> with visible content).",
+    "- Use inline CSS only. No external stylesheets, scripts, fonts, or images (CSS or inline SVG only).",
     "- Do NOT include JavaScript.",
     `- Target the ${device} layout.`,
     `- Project: ${project.name}. ${project.description ?? ""}`.trim(),
     project.uiPreferences ? `- Visual preferences: ${project.uiPreferences}` : "",
     `- Write all visible copy in this language: ${project.outputLanguage}.`,
     "Make it modern, accessible (semantic tags, good contrast) and visually polished.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  ].filter(Boolean);
+
+  const system = isMulti
+    ? [
+        "You are a senior UI designer. Produce ALL the key screens of the website described below, each as its own high-fidelity HTML document.",
+        `Return ONLY a JSON object of the exact shape {"screens":[{"name":"Login","html":"<!doctype html>..."}, ...]} — no prose, no markdown fences.`,
+        `Produce between 2 and ${MAX_SCREENS} screens. If the request names pages, produce exactly those; otherwise infer the main pages from the description (e.g. Landing, Login, Dashboard, and the app's core feature pages).`,
+        "Rules for each screen:",
+        ...baseRules,
+      ].join("\n")
+    : [
+        "You are a senior UI designer. Produce ONE high-fidelity website screen as a single self-contained HTML document.",
+        "Rules:",
+        "- Output ONLY the HTML (no prose, no markdown fences).",
+        ...baseRules,
+      ].join("\n");
 
   const userPrompt = currentHtml
     ? `Here is the current screen HTML:\n\n${currentHtml}\n\nApply this change and return the full updated HTML:\n${parsed.data.prompt}`
@@ -97,40 +111,48 @@ export async function POST(request: Request, { params }: RouteProps) {
     const resolved = await resolveUserModel(session.user.id);
     const temperature = Math.min(resolved.temperature ?? 0.7, 1);
 
-    // Up to two content attempts: a retry recovers from an empty/fragment reply
-    // before we surface an error to the user.
-    let html: string | null = null;
-    for (let attempt = 0; attempt < 2 && !html; attempt++) {
+    // Up to two content attempts: a retry recovers from an empty/fragment reply.
+    let rawScreens: { name?: string; html: string }[] = [];
+    for (let attempt = 0; attempt < 2 && rawScreens.length === 0; attempt++) {
       const { text } = await generateText({
         model: resolved.model,
         system:
           attempt === 0
             ? system
-            : `${system}\n\nYour previous reply had no visible content. Return a COMPLETE HTML document whose <body> contains visible, styled content.`,
+            : `${system}\n\nYour previous reply had no usable screen. Return the required output with visible, styled content.`,
         prompt: userPrompt,
-          temperature,
-          maxOutputTokens: resolved.maxTokens ?? 393216,
-          maxRetries: 3,
-          abortSignal: AbortSignal.timeout(300_000),
+        temperature,
+        maxOutputTokens: resolved.maxTokens ?? 393216,
+        maxRetries: 3,
+        abortSignal: AbortSignal.timeout(300_000),
       });
 
-      const candidate = extractHtml(text);
-      if (candidate && candidate.length <= MAX_SCREEN_HTML && hasVisibleContent(candidate)) {
-        html = candidate;
+      if (isMulti) {
+        rawScreens = parseDesignScreens(text).filter(
+          (s) => s.html.length <= MAX_SCREEN_HTML && hasVisibleContent(s.html),
+        );
+      } else {
+        const html = extractHtml(text);
+        if (html && html.length <= MAX_SCREEN_HTML && hasVisibleContent(html)) {
+          rawScreens = [{ html }];
+        }
       }
     }
 
-    if (!html) {
+    if (rawScreens.length === 0) {
       throw new EmptyModelOutputError();
     }
 
-    const screen = createScreen({
-      name: parsed.data.prompt.trim().slice(0, 40) || "Screen",
-      device,
-      html,
-      prompt: parsed.data.prompt,
-    });
-    return NextResponse.json({ ok: true, screen });
+    const screens = rawScreens.slice(0, MAX_SCREENS).map((s, i) =>
+      createScreen({
+        name: (s.name ?? (isMulti ? `Screen ${i + 1}` : parsed.data.prompt)).trim().slice(0, 60) || "Screen",
+        device,
+        html: s.html,
+        prompt: parsed.data.prompt,
+      }),
+    );
+
+    return NextResponse.json({ ok: true, screens, screen: screens[0] });
   } catch (err) {
     const classified = classifyProviderError(err);
     if (classified) {

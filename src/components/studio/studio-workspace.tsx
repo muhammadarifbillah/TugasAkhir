@@ -2854,6 +2854,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             refine: dict.studio.designRefine,
             refinePlaceholder: dict.studio.designRefinePlaceholder,
             keep: dict.studio.designKeep,
+            keepAll: dict.studio.designKeepAll,
             discard: dict.studio.designDiscard,
             draft: dict.studio.designDraft,
             empty: dict.studio.designEmpty,

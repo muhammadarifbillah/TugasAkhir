@@ -92,7 +92,42 @@ export interface PlanTurnResult {
   plan: PlanResult | null;
   truncated: boolean;
   usage: { promptTokens: number; completionTokens: number } | null;
-}export async function runStageTurn(input: {
+}/**
+ * One corrective regeneration when the first reply could not be parsed as the
+ * required `stage_result` JSON. Returns the retry text when it parses, else null.
+ */
+async function correctiveRetry(opts: {
+  resolved: Awaited<ReturnType<typeof resolveUserModel>>;
+  system: string;
+  history: { role: "user" | "assistant"; content: string }[];
+  userPrompt: string;
+  truncated: boolean;
+}): Promise<string | null> {
+  const instruction =
+    `\n\n=== JSON ONLY ===\n` +
+    `Your previous reply could not be parsed as the required "stage_result" JSON` +
+    `${opts.truncated ? " because it was cut off by the output limit" : ""}. ` +
+    `Reply again with ONLY the JSON object (no prose, no markdown fences). ` +
+    (opts.truncated
+      ? "Keep it compact: include only the most important files and keep each file brief."
+      : "Make sure it is valid, complete JSON.");
+  try {
+    const { text } = await generateText({
+      model: opts.resolved.model,
+      system: `${opts.system}${instruction}`,
+      messages: [...opts.history, { role: "user", content: opts.userPrompt }],
+      temperature: opts.resolved.temperature,
+      maxOutputTokens: opts.resolved.maxTokens,
+      maxRetries: 1,
+    });
+    return parseStageResult(text) ? text : null;
+  } catch (err) {
+    console.warn("[ai/engine] corrective retry failed:", err instanceof Error ? err.message : err);
+    return null;
+  }
+}
+
+export async function runStageTurn(input: {
   userId: string;
   projectId: string;
   projectStageId: string;
@@ -171,7 +206,7 @@ export interface PlanTurnResult {
   // Guardrail: strip secrets from the user prompt before it reaches the model.
   const userPrompt = sanitizePrompt(input.userPrompt);
 
-  const { text, usage, finishReason } = await generateText({
+  const genResult = await generateText({
     model: resolved.model,
     system,
     messages: [...history, { role: "user", content: userPrompt }],
@@ -179,6 +214,9 @@ export interface PlanTurnResult {
     maxOutputTokens: resolved.maxTokens,
     maxRetries: 1,
   });
+  let text = genResult.text;
+  const usage = genResult.usage;
+  const finishReason = genResult.finishReason;
 
   await prisma.$transaction([
     prisma.message.create({
@@ -202,21 +240,43 @@ export interface PlanTurnResult {
     }),
   ]);
 
-  const result = parseStageResult(text);
+  let result = parseStageResult(text);
   if (!result) {
-    console.warn(`[ai/engine] Stage result did not match the expected schema: ${projectStage.stage.code}`);
-    return {
-      reply: text,
-      result: null,
-      securityScore: null,
-      recommendationsSaved: 0,
-      snapshotSaved: false,
+    console.warn(
+      `[ai/engine] Stage result did not match the expected schema: ${projectStage.stage.code} — retrying once`,
+    );
+    const retryText = await correctiveRetry({
+      resolved,
+      system,
+      history,
+      userPrompt,
       truncated: finishReason === "length",
-      recommendations: [],
-      usage: usage
-        ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
-        : null,
-    };
+    });
+    const retryResult = retryText ? parseStageResult(retryText) : null;
+    if (retryResult && retryText) {
+      result = retryResult;
+      text = retryText;
+      const lastAssistant = await prisma.message.findFirst({
+        where: { chatId: chat.id, role: "assistant" },
+        orderBy: { createdAt: "desc" },
+      });
+      if (lastAssistant) {
+        await prisma.message.update({ where: { id: lastAssistant.id }, data: { content: retryText } });
+      }
+    } else {
+      return {
+        reply: text,
+        result: null,
+        securityScore: null,
+        recommendationsSaved: 0,
+        snapshotSaved: false,
+        truncated: finishReason === "length",
+        recommendations: [],
+        usage: usage
+          ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
+          : null,
+      };
+    }
   }
 
   const persisted = await persistStageResult({
@@ -471,7 +531,7 @@ Rules:
   const resolved = await resolveUserModel(input.userId);
   const userPrompt = sanitizePrompt(input.userPrompt);
 
-  const { text, usage, finishReason } = await generateText({
+  const genResult = await generateText({
     model: resolved.model,
     system,
     messages: [...history, { role: "user", content: userPrompt }],
@@ -479,6 +539,9 @@ Rules:
     maxOutputTokens: resolved.maxTokens,
     maxRetries: 1,
   });
+  let text = genResult.text;
+  const usage = genResult.usage;
+  const finishReason = genResult.finishReason;
 
   await prisma.$transaction([
     prisma.message.create({
@@ -503,20 +566,43 @@ Rules:
     }),
   ]);
 
-  const result = parseStageResult(text);
+  let result = parseStageResult(text);
   if (!result) {
-    return {
-      reply: text,
-      result: null,
-      securityScore: null,
-      recommendationsSaved: 0,
-      snapshotSaved: false,
+    console.warn(
+      `[ai/engine] Build result did not match the expected schema: ${projectStage.stage.code} — retrying once`,
+    );
+    const retryText = await correctiveRetry({
+      resolved,
+      system,
+      history,
+      userPrompt,
       truncated: finishReason === "length",
-      recommendations: [],
-      usage: usage
-        ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
-        : null,
-    };
+    });
+    const retryResult = retryText ? parseStageResult(retryText) : null;
+    if (retryResult && retryText) {
+      result = retryResult;
+      text = retryText;
+      const lastAssistant = await prisma.message.findFirst({
+        where: { chatId: chat.id, role: "assistant" },
+        orderBy: { createdAt: "desc" },
+      });
+      if (lastAssistant) {
+        await prisma.message.update({ where: { id: lastAssistant.id }, data: { content: retryText } });
+      }
+    } else {
+      return {
+        reply: text,
+        result: null,
+        securityScore: null,
+        recommendationsSaved: 0,
+        snapshotSaved: false,
+        truncated: finishReason === "length",
+        recommendations: [],
+        usage: usage
+          ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
+          : null,
+      };
+    }
   }
 
   const persisted = await persistStageResult({

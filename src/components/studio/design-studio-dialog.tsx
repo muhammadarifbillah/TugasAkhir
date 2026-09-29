@@ -29,6 +29,7 @@ export interface DesignStudioLabels {
   refine: string;
   refinePlaceholder: string;
   keep: string;
+  keepAll: string;
   discard: string;
   draft: string;
   empty: string;
@@ -60,9 +61,9 @@ export function DesignStudioDialog({
   onSaved,
 }: DesignStudioDialogProps) {
   const [saved, setSaved] = useState<DesignScreenType[]>(savedScreens);
-  const [draft, setDraft] = useState<DesignScreenType | null>(null);
-  // When a draft was refined from a kept screen, Keep overwrites that screen.
-  const [draftBaseId, setDraftBaseId] = useState<string | null>(null);
+  const [drafts, setDrafts] = useState<DesignScreenType[]>([]);
+  // drafts that will replace a saved screen on Keep (refine-from-saved).
+  const [draftBaseById, setDraftBaseById] = useState<Record<string, string>>({});
   const [selectedId, setSelectedId] = useState<string | null>(savedScreens[0]?.id ?? null);
   const [prompt, setPrompt] = useState("");
   const [refinePrompt, setRefinePrompt] = useState("");
@@ -82,9 +83,9 @@ export function DesignStudioDialog({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  const all = useMemo(() => (draft ? [...saved, draft] : saved), [saved, draft]);
+  const all = useMemo(() => [...saved, ...drafts], [saved, drafts]);
   const selected = all.find((s) => s.id === selectedId) ?? null;
-  const canAppend = saved.length < MAX_SCREENS;
+  const room = MAX_SCREENS - saved.length;
 
   const generate = useCallback(
     async (req: Request) => {
@@ -97,26 +98,36 @@ export function DesignStudioDialog({
         const res = await csrfFetch(`/api/projects/${projectId}/design/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: text, device, html: req.base?.html }),
+          body: JSON.stringify({ prompt: text, device, html: req.base?.html, multi: !req.base }),
         });
         const data = (await res.json()) as {
+          screens?: DesignScreenType[];
           screen?: DesignScreenType;
           error?: string;
           message?: string;
         };
-        if (!res.ok || !data.screen) {
+        const list = data.screens ?? (data.screen ? [data.screen] : []);
+        if (!res.ok || list.length === 0) {
           setError(data.message ?? data.error ?? labels.error);
           return;
         }
-        setDraft(data.screen);
-        setSelectedId(data.screen.id);
+        setSelectedId(list[0].id);
         if (req.base) {
-          // Refining a kept screen → Keep will replace it; refining the current
-          // draft keeps the original base.
+          // Refine: replace the base (saved or draft) with the new screen.
           const baseIsSaved = saved.some((s) => s.id === req.base!.id);
-          if (baseIsSaved) setDraftBaseId(req.base.id);
+          const baseIsDraft = drafts.some((d) => d.id === req.base!.id);
+          if (baseIsDraft) {
+            setDrafts((prev) => prev.map((d) => (d.id === req.base!.id ? list[0] : d)));
+            setDraftBaseById({});
+          } else {
+            setDrafts([list[0]]);
+            setDraftBaseById(baseIsSaved ? { [list[0].id]: req.base.id } : {});
+          }
         } else {
-          setDraftBaseId(null);
+          setDrafts((prev) => {
+            const have = new Set(prev.map((d) => d.id));
+            return [...prev, ...list.filter((s) => !have.has(s.id))];
+          });
         }
       } catch {
         setError(labels.error);
@@ -124,7 +135,7 @@ export function DesignStudioDialog({
         setLoading(false);
       }
     },
-    [projectId, device, labels.error, saved],
+    [projectId, device, labels.error, saved, drafts],
   );
 
   async function persist(next: DesignScreenType[]) {
@@ -152,17 +163,39 @@ export function DesignStudioDialog({
     }
   }
 
-  async function keepDraft() {
-    if (!draft) return;
-    if (!draftBaseId && !canAppend) return;
-    const next = draftBaseId
-      ? saved.map((s) => (s.id === draftBaseId ? draft : s))
-      : [...saved, draft];
+  async function keepDraft(screen: DesignScreenType) {
+    const baseId = draftBaseById[screen.id];
+    if (!baseId && saved.length >= MAX_SCREENS) return;
+    const next = baseId ? saved.map((s) => (s.id === baseId ? screen : s)) : [...saved, screen];
     if (await persist(next)) {
-      setSelectedId(draft.id);
-      setDraft(null);
-      setDraftBaseId(null);
+      setDrafts((prev) => prev.filter((d) => d.id !== screen.id));
+      setDraftBaseById((prev) => {
+        const copy = { ...prev };
+        delete copy[screen.id];
+        return copy;
+      });
     }
+  }
+
+  async function keepAll() {
+    const replaces = drafts.filter((d) => draftBaseById[d.id]);
+    const appends = drafts.filter((d) => !draftBaseById[d.id]).slice(0, Math.max(0, room));
+    let next = saved.slice();
+    for (const d of replaces) next = next.map((s) => (s.id === draftBaseById[d.id] ? d : s));
+    next = [...next, ...appends];
+    if (await persist(next)) {
+      setDrafts([]);
+      setDraftBaseById({});
+    }
+  }
+
+  function discardDraft(id: string) {
+    setDrafts((prev) => prev.filter((d) => d.id !== id));
+    setDraftBaseById((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
   }
 
   async function removeScreen(id: string) {
@@ -194,13 +227,20 @@ export function DesignStudioDialog({
             {saved.length} / {MAX_SCREENS} {labels.savedCount}
           </Badge>
         </div>
-        <Button size="icon" variant="ghost" onClick={onClose} aria-label="Close">
-          <X className="size-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          {drafts.length > 1 && (
+            <Button size="sm" className="h-7" onClick={keepAll} disabled={saving}>
+              {saving ? <Loader2 className="size-3 animate-spin" /> : <Save className="size-3" />}
+              {labels.keepAll}
+            </Button>
+          )}
+          <Button size="icon" variant="ghost" onClick={onClose} aria-label="Close">
+            <X className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Prompt panel */}
         <aside className="flex w-full shrink-0 flex-col gap-3 overflow-y-auto border-b p-3 lg:w-80 lg:border-b-0 lg:border-r">
           <div className="flex rounded-lg border bg-muted p-0.5">
             {deviceBtn("desktop", Monitor)}
@@ -257,7 +297,7 @@ export function DesignStudioDialog({
             </div>
           )}
 
-          {!canAppend && (
+          {saved.length >= MAX_SCREENS && (
             <p className="rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-[11px] text-warning">
               {labels.savedCount}: {MAX_SCREENS}. {labels.discard}.
             </p>
@@ -281,7 +321,6 @@ export function DesignStudioDialog({
           )}
         </aside>
 
-        {/* Gallery */}
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {all.length === 0 ? (
             <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">
@@ -290,9 +329,10 @@ export function DesignStudioDialog({
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {all.map((screen) => {
-                const isDraft = draft?.id === screen.id;
+                const isDraft = drafts.some((d) => d.id === screen.id);
                 const active = selectedId === screen.id;
-                const keepDisabled = saving || (!draftBaseId && !canAppend);
+                const replaces = Boolean(draftBaseById[screen.id]);
+                const keepDisabled = saving || (!replaces && saved.length >= MAX_SCREENS);
                 return (
                   <div
                     key={screen.id}
@@ -305,15 +345,27 @@ export function DesignStudioDialog({
                       </span>
                       <div className="flex items-center gap-1">
                         {isDraft ? (
-                          <Button
-                            size="sm"
-                            className="h-6 px-2 text-[11px]"
-                            onClick={keepDraft}
-                            disabled={keepDisabled}
-                          >
-                            {saving ? <Loader2 className="size-3 animate-spin" /> : <Save className="size-3" />}
-                            {labels.keep}
-                          </Button>
+                          <>
+                            <Button
+                              size="sm"
+                              className="h-6 px-2 text-[11px]"
+                              onClick={() => keepDraft(screen)}
+                              disabled={keepDisabled}
+                            >
+                              {saving ? <Loader2 className="size-3 animate-spin" /> : <Save className="size-3" />}
+                              {labels.keep}
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="size-6"
+                              onClick={() => discardDraft(screen.id)}
+                              disabled={saving}
+                              aria-label={labels.discard}
+                            >
+                              <Trash2 className="size-3.5 text-destructive" />
+                            </Button>
+                          </>
                         ) : (
                           <>
                             <Button

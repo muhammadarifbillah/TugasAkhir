@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { MAX_SCREENS, createScreen, hasVisibleContent, normalizeScreens } from "./design";
+import { MAX_SCREENS, createScreen, hasVisibleContent, normalizeScreens, parseDesignScreens } from "./design";
 
 test("createScreen builds a valid screen", () => {
   const screen = createScreen({ html: "<html><body>Hi</body></html>", prompt: "login page" });
@@ -44,4 +44,35 @@ test("hasVisibleContent rejects empty shells and script/style-only documents", (
 test("hasVisibleContent accepts text and media", () => {
   assert.equal(hasVisibleContent("<html><body><h1>Hello</h1></body></html>"), true);
   assert.equal(hasVisibleContent('<html><body><img src="data:image/png;base64,AAA"></body></html>'), true);
+});
+
+test("parseDesignScreens reads a JSON array of screens", () => {
+  const out = parseDesignScreens(
+    JSON.stringify([
+      { name: "Login", html: "<html><body>Login</body></html>" },
+      { name: "Dashboard", html: "<html><body>Dashboard</body></html>" },
+    ]),
+  );
+  assert.equal(out.length, 2);
+  assert.equal(out[0].name, "Login");
+  assert.match(out[1].html, /Dashboard/);
+});
+
+test("parseDesignScreens reads {screens:[...]} inside a fenced block", () => {
+  const text = 'Here you go:\n```json\n{"screens":[{"name":"Home","html":"<html><body>Home</body></html>"}]}\n```';
+  const out = parseDesignScreens(text);
+  assert.equal(out.length, 1);
+  assert.equal(out[0].name, "Home");
+});
+
+test("parseDesignScreens falls back to raw HTML document blocks", () => {
+  const text = 'Screen one:\n<!doctype html><html><body>A</body></html>\nScreen two:\n<html><body>B</body></html>';
+  const out = parseDesignScreens(text);
+  assert.equal(out.length, 2);
+  assert.match(out[0].html, /<body>A<\/body>/);
+  assert.match(out[1].html, /<body>B<\/body>/);
+});
+
+test("parseDesignScreens returns [] for garbage", () => {
+  assert.deepEqual(parseDesignScreens("no screens here"), []);
 });

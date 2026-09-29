@@ -292,6 +292,8 @@
     "designEmpty": "Belum ada layar. Jelaskan layar lalu klik Generate.",
     "designError": "Gagal membuat desain. Silakan coba lagi.",
     "designRetry": "Coba lagi",
+    "designKeepAll": "Simpan semua",
+    "parseErrorWarning": "Respons AI tidak dapat diparsing sebagai JSON yang diminta, sehingga tidak ada yang tersimpan. Coba lagi, atau pakai Plan lalu Build dengan lebih sedikit file per langkah.",
     "designStudioOpen": "Studio Desain",
     "designStudioTitle": "Studio Desain",
     "designPromptPlaceholder": "Jelaskan layar yang Anda inginkan, mis. \"Halaman login modern untuk toko fashion online\"",
