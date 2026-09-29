@@ -1,5 +1,5 @@
 /** Max characters of the approved mockups injected into the Development prompt. */
-export const MAX_DESIGN_REFERENCE_CHARS = 12000;
+export const MAX_DESIGN_REFERENCE_CHARS = 40000;
 
 /**
  * Reference to the designs the user kept in the Design Studio, injected into the

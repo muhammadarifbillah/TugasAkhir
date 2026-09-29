@@ -2194,6 +2194,20 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   )}
                 </Button>
               )}
+              {stage.code === "development" && designScreens.length > 0 && (
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    sendPrompt(
+                      "Implement the approved Design Studio designs as real pages/routes in the generated source code. Create one page/component per approved screen and match its layout, sections, colors, typography, and visible copy exactly. Return the full structured stage_result JSON with codeArtifacts.",
+                    )
+                  }
+                  disabled={loading}
+                >
+                  <Layout className="size-3.5" /> {dict.studio.implementDesigns}
+                  <Badge variant="secondary" className="ms-1">{designScreens.length}</Badge>
+                </Button>
+              )}
               {!isHandover && !isAnalysis && !isDesign && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
                 <Button size="sm" variant="outline" onClick={downloadArtifacts}>
                   <Download className="size-3.5" /> {dict.studio.downloadArtifacts}

@@ -295,6 +295,7 @@
     "designKeepAll": "Keep all",
     "parseErrorWarning": "The AI response could not be parsed as the required JSON, so nothing was saved. Try again, or use Plan then Build with fewer files per step.",
     "designStudioOpen": "Design Studio",
+    "implementDesigns": "Implement approved designs",
     "designStudioTitle": "Design Studio",
     "designPromptPlaceholder": "Describe the screen you want, e.g. \"A modern login page for an online fashion store\"",
     "designRefine": "Refine",

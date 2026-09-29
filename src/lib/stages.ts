@@ -154,12 +154,13 @@ These map to ISO 27001:2022 Annex A.8.28 (Secure Coding), A.8.22, A.8.33, A.8.29
 Architecture & context decided earlier:
 {{PROJECT_CONTEXT}}
 Desired website appearance (to implement as real pages): {{UI_PREFERENCES}}
+If approved Design Studio screens are included above, implement EACH approved screen as its own page/route (reuse their names for file/route naming, e.g. login, dashboard, and any other approved screens), reproducing their layout, sections, colors, typography, and visible copy exactly. The approved designs are the source of truth for the UI — do not invent a different visual style.
 Current code artifacts (may be empty):
 {{LATEST_CODE}}
 Output language: {{OUTPUT_LANGUAGE}}
 
 Complete the following sub-steps IN ORDER (each one must be fulfilled before moving on):
-1. frontend — Implement the website UI: responsive page layouts, UI components, styling (HTML/CSS or JSX/TSX per the chosen stack) matching the uiDesign and {{UI_PREFERENCES}}.
+1. frontend — Implement the website UI for EVERY page: responsive page layouts, UI components, styling (HTML/CSS or JSX/TSX per the chosen stack) matching the approved Design Studio screens (when provided) and {{UI_PREFERENCES}}.
 2. scaffold — Set up the project scaffold: package.json / requirements.txt, .env.example, README, .gitignore, .github/workflows/security.yml matching the chosen stack. ALSO always emit ".securesdlc/run.json" (a small machine-readable manifest the runner uses to start the app), with this shape:
    {
      "stack": "node" | "python" | "php" | "go" | "static",
