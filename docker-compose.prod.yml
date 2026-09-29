@@ -1,0 +1,70 @@
+# Production stack: Caddy (HTTPS) + Next.js app + PostgreSQL.
+# Only Caddy exposes ports (80/443); the app and database stay on the internal
+# network. See DEPLOY.md for step-by-step instructions.
+#
+# Required in .env: DOMAIN, AUTH_URL, AUTH_SECRET, ENCRYPTION_MASTER_KEY,
+# AUTH_GITHUB_ID, AUTH_GITHUB_SECRET, POSTGRES_PASSWORD, and (optionally) AI keys.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: secure_sdlc
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d secure_sdlc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/secure_sdlc?schema=public
+      # Auth.js behind the reverse proxy.
+      AUTH_URL: ${AUTH_URL}
+      NEXTAUTH_URL: ${AUTH_URL}
+      AUTH_TRUST_HOST: "true"
+      # Trust X-Forwarded-For from Caddy for rate limiting and audit IPs.
+      TRUSTED_PROXY: "1"
+      # Run/Scan need the host Docker daemon; disabled on this public stack.
+      RUNNER_MODE: disabled
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  db-data:
+  caddy-data:
+  caddy-config:

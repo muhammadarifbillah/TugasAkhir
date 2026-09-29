@@ -1,0 +1,8 @@
+# Caddyfile — automatic HTTPS reverse proxy for ShieldForge.
+# Set DOMAIN in the environment (see docker-compose.prod.yml / .env).
+{$DOMAIN} {
+	encode gzip
+	# Caddy automatically sets X-Forwarded-Host / X-Forwarded-Proto and obtains
+	# a Let's Encrypt certificate for the domain.
+	reverse_proxy app:3000
+}

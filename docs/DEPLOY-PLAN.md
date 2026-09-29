@@ -1,7 +1,8 @@
 # Rencana Deploy — ShieldForge (Proxmox)
 
-> Status: **DRAFT / DITUNDA**. Dokumen ini rencana; belum ada perubahan kode deploy
-> yang diterapkan. Centang keputusan di Bagian 6 sebelum eksekusi.
+> Status: **IMPLEMENTED**. Artifact produksi sudah ada: `docker-compose.prod.yml`,
+> `Caddyfile`, endpoint `/api/health`, dan panduan langkah-demi-langkah di
+> `DEPLOY.md`. Dokumen ini dipertahankan sebagai catatan desain/keputusan.
 
 ## 1. Konteks
 
