@@ -60,7 +60,15 @@ async function writeProjectFiles(workDir: string, files: Record<string, string>)
 function buildCommand(plan: ResolvedPlan): string[] | undefined {
   const steps = [...plan.install, ...plan.build, plan.start].filter(Boolean);
   if (steps.length === 0) return undefined;
-  return ["sh", "-c", steps.join(" && ")];
+  // The Alpine Node image ships without OpenSSL, which Prisma's native engine
+  // requires. Install it (best-effort) before the app's own steps so generated
+  // apps that use Prisma can run.
+  const setup =
+    plan.stackId === "node"
+      ? "(command -v apk >/dev/null 2>&1 && apk add --no-cache openssl >/dev/null 2>&1 || true)"
+      : null;
+  const commands = setup ? [setup, ...steps] : steps;
+  return ["sh", "-c", commands.join(" && ")];
 }
 
 async function forceStop(session: RunSession): Promise<void> {
@@ -135,7 +143,18 @@ export async function startRun(
       mountSource: workDir,
       mountTarget: plan.adapter.mountTarget,
       command: buildCommand(plan),
-      env: { NODE_ENV: "development", ...plan.env, ...serviceEnv },
+      env: {
+        NODE_ENV: "development",
+        // Stream npm output (so the terminal shows progress) and skip the slow
+        // audit/fund passes during dependency install.
+        ...(plan.stackId === "node"
+          ? { npm_config_loglevel: "info", npm_config_fund: "false", npm_config_audit: "false" }
+          : {}),
+        ...plan.env,
+        ...serviceEnv,
+      },
+      // Reuse a persistent npm cache across runs so repeat installs are fast.
+      extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
       network: network ?? undefined,
     });
   } catch (err) {

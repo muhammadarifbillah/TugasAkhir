@@ -165,13 +165,14 @@ Complete the following sub-steps IN ORDER (each one must be fulfilled before mov
    {
      "stack": "node" | "python" | "php" | "go" | "static",
      "install": string | string[],   // e.g. "npm install"
-     "build": string | string[],     // optional, e.g. "npm run build"
+     "build": string | string[],     // OPTIONAL — omit for a faster dev preview
      "start": string,                // e.g. "npm run dev -- -H 0.0.0.0 -p 3000" (MUST bind 0.0.0.0)
      "port": number,                 // the port the app listens on
      "services": string[],           // optional: "postgres" | "mysql" | "redis"
      "env": { "KEY": "value" }        // optional non-secret defaults
    }
-   The start command must bind to 0.0.0.0 so the app is reachable from outside the container.
+   The start command must bind to 0.0.0.0 so the app is reachable from outside the container. Prefer a DEV start (e.g. "npm run dev -- -H 0.0.0.0 -p 3000", "python app.py", "php -S 0.0.0.0:8000") and OMIT "build" unless the app cannot start without it: the sandbox is a live preview, and skipping the production build makes it start faster and more reliably.
+   The project MUST be self-contained and runnable: every local import you write (e.g. "@/lib/x", "./y", "@/services/z") MUST be satisfied by a file you also include in "codeArtifacts". Never import a module you did not generate, and never reference files that do not exist. If the app uses Prisma, include "prisma generate" in "install" or use a plain JS driver compatible with the runtime.
 3. auth — Implement secure authentication & authorization: password hashing (argon2/bcrypt), session management.
 4. antiInjection — Implement anti-injection & output encoding: parameterized queries/ORM (no SQLi), output encoding/sanitization (no XSS).
 5. secrets — Implement secrets handling & CSRF protection: CSRF tokens, .env.example with no real secrets, safe/minimal error leakage.

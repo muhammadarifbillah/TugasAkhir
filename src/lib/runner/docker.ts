@@ -52,6 +52,8 @@ export interface RunContainerParams {
   cpus?: string;
   pidsLimit?: number;
   network?: string;
+  /** Extra bind/volume mounts, each as "source:target". */
+  extraMounts?: string[];
 }
 
 export async function runContainer(params: RunContainerParams): Promise<void> {
@@ -65,6 +67,7 @@ export async function runContainer(params: RunContainerParams): Promise<void> {
     `${params.hostPort}:${params.containerPort}`,
     "-v",
     `${params.mountSource}:${params.mountTarget}`,
+    ...(params.extraMounts ?? []).flatMap((m) => ["-v", m]),
     "-w",
     params.mountTarget,
     "--memory",
