@@ -20,6 +20,7 @@ export interface RunWorkspaceLabels {
   notRunning: string;
   noLogs: string;
   logs: string;
+  demoAccount: string;
   terminal: string;
   explorer: string;
   preview: string;
@@ -88,6 +89,7 @@ export function RunWorkspace({
   const [error, setError] = useState<string | null>(null);
   const [logs, setLogs] = useState("");
   const [stats, setStats] = useState<string | null>(null);
+  const [demo, setDemo] = useState<{ email: string; password?: string }[]>([]);
   const [device, setDevice] = useState<DeviceSize>("desktop");
   const [iframeKey, setIframeKey] = useState(0);
   const [polling, setPolling] = useState(false);
@@ -100,7 +102,7 @@ export function RunWorkspace({
     setUrl(null);
     try {
       const res = await csrfFetch(`/api/run/${projectId}`, { method: "POST" });
-      const data = (await res.json()) as { error?: string; stackLabel?: string; services?: string[] };
+      const data = (await res.json()) as { error?: string; stackLabel?: string; services?: string[]; demo?: { email: string; password?: string }[] };
       if (!res.ok) {
         setStatus("error");
         setError(data.error ?? labels.error);
@@ -108,6 +110,7 @@ export function RunWorkspace({
       }
       setStackLabel(data.stackLabel ?? "");
       setServices(data.services ?? []);
+      setDemo(data.demo ?? []);
       // Only start polling once the container exists: during the (slow) start
       // request the status endpoint reports "stopped" because no session exists
       // yet, which would otherwise cancel polling prematurely.
@@ -147,12 +150,14 @@ export function RunWorkspace({
           url: string | null;
           stackLabel?: string;
           services?: string[];
+          demo?: { email: string; password?: string }[];
         };
         if (data.status === "running" || data.status === "starting") {
           setStatus(data.status);
           setUrl(data.url ?? null);
           if (data.stackLabel) setStackLabel(data.stackLabel);
           if (data.services) setServices(data.services);
+          if (data.demo) setDemo(data.demo);
           setPolling(true);
           return;
         }
@@ -181,12 +186,14 @@ export function RunWorkspace({
           stats?: string | null;
           error?: string;
           logs?: string;
+          demo?: { email: string; password?: string }[];
         };
         if (cancelled) return;
         setStatus(data.status);
         setUrl(data.url ?? null);
         if (data.stackLabel) setStackLabel(data.stackLabel);
         if (data.services) setServices(data.services);
+        if (data.demo) setDemo(data.demo);
         if (data.error) setError(data.error);
         if (data.logs) setLogs(data.logs);
         setStats(data.stats ?? null);
@@ -289,6 +296,17 @@ export function RunWorkspace({
           </Button>
         </div>
       </div>
+      {demo.length > 0 && (
+        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b bg-muted/40 px-3 py-1.5 text-[11px] text-muted-foreground">
+          <span className="font-medium text-foreground">{labels.demoAccount}:</span>
+          {demo.map((a) => (
+            <span key={a.email} className="rounded bg-background px-1.5 py-0.5 font-mono">
+              {a.email}
+              {a.password ? ` / ${a.password}` : ""}
+            </span>
+          ))}
+        </div>
+      )}
       <div className="min-h-0 flex-1">
         <CodeWorkspace
           variant="popup"

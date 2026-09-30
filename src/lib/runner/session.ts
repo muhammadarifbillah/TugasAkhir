@@ -20,6 +20,12 @@ import { startService, stopService, supportedServices, type ServiceHandle } from
 
 export type RunStatus = "starting" | "running" | "error" | "stopped";
 
+/** A demo account parsed from a generated app's seed/README. */
+export interface DemoAccount {
+  email: string;
+  password?: string;
+}
+
 export interface RunSession {
   projectId: string;
   userId: string;
@@ -36,6 +42,7 @@ export interface RunSession {
   error?: string;
   startedAt: number;
   lastAccess: number;
+  demo?: DemoAccount[];
 }
 
 /** Cap concurrent generated-app containers to keep the host responsive. */
@@ -143,6 +150,29 @@ export interface StartRunResult {
   containerPort: number;
   hostPort: number;
   url: string;
+  demo?: DemoAccount[];
+}
+
+/** Best-effort parse of demo credentials from a generated app's seed/README. */
+function extractDemoAccounts(files: Record<string, string>): DemoAccount[] {
+  const seed =
+    files["prisma/seed.mjs"] ??
+    files["prisma/seed.js"] ??
+    files["prisma/seed.cjs"] ??
+    files["prisma/seed.ts"] ??
+    "";
+  if (!seed) return [];
+  const emails = Array.from(
+    new Set(seed.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) ?? []),
+  ).slice(0, 8);
+  const password =
+    seed.match(/bcrypt\.hash\(\s*["']([^"']+)["']/)?.[1] ??
+    seed.match(/[Pp]assword[^\n]{0,30}?["']([^"']{4,})["']/)?.[1];
+  return emails.map((email) => ({ email, password }));
+}
+
+function demoOf(session: RunSession): { demo: DemoAccount[] } | Record<string, never> {
+  return session.demo && session.demo.length > 0 ? { demo: session.demo } : {};
 }
 
 export async function startRun(
@@ -188,6 +218,7 @@ export async function startRun(
   const containerName = `sdlc-run-${projectId.slice(0, 8)}-${runId}`;
 
   const hasPrisma = Boolean(files["prisma/schema.prisma"]);
+  const demo = extractDemoAccounts(files);
   const runEnv: Record<string, string> = {
     NODE_ENV: "development",
     // Stream npm output (so the terminal shows progress) and skip the slow
@@ -269,6 +300,7 @@ export async function startRun(
     status: "starting",
     startedAt,
     lastAccess: Date.now(),
+    demo,
   };
   sessions.set(projectId, session);
 
@@ -279,6 +311,7 @@ export async function startRun(
     containerPort: plan.port,
     hostPort,
     url: `http://localhost:${hostPort}`,
+    demo,
   };
 }
 
@@ -291,6 +324,7 @@ export interface RunStatusResult {
   stats?: string | null;
   error?: string;
   logs?: string;
+  demo?: DemoAccount[];
 }
 
 async function runningResult(session: RunSession): Promise<RunStatusResult> {
@@ -302,6 +336,7 @@ async function runningResult(session: RunSession): Promise<RunStatusResult> {
     stackLabel: session.stackLabel,
     services: session.services,
     stats,
+    ...demoOf(session),
   };
 }
 
@@ -318,7 +353,7 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
   const state = await containerState(session.containerName);
   if (!state) {
     session.status = "stopped";
-    return { status: "stopped", url: null, stackId: session.stackId, stackLabel: session.stackLabel, services: session.services };
+    return { status: "stopped", url: null, stackId: session.stackId, stackLabel: session.stackLabel, services: session.services, ...demoOf(session) };
   }
   if (state === "exited" || state === "dead") {
     session.status = "error";
@@ -331,6 +366,7 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
       services: session.services,
       error: "Container exited. See logs.",
       logs,
+      ...demoOf(session),
     };
   }
 
@@ -362,10 +398,11 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
       services: session.services,
       error: "Timed out waiting for the app to start.",
       logs,
+      ...demoOf(session),
     };
   }
 
-  return { status: "starting", url: null, stackId: session.stackId, stackLabel: session.stackLabel, services: session.services };
+  return { status: "starting", url: null, stackId: session.stackId, stackLabel: session.stackLabel, services: session.services, ...demoOf(session) };
 }
 
 export async function stopRun(projectId: string): Promise<void> {

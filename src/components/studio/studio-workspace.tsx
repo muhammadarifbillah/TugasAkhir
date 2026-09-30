@@ -2926,6 +2926,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             notRunning: dict.studio.runNotRunning,
             noLogs: dict.studio.runNoLogs,
             logs: dict.studio.runLogs,
+            demoAccount: dict.studio.runDemoAccount,
             terminal: dict.studio.terminal,
             explorer: dict.studio.explorer,
             preview: dict.studio.preview,
