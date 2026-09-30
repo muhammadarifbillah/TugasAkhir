@@ -11,6 +11,7 @@ import {
   containerStats,
   createNetwork,
   ensureImage,
+  listSdlcContainers,
   removeContainer,
   removeNetwork,
   runContainer,
@@ -49,6 +50,37 @@ const READY_TIMEOUT_MS = 15 * 60 * 1000;
 // Survive Next.js dev HMR: keep the registry on globalThis.
 const globalStore = globalThis as unknown as { __sdlcRuns?: Map<string, RunSession> };
 const sessions = (globalStore.__sdlcRuns ??= new Map<string, RunSession>());
+
+/**
+ * Rebuilds the in-memory session registry from labelled Docker containers, so a
+ * process restart (e.g. dev HMR) does not lose track of running apps.
+ */
+async function reconcileSessions(): Promise<void> {
+  try {
+    const containers = await listSdlcContainers();
+    for (const c of containers) {
+      if (sessions.has(c.projectId) || c.state !== "running") continue;
+      sessions.set(c.projectId, {
+        projectId: c.projectId,
+        userId: c.userId,
+        containerName: c.name,
+        workDir: c.workDir,
+        hostPort: c.hostPort,
+        containerPort: c.containerPort,
+        stackId: c.stackId,
+        stackLabel: c.stackLabel,
+        services: c.services,
+        network: c.network,
+        serviceHandles: [],
+        status: "running",
+        startedAt: c.startedAt,
+        lastAccess: Date.now(),
+      });
+    }
+  } catch {
+    // Best-effort: reconciliation must never throw.
+  }
+}
 
 async function writeProjectFiles(workDir: string, files: Record<string, string>): Promise<void> {
   for (const [path, content] of Object.entries(files)) {
@@ -174,6 +206,8 @@ export async function startRun(
     runEnv.DATABASE_URL = "file:./dev.db";
   }
 
+  const startedAt = Date.now();
+
   try {
     await runContainer({
       name: containerName,
@@ -189,6 +223,18 @@ export async function startRun(
       // Node installs are CPU-bound; give them more headroom than the default.
       ...(plan.stackId === "node" ? { memory: "2g", cpus: "2", pidsLimit: 512 } : {}),
       network: network ?? undefined,
+      labels: {
+        "sdlc.projectId": projectId,
+        "sdlc.userId": userId,
+        "sdlc.stackId": plan.stackId,
+        "sdlc.stackLabel": plan.adapter.label,
+        "sdlc.hostPort": String(hostPort),
+        "sdlc.containerPort": String(plan.port),
+        "sdlc.workDir": workDir,
+        "sdlc.network": network ?? "",
+        "sdlc.services": plan.services.join(","),
+        "sdlc.startedAt": String(startedAt),
+      },
     });
   } catch (err) {
     for (const handle of serviceHandles) await stopService(handle).catch(() => undefined);
@@ -210,7 +256,7 @@ export async function startRun(
     network,
     serviceHandles,
     status: "starting",
-    startedAt: Date.now(),
+    startedAt,
     lastAccess: Date.now(),
   };
   sessions.set(projectId, session);
@@ -249,7 +295,12 @@ async function runningResult(session: RunSession): Promise<RunStatusResult> {
 }
 
 export async function getRunStatus(projectId: string): Promise<RunStatusResult | null> {
-  const session = sessions.get(projectId);
+  let session = sessions.get(projectId);
+  if (!session) {
+    // The registry may have been cleared by a restart; rebuild from Docker.
+    await reconcileSessions();
+    session = sessions.get(projectId);
+  }
   if (!session) return null;
   session.lastAccess = Date.now();
 
@@ -319,6 +370,8 @@ export function getSession(projectId: string): RunSession | null {
 // Auto-stop containers that have been idle past the TTL.
 const sweeper = globalThis as unknown as { __sdlcRunSweeper?: NodeJS.Timeout };
 if (!sweeper.__sdlcRunSweeper) {
+  // Rebuild sessions left over from a previous process before sweeping.
+  void reconcileSessions();
   sweeper.__sdlcRunSweeper = setInterval(() => {
     const now = Date.now();
     for (const session of [...sessions.values()]) {

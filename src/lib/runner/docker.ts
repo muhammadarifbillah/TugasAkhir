@@ -54,6 +54,8 @@ export interface RunContainerParams {
   network?: string;
   /** Extra bind/volume mounts, each as "source:target". */
   extraMounts?: string[];
+  /** Docker labels (key/value) used to reconcile containers after a restart. */
+  labels?: Record<string, string>;
 }
 
 export async function runContainer(params: RunContainerParams): Promise<void> {
@@ -83,6 +85,9 @@ export async function runContainer(params: RunContainerParams): Promise<void> {
   ];
   for (const [key, value] of Object.entries(params.env ?? {})) {
     args.push("-e", `${key}=${value}`);
+  }
+  for (const [key, value] of Object.entries(params.labels ?? {})) {
+    args.push("--label", `${key}=${value}`);
   }
   args.push(params.image);
   if (params.command && params.command.length > 0) args.push(...params.command);
@@ -152,4 +157,60 @@ export function streamContainerLogs(name: string): ReadableStream<Uint8Array> {
       });
     },
   });
+}
+
+export interface SdlcContainerInfo {
+  name: string;
+  projectId: string;
+  userId: string;
+  stackId: string;
+  stackLabel: string;
+  hostPort: number;
+  containerPort: number;
+  workDir: string;
+  network: string | null;
+  services: string[];
+  startedAt: number;
+  state: string;
+}
+
+/**
+ * Lists ShieldForge run containers by label so the in-memory session registry
+ * can be rebuilt after a process restart (otherwise runs look "lost").
+ */
+export async function listSdlcContainers(): Promise<SdlcContainerInfo[]> {
+  const res = await docker(
+    ["ps", "-a", "--filter", "label=sdlc.projectId", "--format", "{{json .}}"],
+    30_000,
+  );
+  if (res.code !== 0) return [];
+  const out: SdlcContainerInfo[] = [];
+  for (const line of res.stdout.split("\n").map((l) => l.trim()).filter(Boolean)) {
+    try {
+      const c = JSON.parse(line) as { Names?: string; Labels?: string; State?: string };
+      const labels: Record<string, string> = {};
+      for (const pair of (c.Labels ?? "").split(",")) {
+        const idx = pair.indexOf("=");
+        if (idx > 0) labels[pair.slice(0, idx)] = pair.slice(idx + 1);
+      }
+      if (!labels["sdlc.projectId"]) continue;
+      out.push({
+        name: c.Names ?? "",
+        projectId: labels["sdlc.projectId"],
+        userId: labels["sdlc.userId"] ?? "",
+        stackId: labels["sdlc.stackId"] ?? "",
+        stackLabel: labels["sdlc.stackLabel"] ?? "",
+        hostPort: Number(labels["sdlc.hostPort"] ?? 0),
+        containerPort: Number(labels["sdlc.containerPort"] ?? 0),
+        workDir: labels["sdlc.workDir"] ?? "",
+        network: labels["sdlc.network"] || null,
+        services: (labels["sdlc.services"] ?? "").split(",").filter(Boolean),
+        startedAt: Number(labels["sdlc.startedAt"] ?? Date.now()),
+        state: c.State ?? "",
+      });
+    } catch {
+      // ignore malformed lines
+    }
+  }
+  return out;
 }
