@@ -148,7 +148,14 @@ export async function startRun(
         // Stream npm output (so the terminal shows progress) and skip the slow
         // audit/fund passes during dependency install.
         ...(plan.stackId === "node"
-          ? { npm_config_loglevel: "info", npm_config_fund: "false", npm_config_audit: "false" }
+          ? {
+              npm_config_loglevel: "info",
+              npm_config_fund: "false",
+              npm_config_audit: "false",
+              // Use the persistent cache without re-validating every entry, so
+              // repeat installs stay fast even on slow networks.
+              npm_config_prefer_offline: "true",
+            }
           : {}),
         ...plan.env,
         ...serviceEnv,
