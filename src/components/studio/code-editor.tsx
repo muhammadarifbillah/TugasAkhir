@@ -6,8 +6,12 @@ import type { ComponentProps } from "react";
 import { loader } from "@monaco-editor/react";
 
 // Serve Monaco from our own origin (copied to public/monaco/vs by
-// scripts/copy-monaco.mjs) instead of the jsdelivr CDN.
-loader.config({ paths: { vs: "/monaco/vs" } });
+// scripts/copy-monaco.mjs) instead of the jsdelivr CDN. The path must be
+// absolute (with origin) because Monaco's language workers are created from
+// blob: URLs, where a root-relative path like "/monaco/vs" fails to resolve.
+if (typeof window !== "undefined") {
+  loader.config({ paths: { vs: `${window.location.origin}/monaco/vs` } });
+}
 
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 

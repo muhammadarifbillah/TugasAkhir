@@ -36,9 +36,12 @@ async function stripSourceMapReferences(dir) {
     if (!/\.(js|css)$/i.test(entry.name)) continue;
     const content = await readFile(full, "utf8");
     if (!content.includes("sourceMappingURL")) continue;
+    // Only strip actual source-map comments, which sit on their own line at the
+    // end of the file. Matching anywhere would corrupt files that merely contain
+    // the literal string "sourceMappingURL" in code (e.g. the TS worker).
     const cleaned = content
-      .replace(/\/\/# sourceMappingURL=.*$/gm, "")
-      .replace(/\/\*# sourceMappingURL=.*?\*\//g, "");
+      .replace(/^\/\/#\s*sourceMappingURL=.*$/gm, "")
+      .replace(/^\/\*#\s*sourceMappingURL=[\s\S]*?\*\//gm, "");
     if (cleaned !== content) await writeFile(full, cleaned, "utf8");
   }
 }
