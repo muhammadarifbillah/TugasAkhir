@@ -155,6 +155,8 @@ export async function startRun(
       },
       // Reuse a persistent npm cache across runs so repeat installs are fast.
       extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
+      // Node installs are CPU-bound; give them more headroom than the default.
+      ...(plan.stackId === "node" ? { memory: "2g", cpus: "2", pidsLimit: 512 } : {}),
       network: network ?? undefined,
     });
   } catch (err) {
