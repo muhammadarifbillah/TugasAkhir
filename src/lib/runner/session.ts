@@ -91,26 +91,37 @@ async function writeProjectFiles(workDir: string, files: Record<string, string>)
   }
 }
 
-function buildCommand(plan: ResolvedPlan, hasPrisma: boolean): string[] | undefined {
+function buildCommand(plan: ResolvedPlan, files: Record<string, string>): string[] | undefined {
+  const hasPrisma = Boolean(files["prisma/schema.prisma"]);
   const setup: string[] = [];
   if (plan.stackId === "node") {
     // The Alpine Node image lacks OpenSSL, which Prisma's native engine needs.
     setup.push("(command -v apk >/dev/null 2>&1 && apk add --no-cache openssl >/dev/null 2>&1 || true)");
   }
-  // Generated apps that use Prisma need the client generated and the database
-  // schema pushed before they can serve their API routes. Models sometimes emit
-  // a Prisma 6-style schema alongside Prisma 7 packages, which fails validation;
-  // normalise to Prisma 6 so generate + db push work in the sandbox.
-  const afterInstall = hasPrisma
-    ? [
-        "(npm install --no-save --prefer-offline prisma@^6 @prisma/client@^6 || true)",
-        "(npx prisma generate || true)",
-        "(npx prisma db push --skip-generate --accept-data-loss || true)",
-      ]
-    : [];
-  const steps = [...plan.install, ...afterInstall, ...plan.build, plan.start].filter(Boolean);
+
+  // Generated Prisma apps need the client generated, the schema pushed, and any
+  // seed run (e.g. a demo account) before they can serve their API routes.
+  // Some models emit a Prisma 6 schema with Prisma 7 packages; normalise to v6.
+  const db: string[] = [];
+  if (hasPrisma) {
+    db.push("(npm install --no-save --prefer-offline prisma@^6 @prisma/client@^6 || true)");
+    db.push("(npx prisma generate || true)");
+    db.push("(npx prisma db push --skip-generate --accept-data-loss || true)");
+    const seedFile = ["prisma/seed.mjs", "prisma/seed.js", "prisma/seed.cjs", "prisma/seed.ts"].find(
+      (f) => files[f],
+    );
+    if (seedFile) {
+      db.push(
+        seedFile.endsWith(".ts")
+          ? "(npx --yes tsx prisma/seed.ts || true)"
+          : `(node ${seedFile} || true)`,
+      );
+    }
+  }
+
+  const steps = [...setup, ...plan.install, ...db, ...plan.build, plan.start].filter(Boolean);
   if (steps.length === 0) return undefined;
-  return ["sh", "-c", [...setup, ...steps].join(" && ")];
+  return ["sh", "-c", steps.join(" && ")];
 }
 
 async function forceStop(session: RunSession): Promise<void> {
@@ -216,7 +227,7 @@ export async function startRun(
       containerPort: plan.port,
       mountSource: workDir,
       mountTarget: plan.adapter.mountTarget,
-      command: buildCommand(plan, hasPrisma),
+      command: buildCommand(plan, files),
       env: runEnv,
       // Reuse a persistent npm cache across runs so repeat installs are fast.
       extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
