@@ -39,7 +39,9 @@ export interface RunSession {
 
 /** Cap concurrent generated-app containers to keep the host responsive. */
 const MAX_ACTIVE_RUNS = 2;
-const TTL_MS = 15 * 60 * 1000;
+// Keep a run alive for a while even if the studio tab is not polling (e.g. the
+// user opened the generated app in another tab). Override with RUN_TTL_MINUTES.
+const TTL_MS = Math.max(5, Number(process.env.RUN_TTL_MINUTES ?? 60)) * 60 * 1000;
 // Dependency install for a generated app can take several minutes (npm install
 // observed at ~6 min), so allow a generous window before declaring a timeout.
 const READY_TIMEOUT_MS = 15 * 60 * 1000;
@@ -57,18 +59,23 @@ async function writeProjectFiles(workDir: string, files: Record<string, string>)
   }
 }
 
-function buildCommand(plan: ResolvedPlan): string[] | undefined {
-  const steps = [...plan.install, ...plan.build, plan.start].filter(Boolean);
+function buildCommand(plan: ResolvedPlan, hasPrisma: boolean): string[] | undefined {
+  const setup: string[] = [];
+  if (plan.stackId === "node") {
+    // The Alpine Node image lacks OpenSSL, which Prisma's native engine needs.
+    setup.push("(command -v apk >/dev/null 2>&1 && apk add --no-cache openssl >/dev/null 2>&1 || true)");
+  }
+  // Generated apps that use Prisma need the client generated and the database
+  // schema pushed before they can serve their API routes.
+  const afterInstall = hasPrisma
+    ? [
+        "(npx --yes prisma generate || true)",
+        "(npx --yes prisma db push --skip-generate --accept-data-loss || true)",
+      ]
+    : [];
+  const steps = [...plan.install, ...afterInstall, ...plan.build, plan.start].filter(Boolean);
   if (steps.length === 0) return undefined;
-  // The Alpine Node image ships without OpenSSL, which Prisma's native engine
-  // requires. Install it (best-effort) before the app's own steps so generated
-  // apps that use Prisma can run.
-  const setup =
-    plan.stackId === "node"
-      ? "(command -v apk >/dev/null 2>&1 && apk add --no-cache openssl >/dev/null 2>&1 || true)"
-      : null;
-  const commands = setup ? [setup, ...steps] : steps;
-  return ["sh", "-c", commands.join(" && ")];
+  return ["sh", "-c", [...setup, ...steps].join(" && ")];
 }
 
 async function forceStop(session: RunSession): Promise<void> {
@@ -142,7 +149,7 @@ export async function startRun(
       containerPort: plan.port,
       mountSource: workDir,
       mountTarget: plan.adapter.mountTarget,
-      command: buildCommand(plan),
+      command: buildCommand(plan, Boolean(files["prisma/schema.prisma"])),
       env: {
         NODE_ENV: "development",
         // Stream npm output (so the terminal shows progress) and skip the slow
