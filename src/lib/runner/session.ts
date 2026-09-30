@@ -66,11 +66,14 @@ function buildCommand(plan: ResolvedPlan, hasPrisma: boolean): string[] | undefi
     setup.push("(command -v apk >/dev/null 2>&1 && apk add --no-cache openssl >/dev/null 2>&1 || true)");
   }
   // Generated apps that use Prisma need the client generated and the database
-  // schema pushed before they can serve their API routes.
+  // schema pushed before they can serve their API routes. Models sometimes emit
+  // a Prisma 6-style schema alongside Prisma 7 packages, which fails validation;
+  // normalise to Prisma 6 so generate + db push work in the sandbox.
   const afterInstall = hasPrisma
     ? [
-        "(npx --yes prisma generate || true)",
-        "(npx --yes prisma db push --skip-generate --accept-data-loss || true)",
+        "(npm install --no-save --prefer-offline prisma@^6 @prisma/client@^6 || true)",
+        "(npx prisma generate || true)",
+        "(npx prisma db push --skip-generate --accept-data-loss || true)",
       ]
     : [];
   const steps = [...plan.install, ...afterInstall, ...plan.build, plan.start].filter(Boolean);
@@ -141,6 +144,36 @@ export async function startRun(
   const hostPort = await findFreePort();
   const containerName = `sdlc-run-${projectId.slice(0, 8)}-${runId}`;
 
+  const hasPrisma = Boolean(files["prisma/schema.prisma"]);
+  const runEnv: Record<string, string> = {
+    NODE_ENV: "development",
+    // Stream npm output (so the terminal shows progress) and skip the slow
+    // audit/fund passes during dependency install.
+    ...(plan.stackId === "node"
+      ? {
+          npm_config_loglevel: "info",
+          npm_config_fund: "false",
+          npm_config_audit: "false",
+          // Use the persistent cache without re-validating every entry, so
+          // repeat installs stay fast even on slow networks.
+          npm_config_prefer_offline: "true",
+        }
+      : {}),
+    ...plan.env,
+    ...serviceEnv,
+  };
+  // Generated Prisma apps may omit DATABASE_URL. Fall back to a local SQLite
+  // file so `prisma db push` and the running app can both use it (unless a real
+  // database service is attached).
+  if (
+    hasPrisma &&
+    !runEnv.DATABASE_URL &&
+    !plan.services.includes("postgres") &&
+    !plan.services.includes("mysql")
+  ) {
+    runEnv.DATABASE_URL = "file:./dev.db";
+  }
+
   try {
     await runContainer({
       name: containerName,
@@ -149,24 +182,8 @@ export async function startRun(
       containerPort: plan.port,
       mountSource: workDir,
       mountTarget: plan.adapter.mountTarget,
-      command: buildCommand(plan, Boolean(files["prisma/schema.prisma"])),
-      env: {
-        NODE_ENV: "development",
-        // Stream npm output (so the terminal shows progress) and skip the slow
-        // audit/fund passes during dependency install.
-        ...(plan.stackId === "node"
-          ? {
-              npm_config_loglevel: "info",
-              npm_config_fund: "false",
-              npm_config_audit: "false",
-              // Use the persistent cache without re-validating every entry, so
-              // repeat installs stay fast even on slow networks.
-              npm_config_prefer_offline: "true",
-            }
-          : {}),
-        ...plan.env,
-        ...serviceEnv,
-      },
+      command: buildCommand(plan, hasPrisma),
+      env: runEnv,
       // Reuse a persistent npm cache across runs so repeat installs are fast.
       extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
       // Node installs are CPU-bound; give them more headroom than the default.
