@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { isSafeArtifactPath } from "@/lib/artifact-paths";
+import { relaxFramingForPreview } from "./framing";
 import { findFreePort } from "./ports";
 import { resolvePlan, type ResolvedPlan } from "./registry";
 import {
@@ -94,7 +95,9 @@ async function writeProjectFiles(workDir: string, files: Record<string, string>)
     if (!isSafeArtifactPath(path)) continue;
     const target = join(workDir, path);
     await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, content, "utf8");
+    // Relax framing headers only in the sandbox copy, so the preview iframe can
+    // render the app while the saved artifacts stay hardened.
+    await writeFile(target, relaxFramingForPreview(content), "utf8");
   }
 }
 
