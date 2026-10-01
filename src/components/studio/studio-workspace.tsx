@@ -2142,9 +2142,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         </aside>
 
         {/* Center: AI Prompt Engine + Stage Results */}
-        <section className={`@container relative flex min-h-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
+        <section className={`relative flex min-h-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
           <div
-            className={`flex items-center gap-1 border-b px-2 py-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors duration-300 ${
+            className={`flex items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors duration-300 ${
               promptCollapsed
                 ? "pointer-events-none absolute inset-x-0 top-0 z-20 border-transparent"
                 : "shrink-0"
@@ -2165,66 +2165,62 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               className="min-w-0 flex-1 overflow-hidden transition-[max-height,opacity] duration-300 ease-out"
               style={{ maxHeight: promptCollapsed ? 0 : 240, opacity: promptCollapsed ? 0 : 1 }}
             >
-            <div className="flex min-h-0 min-w-0 flex-nowrap items-center justify-between gap-1 overflow-hidden">
-            <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap ps-1 text-[10px]"><Bot className="size-3.5" /> AI Prompt Engine</span>
-            <div className="flex min-w-0 flex-nowrap items-center justify-end gap-1">
+            <div className="flex min-h-0 min-w-0 items-center justify-between gap-2 overflow-hidden">
+            <span className="flex items-center gap-2 ps-1"><Bot className="size-4" /> AI Prompt Engine</span>
+            <div className="flex items-center gap-2">
               {stage.code === "development" && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
-                <Button size="sm" className="h-7 gap-1 px-2 text-[11px]" title={dict.studio.runApp} onClick={() => setShowRun(true)}>
-                  <Play className="size-3" /> <span className="hidden @min-[820px]:inline">{dict.studio.runApp}</span>
+                <Button size="sm" onClick={() => setShowRun(true)}>
+                  <Play className="size-3.5" /> {dict.studio.runApp}
                 </Button>
               )}
               {stage.code === "development" && (
                 <>
                   <Button
                     size="sm"
-                    className="h-7 gap-1 px-2 text-[11px]"
                     variant={finalizedAt ? "secondary" : "outline"}
                     onClick={toggleFinalize}
                     disabled={dbBusy}
                     title={finalizedAt ? dict.studio.unmarkFixed : dict.studio.markFixed}
                   >
-                    <CheckCircle2 className="size-3" />
-                    <span className="hidden @min-[820px]:inline">{finalizedAt ? dict.studio.fixed : dict.studio.markFixed}</span>
+                    <CheckCircle2 className="size-3.5" />
+                    {finalizedAt ? dict.studio.fixed : dict.studio.markFixed}
                   </Button>
                   {finalizedAt && !database && (
-                    <Button size="sm" className="h-7 gap-1 px-2 text-[11px]" title={dict.studio.createDatabase} onClick={createDatabase} disabled={dbBusy}>
-                      {dbBusy ? <Loader2 className="size-3 animate-spin" /> : <Database className="size-3" />}
-                      <span className="hidden @min-[820px]:inline">{dict.studio.createDatabase}</span>
+                    <Button size="sm" onClick={createDatabase} disabled={dbBusy}>
+                      {dbBusy ? <Loader2 className="size-3.5 animate-spin" /> : <Database className="size-3.5" />}
+                      {dict.studio.createDatabase}
                     </Button>
                   )}
                   {database && (
                     <span className="flex items-center gap-1">
-                      <Badge variant="success" className="text-[10px]" title={database.url}>
+                      <Badge variant="success" title={database.url}>
                         <Database className="size-3" /> {database.service} :{database.hostPort}
                       </Badge>
                       <Button
                         size="icon"
-                        className="h-7 w-7"
                         variant="ghost"
                         onClick={deleteDatabase}
                         disabled={dbBusy}
                         title={dict.studio.deleteDatabase}
                         aria-label={dict.studio.deleteDatabase}
                       >
-                        <Trash2 className="size-3 text-destructive" />
+                        <Trash2 className="size-3.5 text-destructive" />
                       </Button>
                     </span>
                   )}
                 </>
               )}
               {isDesign && (
-                <Button size="sm" className="h-7 gap-1 px-2 text-[11px]" variant="outline" title={dict.studio.designStudioOpen} onClick={() => setShowDesignCanvas(true)}>
-                  <Layout className="size-3" /> <span className="hidden @min-[820px]:inline">{dict.studio.designStudioOpen}</span>
+                <Button size="sm" variant="outline" onClick={() => setShowDesignCanvas(true)}>
+                  <Layout className="size-3.5" /> {dict.studio.designStudioOpen}
                   {designScreens.length > 0 && (
-                    <Badge variant="secondary" className="ms-1 text-[10px]">{designScreens.length}</Badge>
+                    <Badge variant="secondary" className="ms-1">{designScreens.length}</Badge>
                   )}
                 </Button>
               )}
               {stage.code === "development" && designScreens.length > 0 && (
                 <Button
                   size="sm"
-                  className="h-7 gap-1 px-2 text-[11px]"
-                  title={dict.studio.implementDesigns}
                   onClick={() =>
                     sendPrompt(
                       "Implement the approved Design Studio designs as real pages/routes in the generated source code. Create one page/component per approved screen and match its layout, sections, colors, typography, and visible copy exactly. Return the full structured stage_result JSON with codeArtifacts.",
@@ -2233,17 +2229,17 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   }
                   disabled={loading}
                 >
-                  <Layout className="size-3" /> <span className="hidden @min-[820px]:inline">{dict.studio.implementDesigns}</span>
-                  <Badge variant="secondary" className="ms-1 text-[10px]">{designScreens.length}</Badge>
+                  <Layout className="size-3.5" /> {dict.studio.implementDesigns}
+                  <Badge variant="secondary" className="ms-1">{designScreens.length}</Badge>
                 </Button>
               )}
               {!isHandover && !isAnalysis && !isDesign && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
-                <Button size="sm" className="h-7 gap-1 px-2 text-[11px]" variant="outline" title={dict.studio.downloadArtifacts} onClick={downloadArtifacts}>
-                  <Download className="size-3" /> <span className="hidden @min-[820px]:inline">{dict.studio.downloadArtifacts}</span>
+                <Button size="sm" variant="outline" onClick={downloadArtifacts}>
+                  <Download className="size-3.5" /> {dict.studio.downloadArtifacts}
                 </Button>
               )}
               {project.status === "in_revision" && (
-                <Badge variant="warning" className="text-[10px]">
+                <Badge variant="warning">
                   <GitPullRequestArrow className="size-3" /> {dict.studio.revisionBadge}
                 </Badge>
               )}
