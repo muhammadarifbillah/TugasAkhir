@@ -2143,16 +2143,23 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
         {/* Center: AI Prompt Engine + Stage Results */}
         <section className={`flex min-h-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
-          <div className="flex items-center justify-between border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div className="flex shrink-0 items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <button
               type="button"
               onClick={() => setPromptCollapsed((v) => !v)}
               aria-expanded={!promptCollapsed}
-              className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:text-foreground"
+              aria-label="AI Prompt Engine"
+              title="AI Prompt Engine"
+              className="flex items-center rounded-md p-1 hover:bg-muted hover:text-foreground"
             >
-              <ChevronDown className={`size-4 transition-transform ${promptCollapsed ? "-rotate-90" : ""}`} />
-              <Bot className="size-4" /> AI Prompt Engine
+              <ChevronDown className={`size-4 transition-transform duration-300 ${promptCollapsed ? "-rotate-90" : ""}`} />
             </button>
+            <div
+              className="min-w-0 flex-1 overflow-hidden transition-[max-height,opacity] duration-300 ease-out"
+              style={{ maxHeight: promptCollapsed ? 0 : 240, opacity: promptCollapsed ? 0 : 1 }}
+            >
+            <div className="flex min-h-0 min-w-0 items-center justify-between gap-2 overflow-hidden">
+            <span className="flex items-center gap-2 ps-1"><Bot className="size-4" /> AI Prompt Engine</span>
             <div className="flex items-center gap-2">
               {stage.code === "development" && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
                 <Button size="sm" onClick={() => setShowRun(true)}>
@@ -2230,11 +2237,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </Badge>
               )}
             </div>
+            </div>
+            </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">
-            {!promptCollapsed && (
-              <>
             {/* Stage results (above chat) */}
             {isAnalysis && (
               <div className="space-y-4 border-b p-4">
@@ -2476,9 +2483,6 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   />
                 </div>
               </div>
-            )}
-
-              </>
             )}
 
             {/* Chat messages */}
