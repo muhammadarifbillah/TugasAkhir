@@ -2232,9 +2232,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             </div>
           </div>
 
-          {!promptCollapsed && (
-            <>
           <div className="min-h-0 flex-1 overflow-y-auto">
+            {!promptCollapsed && (
+              <>
             {/* Stage results (above chat) */}
             {isAnalysis && (
               <div className="space-y-4 border-b p-4">
@@ -2478,6 +2478,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               </div>
             )}
 
+              </>
+            )}
+
             {/* Chat messages */}
             <div className="space-y-3 p-4">
               {messages.length === 0 && (
@@ -2637,8 +2640,6 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               </Button>
             </div>
           </div>
-            </>
-          )}
         </section>
 
         {/* Right: Security & Compliance */}
