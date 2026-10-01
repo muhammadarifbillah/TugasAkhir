@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -27,6 +28,7 @@ import {
   Loader2,
   Lock,
   Maximize2,
+  MoreHorizontal,
   Network,
   Play,
   RotateCcw,
@@ -326,6 +328,37 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [maximized, setMaximized] = useState(false);
   const [promptCollapsed, setPromptCollapsed] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [morePos, setMorePos] = useState<{ top: number; right: number } | null>(null);
+  const moreBtnRef = useRef<HTMLDivElement>(null);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
+
+  const toggleMoreMenu = useCallback(() => {
+    if (moreOpen) {
+      setMoreOpen(false);
+      return;
+    }
+    const rect = moreBtnRef.current?.getBoundingClientRect();
+    if (rect) setMorePos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+    setMoreOpen(true);
+  }, [moreOpen]);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (!moreBtnRef.current?.contains(t) && !moreMenuRef.current?.contains(t)) setMoreOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   // Stable identity: StepResultDialog syncs this in an effect, so an inline
   // callback would re-run it on every render and immediately undo maximize.
@@ -2218,25 +2251,64 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   )}
                 </Button>
               )}
-              {stage.code === "development" && designScreens.length > 0 && (
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    sendPrompt(
-                      "Implement the approved Design Studio designs as real pages/routes in the generated source code. Create one page/component per approved screen and match its layout, sections, colors, typography, and visible copy exactly. Return the full structured stage_result JSON with codeArtifacts.",
-                      "direct",
-                    )
-                  }
-                  disabled={loading}
-                >
-                  <Layout className="size-3.5" /> {dict.studio.implementDesigns}
-                  <Badge variant="secondary" className="ms-1">{designScreens.length}</Badge>
-                </Button>
-              )}
-              {!isHandover && !isAnalysis && !isDesign && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
-                <Button size="sm" variant="outline" onClick={downloadArtifacts}>
-                  <Download className="size-3.5" /> {dict.studio.downloadArtifacts}
-                </Button>
+              {((stage.code === "development" && designScreens.length > 0) ||
+                (!isHandover && !isAnalysis && !isDesign && !!codeArtifacts && Object.keys(codeArtifacts).length > 0)) && (
+                <div className="relative" ref={moreBtnRef}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label="More actions"
+                    aria-haspopup="menu"
+                    aria-expanded={moreOpen}
+                    title="More actions"
+                    onClick={toggleMoreMenu}
+                  >
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                  {moreOpen && morePos && createPortal(
+                    <div
+                      ref={moreMenuRef}
+                      role="menu"
+                      style={{ top: morePos.top, right: morePos.right }}
+                      className="fixed z-[90] w-64 rounded-md border bg-card p-1 text-xs shadow-lg"
+                    >
+                      {stage.code === "development" && designScreens.length > 0 && (
+                        <button
+                          type="button"
+                          role="menuitem"
+                          disabled={loading}
+                          onClick={() => {
+                            setMoreOpen(false);
+                            void sendPrompt(
+                              "Implement the approved Design Studio designs as real pages/routes in the generated source code. Create one page/component per approved screen and match its layout, sections, colors, typography, and visible copy exactly. Return the full structured stage_result JSON with codeArtifacts.",
+                              "direct",
+                            );
+                          }}
+                          className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-start hover:bg-muted disabled:opacity-50"
+                        >
+                          <Layout className="size-3.5 shrink-0" />
+                          <span className="flex-1">{dict.studio.implementDesigns}</span>
+                          {designScreens.length > 0 && <Badge variant="secondary">{designScreens.length}</Badge>}
+                        </button>
+                      )}
+                      {!isHandover && !isAnalysis && !isDesign && !!codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setMoreOpen(false);
+                            void downloadArtifacts();
+                          }}
+                          className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-start hover:bg-muted"
+                        >
+                          <Download className="size-3.5 shrink-0" />
+                          <span className="flex-1">{dict.studio.downloadArtifacts}</span>
+                        </button>
+                      )}
+                    </div>,
+                    document.body,
+                  )}
+                </div>
               )}
               {project.status === "in_revision" && (
                 <Badge variant="warning">
