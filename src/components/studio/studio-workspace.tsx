@@ -2079,7 +2079,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       {/* 3-column body */}
       <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-6 lg:grid-cols-12">
         {/* Left: Sub-steps & Deliverables */}
-        <aside className={`flex min-h-0 flex-col border-b md:flex md:col-span-2 lg:col-span-3 lg:border-r lg:border-b-0 ${mobileTab !== "navigate" ? "max-md:hidden" : ""}`}>
+        <aside className={`flex min-h-0 min-w-0 flex-col border-b md:flex md:col-span-2 lg:col-span-3 lg:border-r lg:border-b-0 ${mobileTab !== "navigate" ? "max-md:hidden" : ""}`}>
           <div className="flex items-center justify-between border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <span className="flex items-center gap-2"><ListChecks className="size-4" /> {dict.studio.subSteps}</span>
             <Badge variant="secondary" className="text-[9px]">
@@ -2175,7 +2175,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         </aside>
 
         {/* Center: AI Prompt Engine + Stage Results */}
-        <section className={`relative flex min-h-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
+        <section className={`relative flex min-h-0 min-w-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
           <div
             className={`flex items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors duration-300 ${
               promptCollapsed
@@ -2320,7 +2320,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
             {/* Stage results (above chat) */}
             {isAnalysis && (
               <div className="space-y-4 border-b p-4">
@@ -2565,7 +2565,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             )}
 
             {/* Chat messages */}
-            <div className="space-y-3 p-4">
+            <div className="min-w-0 space-y-3 p-4">
               {messages.length === 0 && (
                 <EmptyState
                   icon={Wand2}
@@ -2574,13 +2574,13 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 />
               )}
               {messages.map((m) => (
-                <div key={m.id} className={`flex gap-2 ${m.role === "user" ? "justify-end" : ""}`}>
+                <div key={m.id} className={`flex min-w-0 gap-2 ${m.role === "user" ? "justify-end" : ""}`}>
                   {m.role === "assistant" && (
                     <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
                       <Bot className="size-3.5" />
                     </span>
                   )}
-                  <div className={`whitespace-pre-wrap rounded-lg px-3 py-2 text-sm ${m.role === "user" ? "bg-primary text-primary-foreground" : "border bg-card"}`}>
+                  <div className={`min-w-0 whitespace-pre-wrap break-words rounded-lg px-3 py-2 text-sm [overflow-wrap:anywhere] ${m.role === "user" ? "bg-primary text-primary-foreground" : "border bg-card"}`}>
                     {m.role === "assistant" ? displayAssistantText(m.content) : m.content}
                   </div>
                   {m.role === "user" && (
@@ -2726,12 +2726,12 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         </section>
 
         {/* Right: Security & Compliance */}
-        <aside className={`flex min-h-0 flex-col border-t md:border-l md:border-t-0 lg:col-span-3 ${mobileTab !== "security" ? "max-md:hidden" : ""}`}>
+        <aside className={`flex min-h-0 min-w-0 flex-col border-t md:border-l md:border-t-0 lg:col-span-3 ${mobileTab !== "security" ? "max-md:hidden" : ""}`}>
           <div className="flex items-center gap-2 border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <ShieldCheck className="size-4" /> Security & Compliance
           </div>
 
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+          <div className="min-h-0 min-w-0 flex-1 space-y-4 overflow-y-auto p-4">
             <div className="rounded-lg border p-4">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-xs font-medium">{dict.studio.score}</span>
