@@ -2143,7 +2143,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
         {/* Center: AI Prompt Engine + Stage Results */}
         <section className={`flex min-h-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
-          <div className="flex shrink-0 items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div
+            className="flex shrink-0 items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors duration-300"
+            style={{ borderBottomColor: promptCollapsed ? "transparent" : undefined }}
+          >
             <button
               type="button"
               onClick={() => setPromptCollapsed((v) => !v)}
