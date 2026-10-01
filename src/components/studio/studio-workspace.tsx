@@ -1977,7 +1977,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const stageAlreadyCompleted = currentStageStatus === "completed";
 
   return (
-    <div className="flex h-[calc(100svh-3.5rem)] flex-col max-md:h-auto max-md:min-h-[calc(100svh-3.5rem)]">
+    <div className="flex h-full min-h-0 flex-col max-md:h-auto max-md:min-h-full">
       {/* Top bar + stepper */}
       <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
         <div className="flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
@@ -2726,7 +2726,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         </section>
 
         {/* Right: Security & Compliance */}
-        <aside className={`flex min-h-0 min-w-0 flex-col border-t md:border-l md:border-t-0 lg:col-span-3 ${mobileTab !== "security" ? "max-md:hidden" : ""}`}>
+        <aside className={`flex min-h-0 min-w-0 flex-col border-t md:col-span-2 md:border-l md:border-t-0 lg:col-span-3 ${mobileTab !== "security" ? "max-md:hidden" : ""}`}>
           <div className="flex items-center gap-2 border-b px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <ShieldCheck className="size-4" /> Security & Compliance
           </div>

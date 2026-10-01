@@ -92,10 +92,10 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
         </a>
         <PwaRegister />
         <ThemeProvider>
-          <div className="flex min-h-svh flex-col">
+          <div className="flex h-svh flex-col overflow-hidden">
             <OfflineBanner label={dict.app.offline} />
             <Header lang={lang} />
-            <main id="main" className="flex-1">{children}</main>
+            <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
             <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">
               {dict.app.name} — {dict.app.tagline}. {dict.app.frameworkNote}
             </footer>
