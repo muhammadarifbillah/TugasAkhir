@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { STAGE_DEFINITIONS, completionGaps } from "@/lib/stages";
 import { effectiveDesignPlan } from "@/lib/design";
+import { extractJson, planResultSchema, type PlanResult } from "@/lib/ai/result";
 import { decryptSecret } from "@/lib/crypto";
 
 interface StudioPageProps {
@@ -51,6 +52,23 @@ export default async function StudioPage(props: StudioPageProps) {
     include: { messages: { orderBy: { createdAt: "asc" } } },
   });
 
+  // Restore the latest plan so navigating away and back (or a reload) keeps the
+  // approved plan intact in the Plan card.
+  let initialPlan: PlanResult | null = null;
+  if (chat) {
+    const recentAssistant = chat.messages
+      .filter((m) => m.role === "assistant")
+      .slice(-5)
+      .reverse();
+    for (const m of recentAssistant) {
+      const parsed = planResultSchema.safeParse(extractJson(m.content));
+      if (parsed.success) {
+        initialPlan = parsed.data;
+        break;
+      }
+    }
+  }
+
   const globalSpec = (project.globalSpec as Record<string, unknown> | null) ?? {};
   const codeArtifacts = (globalSpec.codeArtifacts as Record<string, string> | null) ?? null;
   const design = (globalSpec.design as Record<string, unknown> | null) ?? null;
@@ -90,6 +108,7 @@ export default async function StudioPage(props: StudioPageProps) {
     <StudioWorkspace
       lang={lang}
       dict={dict}
+      initialPlan={initialPlan}
       project={{
         id: project.id,
         name: project.name,

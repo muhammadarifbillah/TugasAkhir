@@ -318,6 +318,7 @@
     "aiFinished": "AI selesai. Hasil baru tersedia di sub-step berikut: {steps}. Klik ikon mata (👁) pada masing-masing sub-step untuk membukanya.",
     "aiFinishedView": "Buka yang pertama",
     "stepChanged": "Ada perubahan",
+    "noApprovedPlan": "Belum ada plan yang disetujui. Gunakan mode Plan, lalu klik Approve & Build untuk mengeksekusi.",
     "subStepsHint": "Klik 👁 pada sub-step untuk melihat hasilnya.",
     "designKeep": "Simpan",
     "designDiscard": "Buang",

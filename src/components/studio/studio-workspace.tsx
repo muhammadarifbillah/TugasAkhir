@@ -163,6 +163,8 @@ export interface StudioWorkspaceProps {
   designUiDesign: string[];
   designScreens: unknown;
   designPlan: unknown;
+  /** Latest persisted plan for this stage, restored across navigation/reload. */
+  initialPlan: PlanResult | null;
   analysisDataClassification: string[];
   snapshots: SnapshotRow[];
   analysisStack: {
@@ -367,7 +369,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [database, setDatabase] = useState(props.project.database);
   const [dbBusy, setDbBusy] = useState(false);
   const [chatMode, setChatMode] = useState<ChatMode>("plan");
-  const [activePlan, setActivePlan] = useState<PlanResult | null>(null);
+  const [activePlan, setActivePlan] = useState<PlanResult | null>(props.initialPlan);
   const [buildLoading, setBuildLoading] = useState(false);
   const [buildResult, setBuildResult] = useState<{
     actionsExecuted: number;
@@ -489,6 +491,14 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     setError(null);
     setStructuredWarning(false);
     setTruncatedWarning(false);
+    // Build mode needs an approved plan; otherwise don't silently fall back to a
+    // plain chat turn (that produced "nothing saved" confusion).
+    if (activeMode === "build" && !activePlan) {
+      setLoading(false);
+      setError(dict.studio.noApprovedPlan);
+      return;
+    }
+
     setLoading(true);
     setBuildResult(null);
 

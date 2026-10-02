@@ -318,6 +318,7 @@
     "aiFinished": "AI finished. New results are ready in these sub-steps: {steps}. Click the eye icon (👁) on each sub-step to open them.",
     "aiFinishedView": "Open first",
     "stepChanged": "New changes",
+    "noApprovedPlan": "No approved plan yet. Use Plan mode, then click Approve & Build to execute.",
     "subStepsHint": "Click 👁 on a sub-step to view its result.",
     "designKeep": "Keep",
     "designDiscard": "Discard",
