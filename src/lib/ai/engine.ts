@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { approvedDesignReference } from "@/lib/ai/design-reference";
 import { projectContext } from "@/lib/ai/context";
+import { stageGuidance, withGuidance } from "@/lib/ai/guidance";
 import { completionGaps, getStageDefinition, stepsTouchedByResult } from "@/lib/stages";
 import { sanitizePrompt } from "@/lib/sanitize";
 import { writeAudit } from "@/lib/audit";
@@ -333,6 +334,22 @@ export async function runStageTurn(input: {
   });
 
   const allRecommendations = [...persisted.recommendations, ...extra];
+
+  // Point the user at the sub-steps (eye icon) where these results can be reviewed.
+  const lastAssistant = await prisma.message.findFirst({
+    where: { chatId: chat.id, role: "assistant" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (lastAssistant) {
+    await prisma.message
+      .update({
+        where: { id: lastAssistant.id },
+        data: {
+          content: withGuidance(lastAssistant.content, stageGuidance(project.outputLanguage)),
+        },
+      })
+      .catch(() => undefined);
+  }
 
   const changedSteps = await computeChangedSteps({
     projectId: project.id,
@@ -668,6 +685,22 @@ Rules:
   });
 
   const allRecommendations = [...persisted.recommendations, ...extra];
+
+  // Point the user at the sub-steps (eye icon) where these results can be reviewed.
+  const lastAssistant = await prisma.message.findFirst({
+    where: { chatId: chat.id, role: "assistant" },
+    orderBy: { createdAt: "desc" },
+  });
+  if (lastAssistant) {
+    await prisma.message
+      .update({
+        where: { id: lastAssistant.id },
+        data: {
+          content: withGuidance(lastAssistant.content, stageGuidance(project.outputLanguage)),
+        },
+      })
+      .catch(() => undefined);
+  }
 
   const changedSteps = await computeChangedSteps({
     projectId: project.id,
