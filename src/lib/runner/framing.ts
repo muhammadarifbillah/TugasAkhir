@@ -8,7 +8,10 @@
  * sandbox workdir. The saved artifacts keep their secure defaults, so the
  * delivered source stays hardened while the local preview remains usable.
  */
-const ALLOWED_ANCESTORS = "'self' http://localhost:* http://127.0.0.1:*";
+// The studio may be reached from another device, so the parent origin is not
+// fixed. This only ever applies to the sandbox copy (never the delivered
+// source), so allowing any ancestor is acceptable for a live preview.
+const ALLOWED_ANCESTORS = "*";
 
 export function relaxFramingForPreview(content: string): string {
   if (!content || (!content.includes("frame-ancestors") && !content.includes("X-Frame-Options"))) {

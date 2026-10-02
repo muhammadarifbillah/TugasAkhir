@@ -7,7 +7,7 @@ test("widens a blocking frame-ancestors CSP directive", () => {
   const out = relaxFramingForPreview(
     `const csp = "default-src 'self'; frame-ancestors 'none'; base-uri 'self'";`,
   );
-  assert.match(out, /frame-ancestors 'self' http:\/\/localhost:\*/);
+  assert.match(out, /frame-ancestors \*/);
   assert.ok(!out.includes("frame-ancestors 'none'"));
   // Unrelated directives are untouched.
   assert.match(out, /default-src 'self'/);
@@ -16,8 +16,8 @@ test("widens a blocking frame-ancestors CSP directive", () => {
 
 test("handles double-quoted and bare frame-ancestors values", () => {
   assert.ok(!relaxFramingForPreview(`"frame-ancestors \"none\""`).includes("none"));
-  assert.match(relaxFramingForPreview("frame-ancestors self"), /localhost/);
-  assert.match(relaxFramingForPreview('frame-ancestors "self"'), /localhost/);
+  assert.match(relaxFramingForPreview("frame-ancestors self"), /frame-ancestors \*/);
+  assert.match(relaxFramingForPreview('frame-ancestors "self"'), /frame-ancestors \*/);
 });
 
 test("removes X-Frame-Options DENY in Next.js headers() shape", () => {

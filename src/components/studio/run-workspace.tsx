@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Copy, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
@@ -30,6 +30,7 @@ export interface RunWorkspaceLabels {
   saved: string;
   unsaved: string;
   confirmDiscard: string;
+  openInNewTab: string;
 }
 
 interface RunWorkspaceProps {
@@ -246,12 +247,19 @@ export function RunWorkspace({
     };
   }, [polling, projectId]);
 
-  const preview = url ? (
+  // The app runs on the same host as the studio but a different port, so point
+  // at the browser's hostname so a user on another device reaches this server.
+  const appUrl =
+    url && typeof window !== "undefined"
+      ? url.replace("localhost", window.location.hostname || "localhost")
+      : url;
+
+  const preview = appUrl ? (
     <div className="flex h-full w-full justify-center overflow-auto bg-muted/40 p-2">
       <div style={{ width: DEVICE_WIDTH[device], maxWidth: "100%" }} className="h-full">
         <iframe
           key={iframeKey}
-          src={url}
+          src={appUrl}
           title="App preview"
           className="h-full w-full rounded-md border bg-white"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -302,10 +310,20 @@ export function RunWorkspace({
           {deviceBtn("desktop", Monitor, "Desktop")}
           {deviceBtn("tablet", Tablet, "Tablet")}
           {deviceBtn("mobile", Smartphone, "Mobile")}
-          {url && (
-            <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px]" onClick={() => setIframeKey((k) => k + 1)}>
-              Reload
-            </Button>
+          {appUrl && (
+            <>
+              <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px]" onClick={() => setIframeKey((k) => k + 1)}>
+                Reload
+              </Button>
+              <a
+                href={appUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-7 items-center gap-1 rounded-md px-2 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <ExternalLink className="size-3.5" /> {labels.openInNewTab}
+              </a>
+            </>
           )}
           {status === "running" || status === "starting" ? (
             <Button size="sm" variant="outline" onClick={stop}>

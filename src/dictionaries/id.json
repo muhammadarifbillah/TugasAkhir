@@ -377,6 +377,7 @@
     "runNotRunning": "Aplikasi tidak berjalan.",
     "runNoLogs": "Belum ada log.",
     "runLogs": "Log build & run",
+    "runOpenInNewTab": "Buka di tab baru",
     "runDemoAccount": "Akun demo",
     "markFixed": "Tandai Fix",
     "unmarkFixed": "Batalkan Fix",

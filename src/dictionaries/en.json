@@ -377,6 +377,7 @@
     "runNotRunning": "App is not running.",
     "runNoLogs": "No logs yet.",
     "runLogs": "Build & run logs",
+    "runOpenInNewTab": "Open in new tab",
     "runDemoAccount": "Demo account",
     "markFixed": "Mark as fixed",
     "unmarkFixed": "Unmark fixed",

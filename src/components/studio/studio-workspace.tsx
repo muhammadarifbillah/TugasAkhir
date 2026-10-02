@@ -3189,6 +3189,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             noLogs: dict.studio.runNoLogs,
             logs: dict.studio.runLogs,
             demoAccount: dict.studio.runDemoAccount,
+            openInNewTab: dict.studio.runOpenInNewTab,
             terminal: dict.studio.terminal,
             explorer: dict.studio.explorer,
             preview: dict.studio.preview,
