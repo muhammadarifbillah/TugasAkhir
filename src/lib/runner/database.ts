@@ -1,4 +1,6 @@
+import { randomBytes } from "node:crypto";
 import { docker, removeContainer } from "./docker";
+import { runnerBindHost } from "./config";
 import { findFreePort } from "./ports";
 
 /**
@@ -14,8 +16,12 @@ export interface ServiceHandle {
   env: Record<string, string>;
 }
 
-const DB_PASSWORD = "app_password";
 const DB_NAME = "appdb";
+
+/** Fresh random password per service container (no shared static credential). */
+function randomPassword(): string {
+  return randomBytes(18).toString("hex");
+}
 const SERVICE_MEMORY: Record<string, string> = {
   postgres: "512m",
   mysql: "768m",
@@ -31,6 +37,11 @@ export function supportedServices(): string[] {
   return Object.keys(SERVICE_IMAGE);
 }
 
+/** Deterministic name of a run's throwaway service container. */
+export function serviceContainerName(service: string, runId: string): string {
+  return `sdlc-svc-${service}-${runId}`;
+}
+
 export async function startService(
   service: string,
   network: string,
@@ -39,7 +50,7 @@ export async function startService(
   const image = SERVICE_IMAGE[service];
   if (!image) return null;
 
-  const containerName = `sdlc-svc-${service}-${runId}`;
+  const containerName = serviceContainerName(service, runId);
   const args = [
     "run",
     "-d",
@@ -71,16 +82,17 @@ export async function startService(
     "no-new-privileges",
   ];
 
+  const password = randomPassword();
   let env: Record<string, string>;
   if (service === "postgres") {
-    args.push("-e", `POSTGRES_PASSWORD=${DB_PASSWORD}`, "-e", `POSTGRES_DB=${DB_NAME}`);
+    args.push("-e", `POSTGRES_PASSWORD=${password}`, "-e", `POSTGRES_DB=${DB_NAME}`);
     env = {
-      DATABASE_URL: `postgresql://postgres:${DB_PASSWORD}@${containerName}:5432/${DB_NAME}`,
+      DATABASE_URL: `postgresql://postgres:${password}@${containerName}:5432/${DB_NAME}`,
     };
   } else if (service === "mysql") {
-    args.push("-e", `MYSQL_ROOT_PASSWORD=${DB_PASSWORD}`, "-e", `MYSQL_DATABASE=${DB_NAME}`);
+    args.push("-e", `MYSQL_ROOT_PASSWORD=${password}`, "-e", `MYSQL_DATABASE=${DB_NAME}`);
     env = {
-      DATABASE_URL: `mysql://root:${DB_PASSWORD}@${containerName}:3306/${DB_NAME}`,
+      DATABASE_URL: `mysql://root:${password}@${containerName}:3306/${DB_NAME}`,
     };
   } else {
     env = { REDIS_URL: `redis://${containerName}:6379` };
@@ -129,8 +141,9 @@ export async function startPersistentDatabase(
     "-d",
     "--name",
     containerName,
+    // Loopback only, so the database is not exposed to the network.
     "-p",
-    `${hostPort}:${port}`,
+    `${runnerBindHost()}:${hostPort}:${port}`,
     "--memory",
     SERVICE_MEMORY[service],
     "--cpus",
@@ -153,13 +166,14 @@ export async function startPersistentDatabase(
     "no-new-privileges",
   ];
 
+  const password = randomPassword();
   let url: string;
   if (service === "postgres") {
-    args.push("-e", `POSTGRES_PASSWORD=${DB_PASSWORD}`, "-e", `POSTGRES_DB=${DB_NAME}`);
-    url = `postgresql://postgres:${DB_PASSWORD}@localhost:${hostPort}/${DB_NAME}`;
+    args.push("-e", `POSTGRES_PASSWORD=${password}`, "-e", `POSTGRES_DB=${DB_NAME}`);
+    url = `postgresql://postgres:${password}@localhost:${hostPort}/${DB_NAME}`;
   } else if (service === "mysql") {
-    args.push("-e", `MYSQL_ROOT_PASSWORD=${DB_PASSWORD}`, "-e", `MYSQL_DATABASE=${DB_NAME}`);
-    url = `mysql://root:${DB_PASSWORD}@localhost:${hostPort}/${DB_NAME}`;
+    args.push("-e", `MYSQL_ROOT_PASSWORD=${password}`, "-e", `MYSQL_DATABASE=${DB_NAME}`);
+    url = `mysql://root:${password}@localhost:${hostPort}/${DB_NAME}`;
   } else {
     url = `redis://localhost:${hostPort}`;
   }

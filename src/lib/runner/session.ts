@@ -17,7 +17,13 @@ import {
   removeNetwork,
   runContainer,
 } from "./docker";
-import { startService, stopService, supportedServices, type ServiceHandle } from "./database";
+import {
+  serviceContainerName,
+  startService,
+  stopService,
+  supportedServices,
+  type ServiceHandle,
+} from "./database";
 
 export type RunStatus = "starting" | "running" | "error" | "stopped";
 
@@ -39,6 +45,7 @@ export interface RunSession {
   services: string[];
   network: string | null;
   serviceHandles: ServiceHandle[];
+  healthPath?: string;
   status: RunStatus;
   error?: string;
   startedAt: number;
@@ -46,8 +53,10 @@ export interface RunSession {
   demo?: DemoAccount[];
 }
 
-/** Cap concurrent generated-app containers to keep the host responsive. */
-const MAX_ACTIVE_RUNS = 2;
+// Cap concurrent generated-app containers per user (and overall) to keep the
+// host responsive without letting one tenant starve everyone else.
+const MAX_ACTIVE_RUNS_PER_USER = Math.max(1, Number(process.env.RUNNER_MAX_RUNS_PER_USER ?? 2));
+const MAX_ACTIVE_RUNS_TOTAL = Math.max(1, Number(process.env.RUNNER_MAX_RUNS_TOTAL ?? 6));
 // Keep a run alive for a while even if the studio tab is not polling (e.g. the
 // user opened the generated app in another tab). Override with RUN_TTL_MINUTES.
 const TTL_MS = Math.max(5, Number(process.env.RUN_TTL_MINUTES ?? 60)) * 60 * 1000;
@@ -68,6 +77,12 @@ async function reconcileSessions(): Promise<void> {
     const containers = await listSdlcContainers();
     for (const c of containers) {
       if (sessions.has(c.projectId) || c.state !== "running") continue;
+      // The container name ends in the runId; service containers are named from
+      // it, so their handles can be rebuilt and cleaned up after a restart.
+      const runId = c.name.split("-").pop() ?? "";
+      const serviceHandles: ServiceHandle[] = c.services
+        .filter((s) => supportedServices().includes(s))
+        .map((service) => ({ service, containerName: serviceContainerName(service, runId), env: {} }));
       sessions.set(c.projectId, {
         projectId: c.projectId,
         userId: c.userId,
@@ -79,7 +94,8 @@ async function reconcileSessions(): Promise<void> {
         stackLabel: c.stackLabel,
         services: c.services,
         network: c.network,
-        serviceHandles: [],
+        serviceHandles,
+        healthPath: c.healthPath,
         status: "running",
         startedAt: c.startedAt,
         lastAccess: Date.now(),
@@ -190,7 +206,8 @@ export async function startRun(
 
   const existing = sessions.get(projectId);
   if (existing) await forceStop(existing);
-  if (sessions.size >= MAX_ACTIVE_RUNS) {
+  const activeForUser = [...sessions.values()].filter((s) => s.userId === userId).length;
+  if (activeForUser >= MAX_ACTIVE_RUNS_PER_USER || sessions.size >= MAX_ACTIVE_RUNS_TOTAL) {
     throw new Error("TOO_MANY_RUNS");
   }
 
@@ -202,18 +219,17 @@ export async function startRun(
   // Start throwaway services (postgres/mysql/redis) on a private network so the
   // app can reach them by container name via the injected connection env.
   const wantedServices = plan.services.filter((s) => supportedServices().includes(s));
-  let network: string | null = null;
+  // Every run gets its own private network, so a generated container cannot
+  // reach sibling run containers or persistent databases on the default bridge.
+  const network = `sdlc-net-${runId}`;
+  await createNetwork(network);
   const serviceHandles: ServiceHandle[] = [];
   const serviceEnv: Record<string, string> = {};
-  if (wantedServices.length > 0) {
-    network = `sdlc-net-${runId}`;
-    await createNetwork(network);
-    for (const service of wantedServices) {
-      const handle = await startService(service, network, runId);
-      if (handle) {
-        serviceHandles.push(handle);
-        Object.assign(serviceEnv, handle.env);
-      }
+  for (const service of wantedServices) {
+    const handle = await startService(service, network, runId);
+    if (handle) {
+      serviceHandles.push(handle);
+      Object.assign(serviceEnv, handle.env);
     }
   }
 
@@ -267,7 +283,10 @@ export async function startRun(
       extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
       // Node installs are CPU-bound; give them more headroom than the default.
       ...(plan.stackId === "node" ? { memory: "2g", cpus: "2", pidsLimit: 512 } : {}),
-      network: network ?? undefined,
+      // Node runs `apk add openssl` at start, which needs a writable rootfs;
+      // the other stacks install only inside /app, so their root can be read-only.
+      readOnly: plan.stackId !== "node",
+      network,
       labels: {
         "sdlc.projectId": projectId,
         "sdlc.userId": userId,
@@ -278,6 +297,7 @@ export async function startRun(
         "sdlc.workDir": workDir,
         "sdlc.network": network ?? "",
         "sdlc.services": plan.services.join(","),
+        "sdlc.healthPath": plan.healthPath ?? "",
         "sdlc.startedAt": String(startedAt),
       },
     });
@@ -300,6 +320,7 @@ export async function startRun(
     services: plan.services,
     network,
     serviceHandles,
+    healthPath: plan.healthPath,
     status: "starting",
     startedAt,
     lastAccess: Date.now(),
@@ -377,9 +398,11 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
     return runningResult(session);
   }
 
-  // Still installing/starting: probe the app until it answers.
+  // Still installing/starting: probe the app until it answers. The manifest may
+  // name a health path (e.g. "/api/health") for apps whose "/" is not the entry.
+  const healthPath = session.healthPath?.startsWith("/") ? session.healthPath : "/";
   try {
-    const res = await fetch(`http://127.0.0.1:${session.hostPort}/`, {
+    const res = await fetch(`http://127.0.0.1:${session.hostPort}${healthPath}`, {
       signal: AbortSignal.timeout(2500),
     });
     if (res.status < 500) {
@@ -409,7 +432,13 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
 }
 
 export async function stopRun(projectId: string): Promise<void> {
-  const session = sessions.get(projectId);
+  let session = sessions.get(projectId);
+  if (!session) {
+    // The registry may have been cleared by a restart; rebuild from Docker so a
+    // stop request still tears the container down instead of being a no-op.
+    await reconcileSessions();
+    session = sessions.get(projectId);
+  }
   if (!session) return;
   await forceStop(session);
 }

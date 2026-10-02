@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import { Header } from "@/components/header";
+import { SiteFooter } from "@/components/site-footer";
 import { OfflineBanner } from "@/components/offline-banner";
 import { PwaRegister } from "@/components/pwa-register";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -96,9 +97,9 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
             <OfflineBanner label={dict.app.offline} />
             <Header lang={lang} />
             <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
-            <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">
-              {dict.app.name} — {dict.app.tagline}. {dict.app.frameworkNote}
-            </footer>
+            <SiteFooter
+              label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
+            />
           </div>
         </ThemeProvider>
       </body>

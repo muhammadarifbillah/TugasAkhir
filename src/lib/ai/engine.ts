@@ -2,6 +2,7 @@ import { generateText } from "ai";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { approvedDesignReference } from "@/lib/ai/design-reference";
+import { projectContext } from "@/lib/ai/context";
 import { getStageDefinition } from "@/lib/stages";
 import { sanitizePrompt } from "@/lib/sanitize";
 import { writeAudit } from "@/lib/audit";
@@ -27,7 +28,7 @@ function composeSystemPrompt(opts: {
 }): string {
   const def = getStageDefinition(opts.stageCode);
   const context = opts.globalSpec
-    ? sanitizePrompt(JSON.stringify(opts.globalSpec, null, 2).slice(0, 20000))
+    ? sanitizePrompt(JSON.stringify(projectContext(opts.globalSpec), null, 2).slice(0, 20000))
     : "None yet.";
 
   const approvedDesign =

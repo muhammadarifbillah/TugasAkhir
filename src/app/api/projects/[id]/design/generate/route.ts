@@ -7,15 +7,35 @@ import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
-import { createScreen, hasVisibleContent, parseDesignScreens, MAX_SCREEN_HTML, MAX_SCREENS } from "@/lib/design";
+import {
+  createScreen,
+  hasVisibleContent,
+  parseDesignScreens,
+  MAX_PAGES_PER_ROLE,
+  MAX_SCREEN_HTML,
+  MAX_SCREENS,
+} from "@/lib/design";
 
 const bodySchema = z.object({
   prompt: z.string().min(1).max(4000),
   screenId: z.string().optional(),
   html: z.string().max(MAX_SCREEN_HTML).optional(),
+  /** Display name to keep when refining an existing screen. */
+  name: z.string().max(80).optional(),
   device: z.enum(["desktop", "tablet", "mobile"]).optional(),
   /** When true (and not refining), generate every implied page at once. */
   multi: z.boolean().optional(),
+  /** Role these screens belong to (from the design plan); tags every screen. */
+  role: z.string().max(80).optional(),
+  /** design plan version at the time of generation (for staleness tracking). */
+  planVersion: z.number().optional(),
+  /** Planned-page key this screen implements (kept across a refine). */
+  planKey: z.string().max(160).optional(),
+  /** Planned pages for the role, used to scope + tag a per-role generation. */
+  planPages: z
+    .array(z.object({ key: z.string().max(160), name: z.string().max(80) }))
+    .max(MAX_PAGES_PER_ROLE)
+    .optional(),
 });
 
 interface RouteProps {
@@ -75,7 +95,22 @@ export async function POST(request: Request, { params }: RouteProps) {
     parsed.data.html ??
     (parsed.data.screenId ? storedScreenHtml(project.globalSpec, parsed.data.screenId) : null);
 
+  // A refine that names a screen must base on it; silently generating a fresh
+  // screen (without the base) would look like refine "did nothing".
+  if (parsed.data.screenId && !currentHtml) {
+    return NextResponse.json(
+      {
+        error: "SCREEN_NOT_FOUND",
+        message: "The screen to refine was not found. Reload the designs and try again.",
+      },
+      { status: 409 },
+    );
+  }
+
   const isMulti = Boolean(parsed.data.multi) && !currentHtml;
+  const roleName = parsed.data.role?.trim() || undefined;
+  const planPages = parsed.data.planPages ?? [];
+  const pageKeyByName = new Map(planPages.map((p) => [p.name.trim().toLowerCase(), p.key]));
 
   const baseRules = [
     "- Each screen is a COMPLETE, self-contained HTML document (doctype, <head> with inline <style>, <body> with visible content).",
@@ -88,14 +123,28 @@ export async function POST(request: Request, { params }: RouteProps) {
     "Make it modern, accessible (semantic tags, good contrast) and visually polished.",
   ].filter(Boolean);
 
-  const system = isMulti
+  // A per-role generation is scoped to the pages that role needs, so it never
+  // spills into other roles' pages (that was the "generated everything" bug).
+  const multiSystem = roleName
     ? [
+        `You are a senior UI designer. Produce the UI pages for ONE user role: "${roleName}".`,
+        `Return ONLY a JSON object of the exact shape {"screens":[{"name":"Page Name","html":"<!doctype html>..."}, ...]} — no prose, no markdown fences.`,
+        planPages.length > 0
+          ? `Produce EXACTLY these pages, one screen each, and use the exact given name as the screen "name": ${planPages.map((p) => p.name).join(", ")}.`
+          : `Produce every page this role needs. If the request names pages, produce exactly those. Do NOT produce pages for other roles.`,
+        "Rules for each screen:",
+        ...baseRules,
+      ].join("\n")
+    : [
         "You are a senior UI designer. Produce ALL the key screens of the website described below, each as its own high-fidelity HTML document.",
         `Return ONLY a JSON object of the exact shape {"screens":[{"name":"Login","html":"<!doctype html>..."}, ...]} — no prose, no markdown fences.`,
         `Produce between 2 and ${MAX_SCREENS} screens. If the request names pages, produce exactly those; otherwise infer the main pages from the description (e.g. Landing, Login, Dashboard, and the app's core feature pages).`,
         "Rules for each screen:",
         ...baseRules,
-      ].join("\n")
+      ].join("\n");
+
+  const system = isMulti
+    ? multiSystem
     : [
         "You are a senior UI designer. Produce ONE high-fidelity website screen as a single self-contained HTML document.",
         "Rules:",
@@ -143,14 +192,25 @@ export async function POST(request: Request, { params }: RouteProps) {
       throw new EmptyModelOutputError();
     }
 
-    const screens = rawScreens.slice(0, MAX_SCREENS).map((s, i) =>
-      createScreen({
-        name: (s.name ?? (isMulti ? `Screen ${i + 1}` : parsed.data.prompt)).trim().slice(0, 60) || "Screen",
+    const screens = rawScreens.slice(0, MAX_SCREENS).map((s, i) => {
+      // Tag each screen with its role and (when it matches) the planned page.
+      const planKey =
+        (s.name ? pageKeyByName.get(s.name.trim().toLowerCase()) : undefined) ??
+        parsed.data.planKey;
+      return createScreen({
+        // Prefer the model's name, then the name of the screen being refined,
+        // and only fall back to the prompt for a brand-new single screen.
+        name: (s.name ?? parsed.data.name ?? (isMulti ? `Screen ${i + 1}` : parsed.data.prompt))
+          .trim()
+          .slice(0, 60) || "Screen",
         device,
         html: s.html,
         prompt: parsed.data.prompt,
-      }),
-    );
+        role: roleName,
+        planKey,
+        planVersion: parsed.data.planVersion,
+      });
+    });
 
     return NextResponse.json({ ok: true, screens, screen: screens[0] });
   } catch (err) {

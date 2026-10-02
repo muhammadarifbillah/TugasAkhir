@@ -27,6 +27,8 @@ export interface RunManifest {
   port?: number;
   services?: string[];
   env?: Record<string, string>;
+  /** Optional readiness probe path (defaults to "/"). */
+  healthPath?: string;
 }
 
 export const ADAPTERS: StackAdapter[] = [
@@ -119,6 +121,7 @@ export interface ResolvedPlan {
   port: number;
   services: string[];
   env: Record<string, string>;
+  healthPath?: string;
 }
 
 /**
@@ -154,5 +157,6 @@ export function resolvePlan(files: Record<string, string>): ResolvedPlan | null 
     port,
     services: manifest?.services ?? [],
     env: manifest?.env ?? {},
+    healthPath: manifest?.healthPath,
   };
 }

@@ -162,6 +162,7 @@ export interface StudioWorkspaceProps {
   designThreatModel: Record<string, unknown>[];
   designUiDesign: string[];
   designScreens: unknown;
+  designPlan: unknown;
   analysisDataClassification: string[];
   snapshots: SnapshotRow[];
   analysisStack: {
@@ -1191,51 +1192,69 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
     if (stage.code === "design") {
       switch (stepId) {
-        case "ui":
+        case "ui": {
+          const hasDesigns = designScreens.length > 0;
+          const mockupGrid = (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {designScreens.map((s) => (
+                <div key={s.id} className="overflow-hidden rounded-lg border bg-card">
+                  <div className="flex items-center justify-between gap-2 border-b px-2 py-1 text-[11px]">
+                    <span className="truncate font-medium">{s.name}</span>
+                    {s.role && <Badge variant="outline">{s.role}</Badge>}
+                  </div>
+                  <DesignScreen html={s.html} title={s.name} device={s.device} viewportHeight={180} />
+                </div>
+              ))}
+            </div>
+          );
           return {
             title: label,
-            overview: uiDesign.length > 0 ? (
+            overview: uiDesign.length > 0 || hasDesigns ? (
               <div className="space-y-3 text-sm">
                 <h4 className="font-semibold text-foreground">UI Design</h4>
-                <p className="text-muted-foreground">{uiDesign.length} komponen UI teridentifikasi.</p>
+                <p className="text-muted-foreground">
+                  {uiDesign.length} komponen UI teridentifikasi · {designScreens.length} mockup tersimpan.
+                </p>
               </div>
             ) : empty,
-            visualCards: uiDesign.length > 0 ? [
-              {
-                id: "ui-components",
-                icon: Layout,
-                iconColor: "text-purple-400",
-                title: "UI Components",
-                description: `${uiDesign.length} komponen UI teridentifikasi`,
-                fullscreenTitle: "UI/UX Layout & Components",
-                fullscreenContent: (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {uiDesign.map((u, i) => (
-                      <div key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5">
-                        <div className="w-6 h-6 rounded bg-purple-900 flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-bold text-purple-400">{i + 1}</span>
+            visualCards: hasDesigns
+              ? [
+                  {
+                    id: "ui-mockups",
+                    icon: Layout,
+                    iconColor: "text-purple-400",
+                    title: "UI Mockups",
+                    description: `${designScreens.length} mockup`,
+                    fullscreenTitle: "UI Mockups",
+                    fullscreenContent: <div className="p-4">{mockupGrid}</div>,
+                  },
+                ]
+              : undefined,
+            visual:
+              uiDesign.length > 0 || hasDesigns ? (
+                <div className="space-y-3">
+                  {hasDesigns && mockupGrid}
+                  {uiDesign.length > 0 && (
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      {uiDesign.map((u, i) => (
+                        <div key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5">
+                          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-purple-900">
+                            <span className="text-[10px] font-bold text-purple-400">{i + 1}</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{u}</p>
                         </div>
-                        <p className="text-sm text-muted-foreground">{u}</p>
-                      </div>
-                    ))}
-                  </div>
-                ),
-              },
-            ] : undefined,
-            visual: uiDesign.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {uiDesign.map((u, i) => (
-                  <div key={i} className="flex items-start gap-2 rounded-lg border bg-card p-2.5">
-                    <div className="w-6 h-6 rounded bg-purple-900 flex items-center justify-center shrink-0">
-                      <span className="text-[10px] font-bold text-purple-400">{i + 1}</span>
+                      ))}
                     </div>
-                    <p className="text-sm text-muted-foreground">{u}</p>
-                  </div>
-                ))}
-              </div>
-            ) : empty,
-            raw: <pre className="text-xs bg-muted rounded p-3 overflow-auto">{JSON.stringify(uiDesign, null, 2)}</pre>,
+                  )}
+                </div>
+              ) : empty,
+            raw: (
+              <pre className="text-xs bg-muted rounded p-3 overflow-auto">
+                {JSON.stringify({ uiDesign, mockups: designScreens.length }, null, 2)}
+              </pre>
+            ),
           };
+        }
         case "architecture":
           return {
             title: label,
@@ -1977,10 +1996,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const stageAlreadyCompleted = currentStageStatus === "completed";
 
   return (
-    <div className="flex h-full min-h-0 flex-col max-md:h-auto max-md:min-h-full">
+    <div className="flex h-auto min-h-0 flex-col lg:h-[calc(100dvh-3.5rem)]">
       {/* Top bar + stepper */}
       <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-        <div className="flex flex-col gap-2 px-4 py-2 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-2 px-4 py-2 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
           <div className="flex min-w-0 items-center gap-2 text-sm">
             <Link href={`/${lang}/dashboard`} className="shrink-0 text-muted-foreground hover:text-foreground">
               {dict.studio.back}
@@ -1989,13 +2008,14 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             <span className="truncate font-medium">{project.name}</span>
             <Badge variant="secondary">{project.version}</Badge>
             <ArrowRight className="size-3 shrink-0 text-muted-foreground" />
-            <span className="truncate text-muted-foreground">{stage.name}</span>
+            <span className="truncate text-muted-foreground" title={stageDesc}>{stage.name}</span>
             {project.outputLanguage !== "en" && (
               <Badge variant="outline">{project.outputLanguage.toUpperCase()}</Badge>
             )}
           </div>
 
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+          <div className="flex min-w-0 items-center gap-2">
+          <nav className="flex min-w-0 items-center gap-1 overflow-x-auto scrollbar-none">
             {stages.map((s) => {
               const active = s.code === stage.code;
               const completed = s.status === "completed";
@@ -2029,22 +2049,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               );
             })}
           </nav>
-        </div>
-        <div className="flex flex-col gap-2 px-4 pb-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Lock className="size-3.5 text-success" />
-              {stageDesc}
-            </div>
             <Button
               size="sm"
               variant="outline"
+              className="shrink-0"
               onClick={completeStage}
               disabled={completing || completionGaps.length > 0 || stageAlreadyCompleted}
-              title={completionGaps.length > 0 ? stepMeta(completionGaps[0]).label : undefined}
+              title={completionGaps.length > 0 ? stepMeta(completionGaps[0]).label : stageDesc}
             >
               {completing ? <Loader2 className="animate-spin" /> : <CheckCheck className="size-4" />}
-              {isHandover ? dict.studio.finishProject : dict.studio.completeStage}
+              <span className="hidden sm:inline">
+                {isHandover ? dict.studio.finishProject : dict.studio.completeStage}
+              </span>
             </Button>
           </div>
         </div>
@@ -2121,7 +2137,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                         </button>
                       </p>
                       {meta.detail && (
-                        <p className="hidden text-[11px] text-muted-foreground md:block">{meta.detail}</p>
+                        <p className="hidden text-[11px] text-muted-foreground md:block short:hidden">{meta.detail}</p>
                       )}
                       <div className="mt-0.5 flex flex-wrap gap-1">
                         {s.nistTasks.map((t) => (
@@ -2176,30 +2192,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
         {/* Center: AI Prompt Engine + Stage Results */}
         <section className={`relative flex min-h-0 min-w-0 flex-col md:flex md:col-span-2 lg:col-span-6 ${mobileTab !== "chat" ? "max-md:hidden" : ""}`}>
-          <div
-            className={`flex items-center gap-1 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground transition-colors duration-300 ${
-              promptCollapsed
-                ? "pointer-events-none absolute inset-x-0 top-0 z-20 border-transparent"
-                : "shrink-0"
-            }`}
-            style={{ borderBottomColor: promptCollapsed ? "transparent" : undefined }}
-          >
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <button
               type="button"
               onClick={() => setPromptCollapsed((v) => !v)}
               aria-expanded={!promptCollapsed}
               aria-label="AI Prompt Engine"
               title="AI Prompt Engine"
-              className="pointer-events-auto flex items-center rounded-md p-1 hover:bg-muted hover:text-foreground"
+              className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:bg-muted hover:text-foreground"
             >
               <ChevronDown className={`size-4 transition-transform duration-300 ${promptCollapsed ? "-rotate-90" : ""}`} />
+              <Bot className="size-4" /> AI Prompt Engine
             </button>
-            <div
-              className="min-w-0 flex-1 overflow-hidden transition-[max-height,opacity] duration-300 ease-out"
-              style={{ maxHeight: promptCollapsed ? 0 : 240, opacity: promptCollapsed ? 0 : 1 }}
-            >
-            <div className="flex min-h-0 min-w-0 items-center justify-between gap-2 overflow-hidden">
-            <span className="flex items-center gap-2 ps-1"><Bot className="size-4" /> AI Prompt Engine</span>
             <div className="flex items-center gap-2">
               {stage.code === "development" && codeArtifacts && Object.keys(codeArtifacts).length > 0 && (
                 <Button size="sm" onClick={() => setShowRun(true)}>
@@ -2316,12 +2320,12 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </Badge>
               )}
             </div>
-            </div>
-            </div>
           </div>
 
             <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-            {/* Stage results (above chat) */}
+            {!promptCollapsed && (
+            <>
+            {/* Stage results */}
             {isAnalysis && (
               <div className="space-y-4 border-b p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3">
@@ -2481,7 +2485,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               </div>
             )}
 
-            {(isCodeStage || isHandover) && codeArtifacts && (
+            {((isCodeStage || isHandover) && codeArtifacts) && (
               <div className="flex h-[480px] min-h-0 flex-col border-b">
                 {snapshots.length > 0 && (
                   <details className="border-b px-4 py-2">
@@ -2563,6 +2567,8 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </div>
               </div>
             )}
+            </>
+            )}
 
             {/* Chat messages */}
             <div className="min-w-0 space-y-3 p-4">
@@ -2631,7 +2637,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               )}
               <div ref={messagesEndRef} />
             </div>
-          </div>
+            </div>
 
           {error && (
             <div className="mx-4 mb-2 flex items-start gap-2 rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive">
@@ -2660,13 +2666,13 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             </div>
           )}
 
-          <div className="border-t p-3">
+          <div className="border-t px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
             {/* Mode selector */}
-            <div className="flex items-center gap-2 mb-2">
+            <div className="mb-1.5 flex items-center gap-2">
               <div className="flex rounded-lg border bg-muted p-0.5">
                 <button
                   onClick={() => setChatMode("plan")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                     chatMode === "plan"
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -2676,7 +2682,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 </button>
                 <button
                   onClick={() => setChatMode("build")}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                     chatMode === "build"
                       ? "bg-success text-white shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -2711,11 +2717,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       ? "Describe what to build based on the approved plan..."
                       : "Direct mode — AI will execute immediately"
                 }
-                rows={3}
-                className="resize-none font-mono text-xs"
+                rows={2}
+                className="min-h-[3rem] resize-none font-mono text-xs"
               />
             </div>
-            <div className="mt-2 flex items-center justify-between">
+            <div className="mt-1.5 flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground">{dict.studio.shortcutHint}</span>
               <Button size="sm" onClick={() => sendPrompt()} disabled={loading || !input.trim()}>
                 {loading ? <Loader2 className="animate-spin" /> : <Send className="size-4" />}
@@ -2960,6 +2966,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         <DesignStudioDialog
           projectId={project.id}
           savedScreens={designScreens}
+          designPlan={props.designPlan}
           onClose={() => setShowDesignCanvas(false)}
           onSaved={() => router.refresh()}
           labels={{
@@ -2969,6 +2976,21 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             generating: dict.studio.designGenerating,
             refine: dict.studio.designRefine,
             refinePlaceholder: dict.studio.designRefinePlaceholder,
+            refineHint: dict.studio.designRefineHint,
+            refineBusy: dict.studio.designRefineBusy,
+            roleLabel: dict.studio.designRole,
+            general: dict.studio.designGeneral,
+            generateAll: dict.studio.designGenerateAll,
+            generateAllBusy: dict.studio.designGenerateAllBusy,
+            planTitle: dict.studio.designPlanTitle,
+            planEdit: dict.studio.designPlanEdit,
+            planDone: dict.studio.designPlanDone,
+            planSave: dict.studio.designPlanSave,
+            planRegenerate: dict.studio.designPlanRegenerate,
+            addRole: dict.studio.designAddRole,
+            addPage: dict.studio.designAddPage,
+            stale: dict.studio.designStale,
+            revise: dict.studio.designRevise,
             keep: dict.studio.designKeep,
             keepAll: dict.studio.designKeepAll,
             discard: dict.studio.designDiscard,
@@ -2977,6 +2999,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             savedCount: dict.studio.designPages,
             error: dict.studio.designError,
             retry: dict.studio.designRetry,
+            confirmDiscard: dict.studio.confirmDiscard,
           }}
         />
       )}

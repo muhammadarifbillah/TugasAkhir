@@ -37,6 +37,15 @@ test("returns null for an unknown stack", () => {
   assert.equal(resolvePlan({ "readme.txt": "x" }), null);
 });
 
+test("manifest carries an optional health path", () => {
+  const plan = resolvePlan({
+    "package.json": "{}",
+    ".securesdlc/run.json": JSON.stringify({ healthPath: "/api/health" }),
+  });
+  assert.equal(plan?.healthPath, "/api/health");
+  assert.equal(resolvePlan({ "package.json": "{}" })?.healthPath, undefined);
+});
+
 test("parseManifest tolerates missing or invalid json", () => {
   assert.equal(parseManifest({}), null);
   assert.equal(parseManifest({ ".securesdlc/run.json": "{bad" }), null);

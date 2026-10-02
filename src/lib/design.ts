@@ -5,22 +5,60 @@ import { z } from "zod";
  * Produced by the Design Studio and rendered in a sandboxed iframe.
  */
 
+/** Safety caps so a runaway model cannot bloat the project's JSON. */
+export const MAX_SCREEN_HTML = 200 * 1024;
+export const MAX_SCREENS = 12;
+export const MAX_ROLES = 12;
+export const MAX_PAGES_PER_ROLE = 24;
+
 export const designScreenSchema = z.object({
   id: z.string(),
   name: z.string().default("Screen"),
   device: z.enum(["desktop", "tablet", "mobile"]).default("desktop"),
-  html: z.string().min(1),
-  prompt: z.string().optional(),
+  // Bounded on write so a screen can never be stored larger than the read-side
+  // normalizeScreens() accepts (otherwise it would silently disappear on load).
+  html: z.string().min(1).max(MAX_SCREEN_HTML),
+  prompt: z.string().max(4000).optional(),
   createdAt: z.string().optional(),
+  // Plan linkage: which role/halaman of the design plan this mockup implements.
+  role: z.string().max(80).optional(),
+  planKey: z.string().max(160).optional(),
+  planVersion: z.number().optional(),
 });
 
 export const designScreensSchema = z.array(designScreenSchema);
 
 export type DesignScreen = z.infer<typeof designScreenSchema>;
 
-/** Safety caps so a runaway model cannot bloat the project's JSON. */
-export const MAX_SCREEN_HTML = 200 * 1024;
-export const MAX_SCREENS = 12;
+/** The structured design plan: roles, and the pages each role needs. */
+export const designPlanPageSchema = z.object({
+  id: z.string(),
+  name: z.string().default("Page"),
+  description: z.string().optional(),
+  route: z.string().optional(),
+});
+
+export const designPlanRoleSchema = z.object({
+  id: z.string(),
+  name: z.string().default("Role"),
+  description: z.string().optional(),
+  pages: z.array(designPlanPageSchema).default([]),
+});
+
+export const designPlanSchema = z.object({
+  version: z.number().default(1),
+  updatedAt: z.string().optional(),
+  roles: z.array(designPlanRoleSchema).default([]),
+});
+
+export type DesignPlan = z.infer<typeof designPlanSchema>;
+export type DesignPlanRole = z.infer<typeof designPlanRoleSchema>;
+export type DesignPlanPage = z.infer<typeof designPlanPageSchema>;
+
+/** Stable key tying a screen to a planned page ("<roleId>.<pageId>"). */
+export function planPageKey(roleId: string, pageId: string): string {
+  return `${roleId}.${pageId}`;
+}
 
 /** True when an HTML document has visible content (text or media), not just an empty shell. */
 export function hasVisibleContent(html: string): boolean {
@@ -107,6 +145,9 @@ export function createScreen(input: {
   device?: DesignScreen["device"];
   html: string;
   prompt?: string;
+  role?: string;
+  planKey?: string;
+  planVersion?: number;
 }): DesignScreen {
   return designScreenSchema.parse({
     id: uid("scr"),
@@ -114,12 +155,16 @@ export function createScreen(input: {
     device: input.device ?? "desktop",
     html: input.html,
     prompt: input.prompt,
+    role: input.role,
+    planKey: input.planKey,
+    planVersion: input.planVersion,
     createdAt: new Date().toISOString(),
   });
 }
 
 /** Best-effort normalisation of stored/AI screens, dropping empty/oversized ones. */
-export function normalizeScreens(input: unknown): DesignScreen[] {  const parsed = designScreensSchema.safeParse(input);
+export function normalizeScreens(input: unknown): DesignScreen[] {
+  const parsed = designScreensSchema.safeParse(input);
   if (parsed.success) {
     return parsed.data
       .filter((s) => s.html.trim().length > 0 && s.html.length <= MAX_SCREEN_HTML)
@@ -140,10 +185,89 @@ export function normalizeScreens(input: unknown): DesignScreen[] {  const parsed
         device: s.device === "tablet" || s.device === "mobile" ? s.device : "desktop",
         html: s.html,
         prompt: typeof s.prompt === "string" ? s.prompt : undefined,
+        role: typeof s.role === "string" ? s.role : undefined,
+        planKey: typeof s.planKey === "string" ? s.planKey : undefined,
+        planVersion: typeof s.planVersion === "number" ? s.planVersion : undefined,
         createdAt: typeof s.createdAt === "string" ? s.createdAt : new Date().toISOString(),
       }),
     );
     if (screens.length >= MAX_SCREENS) break;
   }
   return screens;
+}
+
+/** Best-effort normalisation of a stored/AI design plan, capping roles and pages. */
+export function normalizePlan(input: unknown): DesignPlan {
+  const root = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+  const rawRoles = Array.isArray(root.roles) ? root.roles : [];
+
+  const roles: DesignPlanRole[] = [];
+  for (const rawRole of rawRoles.slice(0, MAX_ROLES)) {
+    if (!rawRole || typeof rawRole !== "object") continue;
+    const r = rawRole as Record<string, unknown>;
+    const name =
+      typeof r.name === "string" && r.name.trim() ? r.name.trim().slice(0, 80) : "Role";
+
+    const pagesRaw = Array.isArray(r.pages) ? r.pages : [];
+    const pages: DesignPlanPage[] = [];
+    for (const rawPage of pagesRaw.slice(0, MAX_PAGES_PER_ROLE)) {
+      if (!rawPage || typeof rawPage !== "object") continue;
+      const p = rawPage as Record<string, unknown>;
+      pages.push({
+        id: typeof p.id === "string" && p.id ? p.id : uid("pg"),
+        name: typeof p.name === "string" && p.name.trim() ? p.name.trim().slice(0, 80) : "Page",
+        description: typeof p.description === "string" ? p.description.slice(0, 400) : undefined,
+        route: typeof p.route === "string" ? p.route.slice(0, 200) : undefined,
+      });
+    }
+
+    roles.push({
+      id: typeof r.id === "string" && r.id ? r.id : uid("role"),
+      name,
+      description: typeof r.description === "string" ? r.description.slice(0, 400) : undefined,
+      pages,
+    });
+  }
+
+  const version =
+    typeof root.version === "number" && root.version > 0 ? Math.floor(root.version) : 1;
+  return {
+    version,
+    updatedAt: typeof root.updatedAt === "string" ? root.updatedAt : undefined,
+    roles,
+  };
+}
+
+/**
+ * The design plan the Studio should use: the structured `design.uiPlan` combined
+ * with the user roles identified earlier in Analysis (`analysis.roles`). Roles
+ * from Analysis that are not yet in the plan are added as page-less roles, so
+ * the plan stays connected to Stage 1 even before Stage 2 emits a plan.
+ */
+export function effectiveDesignPlan(globalSpec: unknown): DesignPlan {
+  const spec = (globalSpec && typeof globalSpec === "object" ? globalSpec : {}) as Record<
+    string,
+    unknown
+  >;
+  const design = (spec.design as Record<string, unknown> | null) ?? {};
+  const plan = normalizePlan(design.uiPlan);
+
+  const analysis = (spec.analysis as Record<string, unknown> | null) ?? {};
+  const roleNames = Array.isArray(analysis.roles)
+    ? (analysis.roles as unknown[]).filter(
+        (r): r is string => typeof r === "string" && r.trim().length > 0,
+      )
+    : [];
+  if (roleNames.length === 0) return plan;
+
+  const existing = new Set(plan.roles.map((r) => r.name.trim().toLowerCase()));
+  const extra: DesignPlanRole[] = [];
+  for (const name of roleNames) {
+    const key = name.trim().toLowerCase();
+    if (existing.has(key)) continue;
+    existing.add(key);
+    extra.push({ id: uid("role"), name: name.trim().slice(0, 80), pages: [] });
+  }
+  if (extra.length === 0) return plan;
+  return { ...plan, roles: [...plan.roles, ...extra].slice(0, MAX_ROLES) };
 }

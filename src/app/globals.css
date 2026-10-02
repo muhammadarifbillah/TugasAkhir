@@ -3,6 +3,13 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
+ * Short viewports (e.g. a 1080p laptop at 150% scaling leaves only ~585px of
+ * usable height). The `short:` variant lets dense chrome collapse so the
+ * workspace fits without hunting through a long scroll.
+ */
+@custom-variant short (@media (max-height: 700px));
+
+/*
  * Brand palette: a single indigo/violet accent shared by light and dark so the
  * product feels consistent. Surfaces use a subtle cool tint instead of pure
  * grey, and dark mode is a deep indigo-slate rather than near-black so cards

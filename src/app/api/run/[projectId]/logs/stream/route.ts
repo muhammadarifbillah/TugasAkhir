@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/runner/session";
 import { streamContainerLogs } from "@/lib/runner/docker";
+import { sseFrameStream } from "@/lib/runner/sse";
 
 interface RouteProps {
   params: Promise<{ projectId: string }>;
@@ -33,18 +34,7 @@ export async function GET(_request: Request, { params }: RouteProps) {
   }
 
   const raw = streamContainerLogs(runSession.containerName);
-  const sse = raw.pipeThrough(
-    new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        for (const line of text.split(/\r?\n/)) {
-          if (line.length > 0) {
-            controller.enqueue(new TextEncoder().encode(`data: ${line}\n\n`));
-          }
-        }
-      },
-    }),
-  );
+  const sse = raw.pipeThrough(sseFrameStream());
 
   return new NextResponse(sse, { headers: SSE_HEADERS });
 }

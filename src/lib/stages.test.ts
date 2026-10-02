@@ -50,6 +50,16 @@ test("testing score step accepts a scanner score", () => {
   assert.ok(!gaps.includes("score"));
 });
 
+test("design ui sub-step is met by a structured plan or by mockups", () => {
+  const withPlan = { design: { uiPlan: { roles: [{ name: "Guest" }] } } };
+  assert.ok(!completionGaps("design", withPlan, {}).includes("ui"));
+
+  const withMockups = { design: { designScreens: [{ id: "a", html: "<html>x</html>" }] } };
+  assert.ok(!completionGaps("design", withMockups, {}).includes("ui"));
+
+  assert.ok(completionGaps("design", {}, {}).includes("ui"));
+});
+
 test("getStageDefinition throws for an unknown stage", () => {
   assert.throws(() => getStageDefinition("nope"));
 });

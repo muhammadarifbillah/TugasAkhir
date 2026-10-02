@@ -1,4 +1,5 @@
-import { spawn } from "node:child_process";
+import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { runnerBindHost } from "./config";
 
 export interface DockerResult {
   code: number;
@@ -54,6 +55,8 @@ export interface RunContainerParams {
   network?: string;
   /** Extra bind/volume mounts, each as "source:target". */
   extraMounts?: string[];
+  /** Mount the container root filesystem read-only (writable dirs are tmpfs/binds). */
+  readOnly?: boolean;
   /** Docker labels (key/value) used to reconcile containers after a restart. */
   labels?: Record<string, string>;
 }
@@ -65,8 +68,9 @@ export async function runContainer(params: RunContainerParams): Promise<void> {
     "--name",
     params.name,
     ...(params.network ? ["--network", params.network] : []),
+    // Publish on loopback only, so a generated app is not exposed to the LAN.
     "-p",
-    `${params.hostPort}:${params.containerPort}`,
+    `${runnerBindHost()}:${params.hostPort}:${params.containerPort}`,
     "-v",
     `${params.mountSource}:${params.mountTarget}`,
     ...(params.extraMounts ?? []).flatMap((m) => ["-v", m]),
@@ -78,10 +82,20 @@ export async function runContainer(params: RunContainerParams): Promise<void> {
     params.cpus ?? "1",
     "--pids-limit",
     String(params.pidsLimit ?? 256),
+    // Reap orphaned child processes and keep the root filesystem immutable
+    // where the stack does not need to write to it during install/build.
+    "--init",
     "--cap-drop",
     "ALL",
     "--security-opt",
     "no-new-privileges",
+    "--security-opt",
+    "seccomp=default",
+    "--tmpfs",
+    "/tmp",
+    "--tmpfs",
+    "/run",
+    ...(params.readOnly ? ["--read-only"] : []),
   ];
   for (const [key, value] of Object.entries(params.env ?? {})) {
     args.push("-e", `${key}=${value}`);
@@ -135,10 +149,18 @@ export async function removeNetwork(name: string): Promise<void> {
 /** Streams `docker logs -f` as a web ReadableStream (used for SSE). */
 export function streamContainerLogs(name: string): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();
+  let child: ChildProcessWithoutNullStreams | null = null;
   return new ReadableStream<Uint8Array>({
     start(controller) {
-      const child = spawn("docker", ["logs", "-f", "--tail", "200", name], { windowsHide: true });
-      const push = (buf: Buffer) => controller.enqueue(encoder.encode(buf.toString()));
+      child = spawn("docker", ["logs", "-f", "--tail", "200", name], { windowsHide: true });
+      const push = (buf: Buffer) => {
+        // The consumer may have disconnected; ignore writes after cancel/close.
+        try {
+          controller.enqueue(encoder.encode(buf.toString()));
+        } catch {
+          // stream already cancelled
+        }
+      };
       child.stdout.on("data", push);
       child.stderr.on("data", push);
       child.on("close", () => {
@@ -156,6 +178,11 @@ export function streamContainerLogs(name: string): ReadableStream<Uint8Array> {
         }
       });
     },
+    // Called when the client disconnects: stop the `docker logs -f` process so
+    // it does not linger for the lifetime of the container.
+    cancel() {
+      child?.kill();
+    },
   });
 }
 
@@ -170,6 +197,7 @@ export interface SdlcContainerInfo {
   workDir: string;
   network: string | null;
   services: string[];
+  healthPath?: string;
   startedAt: number;
   state: string;
 }
@@ -205,6 +233,7 @@ export async function listSdlcContainers(): Promise<SdlcContainerInfo[]> {
         workDir: labels["sdlc.workDir"] ?? "",
         network: labels["sdlc.network"] || null,
         services: (labels["sdlc.services"] ?? "").split(",").filter(Boolean),
+        healthPath: labels["sdlc.healthPath"] || undefined,
         startedAt: Number(labels["sdlc.startedAt"] ?? Date.now()),
         state: c.State ?? "",
       });

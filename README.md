@@ -134,7 +134,7 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 - `PATCH /api/projects/:id/artifacts` menyimpan hasil edit kode + snapshot
 - `POST /api/projects/:id/snapshots/:snapshotId/restore` memulihkan source dari snapshot
 - `POST /api/projects/:id/design/generate` menghasilkan mockup UI (HTML) dari prompt
-- `PATCH /api/projects/:id/design` menyimpan desain (`designScreens` / `designFrames`)
+- `PATCH /api/projects/:id/design` menyimpan desain (`designScreens`)
 - `PATCH /api/projects/:id/finalize` menandai proyek "fix"
 - `POST` / `DELETE /api/projects/:id/database` membuat / menghapus database persisten
 - `POST` / `DELETE /api/run/:projectId` menjalankan / menghentikan app hasil generate di Docker
@@ -148,7 +148,7 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 
 - **Editor kode editable** — panel kode studio memakai Monaco **self-hosted** (tanpa CDN); bisa diedit dan disimpan per file atau **Save All**, tiap simpan membuat snapshot.
 - **Snapshot restore** — kembalikan source ke versi sebelumnya dari daftar Versions.
-- **Run app (Docker sandbox)** — jalankan hasil generate multi-stack (Node/Next, Python, PHP, Go, static) di container dengan limit resource; preview di popup gaya VS Code (Desktop/Tablet/Mobile), log live (SSE), statistik CPU/RAM.
+- **Run app (Docker sandbox)** — jalankan hasil generate multi-stack (Node/Next, Python, PHP, Go, static) di container dengan limit resource (`--cap-drop ALL`, `no-new-privileges`, seccomp default, `--tmpfs`, dan root filesystem read-only untuk stack non-Node); port dipublikasikan **hanya ke loopback** (`RUNNER_BIND_HOST`, default `127.0.0.1`), tiap run memakai network privat sendiri, dan kredensial DB throwaway diacak per run. Preview di popup gaya VS Code (Desktop/Tablet/Mobile), log live (SSE), statistik CPU/RAM.
 - **Database** — DB throwaway saat Run; DB persisten setelah proyek ditandai "Fix" (connection string terenkripsi).
 - **Design Studio (ala Google Stitch)** — popup generator UI berbasis prompt: jelaskan layar → AI menghasilkan mockup HTML high-fidelity (statis, dirender di iframe sandbox) → **Refine** dengan prompt lanjutan → **Keep** untuk menyimpan. Desain terpilih menjadi acuan tahap Development.
 - **ERD berkardinalitas** — relasi 1:1 / 1:N / M:N.
@@ -160,7 +160,7 @@ Bahasa output AI dan dokumentasi dipilih saat membuat proyek melalui `outputLang
 ### Menjalankan app hasil generate
 1. Buka tahap **Development** → klik **Run**. Container akan `install` lalu `start`.
 2. Preview muncul di popup; log live di panel Terminal; kontrol ukuran perangkat tersedia.
-3. Menutup popup menghentikan container (juga auto-stop setelah 15 menit idle).
+3. Menutup popup menghentikan container (juga auto-stop setelah `RUN_TTL_MINUTES` menit idle, default 60).
 
 ## Deploy dengan Docker
 

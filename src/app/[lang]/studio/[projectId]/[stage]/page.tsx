@@ -4,6 +4,7 @@ import { StudioWorkspace } from "@/components/studio/studio-workspace";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
 import { STAGE_DEFINITIONS, completionGaps } from "@/lib/stages";
+import { effectiveDesignPlan } from "@/lib/design";
 import { decryptSecret } from "@/lib/crypto";
 
 interface StudioPageProps {
@@ -174,6 +175,7 @@ export default async function StudioPage(props: StudioPageProps) {
       designThreatModel={(design?.threatModel as Record<string, unknown>[] | undefined) ?? []}
       designUiDesign={(design?.uiDesign as string[] | undefined) ?? []}
       designScreens={design?.designScreens ?? []}
+      designPlan={effectiveDesignPlan(globalSpec)}
       analysisDataClassification={
         (analysis?.dataClassification as string[] | undefined) ?? []
       }

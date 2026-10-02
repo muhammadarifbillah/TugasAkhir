@@ -20,12 +20,13 @@ test("includes the first kept screen's html", () => {
   assert.match(ref, /<html><body>Hi<\/body><\/html>/);
 });
 
-test("caps the injected html length", () => {
+test("caps the injected html length and marks the truncation", () => {
   const ref = approvedDesignReference({
     design: { designScreens: [{ id: "s1", name: "Big", html: "x".repeat(50000) }] },
   });
   assert.ok(ref);
   assert.ok(ref.length <= MAX_DESIGN_REFERENCE_CHARS + 200);
+  assert.match(ref, /truncated: remaining design omitted/);
 });
 
 test("includes every kept screen, not just the first", () => {

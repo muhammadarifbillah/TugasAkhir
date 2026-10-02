@@ -7,6 +7,7 @@ import type {
 import type { PrismaClient } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requirementIdFor } from "@/lib/requirement-id";
+import { normalizePlan } from "@/lib/design";
 import {
   findArtifactProblems,
   MAX_MODEL_OUTPUT_CHARS,
@@ -46,6 +47,10 @@ export const stageResultSchema = z
     securityRequirements: z.array(z.string()).optional(),
     dataClassification: z.array(z.string()).optional(),
     uiDesign: z.array(z.string()).optional(),
+    /** Structured design plan (roles → pages) used by the Design Studio. */
+    uiPlan: z.any().optional(),
+    /** User roles/actors identified during Analysis. */
+    roles: z.array(z.string()).optional(),
     architecture: z.array(z.string()).optional(),
     threatModel: z.array(recommendationSchema).optional(),
     databaseSchema: z.array(z.string()).optional(),
@@ -332,6 +337,12 @@ export async function persistStageResult(input: {
     }
     if (stageCode === "design" && result.uiDesign) {
       stageKnowledge.uiDesign = result.uiDesign;
+    }
+    if (stageCode === "design" && result.uiPlan) {
+      stageKnowledge.uiPlan = normalizePlan(result.uiPlan);
+    }
+    if (stageCode === "analysis" && result.roles) {
+      stageKnowledge.roles = result.roles;
     }
 
     if (result.architecture) stageKnowledge.architecture = result.architecture;

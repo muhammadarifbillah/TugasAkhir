@@ -22,13 +22,25 @@ export function approvedDesignReference(globalSpec: unknown): string | null {
   ];
   let used = parts[0].length;
   for (const screen of valid) {
-    const remaining = MAX_DESIGN_REFERENCE_CHARS - used;
-    if (remaining <= 0) break;
     const name = typeof screen.name === "string" ? screen.name : "Approved screen";
-    const html = String(screen.html).slice(0, remaining);
+    const html = String(screen.html);
     const block = `\n\n### "${name}"\n${html}`;
-    parts.push(block);
-    used += block.length;
+    // Prefer whole screens; only fall back to a clearly-marked truncation when
+    // even the last available screen cannot fit in full.
+    if (used + block.length <= MAX_DESIGN_REFERENCE_CHARS) {
+      parts.push(block);
+      used += block.length;
+      continue;
+    }
+    const remaining = MAX_DESIGN_REFERENCE_CHARS - used;
+    if (remaining > 200) {
+      const marker = "\n<!-- truncated: remaining design omitted for context budget -->";
+      parts.push(
+        `\n\n### "${name}"\n${html.slice(0, Math.max(0, remaining - marker.length))}${marker}`,
+      );
+      used = MAX_DESIGN_REFERENCE_CHARS;
+    }
+    break;
   }
   return parts.join("");
 }

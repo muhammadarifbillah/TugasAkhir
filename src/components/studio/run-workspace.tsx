@@ -100,6 +100,7 @@ export function RunWorkspace({
     setError(null);
     setLogs("");
     setUrl(null);
+    setPolling(false);
     try {
       const res = await csrfFetch(`/api/run/${projectId}`, { method: "POST" });
       const data = (await res.json()) as { error?: string; stackLabel?: string; services?: string[]; demo?: { email: string; password?: string }[] };
@@ -209,17 +210,25 @@ export function RunWorkspace({
     };
   }, [polling, status, projectId]);
 
-  // Stream container logs (SSE) while the app is starting or running.
+  // Stream container logs (SSE) once a session exists. Keyed on `polling` (not
+  // `status`) so a starting -> running transition does not reopen the stream and
+  // replay the last 200 lines as duplicates.
   useEffect(() => {
-    if (status !== "starting" && status !== "running") return;
+    if (!polling) return;
     const es = new EventSource(`/api/run/${projectId}/logs/stream`);
     es.onmessage = (e) => {
       if (!e.data) return;
       setLogs((prev) => `${prev}${e.data}\n`.slice(-20_000));
     };
+    // The server emits a named "end" event when there is no live session.
+    const onEnd = () => es.close();
+    es.addEventListener("end", onEnd);
     es.onerror = () => es.close();
-    return () => es.close();
-  }, [status, projectId]);
+    return () => {
+      es.removeEventListener("end", onEnd);
+      es.close();
+    };
+  }, [polling, projectId]);
 
   const preview = url ? (
     <div className="flex h-full w-full justify-center overflow-auto bg-muted/40 p-2">

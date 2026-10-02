@@ -49,7 +49,7 @@ Desired website appearance (colors, layout, pages, references): {{UI_PREFERENCES
 Output language for all explanations/docs: {{OUTPUT_LANGUAGE}}
 
 Complete the following sub-steps IN ORDER (each one must be fulfilled before moving on):
-1. scope — Refine the project scope & objectives: goals, target audience, functional scope.
+1. scope — Refine the project scope & objectives: goals, target audience, functional scope. Explicitly identify the USER ROLES/actors who will use the website (e.g. Guest, Student, Teacher, Admin); put them in the "roles" key.
 2. stack — Recommend the best language/framework/database/hosting combination for their use case, with reasoning (performance, ecosystem, hosting, security).
 3. security — Define security & privacy requirements: authentication needs, PII handling, regulatory/legal obligations.
 4. data — Produce a data classification list: each data type the app handles labeled public / sensitive / PII.
@@ -60,6 +60,7 @@ Output a structured "stage_result" JSON with keys:
    - "recommendedStack": { "languages": string[], "framework", "database", "hosting" }
    - "securityRequirements": string[]
    - "dataClassification": string[]
+   - "roles": string[] (user roles/actors that will use the website, e.g. Guest, Student, Teacher, Admin)
    - "recommendations": array of at least 3 items { "category", "severity" (low|medium|high|critical), "title", "content", "nistTask" }
 Always end your final assistant message with the JSON block so it can be parsed.
 Write all human-readable content in {{OUTPUT_LANGUAGE}}.
@@ -93,7 +94,17 @@ Desired website appearance: {{UI_PREFERENCES}}
 Output language: {{OUTPUT_LANGUAGE}}
 
 Complete the following sub-steps IN ORDER (each one must be fulfilled before moving on):
-1. ui — Design the UI/UX layout & visual appearance: list of required pages (home, login, dashboard, etc.), wireframe/structure of each page, color palette, typography, and component structure. Put it in the "uiDesign" key.
+1. ui — Design the UI/UX layout & visual appearance: list of required pages (home, login, dashboard, etc.), wireframe/structure of each page, color palette, typography, and component structure. Put it in the "uiDesign" key (free-form description).
+   ALSO produce a STRUCTURED plan in the "uiPlan" key grouping the pages BY USER ROLE, so the Design Studio can generate each role's pages. Infer the roles from the Analysis context ("roles") and the project scope; include a public/Guest role ONLY if the site has pages reachable without authentication, otherwise omit it. Shape:
+   "uiPlan": {
+     "roles": [
+       { "name": "Guest", "description": "Public visitor",
+         "pages": [ { "name": "Landing", "description": "…", "route": "/" } ] },
+       { "name": "Student", "description": "…",
+         "pages": [ { "name": "Dashboard", "route": "/dashboard" } ] }
+     ]
+   }
+   Every role must list the concrete pages it needs. Use clear, short English names for roles/pages.
 2. architecture — Produce the component architecture & data flow: components, trust boundaries, entry points, assets, auth flow (OAuth/OIDC/JWT), encryption at rest/in transit.
 3. stride — Produce a STRIDE threat model: threats with likelihood, impact, mitigation.
 4. diagram — Produce Mermaid.js diagram(s) representing the architecture / data flow / threat model (key "mermaid").
@@ -119,6 +130,7 @@ Complete the following sub-steps IN ORDER (each one must be fulfilled before mov
 Output a structured "stage_result" JSON with keys:
    - "summary"
    - "uiDesign": string[]
+   - "uiPlan": { "roles": [ { "name", "description", "pages": [ { "name", "description", "route" } ] } ] } (pages grouped by user role)
    - "architecture": string[]
    - "threatModel": array of { "threat", "likelihood", "impact", "mitigation" }
    - "databaseSchema": string[] (table definitions summary)
@@ -345,9 +357,16 @@ export function completionGaps(
       case "recommendations":
         met[step.id] = recsMet;
         break;
-      case "ui":
-        met[step.id] = asStringArray(stage.uiDesign).length > 0;
+      case "ui": {
+        // Satisfied by any representation of the UI design: the AI's textual
+        // plan, a structured role/page plan, or kept Design Studio mockups.
+        const planRoles = asRecord(stage.uiPlan)?.roles;
+        met[step.id] =
+          asStringArray(stage.uiDesign).length > 0 ||
+          (Array.isArray(stage.designScreens) && stage.designScreens.length > 0) ||
+          (Array.isArray(planRoles) && planRoles.length > 0);
         break;
+      }
       case "architecture":
         met[step.id] = asStringArray(stage.architecture).length > 0;
         break;

@@ -1,7 +1,19 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { MAX_SCREENS, createScreen, hasVisibleContent, normalizeScreens, parseDesignScreens } from "./design";
+import {
+  MAX_ROLES,
+  MAX_SCREENS,
+  MAX_SCREEN_HTML,
+  createScreen,
+  designScreensSchema,
+  effectiveDesignPlan,
+  hasVisibleContent,
+  normalizePlan,
+  normalizeScreens,
+  parseDesignScreens,
+  planPageKey,
+} from "./design";
 
 test("createScreen builds a valid screen", () => {
   const screen = createScreen({ html: "<html><body>Hi</body></html>", prompt: "login page" });
@@ -19,6 +31,16 @@ test("normalizeScreens keeps valid screens and drops empty/oversized", () => {
   assert.equal(screens.length, 1);
   assert.equal(screens[0].id, "a");
   assert.equal(screens[0].device, "mobile");
+});
+
+test("designScreensSchema rejects html larger than the read-side cap", () => {
+  const oversized = [
+    { id: "a", name: "Huge", device: "desktop", html: "x".repeat(MAX_SCREEN_HTML + 1) },
+  ];
+  assert.equal(designScreensSchema.safeParse(oversized).success, false);
+  // At the cap is still accepted (so a stored screen never vanishes on read).
+  const atCap = [{ id: "a", name: "Ok", html: "x".repeat(MAX_SCREEN_HTML) }];
+  assert.equal(designScreensSchema.safeParse(atCap).success, true);
 });
 
 test("normalizeScreens caps the number of screens", () => {
@@ -75,4 +97,72 @@ test("parseDesignScreens falls back to raw HTML document blocks", () => {
 
 test("parseDesignScreens returns [] for garbage", () => {
   assert.deepEqual(parseDesignScreens("no screens here"), []);
+});
+
+test("createScreen keeps role / planKey / planVersion", () => {
+  const s = createScreen({
+    html: "<html>x</html>",
+    name: "Login",
+    role: "Guest",
+    planKey: "guest.login",
+    planVersion: 2,
+  });
+  assert.equal(s.role, "Guest");
+  assert.equal(s.planKey, "guest.login");
+  assert.equal(s.planVersion, 2);
+});
+
+test("normalizeScreens preserves role / planKey", () => {
+  const out = normalizeScreens([
+    { id: "a", name: "A", html: "<html>a</html>", role: "Student", planKey: "student.dashboard" },
+  ]);
+  assert.equal(out[0].role, "Student");
+  assert.equal(out[0].planKey, "student.dashboard");
+});
+
+test("normalizePlan fills ids and caps roles", () => {
+  const plan = normalizePlan({
+    version: 3,
+    roles: [{ name: "Student", pages: [{ name: "Dashboard" }, { name: "" }] }],
+  });
+  assert.equal(plan.version, 3);
+  assert.equal(plan.roles.length, 1);
+  assert.equal(plan.roles[0].name, "Student");
+  assert.ok(plan.roles[0].id);
+  assert.equal(plan.roles[0].pages.length, 2);
+  assert.ok(plan.roles[0].pages[0].id);
+
+  const many = { roles: Array.from({ length: MAX_ROLES + 5 }, (_, i) => ({ name: `R${i}` })) };
+  assert.equal(normalizePlan(many).roles.length, MAX_ROLES);
+});
+
+test("normalizePlan returns empty roles for garbage", () => {
+  assert.deepEqual(normalizePlan("nope").roles, []);
+  assert.deepEqual(normalizePlan({ roles: [null, 5] }).roles, []);
+});
+
+test("planPageKey joins role and page ids", () => {
+  assert.equal(planPageKey("student", "dashboard"), "student.dashboard");
+});
+
+test("effectiveDesignPlan merges analysis roles into the uiPlan", () => {
+  const plan = effectiveDesignPlan({
+    analysis: { roles: ["Guest", "Teacher"] },
+    design: {
+      uiPlan: { version: 2, roles: [{ name: "Teacher", pages: [{ name: "Dashboard" }] }] },
+    },
+  });
+  assert.deepEqual(
+    plan.roles.map((r) => r.name).sort(),
+    ["Guest", "Teacher"],
+  );
+  assert.equal(plan.roles.find((r) => r.name === "Teacher")?.pages.length, 1);
+  assert.equal(plan.roles.find((r) => r.name === "Guest")?.pages.length, 0);
+  assert.equal(plan.version, 2);
+});
+
+test("effectiveDesignPlan returns the plan unchanged without analysis roles", () => {
+  const plan = effectiveDesignPlan({ design: { uiPlan: { roles: [{ name: "A" }] } } });
+  assert.equal(plan.roles.length, 1);
+  assert.equal(plan.roles[0].name, "A");
 });
