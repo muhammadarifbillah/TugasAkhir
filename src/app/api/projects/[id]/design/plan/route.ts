@@ -91,7 +91,7 @@ export async function POST(request: Request, { params }: RouteProps) {
     "You are a senior UX architect. Produce a design plan that groups the website's UI pages BY USER ROLE.",
     'Return ONLY a JSON object of the exact shape {"roles":[{"name":"Guest","description":"...","pages":[{"name":"Landing","description":"...","route":"/"}]}]} — no prose, no markdown fences.',
     "Prefer the roles already identified in Analysis. Include a public/guest role ONLY if the website has pages reachable without authentication; otherwise omit it. Each role must list the concrete pages it needs.",
-    "Use short English names for roles and pages. Keep it focused (<= 12 roles, <= 24 pages each).",
+    "Use short English names for roles and pages. Keep it focused (<= 80 roles, <= 80 pages each).",
   ].join("\n");
 
   const prompt = [

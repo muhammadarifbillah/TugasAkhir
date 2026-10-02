@@ -26,6 +26,7 @@ import {
   MAX_SCREENS,
   normalizePlan,
   planPageKey,
+  uniqueScreensById,
   type DesignPlan,
   type DesignPlanRole,
   type DesignScreen as DesignScreenType,
@@ -127,7 +128,7 @@ export function DesignStudioDialog({
     plan.roles.find((r) => r.id === activeRoleId) ?? null;
   const activeRoleName = activeRole?.name;
 
-  const all = useMemo(() => [...saved, ...drafts], [saved, drafts]);
+  const all = useMemo(() => uniqueScreensById([...saved, ...drafts]), [saved, drafts]);
   const selected = all.find((s) => s.id === selectedId) ?? null;
 
   // General shows every design across all roles; a specific role filters to it.
@@ -173,17 +174,18 @@ export function DesignStudioDialog({
       setSaving(true);
       setError(null);
       try {
-        const res = await csrfFetch(`/api/projects/${projectId}/design`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ designScreens: next }),
-        });
-        if (!res.ok) {
-          const data = (await res.json()) as { error?: string };
-          setError(data.error ?? labels.error);
-          return false;
-        }
-        setSaved(next);
+      const unique = uniqueScreensById(next);
+      const res = await csrfFetch(`/api/projects/${projectId}/design`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ designScreens: unique }),
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        setError(data.error ?? labels.error);
+        return false;
+      }
+      setSaved(unique);
         onSaved?.();
         return true;
       } catch {
@@ -245,7 +247,7 @@ export function DesignStudioDialog({
           if (await persist(next)) setSelectedId(first.id);
         } else {
           setDrafts((prev) => {
-            const have = new Set(prev.map((d) => d.id));
+            const have = new Set([...saved.map((s) => s.id), ...prev.map((d) => d.id)]);
             return [...prev, ...list.filter((s) => !have.has(s.id))];
           });
           setSelectedId(first.id);
@@ -278,12 +280,15 @@ export function DesignStudioDialog({
 
   /** Replace a saved screen with the same planKey/name, else append. */
   function mergedWith(list: DesignScreenType[], screen: DesignScreenType): DesignScreenType[] {
+    // Same id already present (e.g. a kept screen re-added as a draft) → replace.
+    const sameId = list.findIndex((s) => s.id === screen.id);
+    if (sameId >= 0) return list.map((s, i) => (i === sameId ? screen : s));
     const idx = screen.planKey
       ? list.findIndex((s) => s.planKey === screen.planKey)
       : list.findIndex((s) => (s.role ?? GENERAL) === (screen.role ?? GENERAL) && s.name === screen.name);
-    if (idx >= 0) return list.map((s, i) => (i === idx ? screen : s));
+    if (idx >= 0) return uniqueScreensById(list.map((s, i) => (i === idx ? screen : s)));
     if (list.length >= MAX_SCREENS) return list;
-    return [...list, screen];
+    return uniqueScreensById([...list, screen]);
   }
 
   async function keepDraft(screen: DesignScreenType) {

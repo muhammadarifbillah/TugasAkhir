@@ -13,6 +13,7 @@ import {
   normalizeScreens,
   parseDesignScreens,
   planPageKey,
+  uniqueScreensById,
 } from "./design";
 
 test("createScreen builds a valid screen", () => {
@@ -143,6 +144,17 @@ test("normalizePlan returns empty roles for garbage", () => {
 
 test("planPageKey joins role and page ids", () => {
   assert.equal(planPageKey("student", "dashboard"), "student.dashboard");
+});
+
+test("uniqueScreensById drops duplicate ids, later wins", () => {
+  const out = uniqueScreensById([
+    { id: "a", name: "A1", device: "desktop", html: "<html>1</html>" },
+    { id: "b", name: "B", device: "desktop", html: "<html>2</html>" },
+    { id: "a", name: "A2", device: "mobile", html: "<html>3</html>" },
+  ]);
+  assert.equal(out.length, 2);
+  assert.equal(out.find((s) => s.id === "a")?.name, "A2");
+  assert.equal(out.find((s) => s.id === "b")?.name, "B");
 });
 
 test("effectiveDesignPlan merges analysis roles into the uiPlan", () => {

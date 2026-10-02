@@ -7,9 +7,9 @@ import { z } from "zod";
 
 /** Safety caps so a runaway model cannot bloat the project's JSON. */
 export const MAX_SCREEN_HTML = 200 * 1024;
-export const MAX_SCREENS = 12;
-export const MAX_ROLES = 12;
-export const MAX_PAGES_PER_ROLE = 24;
+export const MAX_SCREENS = 80;
+export const MAX_ROLES = 80;
+export const MAX_PAGES_PER_ROLE = 80;
 
 export const designScreenSchema = z.object({
   id: z.string(),
@@ -194,6 +194,17 @@ export function normalizeScreens(input: unknown): DesignScreen[] {
     if (screens.length >= MAX_SCREENS) break;
   }
   return screens;
+}
+
+/**
+ * De-duplicates screens by id (later entries win) so a React list never renders
+ * two children with the same key when the same screen exists in both saved and
+ * draft state.
+ */
+export function uniqueScreensById(screens: DesignScreen[]): DesignScreen[] {
+  const byId = new Map<string, DesignScreen>();
+  for (const screen of screens) byId.set(screen.id, screen);
+  return [...byId.values()];
 }
 
 /** Best-effort normalisation of a stored/AI design plan, capping roles and pages. */
