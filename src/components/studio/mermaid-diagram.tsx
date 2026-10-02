@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import mermaid from "mermaid";
+import { sanitizeMermaid } from "@/lib/mermaid";
 
 let initialized = false;
 
@@ -23,36 +24,61 @@ export function MermaidDiagram({ code, id, variant = "inline" }: MermaidDiagramP
         securityLevel: "strict",
         fontFamily: "var(--font-geist-sans)",
         theme,
+        // On a parse failure we want a rejected promise (handled below) instead
+        // of Mermaid injecting its own "Syntax error" graphic.
+        suppressErrorRendering: true,
       });
       initialized = true;
     }
     if (!ref.current) return;
-    const graphId = `mmd-${id}-${Math.random().toString(36).slice(2, 8)}`;
-    mermaid
-      .render(graphId, code)
-      .then(({ svg }) => {
-        if (!ref.current) return;
-        ref.current.innerHTML = svg;
-        if (variant === "fullscreen") {
-          // Mermaid ships fixed pixel dimensions and a natural max-width. In
-          // fullscreen we let the SVG fill the area and scale its viewBox to
-          // fit (contain) so the whole diagram stays visible.
-          const svgEl = ref.current.querySelector("svg");
-          if (svgEl) {
-            svgEl.removeAttribute("width");
-            svgEl.removeAttribute("height");
-            svgEl.style.width = "100%";
-            svgEl.style.height = "100%";
-            svgEl.style.maxWidth = "100%";
-            svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+    let cancelled = false;
+    const baseId = `mmd-${id}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const renderCandidate = async (candidate: string, attempt: number): Promise<string> => {
+      await mermaid.parse(candidate);
+      const { svg } = await mermaid.render(`${baseId}-${attempt}`, candidate);
+      if (/Syntax error in text/i.test(svg)) throw new Error("mermaid syntax error");
+      return svg;
+    };
+
+    const run = async () => {
+      const candidates = [code, sanitizeMermaid(code)];
+      for (let i = 0; i < candidates.length; i++) {
+        try {
+          const svg = await renderCandidate(candidates[i], i);
+          if (cancelled || !ref.current) return;
+          ref.current.innerHTML = svg;
+          if (variant === "fullscreen") {
+            // Let the SVG fill + scale (contain) the available area.
+            const svgEl = ref.current.querySelector("svg");
+            if (svgEl) {
+              svgEl.removeAttribute("width");
+              svgEl.removeAttribute("height");
+              svgEl.style.width = "100%";
+              svgEl.style.height = "100%";
+              svgEl.style.maxWidth = "100%";
+              svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
+            }
           }
+          return;
+        } catch {
+          // try the next (sanitised) candidate
         }
-      })
-      .catch(() => {
-        if (ref.current) {
-          ref.current.textContent = code;
-        }
-      });
+      }
+      // All candidates failed: show the source, not Mermaid's error graphic.
+      if (cancelled || !ref.current) return;
+      ref.current.innerHTML = "";
+      const pre = document.createElement("pre");
+      pre.className = "max-h-64 overflow-auto whitespace-pre-wrap break-words text-[11px] text-muted-foreground";
+      pre.textContent = code;
+      ref.current.appendChild(pre);
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
   }, [code, id, variant]);
 
   return (
