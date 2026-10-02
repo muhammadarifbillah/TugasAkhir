@@ -87,10 +87,10 @@ export async function runContainer(params: RunContainerParams): Promise<void> {
     "--init",
     "--cap-drop",
     "ALL",
+    // Docker applies its default seccomp profile automatically; passing
+    // "seccomp=default" is invalid (it is read as a profile file path).
     "--security-opt",
     "no-new-privileges",
-    "--security-opt",
-    "seccomp=default",
     "--tmpfs",
     "/tmp",
     "--tmpfs",
