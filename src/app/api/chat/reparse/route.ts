@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
-import { parseStageResult, persistStageResult } from "@/lib/ai/result";
+import { extractJson, parseStageResult, persistStageResult, planResultSchema } from "@/lib/ai/result";
 
 const bodySchema = z.object({
   projectStageId: z.string().min(1),
@@ -47,6 +47,13 @@ export async function POST(request: Request) {
   });
   if (!lastAssistant) {
     return NextResponse.json({ error: "No AI response to parse yet." }, { status: 400 });
+  }
+
+  // A plan-mode reply is checked first: `parseStageResult` is permissive and
+  // would otherwise swallow the plan JSON as an (empty) stage result.
+  const plan = planResultSchema.safeParse(extractJson(lastAssistant.content));
+  if (plan.success) {
+    return NextResponse.json({ ok: true, plan: plan.data });
   }
 
   const result = parseStageResult(lastAssistant.content);

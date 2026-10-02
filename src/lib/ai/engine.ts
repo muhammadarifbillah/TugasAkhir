@@ -448,6 +448,12 @@ Rules:
   const resolved = await resolveUserModel(input.userId);
   const userPrompt = sanitizePrompt(input.userPrompt);
 
+  const chat =
+    (await prisma.chat.findFirst({ where: { projectStageId: projectStage.id } })) ??
+    (await prisma.chat.create({
+      data: { projectStageId: projectStage.id, userId: input.userId, title: project.name },
+    }));
+
   const { text, usage, finishReason } = await generateText({
     model: resolved.model,
     system,
@@ -456,6 +462,34 @@ Rules:
     maxOutputTokens: resolved.maxTokens,
     maxRetries: 1,
   });
+
+  // Persist the turn so the plan survives reload and can be re-parsed.
+  await prisma.$transaction([
+    prisma.message.create({
+      data: {
+        chatId: chat.id,
+        role: "user",
+        content: userPrompt,
+        promptMeta: {
+          stage: projectStage.stage.code,
+          mode: "plan",
+          sanitized: userPrompt !== input.userPrompt,
+        },
+      },
+    }),
+    prisma.message.create({
+      data: {
+        chatId: chat.id,
+        role: "assistant",
+        content: text,
+        promptMeta: {
+          stage: projectStage.stage.code,
+          mode: "plan",
+          usage: usage ? { prompt: usage.inputTokens, completion: usage.outputTokens } : null,
+        },
+      },
+    }),
+  ]);
 
   // Parse plan from response
   let plan: PlanResult | null = null;

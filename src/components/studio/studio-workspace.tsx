@@ -738,6 +738,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         } | null;
         recommendations?: RecommendationRow[];
         securityScore?: number | null;
+        plan?: PlanResult | null;
       };
       if (!res.ok || !data.ok) {
         setError(data.error ?? dict.studio.requestFailed);
@@ -752,6 +753,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         if (data.result.mermaid?.length) setDiagrams(data.result.mermaid);
         if (data.result.architecture?.length) setArchitecture(data.result.architecture);
       }
+      if (data.plan) setActivePlan(data.plan);
       if (data.recommendations?.length) setRecommendations(data.recommendations);
       if (typeof data.securityScore === "number") setScore(Math.round(data.securityScore));
       setStructuredWarning(false);
