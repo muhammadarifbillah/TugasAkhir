@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -201,6 +201,58 @@ function displayAssistantText(content: string): string {
   return trimmed.length > 0 ? trimmed : content;
 }
 
+/**
+ * Tiny localStorage-backed store for the "unseen changes" sub-step ids, read via
+ * `useSyncExternalStore`. The server snapshot is always empty, so the initial
+ * client render matches the server HTML (no hydration mismatch) and the stored
+ * value is applied right after hydration.
+ */
+function makePendingStepsStore(key: string) {
+  let cached = "[]";
+  const listeners = new Set<() => void>();
+  const read = () => {
+    try {
+      return window.localStorage.getItem(key) ?? "[]";
+    } catch {
+      return "[]";
+    }
+  };
+  return {
+    subscribe(cb: () => void) {
+      listeners.add(cb);
+      const onStorage = (e: StorageEvent) => {
+        if (!e.key || e.key === key) {
+          cached = read();
+          cb();
+        }
+      };
+      window.addEventListener("storage", onStorage);
+      return () => {
+        listeners.delete(cb);
+        window.removeEventListener("storage", onStorage);
+      };
+    },
+    getSnapshot() {
+      const value = read();
+      if (value !== cached) cached = value;
+      return cached;
+    },
+    getServerSnapshot() {
+      return "[]";
+    },
+    set(ids: string[]) {
+      const value = JSON.stringify(ids);
+      try {
+        window.localStorage.setItem(key, value);
+      } catch {
+        // storage may be unavailable
+      }
+      cached = value;
+      listeners.forEach((l) => l());
+    },
+  };
+}
+
 /** Generate a simple Mermaid auth flow sequenceDiagram from architecture text. */
 function generateAuthFlowFromArchitecture(architecture: string[]): string | null {
   const joined = architecture.join("\n").toLowerCase();
@@ -328,23 +380,22 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [activeStepResult, setActiveStepResult] = useState<string | null>(null);
   // Sub-steps with unseen changes (dot on the eye icon). Persisted per project+stage.
   const changesKey = `sf.stepChanges.${props.project.id}.${props.stage.code}`;
-  const [pendingSteps, setPendingSteps] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set();
+  const pendingStore = useMemo(() => makePendingStepsStore(changesKey), [changesKey]);
+  const pendingRaw = useSyncExternalStore(
+    pendingStore.subscribe,
+    pendingStore.getSnapshot,
+    pendingStore.getServerSnapshot,
+  );
+  const pendingSteps = useMemo(() => {
     try {
-      const raw = window.localStorage.getItem(changesKey);
-      const arr = raw ? (JSON.parse(raw) as unknown) : [];
-      return new Set(Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : []);
+      const parsed = JSON.parse(pendingRaw) as unknown;
+      return new Set(
+        Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [],
+      );
     } catch {
-      return new Set();
+      return new Set<string>();
     }
-  });
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(changesKey, JSON.stringify([...pendingSteps]));
-    } catch {
-      // storage may be unavailable
-    }
-  }, [pendingSteps, changesKey]);
+  }, [pendingRaw]);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [maximized, setMaximized] = useState(false);
   const [promptCollapsed, setPromptCollapsed] = useState(false);
@@ -405,21 +456,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
    */
   function markStepsChanged(steps: string[]) {
     if (steps.length === 0) return;
-    setPendingSteps((prev) => {
-      const next = new Set(prev);
-      steps.forEach((s) => next.add(s));
-      return next;
-    });
+    const next = new Set(pendingSteps);
+    steps.forEach((s) => next.add(s));
+    pendingStore.set([...next]);
   }
 
   function openStepResult(id: string) {
     setActiveStepResult(id);
-    setPendingSteps((prev) => {
-      if (!prev.has(id)) return prev;
-      const next = new Set(prev);
+    if (pendingSteps.has(id)) {
+      const next = new Set(pendingSteps);
       next.delete(id);
-      return next;
-    });
+      pendingStore.set([...next]);
+    }
   }
 
   /** Tell the user the AI finished and where to look; flag those sub-steps. */
