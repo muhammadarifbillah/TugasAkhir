@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
+import { Check, Copy, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
@@ -305,17 +305,6 @@ export function RunWorkspace({
           </Button>
         </div>
       </div>
-      {demo.length > 0 && (
-        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b bg-muted/40 px-3 py-1.5 text-[11px] text-muted-foreground">
-          <span className="font-medium text-foreground">{labels.demoAccount}:</span>
-          {demo.map((a) => (
-            <span key={a.email} className="rounded bg-background px-1.5 py-0.5 font-mono">
-              {a.email}
-              {a.password ? ` / ${a.password}` : ""}
-            </span>
-          ))}
-        </div>
-      )}
       <div className="min-h-0 flex-1">
         <CodeWorkspace
           variant="popup"
@@ -330,6 +319,8 @@ export function RunWorkspace({
           preview={preview}
           terminal={terminal}
           terminalTitle={labels.logs}
+          demoPanel={demo.length > 0 ? <DemoAccountList accounts={demo} title={labels.demoAccount} /> : undefined}
+          demoLabel={labels.demoAccount}
           loadingLabel="Loading editor..."
           labels={{
             save: labels.save,
@@ -339,9 +330,64 @@ export function RunWorkspace({
             terminal: labels.terminal,
             explorer: labels.explorer,
             preview: labels.preview,
+            demo: labels.demoAccount,
           }}
         />
       </div>
     </div>
+  );
+}
+
+/** Sidebar panel (opened from the key icon) listing the run's demo accounts. */
+function DemoAccountList({
+  accounts,
+  title,
+}: {
+  accounts: { email: string; password?: string }[];
+  title: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {title}
+      </p>
+      {accounts.map((a) => {
+        const credential = a.password ? `${a.email} / ${a.password}` : a.email;
+        return (
+          <div key={a.email} className="rounded-md border bg-card p-2 text-[11px]">
+            <div className="flex items-start justify-between gap-1">
+              <span className="break-all font-mono text-foreground">{a.email}</span>
+              <CopyButton value={credential} />
+            </div>
+            {a.password && (
+              <p className="mt-1 break-all font-mono text-muted-foreground">{a.password}</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      title="Copy"
+      aria-label="Copy"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(value);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        } catch {
+          // clipboard unavailable
+        }
+      }}
+      className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+    >
+      {copied ? <Check className="size-3 text-success" /> : <Copy className="size-3" />}
+    </button>
   );
 }

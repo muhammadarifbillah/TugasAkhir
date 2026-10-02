@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronUp, Eye, Files, Loader2, Save, TerminalSquare } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Eye, Files, KeyRound, Loader2, Save, TerminalSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileEditor, inferLanguage } from "@/components/studio/code-editor";
 
@@ -13,6 +13,7 @@ export interface CodeWorkspaceLabels {
   explorer?: string;
   preview?: string;
   saved?: string;
+  demo?: string;
 }
 
 export interface CodeWorkspaceProps {
@@ -29,6 +30,9 @@ export interface CodeWorkspaceProps {
   preview?: React.ReactNode;
   terminal?: React.ReactNode;
   terminalTitle?: string;
+  /** Sidebar panel shown by the demo/credentials rail icon. */
+  demoPanel?: React.ReactNode;
+  demoLabel?: string;
   editorOverride?: React.ReactNode;
   emptyLabel?: string;
   loadingLabel?: string;
@@ -54,6 +58,8 @@ export function CodeWorkspace({
   preview,
   terminal,
   terminalTitle,
+  demoPanel,
+  demoLabel,
   editorOverride,
   emptyLabel,
   loadingLabel,
@@ -64,7 +70,9 @@ export function CodeWorkspace({
   const sortedFiles = useMemo(() => Object.keys(files).sort(), [files]);
   const hasPreview = preview !== undefined && preview !== null;
   const [view, setView] = useState<"preview" | "file">(hasPreview ? "preview" : "file");
-  const [sidebarOpen, setSidebarOpen] = useState(variant === "popup");
+  const [sidePanel, setSidePanel] = useState<"explorer" | "demo" | null>(
+    variant === "popup" ? "explorer" : null,
+  );
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(180);
   const dragRef = useRef<{ y: number; h: number } | null>(null);
@@ -174,11 +182,21 @@ export function CodeWorkspace({
             <button
               type="button"
               title={labels?.explorer ?? "Explorer"}
-              onClick={() => setSidebarOpen((v) => !v)}
-              className={`flex size-8 items-center justify-center rounded-md ${sidebarOpen ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+              onClick={() => setSidePanel((p) => (p === "explorer" ? null : "explorer"))}
+              className={`flex size-8 items-center justify-center rounded-md ${sidePanel === "explorer" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"}`}
             >
               <Files className="size-4" />
             </button>
+            {demoPanel && (
+              <button
+                type="button"
+                title={demoLabel ?? labels?.demo ?? "Demo account"}
+                onClick={() => setSidePanel((p) => (p === "demo" ? null : "demo"))}
+                className={`flex size-8 items-center justify-center rounded-md ${sidePanel === "demo" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"}`}
+              >
+                <KeyRound className="size-4" />
+              </button>
+            )}
             {terminal && (
               <button
                 type="button"
@@ -192,7 +210,7 @@ export function CodeWorkspace({
           </div>
         )}
 
-        {sidebarOpen && (
+        {sidePanel === "explorer" && (
           <div className="hidden w-56 shrink-0 overflow-y-auto border-r p-2 sm:block">
             {sortedFiles.map((file) => (
               <button
@@ -208,6 +226,10 @@ export function CodeWorkspace({
               </button>
             ))}
           </div>
+        )}
+
+        {sidePanel === "demo" && demoPanel && (
+          <div className="w-56 shrink-0 overflow-y-auto border-r p-2">{demoPanel}</div>
         )}
 
         <div className="flex min-h-0 flex-1 flex-col">
