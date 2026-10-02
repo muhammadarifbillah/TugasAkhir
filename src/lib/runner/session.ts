@@ -279,8 +279,15 @@ export async function startRun(
       mountTarget: plan.adapter.mountTarget,
       command: buildCommand(plan, files),
       env: runEnv,
-      // Reuse a persistent npm cache across runs so repeat installs are fast.
-      extraMounts: plan.stackId === "node" ? ["sdlc-npm-cache:/root/.npm"] : undefined,
+      // Reuse a persistent npm cache (and the project's node_modules) across
+      // runs so repeat installs skip the multi-minute `npm install`.
+      extraMounts:
+        plan.stackId === "node"
+          ? [
+              "sdlc-npm-cache:/root/.npm",
+              `sdlc-nm-${projectId}:${plan.adapter.mountTarget}/node_modules`,
+            ]
+          : undefined,
       // Node installs are CPU-bound; give them more headroom than the default.
       ...(plan.stackId === "node" ? { memory: "2g", cpus: "2", pidsLimit: 512 } : {}),
       // Node runs `apk add openssl` at start, which needs a writable rootfs;
@@ -405,7 +412,9 @@ export async function getRunStatus(projectId: string): Promise<RunStatusResult |
     const res = await fetch(`http://127.0.0.1:${session.hostPort}${healthPath}`, {
       signal: AbortSignal.timeout(2500),
     });
-    if (res.status < 500) {
+    // Any HTTP response means the server is up; a 5xx (e.g. a page that errors)
+    // still counts, so the preview shows the app instead of hanging on "starting".
+    if (res.status < 600) {
       session.status = "running";
       return runningResult(session);
     }

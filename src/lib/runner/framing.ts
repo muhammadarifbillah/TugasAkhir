@@ -36,13 +36,16 @@ export function relaxFramingForPreview(content: string): string {
     /\[\s*(['"])X-Frame-Options\1\s*,\s*(['"])(?:DENY|SAMEORIGIN)\2\s*\],?\s*/gi,
     "",
   );
+  // Capture the whole receiver so removing the call cannot merge `response.headers`
+  // with the next statement (which previously produced `response.headersresponse…`
+  // and crashed the generated middleware). Replace with a valid no-op instead.
   out = out.replace(
-    /\.\s*(?:set|append|setHeader)\s*\(\s*(['"])X-Frame-Options\1\s*,\s*(['"])(?:DENY|SAMEORIGIN)\2\s*\)\s*;?\s*/gi,
-    "",
+    /([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\.\s*(?:set|append|setHeader)\s*\(\s*(['"])X-Frame-Options\2\s*,\s*(['"])(?:DENY|SAMEORIGIN)\3\s*\)/gi,
+    "void 0",
   );
   out = out.replace(
-    /\[\s*(['"])X-Frame-Options\1\s*\]\s*=\s*(['"])(?:DENY|SAMEORIGIN)\2\s*;?\s*/gi,
-    "",
+    /([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\s*\[\s*(['"])X-Frame-Options\2\s*\]\s*=\s*(['"])(?:DENY|SAMEORIGIN)\3/gi,
+    "void 0",
   );
 
   return out;

@@ -57,3 +57,17 @@ test("is a no-op when no framing directives are present", () => {
   const src = `export default function Page() { return <h1>Hello</h1>; }`;
   assert.equal(relaxFramingForPreview(src), src);
 });
+
+test("removes imperative X-Frame-Options without merging the next statement", () => {
+  const src = [
+    "response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');",
+    "response.headers.set('X-Frame-Options', 'DENY');",
+    "response.headers.set('Permissions-Policy', 'camera=()');",
+  ].join("\n");
+  const out = relaxFramingForPreview(src);
+  assert.ok(!out.includes("X-Frame-Options"));
+  assert.ok(!/headersresponse/.test(out));
+  assert.match(out, /response\.headers\.set\('Referrer-Policy'/);
+  assert.match(out, /response\.headers\.set\('Permissions-Policy'/);
+  assert.match(out, /void 0;/);
+});
