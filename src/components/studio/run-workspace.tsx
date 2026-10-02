@@ -32,6 +32,7 @@ export interface RunWorkspaceLabels {
   confirmDiscard: string;
   openInNewTab: string;
   edgeRuntimeHint: string;
+  codeErrorHint: string;
 }
 
 interface RunWorkspaceProps {
@@ -255,9 +256,16 @@ export function RunWorkspace({
       ? url.replace("localhost", window.location.hostname || "localhost")
       : url;
 
-  // Surface the common Edge-runtime failure (a generated middleware importing a
-  // Node-only module) instead of leaving the user with a blank/error preview.
-  const edgeRuntimeIssue = /edge runtime does not support/i.test(logs);
+  // Surface common generated-code failures instead of leaving the user with a
+  // blank/error preview: an Edge middleware importing a Node-only module, or a
+  // runtime/syntax error inside the generated source.
+  const logErrorHint = /edge runtime does not support/i.test(logs)
+    ? labels.edgeRuntimeHint
+    : /(ReferenceError|SyntaxError|is not defined|Cannot find module|Module not found)/i.test(
+        logs,
+      )
+      ? labels.codeErrorHint
+      : null;
 
   const preview = appUrl ? (
     <div className="flex h-full w-full justify-center overflow-auto bg-muted/40 p-2">
@@ -344,10 +352,10 @@ export function RunWorkspace({
           </Button>
         </div>
       </div>
-      {edgeRuntimeIssue && (
+      {logErrorHint && (
         <div className="flex shrink-0 items-start gap-2 border-b border-warning/40 bg-warning/10 px-3 py-1.5 text-[11px] text-warning">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
-          <span>{labels.edgeRuntimeHint}</span>
+          <span>{logErrorHint}</span>
         </div>
       )}
       <div className="min-h-0 flex-1">

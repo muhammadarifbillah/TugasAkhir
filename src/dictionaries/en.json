@@ -379,6 +379,7 @@
     "runLogs": "Build & run logs",
     "runOpenInNewTab": "Open in new tab",
     "runEdgeRuntimeHint": "The generated app imports a Node-only module (e.g. node:crypto) in middleware, which runs on the Edge runtime. Use the Web Crypto API or move that logic to a route handler.",
+    "runCodeErrorHint": "The generated app hit a runtime/syntax error (see the logs). Open the affected file in the Explorer to fix it, or regenerate this stage.",
     "runDemoAccount": "Demo account",
     "markFixed": "Mark as fixed",
     "unmarkFixed": "Unmark fixed",

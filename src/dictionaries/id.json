@@ -379,6 +379,7 @@
     "runLogs": "Log build & run",
     "runOpenInNewTab": "Buka di tab baru",
     "runEdgeRuntimeHint": "App hasil generate mengimpor modul Node (mis. node:crypto) di middleware yang berjalan di Edge runtime. Gunakan Web Crypto atau pindahkan logika itu ke route handler.",
+    "runCodeErrorHint": "App hasil generate mengalami error runtime/sintaks (lihat log). Buka file terkait di Explorer untuk memperbaikinya, atau generate ulang tahap ini.",
     "runDemoAccount": "Akun demo",
     "markFixed": "Tandai Fix",
     "unmarkFixed": "Batalkan Fix",
