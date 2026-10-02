@@ -2137,7 +2137,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                         </button>
                       </p>
                       {meta.detail && (
-                        <p className="hidden text-[11px] text-muted-foreground md:block short:hidden">{meta.detail}</p>
+                        <p className="hidden text-[11px] text-muted-foreground md:block">{meta.detail}</p>
                       )}
                       <div className="mt-0.5 flex flex-wrap gap-1">
                         {s.nistTasks.map((t) => (
