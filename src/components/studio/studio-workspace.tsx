@@ -2155,6 +2155,9 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {stepRows.filter((s) => s.met).length}/{stepRows.length}
             </Badge>
           </div>
+          <p className="border-b px-4 py-1 text-[10px] text-muted-foreground">
+            {dict.studio.subStepsHint}
+          </p>
           <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <ol className="space-y-1.5">
               {stepRows.map((s) => {
