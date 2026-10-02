@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { completionGaps, getStageDefinition } from "./stages";
+import { completionGaps, getStageDefinition, stepsTouchedByResult } from "./stages";
 
 test("analysis is incomplete until every sub-step is present", () => {
   assert.deepEqual(completionGaps("analysis", {}, {}), [
@@ -58,6 +58,25 @@ test("design ui sub-step is met by a structured plan or by mockups", () => {
   assert.ok(!completionGaps("design", withMockups, {}).includes("ui"));
 
   assert.ok(completionGaps("design", {}, {}).includes("ui"));
+});
+
+test("stepsTouchedByResult flags design sub-steps present in the result", () => {
+  const ids = stepsTouchedByResult("design", {
+    uiDesign: ["hero"],
+    architecture: ["layers"],
+    mermaid: ["graph TD"],
+    recommendations: [{ title: "r" }],
+  });
+  assert.ok(ids.includes("ui"));
+  assert.ok(ids.includes("architecture"));
+  assert.ok(ids.includes("diagram"));
+  assert.ok(ids.includes("recommendations"));
+  assert.ok(!ids.includes("stride"));
+});
+
+test("stepsTouchedByResult returns only valid step ids", () => {
+  assert.deepEqual(stepsTouchedByResult("analysis", { bogus: true }), []);
+  assert.deepEqual(stepsTouchedByResult("analysis", { recommendedStack: {} }), ["stack"]);
 });
 
 test("getStageDefinition throws for an unknown stage", () => {

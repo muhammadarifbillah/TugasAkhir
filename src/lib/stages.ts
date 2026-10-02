@@ -288,6 +288,53 @@ export function getStageDefinition(code: string): StageDefinition {
   return stage;
 }
 
+/**
+ * Sub-step ids whose content a stage result touched (present in the AI output).
+ * Used to flag changed sub-steps in the studio so the user notices new results.
+ */
+export function stepsTouchedByResult(stageCode: string, result: unknown): string[] {
+  const r = (result && typeof result === "object" ? result : {}) as Record<string, unknown>;
+  const arr = (v: unknown) => Array.isArray(v) && v.length > 0;
+  const str = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+  const ids = new Set<string>();
+  const add = (...s: string[]) => s.forEach((x) => ids.add(x));
+
+  switch (stageCode) {
+    case "analysis":
+      if (str(r.summary)) add("scope");
+      if (r.recommendedStack != null) add("stack");
+      if (arr(r.securityRequirements)) add("security");
+      if (arr(r.dataClassification)) add("data");
+      break;
+    case "design":
+      if (arr(r.uiDesign) || r.uiPlan != null) add("ui");
+      if (arr(r.architecture)) add("architecture");
+      if (arr(r.threatModel)) add("stride");
+      if (arr(r.mermaid)) add("diagram");
+      if (arr(r.databaseSchema) || str(r.erdDiagram) || str(r.authFlowDiagram)) add("schema");
+      break;
+    case "development":
+      if (r.codeArtifacts != null) add("frontend", "scaffold", "auth", "antiInjection", "secrets");
+      break;
+    case "testing":
+      if (arr(r.findings)) add("owasp");
+      if (typeof r.securityScore === "number") add("score");
+      if (r.fixedArtifacts != null) add("remediation");
+      break;
+    case "handover":
+      if (str(r.manualBook)) add("manual");
+      if (str(r.complianceReport)) add("compliance");
+      if (arr(r.releaseChecklist)) add("checklist");
+      break;
+  }
+  if (arr(r.recommendations)) add("recommendations");
+
+  const valid = new Set(
+    (STAGE_DEFINITIONS.find((s) => s.code === stageCode)?.steps ?? []).map((s) => s.id),
+  );
+  return [...ids].filter((id) => valid.has(id));
+}
+
 type JsonLike = Record<string, unknown> | null | undefined;
 
 function asRecord(value: unknown): Record<string, unknown> | null {

@@ -10,11 +10,17 @@ interface Toast {
   type: ToastType;
   message: string;
   duration?: number;
+  action?: { label: string; onClick: () => void };
 }
 
 interface ToastContextValue {
   toasts: Toast[];
-  addToast: (type: ToastType, message: string, duration?: number) => void;
+  addToast: (
+    type: ToastType,
+    message: string,
+    duration?: number,
+    action?: { label: string; onClick: () => void },
+  ) => void;
   removeToast: (id: string) => void;
 }
 
@@ -34,9 +40,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addToast = useCallback(
-    (type: ToastType, message: string, duration = 5000) => {
+    (
+      type: ToastType,
+      message: string,
+      duration = 5000,
+      action?: { label: string; onClick: () => void },
+    ) => {
       const id = Math.random().toString(36).slice(2, 9);
-      setToasts((prev) => [...prev, { id, type, message, duration }]);
+      setToasts((prev) => [...prev, { id, type, message, duration, action }]);
     },
     [],
   );
@@ -94,6 +105,18 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     >
       <Icon className={`mt-0.5 size-4 shrink-0 ${accent}`} aria-hidden="true" />
       <p className="flex-1 text-xs leading-relaxed">{toast.message}</p>
+      {toast.action && (
+        <button
+          type="button"
+          onClick={() => {
+            toast.action?.onClick();
+            onClose();
+          }}
+          className="mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {toast.action.label}
+        </button>
+      )}
       <button
         type="button"
         onClick={onClose}

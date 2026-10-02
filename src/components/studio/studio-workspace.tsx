@@ -326,6 +326,25 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   } | null>(null);
   const [mobileTab, setMobileTab] = useState<"navigate" | "chat" | "security">("chat");
   const [activeStepResult, setActiveStepResult] = useState<string | null>(null);
+  // Sub-steps with unseen changes (dot on the eye icon). Persisted per project+stage.
+  const changesKey = `sf.stepChanges.${props.project.id}.${props.stage.code}`;
+  const [pendingSteps, setPendingSteps] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const raw = window.localStorage.getItem(changesKey);
+      const arr = raw ? (JSON.parse(raw) as unknown) : [];
+      return new Set(Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : []);
+    } catch {
+      return new Set();
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(changesKey, JSON.stringify([...pendingSteps]));
+    } catch {
+      // storage may be unavailable
+    }
+  }, [pendingSteps, changesKey]);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [maximized, setMaximized] = useState(false);
   const [promptCollapsed, setPromptCollapsed] = useState(false);
@@ -384,6 +403,36 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
    * function would capture the value from the render that created the callback,
    * so approving a plan would re-run plan mode instead of build mode.
    */
+  function markStepsChanged(steps: string[]) {
+    if (steps.length === 0) return;
+    setPendingSteps((prev) => {
+      const next = new Set(prev);
+      steps.forEach((s) => next.add(s));
+      return next;
+    });
+  }
+
+  function openStepResult(id: string) {
+    setActiveStepResult(id);
+    setPendingSteps((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  /** Tell the user the AI finished and where to look; flag those sub-steps. */
+  function notifyChangedSteps(steps?: string[]) {
+    if (!steps || steps.length === 0) return;
+    markStepsChanged(steps);
+    const labels = steps.map((s) => stepMeta(s).label).join(", ");
+    addToast("success", dict.studio.aiFinished.replace("{steps}", labels), 9000, {
+      label: dict.studio.aiFinishedView,
+      onClick: () => openStepResult(steps[0]),
+    });
+  }
+
   async function sendPrompt(text?: string, mode?: ChatMode) {
     const activeMode = mode ?? chatMode;
     const prompt = (text ?? input).trim();
@@ -475,6 +524,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           } | null;
           securityScore?: number | null;
           recommendations?: RecommendationRow[];
+          changedSteps?: string[];
           truncated?: boolean;
           error?: string;
           message?: string;
@@ -531,6 +581,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           securityScore: data.securityScore ?? null,
         });
         addToast("success", `Build complete! ${createdFiles.length} files created, ${modifiedFiles.length} modified`);
+        notifyChangedSteps(data.changedSteps);
         setActivePlan(null);
         setBuildLoading(false);
         setChatMode("plan");
@@ -563,6 +614,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         securityScore?: number | null;
         recommendationsSaved?: number;
         recommendations?: RecommendationRow[];
+        changedSteps?: string[];
         truncated?: boolean;
         error?: string;
         message?: string;
@@ -606,6 +658,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       if (typeof data.securityScore === "number") setScore(Math.round(data.securityScore));
       if (data.recommendations?.length) setRecommendations(data.recommendations);
       if (data.truncated) setTruncatedWarning(true);
+      notifyChangedSteps(data.changedSteps);
       router.refresh();
     } catch {
       setError(dict.studio.networkError);
@@ -2129,11 +2182,21 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                         )}
                         <button
                           type="button"
-                          onClick={() => setActiveStepResult(s.id)}
-                          className="ml-1 inline-flex rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground align-middle"
-                          title={`Lihat hasil: ${meta.label}`}
+                          onClick={() => openStepResult(s.id)}
+                          className="relative ml-1 inline-flex rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground align-middle"
+                          title={
+                            pendingSteps.has(s.id)
+                              ? `${dict.studio.stepChanged}: ${meta.label}`
+                              : `Lihat hasil: ${meta.label}`
+                          }
                         >
                           <Eye className="size-3" />
+                          {pendingSteps.has(s.id) && (
+                            <span
+                              className="absolute -end-0.5 -top-0.5 size-2 rounded-full bg-primary ring-2 ring-background"
+                              aria-label={dict.studio.stepChanged}
+                            />
+                          )}
                         </button>
                       </p>
                       {meta.detail && (
@@ -2983,6 +3046,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           designPlan={props.designPlan}
           onClose={() => setShowDesignCanvas(false)}
           onSaved={() => router.refresh()}
+          onAiFinished={notifyChangedSteps}
           labels={{
             title: dict.studio.designStudioTitle,
             promptPlaceholder: dict.studio.designPromptPlaceholder,

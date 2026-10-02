@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   Loader2,
@@ -72,6 +72,8 @@ interface DesignStudioDialogProps {
   labels: DesignStudioLabels;
   onClose: () => void;
   onSaved?: () => void;
+  /** Called when the AI produced/changed designs, so the studio can flag the UI step. */
+  onAiFinished?: (steps: string[]) => void;
 }
 
 type Device = DesignScreenType["device"];
@@ -94,6 +96,7 @@ export function DesignStudioDialog({
   labels,
   onClose,
   onSaved,
+  onAiFinished,
 }: DesignStudioDialogProps) {
   const [saved, setSaved] = useState<DesignScreenType[]>(savedScreens);
   const [drafts, setDrafts] = useState<DesignScreenType[]>([]);
@@ -114,6 +117,11 @@ export function DesignStudioDialog({
   const [lastRequest, setLastRequest] = useState<Request | null>(null);
   const [fullscreen, setFullscreen] = useState<DesignScreenType | null>(null);
   const [fsMaximized, setFsMaximized] = useState(false);
+  // Keep the latest callback without rebuilding the generate() callback.
+  const onAiFinishedRef = useRef(onAiFinished);
+  useEffect(() => {
+    onAiFinishedRef.current = onAiFinished;
+  }, [onAiFinished]);
 
   const activeRole: DesignPlanRole | null =
     plan.roles.find((r) => r.id === activeRoleId) ?? null;
@@ -225,6 +233,7 @@ export function DesignStudioDialog({
           setError(data.message ?? data.error ?? labels.error);
           return;
         }
+        onAiFinishedRef.current?.(["ui"]);
         const first = list[0];
         if (req.base) {
           if (!baseIsSaved) {
@@ -380,6 +389,7 @@ export function DesignStudioDialog({
       }
       setPlan(normalizePlan(data.plan));
       setPlanEditing(false);
+      onAiFinishedRef.current?.(["ui"]);
       onSaved?.();
     } catch {
       setError(labels.error);
@@ -402,6 +412,7 @@ export function DesignStudioDialog({
       const next = normalizePlan(data.plan);
       setPlan(next);
       setActiveRoleId((id) => (next.roles.some((r) => r.id === id) ? id : next.roles[0]?.id ?? GENERAL));
+      onAiFinishedRef.current?.(["ui"]);
     } catch {
       setError(labels.error);
     } finally {

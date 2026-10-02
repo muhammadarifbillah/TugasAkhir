@@ -5,6 +5,7 @@ import { Check, Copy, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } fr
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
+import { useToast } from "@/components/ui/toast";
 import { csrfFetch } from "@/lib/csrf-client";
 
 type RunStatus = "idle" | "starting" | "running" | "error" | "stopped";
@@ -94,6 +95,21 @@ export function RunWorkspace({
   const [iframeKey, setIframeKey] = useState(0);
   const [polling, setPolling] = useState(false);
   const startedRef = useRef(false);
+  const prevStatusRef = useRef<RunStatus | null>(null);
+  const { addToast } = useToast();
+
+  // Notify the user once when the app becomes ready (or fails).
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    if (prev !== status) {
+      if (status === "running" && prev !== "running") {
+        addToast("success", `${projectName} — ${labels.running}`);
+      } else if (status === "error" && prev !== "error") {
+        addToast("error", error ?? labels.error);
+      }
+      prevStatusRef.current = status;
+    }
+  }, [status, error, projectName, labels.running, labels.error, addToast]);
 
   const start = useCallback(async () => {
     setStatus("starting");

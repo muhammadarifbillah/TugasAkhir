@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { approvedDesignReference } from "@/lib/ai/design-reference";
 import { projectContext } from "@/lib/ai/context";
-import { getStageDefinition } from "@/lib/stages";
+import { completionGaps, getStageDefinition, stepsTouchedByResult } from "@/lib/stages";
 import { sanitizePrompt } from "@/lib/sanitize";
 import { writeAudit } from "@/lib/audit";
 import {
@@ -86,6 +86,8 @@ export interface StageTurnResult {
   truncated: boolean;
   recommendations: PersistedRecommendation[];
   usage: { promptTokens: number; completionTokens: number } | null;
+  /** Sub-step ids whose results changed in this turn (for studio notifications). */
+  changedSteps: string[];
 }
 
 export interface PlanTurnResult {
@@ -125,6 +127,36 @@ async function correctiveRetry(opts: {
   } catch (err) {
     console.warn("[ai/engine] corrective retry failed:", err instanceof Error ? err.message : err);
     return null;
+  }
+}
+
+/**
+ * Sub-steps whose status/content changed during a turn: those that just became
+ * "met" (completionGaps diff) plus those whose result fields were produced.
+ */
+async function computeChangedSteps(opts: {
+  projectId: string;
+  projectStageId: string;
+  stageCode: string;
+  specBefore: unknown;
+  result: StageResult | null;
+}): Promise<string[]> {
+  const touched = stepsTouchedByResult(opts.stageCode, opts.result);
+  try {
+    const [after, recCount, delCount] = await Promise.all([
+      prisma.project.findUnique({ where: { id: opts.projectId }, select: { globalSpec: true } }),
+      prisma.aiRecommendation.count({ where: { projectStageId: opts.projectStageId } }),
+      prisma.deliverable.count({ where: { projectId: opts.projectId } }),
+    ]);
+    const ctx = { recommendationCount: recCount, deliverableCount: delCount };
+    const asJson = (v: unknown): Record<string, unknown> | null =>
+      v && typeof v === "object" ? (v as Record<string, unknown>) : null;
+    const gapsBefore = completionGaps(opts.stageCode, asJson(opts.specBefore), ctx);
+    const gapsAfter = completionGaps(opts.stageCode, asJson(after?.globalSpec), ctx);
+    const newlyMet = gapsBefore.filter((s) => !gapsAfter.includes(s));
+    return [...new Set([...newlyMet, ...touched])];
+  } catch {
+    return touched;
   }
 }
 
@@ -273,6 +305,7 @@ export async function runStageTurn(input: {
         snapshotSaved: false,
         truncated: finishReason === "length",
         recommendations: [],
+        changedSteps: [],
         usage: usage
           ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
           : null,
@@ -301,6 +334,14 @@ export async function runStageTurn(input: {
 
   const allRecommendations = [...persisted.recommendations, ...extra];
 
+  const changedSteps = await computeChangedSteps({
+    projectId: project.id,
+    projectStageId: projectStage.id,
+    stageCode: projectStage.stage.code,
+    specBefore: project.globalSpec,
+    result,
+  });
+
   return {
     reply: text,
     result,
@@ -309,6 +350,7 @@ export async function runStageTurn(input: {
     snapshotSaved: persisted.snapshotSaved,
     truncated: finishReason === "length",
     recommendations: allRecommendations,
+    changedSteps,
     usage: usage
       ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
       : null,
@@ -599,6 +641,7 @@ Rules:
         snapshotSaved: false,
         truncated: finishReason === "length",
         recommendations: [],
+        changedSteps: [],
         usage: usage
           ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
           : null,
@@ -626,6 +669,14 @@ Rules:
 
   const allRecommendations = [...persisted.recommendations, ...extra];
 
+  const changedSteps = await computeChangedSteps({
+    projectId: project.id,
+    projectStageId: projectStage.id,
+    stageCode: projectStage.stage.code,
+    specBefore: project.globalSpec,
+    result,
+  });
+
   return {
     reply: text,
     result,
@@ -634,6 +685,7 @@ Rules:
     snapshotSaved: persisted.snapshotSaved,
     truncated: finishReason === "length",
     recommendations: allRecommendations,
+    changedSteps,
     usage: usage
       ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
       : null,
