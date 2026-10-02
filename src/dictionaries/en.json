@@ -378,6 +378,7 @@
     "runNoLogs": "No logs yet.",
     "runLogs": "Build & run logs",
     "runOpenInNewTab": "Open in new tab",
+    "runEdgeRuntimeHint": "The generated app imports a Node-only module (e.g. node:crypto) in middleware, which runs on the Edge runtime. Use the Web Crypto API or move that logic to a route handler.",
     "runDemoAccount": "Demo account",
     "markFixed": "Mark as fixed",
     "unmarkFixed": "Unmark fixed",

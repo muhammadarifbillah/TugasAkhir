@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, Copy, ExternalLink, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
+import { AlertTriangle, Check, Copy, ExternalLink, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
@@ -31,6 +31,7 @@ export interface RunWorkspaceLabels {
   unsaved: string;
   confirmDiscard: string;
   openInNewTab: string;
+  edgeRuntimeHint: string;
 }
 
 interface RunWorkspaceProps {
@@ -254,6 +255,10 @@ export function RunWorkspace({
       ? url.replace("localhost", window.location.hostname || "localhost")
       : url;
 
+  // Surface the common Edge-runtime failure (a generated middleware importing a
+  // Node-only module) instead of leaving the user with a blank/error preview.
+  const edgeRuntimeIssue = /edge runtime does not support/i.test(logs);
+
   const preview = appUrl ? (
     <div className="flex h-full w-full justify-center overflow-auto bg-muted/40 p-2">
       <div style={{ width: DEVICE_WIDTH[device], maxWidth: "100%" }} className="h-full">
@@ -339,6 +344,12 @@ export function RunWorkspace({
           </Button>
         </div>
       </div>
+      {edgeRuntimeIssue && (
+        <div className="flex shrink-0 items-start gap-2 border-b border-warning/40 bg-warning/10 px-3 py-1.5 text-[11px] text-warning">
+          <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
+          <span>{labels.edgeRuntimeHint}</span>
+        </div>
+      )}
       <div className="min-h-0 flex-1">
         <CodeWorkspace
           variant="popup"

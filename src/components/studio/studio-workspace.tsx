@@ -3190,6 +3190,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             logs: dict.studio.runLogs,
             demoAccount: dict.studio.runDemoAccount,
             openInNewTab: dict.studio.runOpenInNewTab,
+            edgeRuntimeHint: dict.studio.runEdgeRuntimeHint,
             terminal: dict.studio.terminal,
             explorer: dict.studio.explorer,
             preview: dict.studio.preview,

@@ -378,6 +378,7 @@
     "runNoLogs": "Belum ada log.",
     "runLogs": "Log build & run",
     "runOpenInNewTab": "Buka di tab baru",
+    "runEdgeRuntimeHint": "App hasil generate mengimpor modul Node (mis. node:crypto) di middleware yang berjalan di Edge runtime. Gunakan Web Crypto atau pindahkan logika itu ke route handler.",
     "runDemoAccount": "Akun demo",
     "markFixed": "Tandai Fix",
     "unmarkFixed": "Batalkan Fix",
