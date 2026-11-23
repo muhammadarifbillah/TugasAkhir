@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Eye, FileText, Database, type LucideIcon } from "lucide-react";
 import { FullscreenViewer } from "./fullscreen-viewer";
 import { VisualCard } from "./visual-card";
@@ -26,11 +26,13 @@ interface StepResultDialogProps {
   maximized: boolean;
   onToggleMaximize: () => void;
   onFullscreenStateChange?: (open: boolean) => void;
+  labels?: { overview: string; visual: string; raw: string };
 }
 
 export function StepResultDialog({
-  title, overview, visual, visualCards, raw, maximized, onToggleMaximize, onFullscreenStateChange,
+  title, overview, visual, visualCards, raw, maximized, onToggleMaximize, onFullscreenStateChange, labels,
 }: StepResultDialogProps) {
+  const tabIdBase = useId();
   const [activeTab, setActiveTab] = useState<"overview" | "visual" | "raw">("overview");
   const [fullscreenCard, setFullscreenCard] = useState<VisualCardDef | null>(null);
 
@@ -39,9 +41,9 @@ export function StepResultDialog({
   }, [fullscreenCard, onFullscreenStateChange]);
 
   const tabs = [
-    { id: "overview" as const, label: "Overview", icon: FileText },
-    { id: "visual" as const, label: "Visual", icon: Eye },
-    { id: "raw" as const, label: "Raw Data", icon: Database },
+    { id: "overview" as const, label: labels?.overview ?? "Overview", icon: FileText },
+    { id: "visual" as const, label: labels?.visual ?? "Visual", icon: Eye },
+    { id: "raw" as const, label: labels?.raw ?? "Raw Data", icon: Database },
   ];
 
   return (
@@ -55,6 +57,8 @@ export function StepResultDialog({
               key={tab.id}
               type="button"
               role="tab"
+              id={`${tabIdBase}-tab-${tab.id}`}
+              aria-controls={`${tabIdBase}-panel`}
               aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
@@ -73,6 +77,8 @@ export function StepResultDialog({
       {/* Tab content */}
       <div
         role="tabpanel"
+        id={`${tabIdBase}-panel`}
+        aria-labelledby={`${tabIdBase}-tab-${activeTab}`}
         className="min-h-[200px] max-h-[70vh] overflow-y-auto p-3 sm:p-4"
       >
         {activeTab === "overview" && overview}

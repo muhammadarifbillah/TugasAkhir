@@ -26,7 +26,7 @@ export function VisualCard({
     >
       <Icon className={`w-7 h-7 sm:w-8 sm:h-8 ${iconColor} mb-2 shrink-0`} />
       <h4 className="font-semibold text-xs sm:text-sm leading-tight">{title}</h4>
-      <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-2">
+      <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-2">
         {description}
       </p>
     </button>

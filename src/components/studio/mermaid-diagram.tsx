@@ -22,7 +22,7 @@ export function MermaidDiagram({ code, id, variant = "inline" }: MermaidDiagramP
       mermaid.initialize({
         startOnLoad: false,
         securityLevel: "strict",
-        fontFamily: "var(--font-geist-sans)",
+        fontFamily: "var(--font-archivo)",
         theme,
         // On a parse failure we want a rejected promise (handled below) instead
         // of Mermaid injecting its own "Syntax error" graphic.

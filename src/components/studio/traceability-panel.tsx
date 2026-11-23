@@ -13,10 +13,10 @@ interface TraceRowData {
   status: string;
 }
 
-const STATUS_VARIANT: Record<string, "success" | "warning" | "secondary" | "danger"> = {
+const STATUS_VARIANT: Record<string, "success" | "warning" | "info" | "danger"> = {
   Implemented: "success",
   Partial: "warning",
-  Gap: "secondary",
+  Gap: "info",
   Issue: "danger",
 };
 
@@ -64,13 +64,13 @@ export function TraceabilityPanel({
           {rows.map((r) => (
             <div key={r.reqId} className="rounded-md border p-2">
               <div className="mb-1 flex items-center gap-1.5">
-                <span className="font-mono text-[10px] font-semibold">{r.reqId}</span>
+                <span className="font-mono text-[11px] font-semibold">{r.reqId}</span>
                 <Badge variant={STATUS_VARIANT[r.status] ?? "secondary"}>{r.status}</Badge>
-                <span className="ml-auto font-mono text-[10px] text-muted-foreground">{r.nist}</span>
+                <span className="ml-auto font-mono text-[11px] text-muted-foreground">{r.nist}</span>
               </div>
               <p className="text-[11px]">{r.text}</p>
               {r.iso.length > 0 && (
-                <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">{r.iso.join(", ")}</p>
+                <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">{r.iso.join(", ")}</p>
               )}
               {r.files.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
@@ -79,7 +79,7 @@ export function TraceabilityPanel({
                       key={file}
                       type="button"
                       onClick={() => onOpenFile?.(file)}
-                      className="truncate rounded border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                      className="truncate rounded border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground hover:border-primary/50 hover:text-foreground"
                     >
                       {file}
                     </button>

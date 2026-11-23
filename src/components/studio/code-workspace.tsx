@@ -39,6 +39,9 @@ export interface CodeWorkspaceProps {
   headerActions?: React.ReactNode;
   statusRight?: React.ReactNode;
   labels?: CodeWorkspaceLabels;
+  /** 1-based line to scroll to / place the cursor on in the active file. */
+  revealLine?: number | null;
+  revealKey?: number;
 }
 
 const MIN_TERMINAL = 96;
@@ -66,7 +69,10 @@ export function CodeWorkspace({
   headerActions,
   statusRight,
   labels,
+  revealLine,
+  revealKey,
 }: CodeWorkspaceProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const sortedFiles = useMemo(() => Object.keys(files).sort(), [files]);
   const hasPreview = preview !== undefined && preview !== null;
   const [view, setView] = useState<"preview" | "file">(hasPreview ? "preview" : "file");
@@ -90,6 +96,9 @@ export function CodeWorkspace({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "s") return;
+      // Only while focus is inside this workspace (editor, tabs, explorer), so a
+      // second mounted workspace or an unrelated input never triggers a save.
+      if (!rootRef.current?.contains(document.activeElement)) return;
       e.preventDefault();
       if (e.shiftKey) onSaveAll?.();
       else if (activeFile && dirty?.has(activeFile)) onSave?.(activeFile);
@@ -142,6 +151,8 @@ export function CodeWorkspace({
         readOnly={readOnly}
         onChange={readOnly ? undefined : (value) => onChange?.(activeFile, value)}
         loadingLabel={loadingLabel}
+        revealLine={revealLine}
+        revealKey={revealKey}
       />
     ) : (
       <div className="flex h-full items-center justify-center p-6 text-center text-xs text-muted-foreground">
@@ -155,7 +166,7 @@ export function CodeWorkspace({
     }`;
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <div ref={rootRef} className="flex h-full min-h-0 flex-col bg-background">
       {/* Tab bar */}
       <div className="flex items-center gap-1 overflow-x-auto border-b px-2 py-1.5">
         {hasPreview && (

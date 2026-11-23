@@ -516,7 +516,7 @@ export function DesignStudioDialog({
                 {loading && busyKind === "refine" ? <Loader2 className="size-3.5 animate-spin" /> : <Sparkles className="size-3.5" />}
                 {loading && busyKind === "refine" ? labels.refineBusy : labels.refine}
               </Button>
-              <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">{labels.refineHint}</p>
+              <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{labels.refineHint}</p>
             </div>
           )}
 
@@ -605,7 +605,7 @@ export function DesignStudioDialog({
                       }`}
                     >
                       <span className="truncate">{r.name}</span>
-                      <span className="font-mono text-[10px]">{r.pages.length}</span>
+                      <span className="font-mono text-[11px]">{r.pages.length}</span>
                     </button>
                   ))
                 )}

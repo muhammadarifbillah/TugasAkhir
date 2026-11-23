@@ -1,11 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { AlertTriangle, Check, Copy, ExternalLink, Loader2, Monitor, Play, Smartphone, Square, Tablet, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AlertTriangle, Check, Eraser, ExternalLink, Loader2, Monitor, Pause, Play, RotateCw, Search, Smartphone, Square, Tablet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CodeWorkspace } from "@/components/studio/code-workspace";
+import { CopyButton } from "@/components/ui/copy-button";
 import { useToast } from "@/components/ui/toast";
+import { fmt } from "@/lib/format";
+import { RUN_PHASES as PHASES, inferRunPhase, type RunPhase } from "@/lib/run-phase";
+import { cn } from "@/lib/utils";
 import { csrfFetch } from "@/lib/csrf-client";
 
 type RunStatus = "idle" | "starting" | "running" | "error" | "stopped";
@@ -33,7 +37,28 @@ export interface RunWorkspaceLabels {
   openInNewTab: string;
   edgeRuntimeHint: string;
   codeErrorHint: string;
+  phaseLabel: string;
+  phaseContainer: string;
+  phaseInstall: string;
+  phaseStart: string;
+  phaseReady: string;
+  logSearch: string;
+  logPause: string;
+  logResume: string;
+  logClear: string;
+  logMatches: string;
+  copy: string;
+  copied: string;
+  reload: string;
+  deviceDesktop: string;
+  deviceTablet: string;
+  deviceMobile: string;
+  appPreview: string;
+  close: string;
+  loadingEditor: string;
 }
+
+
 
 interface RunWorkspaceProps {
   projectId: string;
@@ -273,7 +298,7 @@ export function RunWorkspace({
         <iframe
           key={iframeKey}
           src={appUrl}
-          title="App preview"
+          title={labels.appPreview}
           className="h-full w-full rounded-md border bg-white"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
         />
@@ -292,16 +317,21 @@ export function RunWorkspace({
     </div>
   );
 
-  const terminal = (
-    <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed text-muted-foreground">
-      {logs || labels.noLogs}
-    </pre>
-  );
+  const terminal = <LogViewer logs={logs} labels={labels} />;
+  const phase = inferRunPhase(status, logs);
+  const phaseLabels: Record<RunPhase, string> = {
+    container: labels.phaseContainer,
+    install: labels.phaseInstall,
+    start: labels.phaseStart,
+    ready: labels.phaseReady,
+  };
 
   const deviceBtn = (size: DeviceSize, Icon: typeof Monitor, title: string) => (
     <button
       type="button"
       title={title}
+      aria-label={title}
+      aria-pressed={device === size}
       onClick={() => setDevice(size)}
       className={`flex size-7 items-center justify-center rounded-md ${device === size ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-muted"}`}
     >
@@ -320,13 +350,13 @@ export function RunWorkspace({
           {stats && <Badge variant="muted">{stats.replace("|", " · ")}</Badge>}
         </div>
         <div className="flex items-center gap-1.5">
-          {deviceBtn("desktop", Monitor, "Desktop")}
-          {deviceBtn("tablet", Tablet, "Tablet")}
-          {deviceBtn("mobile", Smartphone, "Mobile")}
+          {deviceBtn("desktop", Monitor, labels.deviceDesktop)}
+          {deviceBtn("tablet", Tablet, labels.deviceTablet)}
+          {deviceBtn("mobile", Smartphone, labels.deviceMobile)}
           {appUrl && (
             <>
               <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px]" onClick={() => setIframeKey((k) => k + 1)}>
-                Reload
+                <RotateCw className="size-3.5" /> {labels.reload}
               </Button>
               <a
                 href={appUrl}
@@ -347,11 +377,44 @@ export function RunWorkspace({
               <Play className="size-3.5" /> {labels.run}
             </Button>
           )}
-          <Button size="icon" variant="ghost" onClick={handleClose} aria-label="Close">
+          <Button size="icon" variant="ghost" onClick={handleClose} aria-label={labels.close} title={labels.close}>
             <X className="size-4" />
           </Button>
         </div>
       </div>
+      {status === "starting" && (
+        <ol
+          aria-label={labels.phaseLabel}
+          className="flex shrink-0 items-center gap-1 overflow-x-auto border-b px-3 py-1.5 text-[11px]"
+        >
+          {PHASES.map((p, i) => {
+            const idx = PHASES.indexOf(phase);
+            const done = i < idx;
+            const current = i === idx;
+            return (
+              <li
+                key={p}
+                aria-current={current ? "step" : undefined}
+                className={cn(
+                  "flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5",
+                  done && "text-success",
+                  current && "bg-primary/10 font-medium text-primary",
+                  !done && !current && "text-muted-foreground",
+                )}
+              >
+                {done ? (
+                  <Check className="size-3" />
+                ) : current ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <span className="size-1.5 rounded-full bg-current opacity-50" aria-hidden="true" />
+                )}
+                {phaseLabels[p]}
+              </li>
+            );
+          })}
+        </ol>
+      )}
       {logErrorHint && (
         <div className="flex shrink-0 items-start gap-2 border-b border-warning/40 bg-warning/10 px-3 py-1.5 text-[11px] text-warning">
           <AlertTriangle className="mt-0.5 size-3.5 shrink-0" />
@@ -372,9 +435,9 @@ export function RunWorkspace({
           preview={preview}
           terminal={terminal}
           terminalTitle={labels.logs}
-          demoPanel={demo.length > 0 ? <DemoAccountList accounts={demo} title={labels.demoAccount} /> : undefined}
+          demoPanel={demo.length > 0 ? <DemoAccountList accounts={demo} title={labels.demoAccount} labels={labels} /> : undefined}
           demoLabel={labels.demoAccount}
-          loadingLabel="Loading editor..."
+          loadingLabel={labels.loadingEditor}
           labels={{
             save: labels.save,
             saveAll: labels.saveAll,
@@ -395,13 +458,15 @@ export function RunWorkspace({
 function DemoAccountList({
   accounts,
   title,
+  labels,
 }: {
   accounts: { email: string; password?: string }[];
   title: string;
+  labels: { copy: string; copied: string };
 }) {
   return (
     <div className="space-y-2">
-      <p className="px-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <p className="px-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
         {title}
       </p>
       {accounts.map((a) => {
@@ -410,7 +475,7 @@ function DemoAccountList({
           <div key={a.email} className="rounded-md border bg-card p-2 text-[11px]">
             <div className="flex items-start justify-between gap-1">
               <span className="break-all font-mono text-foreground">{a.email}</span>
-              <CopyButton value={credential} />
+              <CopyButton value={credential} label={labels.copy} copiedLabel={labels.copied} />
             </div>
             {a.password && (
               <p className="mt-1 break-all font-mono text-muted-foreground">{a.password}</p>
@@ -422,25 +487,103 @@ function DemoAccountList({
   );
 }
 
-function CopyButton({ value }: { value: string }) {
-  const [copied, setCopied] = useState(false);
+const ERROR_LINE = /\b(error|failed|exception|fatal|ERR!|Traceback)\b/i;
+const WARN_LINE = /\b(warn|warning|deprecated)\b/i;
+
+/** Container log viewer: search, pausable auto-scroll, copy, clear, coloured lines. */
+function LogViewer({ logs, labels }: { logs: string; labels: RunWorkspaceLabels }) {
+  const [query, setQuery] = useState("");
+  const [paused, setPaused] = useState(false);
+  // Polling replaces the whole log tail, so "clear" remembers the last line seen
+  // and hides everything up to it instead of mutating the shared log state.
+  const [clearMarker, setClearMarker] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const allLines = useMemo(() => (logs ? logs.replace(/\n$/, "").split("\n") : []), [logs]);
+  const lines = useMemo(() => {
+    if (clearMarker === null) return allLines;
+    const at = allLines.lastIndexOf(clearMarker);
+    return at >= 0 ? allLines.slice(at + 1) : allLines;
+  }, [allLines, clearMarker]);
+  const onClear = () => setClearMarker(allLines[allLines.length - 1] ?? null);
+  const q = query.trim().toLowerCase();
+  const visible = useMemo(
+    () => (q ? lines.filter((l) => l.toLowerCase().includes(q)) : lines),
+    [lines, q],
+  );
+
+  useEffect(() => {
+    if (paused) return;
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [visible, paused]);
+
   return (
-    <button
-      type="button"
-      title="Copy"
-      aria-label="Copy"
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(value);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        } catch {
-          // clipboard unavailable
-        }
-      }}
-      className="shrink-0 rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-    >
-      {copied ? <Check className="size-3 text-success" /> : <Copy className="size-3" />}
-    </button>
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex shrink-0 items-center gap-1 border-b px-1 pb-1.5">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute start-1.5 top-1/2 size-3 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={labels.logSearch}
+            aria-label={labels.logSearch}
+            className="h-7 w-full rounded-md border border-input bg-background ps-6 pe-2 text-[11px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+          title={paused ? labels.logResume : labels.logPause}
+          aria-label={paused ? labels.logResume : labels.logPause}
+          className={cn(
+            "rounded p-1.5 hover:bg-muted",
+            paused ? "text-warning" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+        </button>
+        <CopyButton value={logs} label={labels.copy} copiedLabel={labels.copied} className="p-1.5" />
+        <button
+          type="button"
+          onClick={onClear}
+          title={labels.logClear}
+          aria-label={labels.logClear}
+          className="rounded p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <Eraser className="size-3.5" />
+        </button>
+      </div>
+      {q && (
+        <p className="shrink-0 px-1 pt-1 text-[11px] text-muted-foreground tabular-nums" aria-live="polite">
+          {fmt(labels.logMatches, { count: visible.length })}
+        </p>
+      )}
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto pt-1" role="log" aria-live="off">
+        {visible.length === 0 ? (
+          <p className="font-mono text-[11px] text-muted-foreground">{labels.noLogs}</p>
+        ) : (
+          <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-relaxed">
+            {visible.map((line, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "block",
+                  ERROR_LINE.test(line)
+                    ? "text-danger"
+                    : WARN_LINE.test(line)
+                      ? "text-warning"
+                      : "text-muted-foreground",
+                )}
+              >
+                {line || " "}
+              </span>
+            ))}
+          </pre>
+        )}
+      </div>
+    </div>
   );
 }
