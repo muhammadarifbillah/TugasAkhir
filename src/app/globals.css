@@ -10,81 +10,98 @@
 @custom-variant short (@media (max-height: 700px));
 
 /*
- * Brand palette: a single indigo/violet accent shared by light and dark so the
- * product feels consistent. Surfaces use a subtle cool tint instead of pure
- * grey, and dark mode is a deep indigo-slate rather than near-black so cards
- * and borders read as distinct layers.
+ * Brand palette: "tempered report" — flat surfaces and thin rules, in the cool
+ * grey of a compliance document rather than a tinted SaaS violet. Light is the
+ * default because the product is shown on projectors and printed; dark is the
+ * long-session studio mode. All text pairings tested >= 4.5:1.
  */
 :root {
   color-scheme: light;
 
-  --background: oklch(0.992 0.003 286);
-  --foreground: oklch(0.21 0.02 286);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.02 286);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.02 286);
+  --background: #f4f6f8;
+  --foreground: #15191e;
+  --card: #ffffff;
+  --card-foreground: #15191e;
+  --popover: #ffffff;
+  --popover-foreground: #15191e;
 
-  --primary: oklch(0.55 0.222 275);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.968 0.007 286);
-  --secondary-foreground: oklch(0.26 0.02 286);
-  --muted: oklch(0.968 0.007 286);
-  --muted-foreground: oklch(0.53 0.02 286);
-  --accent: oklch(0.958 0.012 286);
-  --accent-foreground: oklch(0.26 0.02 286);
+  --primary: #2f5e9e;
+  --primary-foreground: #ffffff;
+  --secondary: #e9edf1;
+  --secondary-foreground: #15191e;
+  --muted: #e9edf1;
+  --muted-foreground: #5b6470;
+  --accent: #e3e8ee;
+  --accent-foreground: #15191e;
 
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-foreground: #ffffff;
   --success: oklch(0.596 0.145 163.225);
+  --success-foreground: #ffffff;
   --warning: oklch(0.769 0.16 70.08);
   --danger: oklch(0.637 0.237 25.331);
+  /* Informational / low severity: never green, so "low" never reads as "safe". */
+  --info: oklch(0.58 0.14 240);
 
-  --accent-2: oklch(0.7 0.13 205);
+  /*
+   * Forge ramp: the five Secure SDLC stages, straw -> bronze -> violet -> blue
+   * -> grey, as steel changes colour while it is tempered. Kept apart from the
+   * status colours above so a stage never reads as a warning.
+   */
+  --stage-1: #8a6812;
+  --stage-2: #a5662f;
+  --stage-3: #6e4a93;
+  --stage-4: #2f5e9e;
+  --stage-5: #5e6f80;
 
-  --border: oklch(0.922 0.006 286);
-  --input: oklch(0.922 0.006 286);
-  --ring: oklch(0.55 0.222 275);
+  --border: #d5dbe2;
+  --input: #8a94a0;
+  --ring: #2f5e9e;
 
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 
-  --shadow-color: 275 40% 30%;
-  --motif-opacity: 0.55;
+  --shadow-color: 215 25% 20%;
 }
 
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.16 0.014 275);
-  --foreground: oklch(0.97 0.005 286);
-  --card: oklch(0.2 0.016 275);
-  --card-foreground: oklch(0.97 0.005 286);
-  --popover: oklch(0.2 0.016 275);
-  --popover-foreground: oklch(0.97 0.005 286);
+  --background: #1e2227;
+  --foreground: #e7eaee;
+  --card: #272c33;
+  --card-foreground: #e7eaee;
+  --popover: #272c33;
+  --popover-foreground: #e7eaee;
 
-  --primary: oklch(0.68 0.19 275);
-  --primary-foreground: oklch(0.16 0.014 275);
-  --secondary: oklch(0.25 0.018 275);
-  --secondary-foreground: oklch(0.97 0.005 286);
-  --muted: oklch(0.25 0.018 275);
-  --muted-foreground: oklch(0.73 0.02 286);
-  --accent: oklch(0.27 0.022 275);
-  --accent-foreground: oklch(0.97 0.005 286);
+  --primary: #7fa6dc;
+  --primary-foreground: #1e2227;
+  --secondary: #2f353d;
+  --secondary-foreground: #e7eaee;
+  --muted: #2f353d;
+  --muted-foreground: #a3acb7;
+  --accent: #323942;
+  --accent-foreground: #e7eaee;
 
   --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.16 0.014 275);
+  --destructive-foreground: #1e2227;
   --success: oklch(0.7 0.16 162.48);
+  --success-foreground: #1e2227;
   --warning: oklch(0.82 0.14 75);
   --danger: oklch(0.704 0.191 22.216);
+  --info: oklch(0.74 0.12 235);
 
-  --accent-2: oklch(0.78 0.12 200);
+  /* Lifted for dark surfaces; still >= 4.5:1 on --card. */
+  --stage-1: #d9b45e;
+  --stage-2: #d08a4e;
+  --stage-3: #b394db;
+  --stage-4: #86ace0;
+  --stage-5: #9cadbd;
 
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.68 0.19 275);
+  --border: #3a414a;
+  --input: #6b7683;
+  --ring: #7fa6dc;
 
-  --shadow-color: 275 60% 4%;
-  --motif-opacity: 0.4;
+  --shadow-color: 215 30% 4%;
 }
 
 @theme inline {
@@ -105,13 +122,19 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
-  --color-accent-2: var(--accent-2);
+  --color-info: var(--info);
+  --color-stage-1: var(--stage-1);
+  --color-stage-2: var(--stage-2);
+  --color-stage-3: var(--stage-3);
+  --color-stage-4: var(--stage-4);
+  --color-stage-5: var(--stage-5);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -119,58 +142,47 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-* {
-  border-color: var(--border);
+/* Tailwind ships no default border colour, so give every border the theme's
+ * hairline. It lives in `base` (not unlayered) so `border-*` utilities can
+ * still override it — an unlayered rule silently beat every one of them. */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
 }
 
 html {
   -webkit-tap-highlight-color: transparent;
 }
 
-/*
- * Lightweight, asset-free background motif: a faint dot grid that fades out
- * toward the bottom, layered under two soft radial glows (brand indigo +
- * secondary cyan). Pure CSS, static, and fixed so it stays cheap on scroll.
- */
 body {
   background-color: var(--background);
-  background-image:
-    linear-gradient(to bottom, transparent 0%, var(--background) 62%),
-    radial-gradient(circle, color-mix(in oklab, var(--foreground) 12%, transparent) 1px, transparent 1.5px),
-    radial-gradient(1100px 560px at 100% -12%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
-    radial-gradient(900px 520px at -12% 4%, color-mix(in oklab, var(--accent-2) 9%, transparent), transparent 55%);
-  background-size: 100% 100%, 22px 22px, 100% 100%, 100% 100%;
-  background-repeat: no-repeat, repeat, no-repeat, no-repeat;
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Bounded dot motif for hero/panel decoration. */
-.motif-dots {
-  background-image: radial-gradient(
-    color-mix(in oklab, var(--foreground) 16%, transparent) 1px,
-    transparent 1.5px
-  );
-  background-size: 20px 20px;
-  -webkit-mask-image: radial-gradient(70% 60% at 50% 0%, black, transparent 75%);
-  mask-image: radial-gradient(70% 60% at 50% 0%, black, transparent 75%);
+/*
+ * Display voice: Archivo's expanded width, stamped-plate weight. Used for page
+ * headings only — body copy stays at the normal width so long text stays
+ * readable.
+ */
+.display-type {
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.022em;
+  line-height: 1.04;
 }
 
-.text-gradient {
-  background-image: linear-gradient(115deg, var(--primary), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Hairline brand accent (e.g. under the app header). */
-.accent-line {
+/* Signature hairline: the five stage colours as a single 1px rule. */
+.stage-ramp {
   background-image: linear-gradient(
     90deg,
-    color-mix(in oklab, var(--primary) 70%, transparent),
-    color-mix(in oklab, var(--accent-2) 60%, transparent),
-    transparent
+    var(--stage-1) 0 20%,
+    var(--stage-2) 20% 40%,
+    var(--stage-3) 40% 60%,
+    var(--stage-4) 60% 80%,
+    var(--stage-5) 80% 100%
   );
 }
 
@@ -212,19 +224,11 @@ body {
   display: none;
 }
 
-/* Soft elevated card used by panels/dialogs on top of the tinted background */
+/* Soft elevated card used by panels/dialogs on top of the flat background */
 .card-elevated {
   box-shadow:
-    0 1px 2px -1px hsl(var(--shadow-color) / 0.12),
-    0 8px 24px -12px hsl(var(--shadow-color) / 0.18);
-}
-
-.brand-gradient {
-  background-image: linear-gradient(
-    135deg,
-    color-mix(in oklab, var(--primary) 92%, white),
-    color-mix(in oklab, var(--primary) 70%, black)
-  );
+    0 1px 2px hsl(var(--shadow-color) / 0.08),
+    0 12px 28px -22px hsl(var(--shadow-color) / 0.35);
 }
 
 @keyframes slide-in {
