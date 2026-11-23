@@ -9,7 +9,7 @@ interface EmptyStateProps extends HTMLAttributes<HTMLDivElement> {
   action?: React.ReactNode;
 }
 
-/** Consistent empty state: soft motif, icon chip, copy and an optional CTA. */
+/** Consistent empty state: icon chip, copy and an optional CTA. */
 export function EmptyState({
   icon: Icon,
   title,
@@ -26,7 +26,6 @@ export function EmptyState({
       )}
       {...props}
     >
-      <div className="motif-dots pointer-events-none absolute inset-0 -z-10 opacity-60" aria-hidden="true" />
       {Icon && (
         <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Icon className="size-5" aria-hidden="true" />

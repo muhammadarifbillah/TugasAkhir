@@ -95,7 +95,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     success: { Icon: CheckCircle, accent: "text-success", border: "border-success/40" },
     error: { Icon: XCircle, accent: "text-danger", border: "border-danger/40" },
     warning: { Icon: AlertTriangle, accent: "text-warning", border: "border-warning/40" },
-    info: { Icon: Info, accent: "text-accent-2", border: "border-accent-2/40" },
+    info: { Icon: Info, accent: "text-info", border: "border-info/40" },
   };
   const { Icon, accent, border } = styles[toast.type];
 
