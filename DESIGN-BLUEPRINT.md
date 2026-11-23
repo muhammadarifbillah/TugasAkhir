@@ -208,12 +208,20 @@ Mono: Geist_Mono, ui-monospace, monospace
 ```
 
 **Spesifikasi:**
-- Container: `flex h-[calc(100svh-3.5rem)]`
-- Grid: `grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12`
-- Left: `lg:col-span-3` — Sub-steps + Deliverables
-- Center: `lg:col-span-6` — AI Chat + Code Editor
-- Right: `lg:col-span-3` — Security & Compliance
+- Container: `flex md:h-[calc(100dvh-3.5rem)]`
+- Grid: `grid grid-cols-1 md:grid-cols-12`
+- Left: `md:col-span-4 lg:col-span-3` — Sub-steps (current step highlighted, `aria-current="step"`) + Deliverables
+- Center: `md:col-span-8 lg:col-span-6` — tablist **Results & editor / Chat** (both panels stay mounted so Monaco keeps its state) + a composer that is always visible
+- Right: `lg:col-span-3` — Security & Compliance with tabs **Score / Findings / Compliance / Traceability** (Traceability only in testing & handover)
 - Mobile: Tab switching (Navigate/Chat/Security)
+
+**Next Action Bar** (under the stepper, `next-action-bar.tsx`): shows the current sub-step + the list of remaining gaps (chip → opens the step result) + an "Ask AI" button that fills in the composer. When every requirement is met it shows a **Complete Stage** button → ConfirmDialog → toast → `router.push` to the next stage. Once the stage is completed it shows a link to the next stage.
+
+**Security Score**: the score comes from `scoreInfo` (server) with a trust badge: *Verified by scanner* / *AI-generated* / *Stale* (the code changed after the last scan).
+
+**Errors**: shown as `InlineAlert`s per area (`chat`, `stage`, `files`, `findings`) next to the control that triggered them. A failed prompt goes back into the composer.
+
+**Confirmation**: completing a stage, deleting the database and restoring a snapshot all go through `ConfirmDialog`.
 
 ### 2.4 Settings Page
 
@@ -447,9 +455,9 @@ Content: max-h-[60vh] overflow-y-auto p-4
 │ ☐ PS.1.1 Secure Coding             │
 │                                     │
 │ ISO Mapping                         │
-│ ☑ A.5.1.1 policies                 │
-│ ☑ A.8.2.1 information classify     │
-│ ☐ A.8.3.1 information access       │
+│ ☑ A.5.1 policies                   │
+│ ☑ A.8.2 information classify       │
+│ ☐ A.8.3 information access         │
 └─────────────────────────────────────┘
 
 Progress: color coded (green >=85, amber >=60, red <60)
@@ -496,11 +504,12 @@ Severity colors:
 Desktop (lg+):           Tablet (md):            Mobile (<md):
 ┌────┬────────┬────┐    ┌──────┬────────┐      ┌──────────┐
 │Left│ Center │Rght│    │ Left │ Center │      │ [Navigate]│
-│3/12│ 6/12   │3/12│    │2/6   │ 4/6    │      │ [Chat]    │
+│3/12│ 6/12   │3/12│    │4/12  │ 8/12   │      │ [Chat]    │
 │    │        │    │    │      │        │      │ [Security] │
 └────┴────────┴────┘    └──────┴────────┘      └──────────┘
-                                              Content switches
-                                              per active tab
+                        Security = drawer      Content switches
+                        on the right (button   per active tab
+                        in the header, Esc/backdrop closes it)
 ```
 
 ### 4.3 Mobile Tab Bar
@@ -657,8 +666,11 @@ focus-visible:ring-offset-2
 - Tab order follows visual layout
 - Enter/Space activates buttons
 - Escape closes dialogs
-- Arrow keys navigate menus
+- Arrow keys navigate menus, tablists and the Plan/Build radiogroup (roving tabindex, Home/End)
 - Ctrl+Enter sends chat
+- Ctrl/Cmd+K opens the command palette (stages, sub-steps, panels, actions)
+- Alt+1..5 switches to that stage (if it is not locked)
+- Ctrl/Cmd+Shift+Enter approves & builds the active plan
 
 ### 8.3 Screen Reader
 
