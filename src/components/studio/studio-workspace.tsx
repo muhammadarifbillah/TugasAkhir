@@ -1086,7 +1086,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   return (
     <div className="flex h-auto min-h-0 flex-col md:h-[calc(100dvh-3.5rem)]">
       {/* Top bar + stepper + next action */}
-      <div className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+      <div className="sticky top-0 z-30 border-b bg-background">
         <div className="flex flex-col gap-2 px-4 py-2 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
           <div className="flex min-w-0 items-center gap-2 text-sm">
             <Link href={`/${lang}/dashboard`} className="shrink-0 text-muted-foreground hover:text-foreground">

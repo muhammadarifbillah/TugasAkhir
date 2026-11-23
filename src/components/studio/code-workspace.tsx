@@ -255,7 +255,7 @@ export function CodeWorkspace({
                 className="h-1 shrink-0 cursor-row-resize bg-border/60 hover:bg-primary/50"
               />
               <div style={{ height: terminalHeight }} className="shrink-0 overflow-auto border-t bg-muted/30">
-                <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground backdrop-blur">
+                <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   <span>{terminalTitle ?? labels?.terminal ?? "Terminal"}</span>
                   <button type="button" onClick={() => setTerminalOpen(false)} aria-label="Hide terminal">
                     <ChevronDown className="size-3.5" />
