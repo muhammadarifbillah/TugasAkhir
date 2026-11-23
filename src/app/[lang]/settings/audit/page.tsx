@@ -63,16 +63,16 @@ export default async function AuditPage({ params }: AuditPageProps) {
                   {logs.map((log) => (
                     <tr key={log.id} className="border-b last:border-0 odd:bg-muted/20">
                       <td className="py-2 pr-3">
-                        <Badge variant="secondary" className="font-mono text-[10px]">
+                        <Badge variant="secondary" className="font-mono text-[11px]">
                           {log.action}
                         </Badge>
                       </td>
                       <td className="max-w-[280px] py-2 pr-3">
-                        <span className="line-clamp-1 font-mono text-[10px] text-muted-foreground">
+                        <span className="line-clamp-1 font-mono text-[11px] text-muted-foreground">
                           {log.details ? JSON.stringify(log.details) : "—"}
                         </span>
                       </td>
-                      <td className="py-2 pr-3 font-mono text-[10px] text-muted-foreground">
+                      <td className="py-2 pr-3 font-mono text-[11px] text-muted-foreground">
                         {log.ipAddress ?? "—"}
                       </td>
                       <td className="whitespace-nowrap py-2 text-muted-foreground">

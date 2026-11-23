@@ -7,6 +7,7 @@ import { rateLimited } from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import { scanProjectArtifacts } from "@/lib/scanner/run";
 import { severityCounts } from "@/lib/scanner/score";
+import { artifactsFingerprint } from "@/lib/project-stats";
 
 interface RouteProps {
   params: Promise<{ id: string }>;
@@ -93,6 +94,7 @@ export async function POST(request: Request, { params }: RouteProps) {
         counts,
         findingCount: report.findings.length,
         durationMs: report.durationMs,
+        codeFingerprint: artifactsFingerprint(codeArtifacts),
       },
     },
   };

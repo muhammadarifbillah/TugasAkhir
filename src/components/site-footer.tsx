@@ -10,7 +10,7 @@ export function SiteFooter({ label }: { label: string }) {
   const pathname = usePathname();
   if (pathname?.includes("/studio/")) return null;
   return (
-    <footer className="border-t px-4 py-6 text-center text-xs text-muted-foreground">
+    <footer className="mt-auto border-t px-4 py-6 text-center text-xs text-muted-foreground">
       {label}
     </footer>
   );

@@ -170,7 +170,7 @@ export default async function SettingsPage({ params }: SettingsProps) {
                           style={{ height: `${height}%` }}
                         />
                       </div>
-                      <span className="mt-1 text-[9px] text-muted-foreground">{label}</span>
+                      <span className="mt-1 text-[11px] text-muted-foreground">{label}</span>
                     </div>
                   );
                 })}

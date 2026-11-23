@@ -552,7 +552,7 @@ export function ByokManager({
                             <SelectItem key={m.id} value={m.id}>
                               {m.name}
                               {m.maxTokens && (
-                                <span className="ml-1 text-[10px] text-muted-foreground">
+                                <span className="ml-1 text-[11px] text-muted-foreground">
                                   ({m.maxTokens.toLocaleString()} tokens)
                                 </span>
                               )}

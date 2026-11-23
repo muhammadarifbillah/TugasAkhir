@@ -6,7 +6,7 @@ import { getDictionary, type Locale } from "@/lib/i18n";
 import { STAGE_DEFINITIONS, completionGaps } from "@/lib/stages";
 import { effectiveDesignPlan } from "@/lib/design";
 import { extractJson, planResultSchema, type PlanResult } from "@/lib/ai/result";
-import { decryptSecret } from "@/lib/crypto";
+import { getScoreInfo } from "@/lib/project-stats";
 
 interface StudioPageProps {
   params: Promise<{ lang: string; projectId: string; stage: string }>;
@@ -90,12 +90,8 @@ export default async function StudioPage(props: StudioPageProps) {
     select: { id: true, version: true, diffSummary: true, createdAt: true, codeArtifacts: true },
   });
 
-  const rawScore =
-    typeof testing?.scanScore === "number" ? testing.scanScore : testing?.securityScore;
-  const securityScore =
-    typeof rawScore === "number"
-      ? Math.max(0, Math.min(100, Math.round(rawScore)))
-      : null;
+  const scoreInfo = getScoreInfo(project.globalSpec);
+
 
   const deliverableCount = await prisma.deliverable.count({ where: { projectId } });
 
@@ -119,17 +115,13 @@ export default async function StudioPage(props: StudioPageProps) {
         finalizedAt: project.finalizedAt ? project.finalizedAt.toISOString() : null,
         database: (() => {
           const db = project.database as Record<string, unknown> | null;
+          // The connection URL (with credentials) is never sent to the client.
           if (!db || typeof db.urlEncrypted !== "string") return null;
-          try {
-            return {
-              service: String(db.service ?? ""),
-              hostPort: Number(db.hostPort ?? 0),
-              status: String(db.status ?? "ready"),
-              url: decryptSecret(Uint8Array.from(Buffer.from(db.urlEncrypted, "base64"))),
-            };
-          } catch {
-            return null;
-          }
+          return {
+            service: String(db.service ?? ""),
+            hostPort: Number(db.hostPort ?? 0),
+            status: String(db.status ?? "ready"),
+          };
         })(),
       }}
       stage={{
@@ -149,10 +141,9 @@ export default async function StudioPage(props: StudioPageProps) {
         projectStageId: current.id,
       }}
       completionGaps={stageGaps}
-      nextStageName={(() => {
-        const next = stages.find((ps) => ps.stage.orderIndex === stageDef.orderIndex + 1);
-        return next?.stage.name ?? null;
-      })()}
+      nextStageCode={
+        stages.find((ps) => ps.stage.orderIndex === stageDef.orderIndex + 1)?.stage.code ?? null
+      }
       stages={stages.map((ps) => ({
         code: ps.stage.code,
         name: ps.stage.name,
@@ -185,7 +176,7 @@ export default async function StudioPage(props: StudioPageProps) {
           : null,
       }))}
       codeArtifacts={codeArtifacts}
-      securityScore={securityScore}
+      scoreInfo={scoreInfo}
       latestRevision={
         project.revisions.find((r) => r.status === "in_progress") ?? project.revisions[0] ?? null
       }

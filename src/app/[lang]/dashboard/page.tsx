@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
-import { getProjectScore, getProjectStack, getStageProgress } from "@/lib/project-stats";
+import { getActiveStageCode, getProjectStack, getScoreInfo, getStageProgress } from "@/lib/project-stats";
 
 interface DashboardProps {
   params: Promise<{ lang: string }>;
@@ -22,7 +22,7 @@ export default async function DashboardPage({ params }: DashboardProps) {
   const projects = await prisma.project.findMany({
     where: { userId: session.user.id },
     include: {
-      projectStages: true,
+      projectStages: { include: { stage: { select: { code: true, orderIndex: true } } } },
       revisions: { select: { id: true } },
     },
     orderBy: { updatedAt: "desc" },
@@ -35,7 +35,14 @@ export default async function DashboardPage({ params }: DashboardProps) {
     status: p.status,
     version: p.currentVersion,
     stack: getProjectStack(p),
-    score: getProjectScore(p),
+    ...(() => {
+      const info = getScoreInfo(p.globalSpec);
+      return { score: info.score, scoreSource: info.source, scoreStale: info.stale };
+    })(),
+    activeStage:
+      getActiveStageCode(
+        p.projectStages.map((ps) => ({ status: ps.status, code: ps.stage.code, orderIndex: ps.stage.orderIndex })),
+      ) ?? "analysis",
     stageProgress: getStageProgress(p),
     revisionCount: p.revisions.length,
     updatedAt: p.updatedAt.toISOString(),

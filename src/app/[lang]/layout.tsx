@@ -9,12 +9,14 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { getDictionary, isLocale, locales } from "@/lib/i18n";
 import "../globals.css";
 
-// Self-hosted Geist (latin subset) so the app does not depend on Google Fonts
-// at build/runtime and works fully offline.
-const geistSans = localFont({
-  src: "../fonts/Geist.woff2",
-  variable: "--font-geist-sans",
+// Self-hosted Archivo (latin subset, weight 100-900 + width 62-125%) so the app
+// does not depend on Google Fonts at build/runtime and works fully offline.
+const archivoSans = localFont({
+  src: "../fonts/Archivo.woff2",
+  variable: "--font-archivo",
+  weight: "100 900",
   display: "swap",
+  declarations: [{ prop: "font-stretch", value: "62% 125%" }],
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
@@ -82,7 +84,7 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
       lang={lang}
       dir="ltr"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${archivoSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <a
@@ -96,10 +98,12 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
           <div className="flex h-svh flex-col overflow-hidden">
             <OfflineBanner label={dict.app.offline} />
             <Header lang={lang} />
-            <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
-            <SiteFooter
-              label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
-            />
+            <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              {children}
+              <SiteFooter
+                label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
+              />
+            </main>
           </div>
         </ThemeProvider>
       </body>

@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import type { Dictionary } from "@/lib/i18n";
 import { csrfFetch } from "@/lib/csrf-client";
-import { scoreColorClass } from "@/lib/project-stats";
+import { scoreBgClass, scoreColorClass } from "@/lib/project-stats";
 
 export interface ProjectCardData {
   id: string;
@@ -29,6 +29,9 @@ export interface ProjectCardData {
   version: string;
   stack: string;
   score: number | null;
+  scoreSource: "scanner" | "ai" | null;
+  scoreStale: boolean;
+  activeStage: string;
   stageProgress: { completed: number; total: number };
   revisionCount: number;
   updatedAt: string;
@@ -213,24 +216,23 @@ export function ProjectList({
 
                   <div className="flex items-center gap-2 text-xs">
                     <ShieldCheck className={`size-4 ${scoreColorClass(p.score)}`} />
-                    <span className={scoreColorClass(p.score)}>
+                    <span className={`tabular-nums ${scoreColorClass(p.score)}`}>
                       {p.score != null
                         ? `${dict.dashboard.securityScore}: ${p.score}%`
                         : `${dict.dashboard.securityScore}: ${dict.studio.notScored}`}
                     </span>
+                    {p.scoreSource && (
+                      <Badge variant={p.scoreSource === "scanner" ? "success" : "info"}>
+                        {p.scoreSource === "scanner" ? dict.workspace.trustVerified : dict.workspace.trustAi}
+                      </Badge>
+                    )}
+                    {p.scoreStale && <Badge variant="warning">{dict.workspace.trustStale}</Badge>}
                   </div>
                   <Progress
                     value={p.score ?? 0}
                     aria-label={`${dict.dashboard.securityScore}: ${p.score ?? 0}%`}
-                    indicatorClassName={
-                      p.score == null
-                        ? "bg-muted"
-                        : p.score >= 85
-                          ? "bg-success"
-                          : p.score >= 60
-                            ? "bg-warning"
-                            : "bg-danger"
-                    }
+                    indicatorClassName={scoreBgClass(p.score)}
+
                   />
 
                   <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
@@ -246,7 +248,7 @@ export function ProjectList({
                         ))}
                       </div>
                       <span className="text-[11px] text-muted-foreground">
-                        {dict.dashboard.stageLabel} {p.stageProgress.completed}/{p.stageProgress.total}
+                        {dict.dashboard.stageLabel} <span className="tabular-nums">{p.stageProgress.completed}/{p.stageProgress.total}</span>
                       </span>
                     </div>
                     <div className="flex gap-2">
@@ -257,7 +259,7 @@ export function ProjectList({
                         </Button>
                       )}
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/${lang}/studio/${p.id}/analysis`}>
+                        <Link href={`/${lang}/studio/${p.id}/${p.activeStage}`}>
                           {dict.dashboard.openStudio} <ArrowRight className="size-3" />
                         </Link>
                       </Button>

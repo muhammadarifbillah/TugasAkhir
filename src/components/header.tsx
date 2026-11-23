@@ -15,12 +15,12 @@ export async function Header({ lang }: { lang: Locale }) {
   const dict = await getDictionary(lang);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
-      <div className="accent-line h-px w-full" aria-hidden="true" />
+    <header className="sticky top-0 z-40 border-b bg-background">
+      <div className="stage-ramp h-px w-full" aria-hidden="true" />
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-2 px-4 sm:gap-4">
         <div className="flex items-center gap-4 sm:gap-6">
           <Link href={`/${lang}`} className="flex items-center gap-2 font-semibold">
-            <span className="brand-gradient flex size-7 items-center justify-center rounded-md text-primary-foreground shadow-sm">
+            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
               <ShieldCheck className="size-4" />
             </span>
             <span className="text-sm">{dict.app.name}</span>
@@ -75,7 +75,7 @@ export async function Header({ lang }: { lang: Locale }) {
             />
           ) : (
             <Button asChild size="sm">
-              <Link href={`/${lang}/login`}>{dict.auth.signInWithGithub}</Link>
+              <Link href={`/${lang}/login`}>{dict.auth.signInLink}</Link>
             </Button>
           )}
         </div>
@@ -87,7 +87,7 @@ export async function Header({ lang }: { lang: Locale }) {
             dashboard: dict.nav.dashboard,
             settings: dict.nav.settings,
             signOut: dict.nav.signOut,
-            signIn: dict.auth.signInWithGithub,
+            signIn: dict.auth.signInLink,
             user: dict.auth.user,
             toggleTheme: dict.settings.toggleTheme,
             language: dict.settings.language,

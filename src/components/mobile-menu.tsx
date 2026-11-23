@@ -141,7 +141,7 @@ export function MobileMenu({
                         referrerPolicy="no-referrer"
                       />
                     ) : (
-                      <span className="flex size-6 items-center justify-center rounded-full bg-primary/15 text-[10px] font-bold text-primary">
+                      <span className="flex size-6 items-center justify-center rounded-full bg-primary/15 text-[11px] font-bold text-primary">
                         {(userName ?? userEmail ?? "U").slice(0, 1).toUpperCase()}
                       </span>
                     )}
