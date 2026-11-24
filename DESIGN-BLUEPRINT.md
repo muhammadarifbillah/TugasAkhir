@@ -109,17 +109,12 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
-│  │ 🔄 5-Stage   │ │ 🔒 ISO 27001 │ │ 🔑 Bring     │     │
-│  │ Secure SDLC  │ │ Crosswalk    │ │ Your Own Key │     │
-│  └──────────────┘ └──────────────┘ └──────────────┘     │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
-│  │ 🐙 GitHub    │ │ 💬 Prompt-   │ │ 🛡️ Secure by  │     │
-│  │ Native       │ │ Driven       │ │ Design       │     │
-│  └──────────────┘ └──────────────┘ └──────────────┘     │
+│  🔄 5-Stage Secure SDLC       🔒 ISO 27001 Crosswalk    │
+│  🔑 Bring Your Own Key        🐙 GitHub Native          │
+│  💬 Prompt-Driven             🛡️ Secure by Design      │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
-│ FOOTER: ShieldForge — AI-powered secure website generator. NIST SP 800-218 engine → ISO 27001:2022 crosswalk (concept). │
+│ FOOTER: ShieldForge — AI-powered secure website generator. NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept). │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -127,7 +122,7 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 - Container: `max-w-6xl px-4 py-14 md:py-20`
 - Hero: rata kiri di grid, H1 `text-4xl md:text-5xl` dengan kelas `display-type`
 - CTA: dua `Button size="lg"` tanpa ikon: "Start a project" dan "See the control mapping"
-- Features: `grid gap-x-12 gap-y-7 sm:grid-cols-2`
+- Features: enam butir daftar ber-ikon (bukan kartu), `grid gap-x-12 gap-y-7 sm:grid-cols-2`
 
 ### 2.2 Dashboard
 
@@ -225,7 +220,7 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 │  Manage your account and AI configuration               │
 │                                                         │
 │  ┌─────────────────┐ ┌─────────────────┐               │
-│  │ 🐙 GitHub       │ │ 📊 Token Usage  │               │
+│  │ 🐙 GitHub       │ │ 📊 Token usage  │               │
 │  │ Connected: @user│ │ Prompts: 1,234  │               │
 │  │ [Disconnect]    │ │ Tokens: 45,678  │               │
 │  └─────────────────┘ └─────────────────┘               │
@@ -308,10 +303,10 @@ Right: [Locale] [Theme] [Avatar Pill] [Logout]
 │                                     │
 │ [React] [Node] [v1.0]              │
 │                                     │
-│ 🔒 Security score: 72%               │
+│ 🔒 Security Score: 72%               │
 │ ████████░░░░░░░░░░░░ (72%)          │
 │                                     │
-│ Stage: Analysis  [Revise] [Open]    │
+│ Stage 3/5    [Revise] [Open Studio] │
 └─────────────────────────────────────┘
 
 Border: rounded-xl border
@@ -322,17 +317,17 @@ Padding: CardHeader p-6 + CardContent p-6 pt-0
 ### 3.3 Stage Stepper
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│ 1. Analysis & Requirements > 2. Design & Architecture > 3. Secure Development > 4. Security Testing & Audit > 5. Handover & Deliverables │
-├─────────────────────────────────────────────────────────┤
-│ States:                                                 │
-│ - Active: bg-primary text-primary-foreground            │
-│ - Completed: text-success + CheckCircle2 icon           │
-│ - Locked: text-muted-foreground/50 + Lock icon          │
-│ - Default: text-muted-foreground hover:bg-accent        │
-│                                                         │
-│ Scroll: overflow-x-auto scrollbar-none                  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ 1. Analysis & Requirements  2. Design & Architecture  3. Secure Development  4. Security Testing & Audit  5. Handover & Deliverables │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ States:                                                                                                                              │
+│ - Active: bg-primary text-primary-foreground                                                                                         │
+│ - Completed: text-success + CheckCircle2 icon                                                                                        │
+│ - Locked: text-muted-foreground/50 + Lock icon                                                                                       │
+│ - Default: text-muted-foreground hover:bg-accent                                                                                     │
+│                                                                                                                                      │
+│ Scroll: overflow-x-auto scrollbar-none                                                                                               │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.4 Chat Interface
@@ -430,26 +425,29 @@ Content: max-h-[70vh] overflow-y-auto p-3 sm:p-4
 ### 3.7 Security Score Panel
 
 ```
-┌─────────────────────────────────────┐
-│ Security Score                      │
-│ ┌─────────────────────────────────┐ │
-│ │ Score: 72/100                   │ │
-│ │ ████████░░░░░░░░░░░░ (72%)     │ │
-│ └─────────────────────────────────┘ │
-│                                     │
-│ Stage Security Parameters           │
-│ [PO.1.1] [PW.1.1] [PS.1.1]        │
-│                                     │
-│ NIST Checks                         │
-│ ☑ PO.1.1 Define Security Req       │
-│ ☑ PW.1.1 Design Review             │
-│ ☐ PS.1.1 Secure Coding             │
-│                                     │
-│ ISO Mapping                         │
-│ ☑ A.5.1 policies                   │
-│ ☑ A.8.2 information classify       │
-│ ☐ A.8.3 information access         │
-└─────────────────────────────────────┘
+Tab "Score":
+┌─────────────────────────────────────────┐
+│ Security Score                [72 / 100]│
+│ ████████░░░░░░░░░░░░                    │
+│ [Verified by scanner]                   │
+└─────────────────────────────────────────┘
+
+Tab "Compliance":
+┌─────────────────────────────────────────┐
+│ Stage Security Parameters               │
+│ [PO] [PW] [PS]                          │
+│ NIST SSDF → ISO 27001                   │
+│ [PO.1.1] [PW.1.1] [PS.1.1]              │
+│ [A.5.1] [A.8.2] [A.8.3]                 │
+│                                         │
+│ Secure params                           │
+│ ✓ scope refinement                      │
+│                                         │
+│ NIST Checks                             │
+│ ☑ PO.1.1                                │
+│ ISO Mapping                             │
+│ ☑ A.5.1                                 │
+└─────────────────────────────────────────┘
 
 Progress: color coded (green >=85, amber >=60, red <60)
 ```
