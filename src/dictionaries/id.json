@@ -50,7 +50,7 @@
     "mapNist": "Praktik NIST SSDF",
     "mapIso": "Kontrol ISO 27001",
     "mapArtifact": "Artefak",
-    "featuresTitle": "Di sekitar gerbang",
+    "featuresTitle": "Yang ada di sekitar gerbang.",
     "featSdlcTitle": "Secure SDLC 5 Tahap",
     "featSdlcDesc": "Analisis, desain, pengembangan, pengujian, dan serah terima, tiap gerbang ditegakkan NIST SP 800-218.",
     "featIsoTitle": "Crosswalk ISO 27001",
@@ -97,7 +97,7 @@
     "ctaHow": "Lihat cara kerja",
     "standardsLabel": "Dipetakan ke",
     "problemEyebrow": "Masalahnya",
-    "problemTitle": "Kenapa gerbang keamanan dibutuhkan",
+    "problemTitle": "Kode buatan AI cepat jadi, tapi jarang diperiksa.",
     "problemLede": "Kecepatan bukan lagi bagian tersulit. Yang sulit adalah membuktikan bahwa yang dikirim aman, dan menunjukkan di mana bukti itu berada.",
     "problems": [
       {
@@ -122,7 +122,7 @@
     "statProviders": "penyedia AI (BYOK)",
     "statLanguages": "bahasa antarmuka & keluaran",
     "gatesEyebrow": "Lima gerbang",
-    "gatesLede": "Setiap tahap harus lulus sebelum tahap berikutnya terbuka. Tiap gerbang menyebut praktik NIST yang ditegakkannya dan kontrol ISO 27001 yang didukungnya.",
+    "gatesLede": "Tahap berikutnya baru terbuka setelah semua sub-langkah tahap ini terpenuhi, dan server menolak jalan pintas.",
     "gatesTabs": "Tahap Secure SDLC",
     "gatesPrev": "Tahap sebelumnya",
     "gatesNext": "Tahap berikutnya",
@@ -166,7 +166,7 @@
     "howFinding": "Query SQL disusun dari input pengguna",
     "howFixed": "Query berparameter",
     "previewEyebrow": "Produk",
-    "previewTitle": "Lihat langsung di dalam studio",
+    "previewTitle": "Ini studionya, bukan ilustrasi.",
     "previewLede": "Ruang kerja yang sama memandu setiap proyek: sub-langkah di kiri, AI dan hasil di tengah, keamanan dan kepatuhan di kanan.",
     "previewShots": [
       {
@@ -239,12 +239,189 @@
       {
         "q": "Bahasa apa yang didukung?",
         "a": "Antarmuka dan keluaran AI tersedia dalam Bahasa Indonesia dan Inggris."
+      },
+      {
+        "q": "Versi SSDF mana yang dipakai?",
+        "a": "NIST SP 800-218 versi 1.1 (Februari 2022). Draf versi 1.2 masih dalam konsultasi publik."
       }
     ],
     "closingTitle": "Mulai proyek aman pertama Anda",
     "closingLede": "Lima gerbang, satu ruang kerja terpandu, dan bukti yang bisa Anda tunjukkan.",
     "howPlanTitle": "Rencana usulan",
-    "howApprove": "Setujui & bangun"
+    "howApprove": "Setujui & bangun",
+    "heroLede": "ShieldForge membangun website dengan AI, lalu menahannya di lima gerbang keamanan. Tiap gerbang dipetakan ke NIST SSDF dan ISO 27001, dan dibuktikan oleh pemindai, bukan tebakan AI.",
+    "ctaGates": "Lihat lima gerbang",
+    "heroStandards": "Dipetakan ke NIST SP 800-218 v1.1 dan ISO/IEC 27001:2022 Lampiran A.",
+    "rail": {
+      "label": "Contoh: satu proyek melewati lima gerbang",
+      "passed": "Lulus",
+      "waiting": "Menunggu",
+      "summary": "{passed}/{total} gerbang lulus, skor {score}",
+      "replay": "Putar ulang",
+      "colours": {
+        "straw": "jerami",
+        "brown": "cokelat",
+        "purple": "ungu",
+        "blue": "biru tua",
+        "grey": "biru keabuan"
+      }
+    },
+    "problemStatShow": "true",
+    "problemStat": "Kode buatan AI memunculkan celah keamanan berisiko pada 45% pengujian.",
+    "problemStatSource": "Veracode, 2025 GenAI Code Security Report (pembaruan Oktober 2025)",
+    "problemStatUrl": "https://www.veracode.com/resources/analyst-reports/2025-genai-code-security-report/",
+    "newTab": "(membuka tab baru)",
+    "problemList": [
+      "Kode dihasilkan dalam hitungan menit, tetapi jarang diperiksa terhadap injeksi, autentikasi yang lemah, atau rahasia yang bocor.",
+      "Pemetaan ke standar biasanya dibuat setelah aplikasi jadi, saat setiap perubahan sudah mahal.",
+      "Tanpa artefak per tahap, sulit menunjukkan kontrol mana yang dipenuhi dan kapan."
+    ],
+    "aboutTitle": "Apa itu ShieldForge?",
+    "aboutLede": "ShieldForge adalah studio pembuat website berbasis AI yang bekerja seperti lini produksi dengan pos pemeriksaan. AI menyusun kebutuhan, desain, kode, dan dokumen; ShieldForge memastikan setiap tahap memenuhi syaratnya sebelum tahap berikutnya dibuka, lalu memeriksa hasilnya dengan pemindai keamanan sungguhan.",
+    "aboutAiTitle": "Dikerjakan AI",
+    "aboutAi": [
+      "Menyusun kebutuhan keamanan dan klasifikasi data",
+      "Membuat desain UI, arsitektur, diagram, dan skema database",
+      "Menulis kode untuk berbagai stack",
+      "Menulis manual book dan laporan kepatuhan"
+    ],
+    "aboutGateTitle": "Dijaga gerbang",
+    "aboutGate": [
+      "Mengunci tahap sampai semua sub-langkahnya terpenuhi, diperiksa di server",
+      "Menjalankan Semgrep dan Trivy pada kode",
+      "Menghitung skor keamanan dari temuan, bukan perkiraan",
+      "Menelusuri setiap kebutuhan ke rekomendasi, berkas, dan standar"
+    ],
+    "aboutForTitle": "Untuk siapa",
+    "aboutFor": [
+      "Mahasiswa dan developer pemula yang sedang belajar praktik pengembangan aman",
+      "Tim kecil dan UMKM yang membutuhkan website beserta bukti keamanannya",
+      "Pengajar yang ingin memperagakan Secure SDLC secara nyata"
+    ],
+    "gatesTitle": "Lima gerbang, diuji berurutan.",
+    "gatesCelsius": "{n} °C",
+    "gatesSubSteps": "Lihat {count} sub-langkah",
+    "gatesSubStepsCount": "{count} sub-langkah",
+    "gatesSubStepCol": "Sub-langkah",
+    "howScanExample": "{medium} temuan sedang + {low} rendah → 100 − ({medium}×{wm} + {low}×{wl}) = {score}",
+    "archTitle": "Apa yang terjadi di balik layar.",
+    "archLede": "Pilih bagian untuk membaca penjelasannya.",
+    "archNodes": [
+      {
+        "name": "Studio",
+        "note": "Tempat Anda bekerja dan semua proyek disimpan. (Next.js, PostgreSQL lewat Prisma.) Akses dibatasi per akun."
+      },
+      {
+        "name": "Penyedia AI",
+        "note": "Menulis isi tiap tahap dengan model pilihan Anda. (OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, Ollama; kunci disimpan terenkripsi AES-256-GCM.) Kualitas hasil bergantung pada model yang dipilih."
+      },
+      {
+        "name": "Gerbang tahap",
+        "note": "Memeriksa syarat sebelum tahap selesai. (Server menolak bila sub-langkah belum terpenuhi atau tahap sebelumnya belum selesai.) Syarat memeriksa kelengkapan hasil, bukan kebenaran setiap baris kode."
+      },
+      {
+        "name": "Sandbox Docker",
+        "note": "Menjalankan aplikasi Anda di kotak terisolasi. (Node/Next, Python, PHP, Go, statis; cap-drop ALL, no-new-privileges, port hanya ke 127.0.0.1, jaringan privat per run.) Mengurangi dampak kode berbahaya, bukan pengganti peninjauan."
+      },
+      {
+        "name": "Pemindai",
+        "note": "Memeriksa kode dan dependensi. (Semgrep untuk SAST; Trivy untuk kerentanan, rahasia, dan miskonfigurasi; audit dependensi.) Menemukan pola yang dikenal, bukan semua celah."
+      },
+      {
+        "name": "Ekspor & GitHub",
+        "note": "Menyerahkan hasil yang bisa diaudit. (ZIP, manual book, laporan ISO, matriks ketertelusuran; push dan pull request dengan workflow security.yml.) Repositori tetap milik Anda."
+      }
+    ],
+    "archPlatformTitle": "Keamanan platform ShieldForge",
+    "archPlatform": [
+      "Kunci dan token terenkripsi AES-256-GCM",
+      "Content Security Policy dengan nonce per permintaan",
+      "Perlindungan CSRF pada permintaan yang mengubah data",
+      "Pembatasan laju permintaan",
+      "Log audit aktivitas akun"
+    ],
+    "proofTitle": "Angka dan metode yang bisa Anda periksa sendiri.",
+    "proofFormulaTitle": "Cara skor dihitung",
+    "proofFormula": "Skor = 100 − (20 × kritis + 10 × tinggi + 4 × sedang + 1 × rendah), minimal 0. Hanya temuan Semgrep dan Trivy yang dihitung; skor yang berasal dari AI ditandai berbeda.",
+    "proofDownload": "Unduh matriks 26 sub-langkah (CSV)",
+    "figure": "Gbr. {n}",
+    "featureGroups": [
+      {
+        "title": "Bangun",
+        "rows": [
+          "Rencana lalu bangun: AI mengusulkan, Anda menyetujui",
+          "Design Studio: mockup HTML dari prompt, bisa diperhalus",
+          "Editor kode Monaco dengan snapshot dan pemulihan",
+          "ERD dengan kardinalitas 1:1, 1:N, dan M:N"
+        ]
+      },
+      {
+        "title": "Verifikasi",
+        "rows": [
+          "Threat model STRIDE",
+          "Pemindaian Semgrep dan Trivy",
+          "Skor keamanan deterministik",
+          "Ketertelusuran REQ-SEC ke kode, NIST, dan ISO"
+        ]
+      },
+      {
+        "title": "Serahkan",
+        "rows": [
+          "Sandbox Docker dengan pratinjau desktop, tablet, dan ponsel",
+          "Database PostgreSQL persisten",
+          "Push, release branch, dan pull request GitHub",
+          "Revisi proyek selesai lewat pull request"
+        ]
+      }
+    ],
+    "resultsTitle": "Yang Anda bawa pulang, dan yang tidak dijanjikan.",
+    "resultsDeliverables": "Hasil",
+    "limitsTitle": "Batasan",
+    "limits": [
+      "Bukan sertifikasi ISO 27001 atau NIST; ShieldForge memetakan kontrol dan menyiapkan bukti",
+      "Pemindai menemukan pola yang dikenal; tinjauan manusia tetap diperlukan",
+      "Kualitas hasil AI bergantung pada model yang Anda pilih",
+      "Docker dibutuhkan untuk menjalankan aplikasi dan pemindaian"
+    ],
+    "glossaryTitle": "Glosarium",
+    "glossary": [
+      {
+        "term": "Secure SDLC",
+        "definition": "Siklus pengembangan perangkat lunak yang memasukkan pemeriksaan keamanan di setiap tahap, bukan di akhir."
+      },
+      {
+        "term": "NIST SSDF (SP 800-218 v1.1)",
+        "definition": "Kumpulan praktik pengembangan aman dari NIST, dikelompokkan PO, PS, PW, dan RV; kode task-nya (mis. PW.5.1) menjadi syarat gerbang."
+      },
+      {
+        "term": "ISO/IEC 27001:2022 Lampiran A",
+        "definition": "Daftar kontrol keamanan informasi; tiap sub-langkah dipetakan ke kontrolnya (mis. A.8.28)."
+      },
+      {
+        "term": "SAST",
+        "definition": "Pemeriksaan kode sumber tanpa menjalankannya; dilakukan Semgrep."
+      },
+      {
+        "term": "SCA & secret scanning",
+        "definition": "Pemeriksaan dependensi yang rentan dan rahasia yang bocor; dilakukan Trivy."
+      },
+      {
+        "term": "STRIDE",
+        "definition": "Cara memodelkan ancaman: spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege."
+      },
+      {
+        "term": "OWASP Top 10",
+        "definition": "Daftar sepuluh risiko keamanan aplikasi web yang paling umum; ditinjau di gerbang Pengujian."
+      },
+      {
+        "term": "BYOK",
+        "definition": "Bring Your Own Key: memakai kunci API penyedia AI milik Anda sendiri."
+      },
+      {
+        "term": "Ketertelusuran",
+        "definition": "Setiap kebutuhan keamanan (REQ-SEC-…) dapat ditelusuri ke rekomendasi, berkas kode, task NIST, dan kontrol ISO."
+      }
+    ]
   },
   "nav": {
     "dashboard": "Dasbor",
