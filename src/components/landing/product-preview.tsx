@@ -8,29 +8,21 @@ export interface PreviewShot {
   caption: string;
 }
 
-function Frame({ shot, label }: { shot: PreviewShot; label: string }) {
+/** Inside the studio: three real screenshots as project-style clay cards (no testimonials). */
+export function ProductPreview({ shots, figureLabels }: { shots: PreviewShot[]; figureLabels: string[] }) {
   return (
-    <figure>
-      <div className="card-elevated overflow-hidden rounded-xl border bg-card">
-        <Image src={shot.src} width={shot.width} height={shot.height} alt={shot.alt} sizes="(min-width: 1024px) 900px, 100vw" className="block h-auto w-full" />
-      </div>
-      <figcaption className="mt-2 text-sm">
-        <span className="font-narrow me-2 text-muted-foreground">{label}</span>
-        {shot.caption}
-      </figcaption>
-    </figure>
-  );
-}
-
-/** §7: three real studio screenshots as numbered figures (no overlap, no parallax). */
-export function ProductPreview({ shots, figureLabels }: { shots: [PreviewShot, PreviewShot, PreviewShot]; figureLabels: [string, string, string] }) {
-  return (
-    <div className="grid gap-8">
-      <Frame shot={shots[0]} label={figureLabels[0]} />
-      <div className="grid max-w-3xl gap-8 sm:grid-cols-2">
-        <Frame shot={shots[1]} label={figureLabels[1]} />
-        <Frame shot={shots[2]} label={figureLabels[2]} />
-      </div>
-    </div>
+    <ul className="grid gap-6 md:grid-cols-3">
+      {shots.map((s, i) => (
+        <li key={s.src} className="clay-card clay-hover flex flex-col overflow-hidden p-2">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[1.1rem] bg-[var(--clay-bg)]">
+            <Image src={s.src} fill alt={s.alt} sizes="(min-width: 768px) 33vw, 100vw" className="object-cover object-top" />
+          </div>
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <span className="font-medium">{s.caption}</span>
+            <span className="clay-chip font-narrow shrink-0 px-2.5 py-0.5 text-xs text-muted-foreground">{figureLabels[i]}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }

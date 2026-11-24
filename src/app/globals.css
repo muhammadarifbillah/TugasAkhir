@@ -268,19 +268,63 @@ html[data-contrast="high"].dark {
 }
 
 /*
- * Landing "Forge Ledger": a technical report built on the steel tempering
- * ramp. Hairline rules instead of floating cards; elevation only for the hero
- * rail, screenshot frames and the vignette. Scoped to .landing so the app keeps
- * its own look. No backdrop blur, no decorative loops.
+ * Landing "Dark Clay": claymorphism on a deep navy base with violet neon,
+ * after the cyber-security references. The landing is always dark: when the
+ * page contains .landing the whole document (header, footer included) takes
+ * these tokens, whatever the app theme toggle says. No backdrop blur; glow is
+ * box-shadow only; every clay edge keeps a faint border so it reads on a
+ * projector. Contrast pairs are pinned in src/lib/contrast.test.ts.
  */
+html:has(.landing) {
+  color-scheme: dark;
+  --background: #0b0d1a;
+  --foreground: #eef0ff;
+  --card: #1a1e3a;
+  --card-foreground: #eef0ff;
+  --popover: #1a1e3a;
+  --popover-foreground: #eef0ff;
+  --primary: #b9a6ff;
+  --primary-foreground: #0b0d1a;
+  --secondary: #252a52;
+  --secondary-foreground: #eef0ff;
+  --muted: #1a1e3a;
+  --muted-foreground: #a6abd6;
+  --accent: #252a52;
+  --accent-foreground: #eef0ff;
+  --success: oklch(0.7 0.16 162.48);
+  --success-foreground: #0b0d1a;
+  --stage-1: #d9b45e;
+  --stage-2: #d08a4e;
+  --stage-3: #b394db;
+  --stage-4: #86ace0;
+  --stage-5: #9cadbd;
+  --border: #2a2f57;
+  --input: #4a5088;
+  --ring: #60a5fa;
+  --shadow-color: 235 60% 3%;
+}
 .landing {
-  --ledger-rule: var(--border);
-  --ledger-leader: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
-  --coupon-radius: 2px;
-  --coupon-raise:
-    0 1px 0 var(--ledger-rule),
-    0 6px 16px -10px hsl(var(--shadow-color) / 0.35);
-  interpolate-size: allow-keywords;
+  --clay-bg: #0b0d1a;
+  --clay-bg-2: #11142a;
+  --clay-surface: #1a1e3a;
+  --clay-surface-hi: #252a52;
+  --clay-edge: rgba(255, 255, 255, 0.07);
+  --clay-glow: rgba(139, 92, 246, 0.5);
+  --clay-shadow:
+    12px 14px 28px rgba(0, 0, 0, 0.55),
+    -8px -8px 22px rgba(120, 110, 255, 0.05),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.07),
+    inset -4px -6px 12px rgba(0, 0, 0, 0.35);
+  --clay-shadow-hover:
+    16px 20px 36px rgba(0, 0, 0, 0.6),
+    -8px -8px 22px rgba(120, 110, 255, 0.07),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.09),
+    inset -4px -6px 12px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(167, 139, 250, 0.35);
+  background:
+    radial-gradient(60rem 40rem at 50% -10rem, rgba(124, 58, 237, 0.22), transparent 70%),
+    radial-gradient(40rem 30rem at 100% 30%, rgba(59, 130, 246, 0.1), transparent 70%),
+    var(--clay-bg);
 }
 .font-wide {
   font-stretch: 125%;
@@ -288,54 +332,161 @@ html[data-contrast="high"].dark {
   letter-spacing: -0.022em;
   line-height: 1.04;
 }
-/* Narrow labels replace all-caps eyebrows (Archivo's width axis does the work). */
 .font-narrow {
   font-stretch: 75%;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
-/* Ledger row: label ........ value */
-.leader {
+.clay-card {
+  border-radius: 1.5rem;
+  border: 1px solid var(--clay-edge);
+  background: linear-gradient(145deg, var(--clay-surface-hi), var(--clay-surface));
+  box-shadow: var(--clay-shadow);
+  transition:
+    box-shadow 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+.clay-hover:hover,
+.clay-hover:focus-within {
+  box-shadow: var(--clay-shadow-hover);
+  transform: translateY(-4px);
+}
+.clay-chip {
+  border-radius: 999px;
+  border: 1px solid var(--clay-edge);
+  background: var(--clay-surface-hi);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+/* Section label pill: real text that names the section's content. */
+.clay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(124, 58, 237, 0.12);
+  padding: 0.25rem 0.85rem;
+  font-size: 0.8125rem;
+  color: var(--primary);
+}
+.clay-btn {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(180deg, #7c3aed, #5b21b6);
+  box-shadow:
+    0 10px 26px var(--clay-glow),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+  transition:
+    transform 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+}
+.clay-btn:hover {
+  box-shadow:
+    0 14px 34px var(--clay-glow),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+}
+.clay-btn:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 4px 14px var(--clay-glow),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.3);
+}
+.clay-btn-ghost {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  color: var(--foreground);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  background: rgba(37, 42, 82, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: background-color 150ms var(--ease-out);
+}
+.clay-btn-ghost:hover {
+  background: rgba(55, 48, 120, 0.7);
+}
+.clay-btn:focus-visible,
+.clay-btn-ghost:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+/* Gate coupon: clay plate tinted by its stage colour (set --tint). */
+.coupon {
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--tint) 30%, var(--clay-edge));
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--tint) 16%, var(--clay-surface-hi)),
+    color-mix(in oklab, var(--tint) 6%, var(--clay-surface))
+  );
+  box-shadow: var(--clay-shadow);
+  transition: box-shadow 200ms var(--ease-out);
+}
+.coupon[data-selected="true"] {
+  box-shadow:
+    var(--clay-shadow),
+    0 0 0 2px var(--tint),
+    0 0 28px color-mix(in oklab, var(--tint) 45%, transparent);
+}
+/* Giant spaced wordmark behind the hero (decorative). */
+.hero-wordmark {
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffffff 15%, #b9a8ff 75%, rgba(185, 168, 255, 0.35));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-float {
+  animation: hero-float 6s ease-in-out infinite;
+}
+.hero-float[data-paused="true"] {
+  animation-play-state: paused;
+}
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.ledger-row {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
-.leader::after {
+.ledger-row::after {
   content: "";
   order: 1;
   flex: 1;
   min-width: 1.5rem;
-  border-bottom: 1px dotted var(--ledger-leader);
+  border-bottom: 1px dotted rgba(166, 171, 214, 0.35);
   transform: translateY(-0.3em);
 }
-.leader > dt {
+.ledger-row > dt {
   order: 0;
 }
-.leader > dd {
+.ledger-row > dd {
   order: 2;
   font-variant-numeric: tabular-nums;
 }
-/* Temper coupon: a small steel plate with a faint oxide banding. Set --tint. */
-.coupon {
-  border-radius: var(--coupon-radius);
-  border: 1px solid color-mix(in oklab, var(--tint) 45%, var(--border));
-  background-image: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--tint) 10%, var(--card)),
-    color-mix(in oklab, var(--tint) 4%, var(--card)) 60%,
-    color-mix(in oklab, var(--tint) 12%, var(--card))
-  );
-  transition:
-    box-shadow 150ms var(--ease-out),
-    outline-color 150ms var(--ease-out);
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-.coupon[data-selected="true"] {
-  box-shadow: var(--coupon-raise);
-  outline-color: var(--tint);
-}
-/* Carousel progress: the selected coupon's bottom edge fills, paused with the carousel. */
 .gate-progress {
   transform-origin: left;
   animation: gate-fill var(--gate-ms, 4500ms) linear both;
@@ -361,6 +512,9 @@ html[data-contrast="high"].dark {
 .faq-item[open]::details-content {
   height: auto;
 }
+.landing {
+  interpolate-size: allow-keywords;
+}
 /* Landing motion is desktop-only: below lg everything renders in its final state. */
 @media (max-width: 1023.98px) {
   .landing .gate-progress {
@@ -369,16 +523,25 @@ html[data-contrast="high"].dark {
   .landing .faq-item::details-content {
     transition: none;
   }
-}
-@media (prefers-contrast: more) {
-  .landing .coupon {
-    background-image: none;
-    border-color: var(--border);
+  .landing .hero-float {
+    animation: none;
+  }
+  .landing .clay-hover:hover,
+  .landing .clay-hover:focus-within {
+    transform: none;
   }
 }
+@media (prefers-contrast: more) {
+  .landing .clay-card,
+  .landing .coupon {
+    box-shadow: none;
+    border: 2px solid var(--border);
+  }
+}
+html[data-contrast="high"] .landing .clay-card,
 html[data-contrast="high"] .landing .coupon {
-  background-image: none;
-  border-color: var(--border);
+  box-shadow: none;
+  border: 2px solid var(--border);
 }
 
 /*
@@ -473,8 +636,13 @@ html[data-contrast="high"] .landing .coupon {
     --tw-exit-rotate: 0 !important;
   }
   .animate-bounce,
-  .animate-ping {
+  .animate-ping,
+  .hero-float {
     animation: none !important;
+  }
+  .clay-hover:hover,
+  .clay-hover:focus-within {
+    transform: none !important;
   }
   /* Route changes crossfade instead of sliding; shared elements jump, not fly. */
   ::view-transition-group(*) {

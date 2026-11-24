@@ -23,8 +23,8 @@ export function SubStepsDisclosure({
 }) {
   return (
     <div className="mt-12">
-      <h3 className="font-narrow text-base">{summary}</h3>
-      <div className="mt-3 divide-y divide-[var(--ledger-rule)] border-y border-[var(--ledger-rule)]">
+      <h3 className="font-narrow text-center text-base text-muted-foreground">{summary}</h3>
+      <div className="clay-card mt-4 divide-y divide-[var(--border)] px-5 md:px-7">
         {gates.map((g, i) => (
           <details key={g.title} className="faq-item group">
             <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
@@ -53,7 +53,7 @@ export function SubStepsDisclosure({
                 </thead>
                 <tbody>
                   {g.steps.map((s) => (
-                    <tr key={s.label} className="border-t border-[var(--ledger-rule)]">
+                    <tr key={s.label} className="border-t border-[var(--border)]">
                       <td className="py-2 pe-4">{s.label}</td>
                       <td className="py-2 pe-4 font-mono text-xs">{s.nist.join(", ")}</td>
                       <td className="py-2 font-mono text-xs">{s.iso.join(", ")}</td>

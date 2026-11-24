@@ -5,7 +5,6 @@ import { CountUp } from "@/components/landing/count-up";
 import { useGateLink } from "@/components/landing/gate-link";
 import { Hallmark } from "@/components/landing/hallmark";
 import { Ledger, LedgerRow } from "@/components/landing/ledger";
-import { Button } from "@/components/ui/button";
 import { buildMatrixCsv, type MatrixRow } from "@/lib/matrix-csv";
 import { cn } from "@/lib/utils";
 
@@ -49,22 +48,22 @@ export function ProofSection({
 
   return (
     <div className="grid gap-10 lg:grid-cols-10 lg:gap-8">
-      <div className="lg:col-span-4">
+      <div className="clay-card p-7 lg:col-span-4">
         <Ledger>
           {facts.map((f) => (
             <LedgerRow key={f.label} label={f.label} value={<CountUp value={f.value} className="font-wide text-xl" />} />
           ))}
         </Ledger>
-        <div className="mt-8 border-s-2 border-[var(--primary)] ps-4">
+        <div className="mt-6 rounded-2xl bg-[rgba(124,58,237,0.12)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <h3 className="font-narrow text-base">{formulaTitle}</h3>
           <p className="mt-2 text-sm leading-relaxed">{formula}</p>
         </div>
       </div>
-      <div className="min-w-0 lg:col-span-6">
+      <div className="clay-card min-w-0 p-5 md:p-7 lg:col-span-6">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[34rem] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-[var(--ledger-rule)] text-left text-xs text-muted-foreground">
+              <tr className="border-b border-[var(--border)] text-left text-xs text-muted-foreground">
                 <th scope="col" className="font-narrow py-2.5 pe-4 font-medium">{labels.stage}</th>
                 <th scope="col" className="font-narrow py-2.5 pe-4 font-medium">{labels.nist}</th>
                 <th scope="col" className="font-narrow py-2.5 pe-4 font-medium">{labels.iso}</th>
@@ -77,7 +76,7 @@ export function ProofSection({
                   key={r.title}
                   onPointerEnter={() => setActive(i)}
                   onPointerLeave={() => setActive(null)}
-                  className={cn("border-b border-[var(--ledger-rule)] transition-colors duration-150")}
+                  className={cn("border-b border-[var(--border)] transition-colors duration-150 last:border-b-0")}
                   style={active === i ? { background: `color-mix(in oklab, var(--stage-${i + 1}) 8%, transparent)` } : undefined}
                 >
                   <td className="py-3 pe-4">
@@ -94,10 +93,10 @@ export function ProofSection({
             </tbody>
           </table>
         </div>
-        <Button type="button" variant="outline" className="mt-6" onClick={download}>
-          <Download aria-hidden="true" />
+        <button type="button" className="clay-btn mt-6" onClick={download}>
+          <Download className="size-4" aria-hidden="true" />
           {labels.download}
-        </Button>
+        </button>
       </div>
     </div>
   );

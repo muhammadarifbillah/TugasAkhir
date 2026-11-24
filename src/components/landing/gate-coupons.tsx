@@ -98,7 +98,7 @@ export function GateCoupons({
               onPointerLeave={() => setActive(null)}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              className="coupon relative flex min-h-11 min-w-0 flex-col items-start gap-1 overflow-hidden p-2 text-start focus-visible:outline-2 md:p-3"
+              className="coupon relative flex min-h-11 min-w-0 flex-col items-start gap-1 overflow-hidden p-3 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] md:p-4"
               style={{ "--tint": `var(--stage-${stage})` } as React.CSSProperties}
             >
               <span className="flex items-center gap-1.5">
@@ -144,8 +144,8 @@ export function GateCoupons({
             if (info.offset.x < -60) step(1);
             else if (info.offset.x > 60) step(-1);
           }}
-          className="mt-6 grid touch-pan-y gap-8 border-t-2 pt-6 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]"
-          style={{ borderColor: tint }}
+          className="clay-card mt-8 grid touch-pan-y gap-8 p-7 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:p-9"
+          style={{ boxShadow: `var(--clay-shadow), inset 0 3px 0 ${tint}` }}
         >
           <div>
             <p className="flex items-center gap-2">
@@ -165,12 +165,12 @@ export function GateCoupons({
         </m.div>
       </AnimatePresence>
 
-      <div className="mt-6 flex items-center gap-2">
+      <div className="mt-6 flex items-center justify-center gap-2">
         <button
           type="button"
           onClick={() => step(-1)}
           aria-label={labels.prev}
-          className="inline-flex size-11 items-center justify-center rounded-md border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="clay-chip inline-flex size-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft className="size-4" aria-hidden="true" />
         </button>
@@ -181,7 +181,7 @@ export function GateCoupons({
           type="button"
           onClick={() => step(1)}
           aria-label={labels.next}
-          className="inline-flex size-11 items-center justify-center rounded-md border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="clay-chip inline-flex size-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight className="size-4" aria-hidden="true" />
         </button>
@@ -190,7 +190,7 @@ export function GateCoupons({
           onClick={() => setUserPaused((p) => !p)}
           aria-label={userPaused ? labels.play : labels.pause}
           title={userPaused ? labels.play : labels.pause}
-          className="ms-2 inline-flex size-11 items-center justify-center rounded-md border bg-card text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-lg:hidden"
+          className="clay-chip ms-2 inline-flex size-11 items-center justify-center text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-lg:hidden"
         >
           {userPaused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
         </button>

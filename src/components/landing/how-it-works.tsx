@@ -29,7 +29,7 @@ export function HowItWorks({
         role="tablist"
         aria-label={label}
         aria-orientation="vertical"
-        className="flex min-w-0 gap-1 overflow-x-auto pb-1 scrollbar-none lg:col-span-4 lg:flex-col lg:divide-y lg:divide-[var(--ledger-rule)] lg:overflow-visible lg:border-y lg:border-[var(--ledger-rule)] lg:pb-0"
+        className="flex min-w-0 gap-1 overflow-x-auto pb-1 scrollbar-none lg:col-span-4 lg:flex-col lg:gap-3 lg:overflow-visible lg:pb-0"
         onKeyDown={(e) => tabKeyNav(e, ids, String(active), (v) => setActive(Number(v)))}
       >
         {steps.map((s, i) => {
@@ -45,14 +45,14 @@ export function HowItWorks({
               tabIndex={selected ? 0 : -1}
               onClick={() => setActive(i)}
               className={cn(
-                "relative flex min-h-11 shrink-0 gap-3 px-3 py-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring lg:shrink lg:ps-4",
-                selected ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                "relative flex min-h-11 shrink-0 gap-3 rounded-2xl px-4 py-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:shrink",
+                selected ? "clay-card text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {selected && (
                 <m.span
                   layoutId="how-indicator"
-                  className="absolute inset-y-2 start-0 w-0.5 bg-primary max-lg:inset-x-2 max-lg:inset-y-auto max-lg:bottom-0 max-lg:h-0.5 max-lg:w-auto"
+                  className="absolute inset-y-3 start-0 w-1 rounded-full bg-[#8b5cf6] shadow-[0_0_12px_rgba(139,92,246,0.8)] max-lg:inset-x-3 max-lg:inset-y-auto max-lg:bottom-0 max-lg:h-1 max-lg:w-auto"
                   transition={{ type: "spring", stiffness: 400, damping: 34 }}
                   aria-hidden="true"
                 />
@@ -71,7 +71,7 @@ export function HowItWorks({
         id="how-panel"
         role="tabpanel"
         aria-labelledby={`how-tab-${active}`}
-        className="card-elevated relative min-h-[18rem] overflow-hidden rounded-xl border bg-card lg:col-span-6 lg:self-start"
+        className="clay-card relative min-h-[18rem] overflow-hidden lg:col-span-6 lg:self-start"
       >
         <p className="border-b px-5 py-3 text-sm text-muted-foreground lg:hidden">{steps[active].desc}</p>
         <AnimatePresence mode="wait" initial={false}>

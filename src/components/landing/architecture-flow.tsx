@@ -68,7 +68,7 @@ export function ArchitectureFlow({
               const on = a === sel || b === sel;
               return (
                 <g key={`${a}-${b}`}>
-                  <line x1={POS[a].x} y1={POS[a].y} x2={POS[b].x} y2={POS[b].y} stroke="var(--border)" strokeWidth={0.4} vectorEffect="non-scaling-stroke" />
+                  <line x1={POS[a].x} y1={POS[a].y} x2={POS[b].x} y2={POS[b].y} stroke="rgba(167,139,250,0.25)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
                   {on && (
                     <m.line
                       key={`on-${sel}`}
@@ -76,8 +76,8 @@ export function ArchitectureFlow({
                       y1={POS[a].y}
                       x2={POS[b].x}
                       y2={POS[b].y}
-                      stroke="var(--primary)"
-                      strokeWidth={2}
+                      stroke="#a78bfa"
+                      strokeWidth={2.5}
                       vectorEffect="non-scaling-stroke"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -97,8 +97,8 @@ export function ArchitectureFlow({
               onClick={() => setSel(i)}
               onFocus={() => setSel(i)}
               className={cn(
-                "absolute flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-sm border bg-card px-3 py-2 text-sm font-medium transition-[outline-color,color] duration-150 focus-visible:outline-none",
-                sel === i ? "outline-2 outline-offset-2 outline-[var(--primary)]" : "outline-2 outline-transparent hover:text-primary",
+                "clay-card absolute flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-2xl px-4 py-2.5 text-sm font-medium focus-visible:outline-none",
+                sel === i ? "outline-2 outline-offset-2 outline-[#a78bfa] shadow-[0_0_28px_rgba(139,92,246,0.55)]" : "outline-2 outline-transparent hover:text-primary",
               )}
               style={{ left: `${POS[i].x}%`, top: `${POS[i].y * 2}%` }}
             >
@@ -109,7 +109,7 @@ export function ArchitectureFlow({
         </div>
         <div className="col-span-3">
           <p className="font-narrow text-sm text-muted-foreground">{lede}</p>
-          <div id="arch-note" aria-live="polite" className="mt-3 border-t-2 border-[var(--primary)] pt-4">
+          <div id="arch-note" aria-live="polite" className="clay-card mt-3 p-6">
             <m.div key={sel} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }}>
               <h3 className="text-lg font-semibold">{nodes[sel].name}</h3>
               <div className="mt-2">
@@ -120,9 +120,9 @@ export function ArchitectureFlow({
         </div>
       </div>
 
-      <ol className="divide-y divide-[var(--ledger-rule)] border-y border-[var(--ledger-rule)] lg:hidden">
+      <ol className="grid gap-4 lg:hidden">
         {nodes.map((n, i) => (
-          <li key={n.name} className="py-4">
+          <li key={n.name} className="clay-card p-5">
             <h3 className="font-semibold">
               <span className="font-narrow me-2 text-sm tabular-nums text-muted-foreground">{i + 1}</span>
               {n.name}
@@ -134,11 +134,11 @@ export function ArchitectureFlow({
         ))}
       </ol>
 
-      <div className="mt-12 max-w-3xl">
-        <h3 className="font-narrow text-base">{platformTitle}</h3>
-        <ul className="mt-3 divide-y divide-[var(--ledger-rule)] border-y border-[var(--ledger-rule)]">
+      <div className="mt-14">
+        <h3 className="font-narrow text-center text-base text-muted-foreground">{platformTitle}</h3>
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {platform.map((p) => (
-            <li key={p} className="flex gap-3 py-3">
+            <li key={p} className="clay-card flex gap-3 p-5 text-sm">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
               <span>{p}</span>
             </li>

@@ -20,10 +20,10 @@ export function Deliverables({
   limits: string[];
 }) {
   return (
-    <div className="grid gap-10 md:grid-cols-2 md:gap-8">
-      <div>
-        <h3 className="font-narrow text-base">{resultsTitle}</h3>
-        <ul className="mt-3 divide-y divide-[var(--ledger-rule)] border-y border-[var(--ledger-rule)]">
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="clay-card p-7">
+        <h3 className="text-lg font-semibold">{resultsTitle}</h3>
+        <ul className="mt-3 divide-y divide-[var(--border)]">
           {items.map((item, i) => (
             <li key={item.title} className="flex items-start gap-3 py-3">
               <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
@@ -47,9 +47,9 @@ export function Deliverables({
           ))}
         </ul>
       </div>
-      <div>
-        <h3 className="font-narrow text-base">{limitsTitle}</h3>
-        <ul className="mt-3 divide-y divide-[var(--ledger-rule)] border-y border-[var(--ledger-rule)]">
+      <div className="clay-card p-7">
+        <h3 className="text-lg font-semibold">{limitsTitle}</h3>
+        <ul className="mt-3 divide-y divide-[var(--border)]">
           {limits.map((l) => (
             <li key={l} className="flex items-start gap-3 py-3">
               <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
