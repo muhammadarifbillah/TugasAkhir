@@ -17,6 +17,8 @@ export interface VignetteCopy {
   planTitle: string;
   approve: string;
   verified: string;
+  scanScore: number;
+  scanExample: string;
   finding: string;
   fixed: string;
   exports: string[];
@@ -106,13 +108,16 @@ function BuildVignette() {
   );
 }
 
-function ScanVignette({ verified, finding }: { verified: string; finding: string }) {
-  const mv = useMotionValue(0);
+function ScanVignette({ verified, finding, score, example }: { verified: string; finding: string; score: number; example: string }) {
+  // Starts at the final value (server, mobile); desktop counts up from 0.
+  const mv = useMotionValue(score);
   const shown = useTransform(mv, (v) => Math.round(v));
   useEffect(() => {
-    const c = animate(mv, 100, { duration: 1.2, ease: EASE });
+    if (!isDesktop()) return;
+    mv.set(0);
+    const c = animate(mv, score, { duration: 1.2, ease: EASE });
     return () => c.stop();
-  }, [mv]);
+  }, [mv, score]);
   return (
     <div className={frame}>
       <div className="rounded-lg border bg-background p-4">
@@ -126,10 +131,11 @@ function ScanVignette({ verified, finding }: { verified: string; finding: string
           <m.div
             className="h-full origin-left rounded-full bg-success"
             initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
+            animate={{ scaleX: score / 100 }}
             transition={{ duration: 1.2, ease: EASE }}
           />
         </div>
+        <p className="mt-3 font-mono text-[11px] leading-relaxed text-muted-foreground">{example}</p>
         <m.span
           className="mt-3 inline-flex items-center gap-1 rounded-md bg-success/15 px-2 py-0.5 text-xs font-medium text-success"
           initial={{ scale: 0.9, opacity: 0 }}
@@ -196,7 +202,7 @@ export function HowVignette({ step, copy }: { step: number; copy: VignetteCopy }
     case 2:
       return <BuildVignette />;
     case 3:
-      return <ScanVignette verified={copy.verified} finding={copy.finding} />;
+      return <ScanVignette verified={copy.verified} finding={copy.finding} score={copy.scanScore} example={copy.scanExample} />;
     case 4:
       return <FixVignette finding={copy.finding} fixed={copy.fixed} />;
     default:

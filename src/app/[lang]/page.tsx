@@ -1,40 +1,28 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
-import { AuroraBackdrop } from "@/components/landing/aurora-backdrop";
+import { AboutSection } from "@/components/landing/about-section";
+import { ArchitectureFlow } from "@/components/landing/architecture-flow";
 import { Deliverables } from "@/components/landing/deliverables";
 import { Faq } from "@/components/landing/faq";
-import { FeatureBento, type FeatureTile } from "@/components/landing/feature-bento";
-import { HeroHeadline } from "@/components/landing/hero-headline";
+import { FeatureLedger } from "@/components/landing/feature-ledger";
+import { GateCoupons } from "@/components/landing/gate-coupons";
+import { GateLinkProvider } from "@/components/landing/gate-link";
+import { Glossary } from "@/components/landing/glossary";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
-import { ProblemCards } from "@/components/landing/problem-cards";
+import { LedgerSection } from "@/components/landing/ledger-section";
+import { ProblemSection } from "@/components/landing/problem-section";
 import { ProductPreview, type PreviewShot } from "@/components/landing/product-preview";
-import { Reveal } from "@/components/landing/reveal";
-import { RevealRow } from "@/components/landing/reveal-row";
-import { SectionHeading } from "@/components/landing/section-heading";
-import { StageCarousel } from "@/components/landing/stage-carousel";
-import { StageTraceDemo } from "@/components/landing/stage-trace-demo";
-import { StatsBand } from "@/components/landing/stats-band";
-import { TiltCard } from "@/components/landing/tilt-card";
+import { ProofSection } from "@/components/landing/proof-section";
+import { QuenchRule } from "@/components/landing/quench-rule";
+import { SubStepsDisclosure } from "@/components/landing/substeps-disclosure";
+import { TemperRail } from "@/components/landing/temper-rail";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
+import { fmt } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n";
-import { AI_PROVIDERS, LANDING_FACTS } from "@/lib/landing-facts";
-
-/**
- * SSDF task -> ISO 27001 Annex A crosswalk for each stage, copied from
- * prisma/seed.ts (a stage may satisfy more than one control).
- */
-const STAGE_CODES = [
-  { nist: "PO.1.1", iso: "A.5.1, A.5.8" },
-  { nist: "PW.1.1", iso: "A.8.26, A.8.27" },
-  { nist: "PW.5.1", iso: "A.8.28" },
-  { nist: "PW.8.1", iso: "A.8.29" },
-  { nist: "PS.3.1", iso: "A.8.13, A.8.10" },
-] as const;
-
-const STANDARDS = ["NIST SP 800-218", "ISO 27001:2022", "Semgrep", "Trivy"];
+import { LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "@/lib/landing-facts";
+import { computeSecurityScore } from "@/lib/scanner/score";
 
 // Real screenshots of the studio (public/landing), captured from a demo project.
 const SHOT_FILES = [
@@ -42,6 +30,9 @@ const SHOT_FILES = [
   { src: "/landing/security-score.jpg", width: 360, height: 460 },
   { src: "/landing/compliance-panel.jpg", width: 360, height: 460 },
 ] as const;
+
+// Worked example for the score formula, computed by the real scoring function.
+const EXAMPLE_FINDINGS = [{ severity: "medium" }, { severity: "medium" }, { severity: "low" }] as const;
 
 interface HomePageProps {
   params: Promise<{ lang: string }>;
@@ -54,235 +45,220 @@ export default async function HomePage({ params }: HomePageProps) {
   const session = await auth();
   const primaryHref = session?.user ? `/${lang}/dashboard` : `/${lang}/login`;
   const primaryLabel = session?.user ? l.ctaDashboard : l.ctaPrimary;
-  const steps = l.steps;
 
-  const stats = [
-    { value: LANDING_FACTS.stages, label: l.statStages },
-    { value: LANDING_FACTS.nistTasks, label: l.statNist },
-    { value: LANDING_FACTS.subSteps, label: l.statSubsteps },
-    { value: LANDING_FACTS.providers, label: l.statProviders },
-    { value: LANDING_FACTS.languages, label: l.statLanguages },
-  ];
-
-  const tiles: FeatureTile[] = [
-    { key: "sdlc", title: l.featSdlcTitle, desc: l.featSdlcDesc },
-    { key: "iso", title: l.featIsoTitle, desc: l.featIsoDesc },
-    { key: "byok", title: l.featByokTitle, desc: l.featByokDesc },
-    { key: "github", title: l.featGithubTitle, desc: l.featGithubDesc },
-    { key: "docker", title: l.featDockerTitle, desc: l.featDockerDesc },
-    { key: "db", title: l.featDbTitle, desc: l.featDbDesc },
-    { key: "secure", title: l.featSecureTitle, desc: l.featSecureDesc },
-    { key: "prompt", title: l.featPromptTitle, desc: l.featPromptDesc },
-  ];
-
+  const facts = gateFacts();
+  const stageDict = dict.stages as unknown as Record<string, { steps: Record<string, { label: string }> }>;
+  const stepLabel = (code: string, id: string) => stageDict[code]?.steps?.[id]?.label ?? id;
+  const gates = facts.map((g, i) => ({
+    ...g,
+    title: l.steps[i].title,
+    why: l.steps[i].why,
+    artifact: l.steps[i].artifact,
+    temper: TEMPER[i],
+    colourName: l.rail.colours[TEMPER[i].colour],
+  }));
+  const scanScore = computeSecurityScore([...EXAMPLE_FINDINGS]);
   const shots = SHOT_FILES.map((f, i) => ({ ...f, ...l.previewShots[i] })) as [PreviewShot, PreviewShot, PreviewShot];
 
   return (
     <PageTransition>
       <div className="landing">
         <LandingMotion>
-          {/* 1. Hero */}
-          <section className="relative isolate overflow-hidden">
-            <AuroraBackdrop />
-            <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 py-16 md:py-24 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16">
-              <div>
-                <p className="animate-in fade-in-0 fill-mode-both text-sm font-medium text-primary duration-500 max-lg:animate-none">
-                  {l.heroEyebrow}
-                </p>
-                <div className="mt-4">
-                  <HeroHeadline text={l.headline} />
-                </div>
-                <Reveal delay={0.15}>
-                  <p className="mt-6 max-w-[42ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.lede}</p>
-                </Reveal>
-                <Reveal delay={0.25} className="mt-8 flex flex-wrap gap-3">
-                  <Button asChild size="lg" className="group">
-                    <Link href={primaryHref}>
-                      {primaryLabel}
-                      <ArrowRight className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="#cara-kerja">{l.ctaHow}</Link>
-                  </Button>
-                </Reveal>
-                <Reveal delay={0.35} className="mt-8 flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{l.standardsLabel}</span>
-                  {STANDARDS.map((s) => (
-                    <span key={s} className="rounded-full border bg-card/80 px-3 py-1 font-mono text-xs">
-                      {s}
-                    </span>
-                  ))}
-                </Reveal>
-              </div>
-
-              {/* The product's most characteristic artefact: one project moving through
-                  the five gates, each tied to a real SSDF task code. */}
-              <TiltCard>
-                <StageTraceDemo
-                  steps={steps}
-                  codes={STAGE_CODES}
-                  labels={{
-                    title: l.traceTitle,
-                    meta: l.traceMeta,
-                    pass: l.statusPass,
-                    running: l.statusRunning,
-                    waiting: l.statusWaiting,
-                    pause: l.demoPause,
-                    play: l.demoPlay,
-                  }}
-                />
-              </TiltCard>
-            </div>
-          </section>
-
-          <div className="mx-auto w-full max-w-6xl px-4 pb-24">
-            {/* 2. Problem */}
-            <section id="masalah" aria-labelledby="masalah-title" className="mt-8 scroll-mt-20">
-              <SectionHeading id="masalah-title" eyebrow={l.problemEyebrow} title={l.problemTitle} lede={l.problemLede} />
-              <ProblemCards items={l.problems} />
-            </section>
-
-            {/* 3. Numbers */}
-            <section id="angka" aria-labelledby="angka-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="angka-title" eyebrow={l.statsEyebrow} title={l.statsTitle} />
-              <StatsBand items={stats} caption={l.statsCaption} />
-            </section>
-
-            {/* 4. Five gates */}
-            <section id="gerbang" aria-labelledby="gerbang-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="gerbang-title" eyebrow={l.gatesEyebrow} title={l.storyTitle} lede={l.gatesLede} />
-              <StageCarousel
-                steps={steps}
-                codes={STAGE_CODES}
-                labels={{
-                  tabs: l.gatesTabs,
-                  prev: l.gatesPrev,
-                  next: l.gatesNext,
-                  pause: l.demoPause,
-                  play: l.demoPlay,
-                  artifact: l.gatesArtifact,
-                  nist: l.mapNist,
-                  iso: l.mapIso,
-                }}
-              />
-            </section>
-
-            {/* 5. How it works */}
-            <section id="cara-kerja" aria-labelledby="cara-kerja-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="cara-kerja-title" eyebrow={l.howEyebrow} title={l.howTitle} lede={l.howLede} />
-              <HowItWorks
-                label={l.howTitle}
-                steps={l.how}
-                copy={{
-                  prompt: l.howPrompt,
-                  plan: l.howPlan,
-                  planTitle: l.howPlanTitle,
-                  approve: l.howApprove,
-                  verified: l.howVerified,
-                  finding: l.howFinding,
-                  fixed: l.howFixed,
-                  exports: l.deliverables.map((d) => d.title),
-                }}
-              />
-            </section>
-
-            {/* 6. Product preview */}
-            <section id="pratinjau" aria-labelledby="pratinjau-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="pratinjau-title" eyebrow={l.previewEyebrow} title={l.previewTitle} lede={l.previewLede} />
-              <ProductPreview shots={shots} url="shieldforge.local/studio" />
-            </section>
-
-            {/* 7. Control mapping */}
-            <section id="pemetaan" aria-labelledby="pemetaan-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="pemetaan-title" eyebrow={l.mappingEyebrow} title={l.mappingTitle} lede={l.mappingSubtitle} />
-              <Reveal className="soft-card mt-10 overflow-x-auto">
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b text-left text-xs text-muted-foreground">
-                      <th scope="col" className="px-5 py-3 font-medium">
-                        {l.mapStage}
-                      </th>
-                      <th scope="col" className="hidden px-5 py-3 font-medium sm:table-cell">
-                        {l.mapNist}
-                      </th>
-                      <th scope="col" className="hidden px-5 py-3 font-medium sm:table-cell">
-                        {l.mapIso}
-                      </th>
-                      <th scope="col" className="px-5 py-3 font-medium">
-                        {l.mapArtifact}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {steps.map((step, i) => (
-                      <RevealRow key={step.title} index={i} tint={`var(--stage-${i + 1})`}>
-                        <td className="border-s-4 px-5 py-3.5" style={{ borderInlineStartColor: `var(--stage-${i + 1})` }}>
-                          <span className="font-medium">{step.title}</span>
-                          {/* Codes move under the title on narrow screens instead of
-                              forcing a horizontally scrolled table. */}
-                          <span className="mt-1 block font-mono text-[11px] text-muted-foreground sm:hidden">
-                            {STAGE_CODES[i].nist} — {STAGE_CODES[i].iso}
-                          </span>
-                        </td>
-                        <td className="hidden px-5 py-3.5 font-mono text-xs sm:table-cell">{STAGE_CODES[i].nist}</td>
-                        <td className="hidden px-5 py-3.5 font-mono text-xs text-muted-foreground sm:table-cell">
-                          {STAGE_CODES[i].iso}
-                        </td>
-                        <td className="px-5 py-3.5 text-muted-foreground">{step.artifact}</td>
-                      </RevealRow>
-                    ))}
-                  </tbody>
-                </table>
-              </Reveal>
-            </section>
-
-            {/* 8. Features */}
-            <section id="fitur" aria-labelledby="fitur-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="fitur-title" eyebrow={l.featuresEyebrow} title={l.featuresTitle} />
-              <FeatureBento tiles={tiles} stages={steps.map((s) => s.title)} providers={AI_PROVIDERS} />
-            </section>
-
-            {/* 9. Deliverables */}
-            <section
-              id="hasil"
-              aria-labelledby="hasil-title"
-              className="mt-24 grid scroll-mt-20 items-start gap-10 md:mt-32 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]"
-            >
-              <div>
-                <SectionHeading id="hasil-title" eyebrow={l.deliverablesEyebrow} title={l.deliverablesTitle} lede={l.deliverablesLede} />
-                <Reveal delay={0.1} className="mt-8">
+          <div className="mx-auto w-full max-w-6xl px-4">
+            {/* Hero: the headline beside the temper rail, the page's one load-time moment. */}
+            <section className="grid items-center gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-10">
+              <div className="lg:col-span-6">
+                <h1 className="font-wide text-balance text-4xl md:text-5xl lg:text-6xl">{l.headline}</h1>
+                <p className="mt-6 max-w-[56ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.heroLede}</p>
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
                   <Button asChild size="lg">
                     <Link href={primaryHref}>{primaryLabel}</Link>
                   </Button>
-                </Reveal>
-              </div>
-              <Deliverables items={l.deliverables} />
-            </section>
-
-            {/* 10. FAQ */}
-            <section id="faq" aria-labelledby="faq-title" className="mt-24 scroll-mt-20 md:mt-32">
-              <SectionHeading id="faq-title" eyebrow={l.faqEyebrow} title={l.faqTitle} align="center" />
-              <Faq items={l.faq} />
-            </section>
-
-            {/* 11. Closing CTA */}
-            <Reveal className="relative isolate mt-24 overflow-hidden rounded-3xl border px-6 py-16 text-center md:mt-32">
-              <AuroraBackdrop className="[--aurora-strength:20%]" />
-              <h2 className="display-type text-balance text-2xl md:text-4xl">{l.closingTitle}</h2>
-              <p className="mx-auto mt-4 max-w-[48ch] text-muted-foreground">{l.closingLede}</p>
-              <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Button asChild size="lg" className="group">
-                  <Link href={primaryHref}>
-                    {primaryLabel}
-                    <ArrowRight className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
+                  <Link href="#gerbang" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+                    {l.ctaGates}
                   </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="#pemetaan">{l.ctaSecondary}</Link>
-                </Button>
+                </div>
+                <p className="font-narrow mt-8 text-sm text-muted-foreground">{l.heroStandards}</p>
               </div>
-            </Reveal>
+              <div className="lg:col-span-6">
+                <TemperRail
+                  gates={gates.map((g) => ({
+                    title: g.title,
+                    nist: g.steps[0].nist[0],
+                    celsius: g.temper.celsius,
+                    colourName: g.colourName,
+                  }))}
+                  labels={{
+                    label: l.rail.label,
+                    passed: l.rail.passed,
+                    waiting: l.rail.waiting,
+                    summary: fmt(l.rail.summary, { passed: gates.length, total: gates.length, score: 100 }),
+                    replay: l.rail.replay,
+                  }}
+                />
+              </div>
+            </section>
+
+            <LedgerSection n={1} id="masalah" title={l.problemTitle}>
+              <ProblemSection
+                stat={{
+                  show: l.problemStatShow === "true",
+                  text: l.problemStat,
+                  source: l.problemStatSource,
+                  url: l.problemStatUrl,
+                  newTab: l.newTab,
+                }}
+                items={l.problemList}
+              />
+            </LedgerSection>
+
+            <LedgerSection n={2} id="tentang" title={l.aboutTitle} lede={l.aboutLede}>
+              <AboutSection
+                aiTitle={l.aboutAiTitle}
+                ai={l.aboutAi}
+                gateTitle={l.aboutGateTitle}
+                gate={l.aboutGate}
+                forTitle={l.aboutForTitle}
+                forItems={l.aboutFor}
+              />
+            </LedgerSection>
+
+            <GateLinkProvider>
+              <LedgerSection n={3} id="gerbang" title={l.gatesTitle} lede={l.gatesLede}>
+                <GateCoupons
+                  gates={gates.map((g) => ({
+                    title: g.title,
+                    why: g.why,
+                    artifact: g.artifact,
+                    celsius: fmt(l.gatesCelsius, { n: g.temper.celsius }),
+                    colourName: g.colourName,
+                    nist: g.nist,
+                    iso: g.iso,
+                  }))}
+                  labels={{
+                    tabs: l.gatesTabs,
+                    prev: l.gatesPrev,
+                    next: l.gatesNext,
+                    pause: l.demoPause,
+                    play: l.demoPlay,
+                    artifact: l.gatesArtifact,
+                    nist: l.mapNist,
+                    iso: l.mapIso,
+                  }}
+                />
+                <SubStepsDisclosure
+                  summary={fmt(l.gatesSubSteps, { count: LANDING_FACTS.subSteps })}
+                  gates={gates.map((g) => ({
+                    title: g.title,
+                    count: fmt(l.gatesSubStepsCount, { count: g.steps.length }),
+                    steps: g.steps.map((s) => ({ label: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
+                  }))}
+                  labels={{ subStep: l.gatesSubStepCol, nist: l.mapNist, iso: l.mapIso }}
+                />
+              </LedgerSection>
+
+              <LedgerSection n={4} id="cara-kerja" title={l.howTitle} lede={l.howLede}>
+                <HowItWorks
+                  label={l.howTitle}
+                  steps={l.how}
+                  copy={{
+                    prompt: l.howPrompt,
+                    plan: l.howPlan,
+                    planTitle: l.howPlanTitle,
+                    approve: l.howApprove,
+                    verified: l.howVerified,
+                    finding: l.howFinding,
+                    fixed: l.howFixed,
+                    exports: l.deliverables.map((d) => d.title),
+                    scanScore,
+                    scanExample: fmt(l.howScanExample, {
+                      medium: 2,
+                      low: 1,
+                      wm: SCORE_WEIGHTS.medium,
+                      wl: SCORE_WEIGHTS.low,
+                      score: scanScore,
+                    }),
+                  }}
+                />
+              </LedgerSection>
+
+              <LedgerSection n={5} id="arsitektur" title={l.archTitle}>
+                <ArchitectureFlow
+                  nodes={l.archNodes}
+                  lede={l.archLede}
+                  platformTitle={l.archPlatformTitle}
+                  platform={l.archPlatform}
+                />
+              </LedgerSection>
+
+              <LedgerSection n={6} id="bukti" title={l.proofTitle}>
+                <ProofSection
+                  facts={[
+                    { label: l.statStages, value: LANDING_FACTS.stages },
+                    { label: l.statNist, value: LANDING_FACTS.nistTasks },
+                    { label: l.statSubsteps, value: LANDING_FACTS.subSteps },
+                    { label: l.statProviders, value: LANDING_FACTS.providers },
+                    { label: l.statLanguages, value: LANDING_FACTS.languages },
+                  ]}
+                  formulaTitle={l.proofFormulaTitle}
+                  formula={l.proofFormula}
+                  rows={gates.map((g) => ({ title: g.title, nist: g.nist, iso: g.iso, artifact: g.artifact }))}
+                  matrix={gates.flatMap((g) =>
+                    g.steps.map((s) => ({ gate: g.title, subStep: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
+                  )}
+                  labels={{
+                    stage: l.mapStage,
+                    nist: l.mapNist,
+                    iso: l.mapIso,
+                    artifact: l.mapArtifact,
+                    download: l.proofDownload,
+                  }}
+                />
+              </LedgerSection>
+            </GateLinkProvider>
+
+            <LedgerSection n={7} id="pratinjau" title={l.previewTitle}>
+              <ProductPreview
+                shots={shots}
+                figureLabels={[fmt(l.figure, { n: 1 }), fmt(l.figure, { n: 2 }), fmt(l.figure, { n: 3 })]}
+              />
+            </LedgerSection>
+
+            <LedgerSection n={8} id="fitur" title={l.featuresTitle}>
+              <FeatureLedger groups={l.featureGroups} />
+            </LedgerSection>
+
+            <LedgerSection n={9} id="hasil" title={l.resultsTitle}>
+              <Deliverables
+                resultsTitle={l.resultsDeliverables}
+                items={l.deliverables}
+                limitsTitle={l.limitsTitle}
+                limits={l.limits}
+              />
+            </LedgerSection>
+
+            <LedgerSection n={10} id="glosarium" title={l.glossaryTitle}>
+              <Glossary items={l.glossary} />
+            </LedgerSection>
+
+            <LedgerSection n={11} id="faq" title={l.faqTitle}>
+              <Faq items={l.faq} />
+            </LedgerSection>
+
+            {/* Closing: the temper hairline cools to grey once (a quench) on desktop. */}
+            <section className="pb-24 pt-8 text-center">
+              <QuenchRule />
+              <h2 className="font-wide mt-16 text-balance text-3xl md:text-5xl">{l.closingTitle}</h2>
+              <p className="mx-auto mt-4 max-w-[48ch] text-muted-foreground">{l.closingLede}</p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+                <Button asChild size="lg">
+                  <Link href={primaryHref}>{primaryLabel}</Link>
+                </Button>
+                <Link href="#gerbang" className="text-sm font-medium text-primary underline-offset-4 hover:underline">
+                  {l.ctaGates}
+                </Link>
+              </div>
+            </section>
           </div>
         </LandingMotion>
       </div>

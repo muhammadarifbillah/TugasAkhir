@@ -35,34 +35,13 @@
   },
   "landing": {
     "headline": "Every stage is checked before any code ships.",
-    "lede": "ShieldForge walks a web project through five Secure SDLC gates. Each gate maps to NIST SP 800-218 and ISO 27001 Annex A, and is proven with real Semgrep and Trivy output instead of an AI estimate.",
     "ctaPrimary": "Start a project",
     "ctaDashboard": "Open dashboard",
-    "ctaSecondary": "See the control mapping",
-    "traceTitle": "Example trail",
-    "traceMeta": "stage 3 of 5",
-    "statusPass": "Passed",
-    "statusRunning": "Running",
-    "statusWaiting": "Waiting",
-    "mappingTitle": "Five gates, five artefacts",
-    "mappingSubtitle": "Each stage names the NIST practice it enforces, the ISO 27001 controls it satisfies, and the file it leaves behind for the audit.",
     "mapStage": "Stage",
     "mapNist": "NIST SSDF practice",
     "mapIso": "ISO 27001 control",
     "mapArtifact": "Artefact",
     "featuresTitle": "What surrounds the gates.",
-    "featSdlcTitle": "5-Stage Secure SDLC",
-    "featSdlcDesc": "Analysis, design, development, testing and handover, each gate enforced by NIST SP 800-218.",
-    "featIsoTitle": "ISO 27001 Crosswalk",
-    "featIsoDesc": "Every stage maps automatically to ISO 27001:2022 Annex A for audit-ready compliance reports.",
-    "featByokTitle": "Bring Your Own Key",
-    "featByokDesc": "Connect your own AI provider: OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, or Ollama. Keys stay encrypted.",
-    "featGithubTitle": "GitHub Native",
-    "featGithubDesc": "Push finished code straight to your repository with a DevSecOps CI/CD pipeline included.",
-    "featPromptTitle": "Prompt-Driven",
-    "featPromptDesc": "Chat with the AI at every stage to generate, review, and revise your website.",
-    "featSecureTitle": "Secure by Design",
-    "featSecureDesc": "Threat models, secure coding, vulnerability scanning and auto-fix as a built-in workflow.",
     "steps": [
       {
         "title": "Analysis & Requirements",
@@ -92,42 +71,17 @@
     ],
     "demoPause": "Pause animation",
     "demoPlay": "Play animation",
-    "storyTitle": "Follow one project through the five gates",
-    "heroEyebrow": "AI builds websites fast. Who checks they're secure?",
-    "ctaHow": "See how it works",
-    "standardsLabel": "Mapped to",
-    "problemEyebrow": "The problem",
     "problemTitle": "AI-written code ships fast, but is rarely checked.",
-    "problemLede": "Speed is not the hard part any more. Proving that what you ship is safe, and showing where that proof lives, is.",
-    "problems": [
-      {
-        "title": "AI code is rarely audited",
-        "desc": "Generators produce code quickly but seldom check for injection, broken authentication, or leaked secrets."
-      },
-      {
-        "title": "Compliance comes last",
-        "desc": "Mapping to a standard usually happens after the app is finished, when every change is already expensive."
-      },
-      {
-        "title": "No trail for the auditor",
-        "desc": "Without an artefact per stage it is hard to prove which control was met, and when."
-      }
-    ],
-    "statsEyebrow": "In numbers",
-    "statsTitle": "Built on a real framework",
-    "statsCaption": "Numbers come from ShieldForge's own configuration, not estimates.",
     "statStages": "Secure SDLC stages",
     "statNist": "NIST SSDF tasks",
     "statSubsteps": "sub-step completion criteria",
     "statProviders": "AI providers (BYOK)",
     "statLanguages": "interface & output languages",
-    "gatesEyebrow": "Five gates",
     "gatesLede": "The next stage opens only when every sub-step of this one is met, and the server refuses shortcuts.",
     "gatesTabs": "Secure SDLC stages",
     "gatesPrev": "Previous stage",
     "gatesNext": "Next stage",
     "gatesArtifact": "Artefact",
-    "howEyebrow": "How it works",
     "howTitle": "From prompt to an auditable release",
     "howLede": "You stay in control at every step: the AI proposes, you approve, and scanners verify.",
     "how": [
@@ -165,9 +119,7 @@
     "howVerified": "Verified by scanner",
     "howFinding": "SQL query built from user input",
     "howFixed": "Parameterised query",
-    "previewEyebrow": "Product",
     "previewTitle": "This is the studio, not an illustration.",
-    "previewLede": "The same workspace guides every project: sub-steps on the left, AI and results in the centre, security and compliance on the right.",
     "previewShots": [
       {
         "alt": "ShieldForge studio with sub-steps, the AI workspace and the security panel",
@@ -182,15 +134,6 @@
         "caption": "NIST → ISO compliance panel"
       }
     ],
-    "mappingEyebrow": "Control mapping",
-    "featuresEyebrow": "Features",
-    "featDockerTitle": "Run it in Docker",
-    "featDockerDesc": "Start the generated app in a container and preview it without leaving the studio.",
-    "featDbTitle": "Persistent database",
-    "featDbDesc": "Create a PostgreSQL database for your app with one click.",
-    "deliverablesEyebrow": "Deliverables",
-    "deliverablesTitle": "What you take home",
-    "deliverablesLede": "Every completed project leaves files you can hand to a client, a lecturer or an auditor.",
     "deliverables": [
       {
         "title": "Source code",
@@ -213,7 +156,6 @@
         "desc": "Every requirement linked to its NIST task, ISO control and file."
       }
     ],
-    "faqEyebrow": "FAQ",
     "faqTitle": "Questions people ask",
     "faq": [
       {

@@ -35,34 +35,13 @@
   },
   "landing": {
     "headline": "Setiap tahap diperiksa sebelum kode dikirim.",
-    "lede": "ShieldForge menuntun proyek web melalui lima gerbang Secure SDLC. Tiap gerbang dipetakan ke NIST SP 800-218 dan ISO 27001 Lampiran A, lalu dibuktikan dengan keluaran Semgrep dan Trivy yang nyata, bukan perkiraan AI.",
     "ctaPrimary": "Mulai proyek",
     "ctaDashboard": "Buka dasbor",
-    "ctaSecondary": "Lihat pemetaan kontrol",
-    "traceTitle": "Contoh jejak",
-    "traceMeta": "tahap 3 dari 5",
-    "statusPass": "Lulus",
-    "statusRunning": "Berjalan",
-    "statusWaiting": "Menunggu",
-    "mappingTitle": "Lima gerbang, lima artefak",
-    "mappingSubtitle": "Tiap tahap menyebut praktik NIST yang ditegakkannya, kontrol ISO 27001 yang dipenuhinya, dan berkas yang ditinggalkannya untuk audit.",
     "mapStage": "Tahap",
     "mapNist": "Praktik NIST SSDF",
     "mapIso": "Kontrol ISO 27001",
     "mapArtifact": "Artefak",
     "featuresTitle": "Yang ada di sekitar gerbang.",
-    "featSdlcTitle": "Secure SDLC 5 Tahap",
-    "featSdlcDesc": "Analisis, desain, pengembangan, pengujian, dan serah terima, tiap gerbang ditegakkan NIST SP 800-218.",
-    "featIsoTitle": "Crosswalk ISO 27001",
-    "featIsoDesc": "Setiap tahap dipetakan otomatis ke ISO 27001:2022 Lampiran A untuk laporan kepatuhan siap audit.",
-    "featByokTitle": "Bawa Kunci Sendiri (BYOK)",
-    "featByokDesc": "Hubungkan penyedia AI Anda sendiri: OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, atau Ollama. Kunci tetap terenkripsi.",
-    "featGithubTitle": "Natif GitHub",
-    "featGithubDesc": "Dorong kode selesai langsung ke repositori Anda dengan alur kerja DevSecOps CI/CD bawaan.",
-    "featPromptTitle": "Bertenaga Prompt",
-    "featPromptDesc": "Obrolkan dengan AI di setiap tahap untuk menghasilkan, meninjau, dan merevisi website Anda.",
-    "featSecureTitle": "Aman Secara Desain",
-    "featSecureDesc": "Model ancaman, pemograman aman, pemindaian kerentanan, dan perbaikan otomatis sebagai alur bawaan.",
     "steps": [
       {
         "title": "Analisis & Kebutuhan",
@@ -92,42 +71,17 @@
     ],
     "demoPause": "Jeda animasi",
     "demoPlay": "Putar animasi",
-    "storyTitle": "Ikuti satu proyek melewati lima gerbang",
-    "heroEyebrow": "Website buatan AI cepat jadi. Keamanannya siapa yang memeriksa?",
-    "ctaHow": "Lihat cara kerja",
-    "standardsLabel": "Dipetakan ke",
-    "problemEyebrow": "Masalahnya",
     "problemTitle": "Kode buatan AI cepat jadi, tapi jarang diperiksa.",
-    "problemLede": "Kecepatan bukan lagi bagian tersulit. Yang sulit adalah membuktikan bahwa yang dikirim aman, dan menunjukkan di mana bukti itu berada.",
-    "problems": [
-      {
-        "title": "Kode AI jarang diaudit",
-        "desc": "Generator cepat menghasilkan kode, tetapi jarang memeriksa injeksi, autentikasi yang lemah, atau rahasia yang bocor."
-      },
-      {
-        "title": "Kepatuhan dikerjakan belakangan",
-        "desc": "Pemetaan ke standar biasanya dibuat setelah aplikasi jadi, saat setiap perubahan sudah mahal."
-      },
-      {
-        "title": "Tidak ada jejak untuk auditor",
-        "desc": "Tanpa artefak per tahap, sulit membuktikan kontrol mana yang dipenuhi dan kapan."
-      }
-    ],
-    "statsEyebrow": "Dalam angka",
-    "statsTitle": "Dibangun di atas kerangka nyata",
-    "statsCaption": "Angka diambil dari konfigurasi ShieldForge, bukan perkiraan.",
     "statStages": "tahap Secure SDLC",
     "statNist": "task NIST SSDF",
     "statSubsteps": "syarat selesai sub-langkah",
     "statProviders": "penyedia AI (BYOK)",
     "statLanguages": "bahasa antarmuka & keluaran",
-    "gatesEyebrow": "Lima gerbang",
     "gatesLede": "Tahap berikutnya baru terbuka setelah semua sub-langkah tahap ini terpenuhi, dan server menolak jalan pintas.",
     "gatesTabs": "Tahap Secure SDLC",
     "gatesPrev": "Tahap sebelumnya",
     "gatesNext": "Tahap berikutnya",
     "gatesArtifact": "Artefak",
-    "howEyebrow": "Cara kerja",
     "howTitle": "Dari prompt ke rilis yang bisa diaudit",
     "howLede": "Anda tetap memegang kendali di setiap langkah: AI mengusulkan, Anda menyetujui, pemindai memverifikasi.",
     "how": [
@@ -165,9 +119,7 @@
     "howVerified": "Terverifikasi pemindai",
     "howFinding": "Query SQL disusun dari input pengguna",
     "howFixed": "Query berparameter",
-    "previewEyebrow": "Produk",
     "previewTitle": "Ini studionya, bukan ilustrasi.",
-    "previewLede": "Ruang kerja yang sama memandu setiap proyek: sub-langkah di kiri, AI dan hasil di tengah, keamanan dan kepatuhan di kanan.",
     "previewShots": [
       {
         "alt": "Studio ShieldForge dengan sub-langkah, ruang kerja AI, dan panel keamanan",
@@ -182,15 +134,6 @@
         "caption": "Panel kepatuhan NIST → ISO"
       }
     ],
-    "mappingEyebrow": "Pemetaan kontrol",
-    "featuresEyebrow": "Fitur",
-    "featDockerTitle": "Jalankan di Docker",
-    "featDockerDesc": "Jalankan aplikasi hasil generate di container dan pratinjau tanpa keluar dari studio.",
-    "featDbTitle": "Database persisten",
-    "featDbDesc": "Buat database PostgreSQL untuk aplikasi Anda dengan satu klik.",
-    "deliverablesEyebrow": "Hasil",
-    "deliverablesTitle": "Yang Anda bawa pulang",
-    "deliverablesLede": "Setiap proyek yang selesai meninggalkan berkas yang bisa diserahkan ke klien, dosen, atau auditor.",
     "deliverables": [
       {
         "title": "Kode sumber",
@@ -213,7 +156,6 @@
         "desc": "Setiap kebutuhan terhubung ke task NIST, kontrol ISO, dan berkasnya."
       }
     ],
-    "faqEyebrow": "FAQ",
     "faqTitle": "Pertanyaan yang sering diajukan",
     "faq": [
       {
