@@ -17,3 +17,12 @@ test("githubPushError maps Octokit failures by status, not only by message text"
   assert.match(githubPushError(fail(500, "Server Error")), /GitHub push failed/);
   assert.match(githubPushError("boom"), /GitHub push failed/);
 });
+
+test("githubPushError names the Workflows permission when the project ships a CI file", () => {
+  // GitHub answers 403 with an empty body and `contents=write` in the headers for
+  // .github/workflows/* writes, so the token gap is invisible without this hint.
+  const err = fail(403, "Resource not accessible by personal access token");
+  assert.match(githubPushError(err, { hasWorkflows: true }), /Workflows: Read and write/);
+  assert.doesNotMatch(githubPushError(err), /Workflows/);
+  assert.match(githubPushError(fail(500, "Server Error"), { hasWorkflows: true }), /GitHub push failed/);
+});

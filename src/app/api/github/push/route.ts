@@ -57,8 +57,10 @@ export async function POST(request: Request) {
     );
   }
 
+  let hasWorkflows = false;
   try {
     const { project, files } = await buildProjectFiles(projectId, session.user.id);
+    hasWorkflows = Object.keys(files).some((path) => path.startsWith(".github/workflows/"));
     const octokit = new Octokit({ auth: token });
 
     const me = await octokit.rest.users.getAuthenticated();
@@ -110,7 +112,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[api/github/push]", err);
     return NextResponse.json(
-      { error: githubPushError(err) },
+      { error: githubPushError(err, { hasWorkflows }) },
       { status: 400 },
     );
   }
