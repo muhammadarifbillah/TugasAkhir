@@ -2,7 +2,7 @@ import { test } from "vitest";
 import assert from "node:assert/strict";
 import type { Octokit } from "octokit";
 
-import { pushFiles, resolveTarget } from "./github-push";
+import { ensureBranch, pushFiles, resolveTarget } from "./github-push";
 
 const fail = (status: number, message: string) => Object.assign(new Error(message), { status });
 
@@ -62,6 +62,17 @@ function fakeGitHub(opts: { unavailableReads?: number } = {}) {
           refs.set(key(owner, repo, ref), sha);
           return { data: {} };
         },
+        createRef: async ({ owner, repo, ref, sha }: { owner: string; repo: string; ref: string; sha: string }) => {
+          guard(owner, repo);
+          const name = ref.replace(/^refs\//, "");
+          if (refs.has(key(owner, repo, name))) throw fail(422, "Reference already exists");
+          refs.set(key(owner, repo, name), sha);
+          return { data: {} };
+        },
+        deleteRef: async ({ owner, repo, ref }: { owner: string; repo: string; ref: string }) => {
+          if (!refs.delete(key(owner, repo, ref))) throw fail(422, "Reference does not exist");
+          return { data: {} };
+        },
       },
     },
   };
@@ -92,4 +103,17 @@ test("pushing to an existing repository builds on its current head", async () =>
   assert.equal(gh.refs.get("me/old:heads/main"), sha);
   assert.deepEqual(gh.parents.at(-1), ["head1"]);
   assert.equal(target.created, false);
+});
+
+test("a release branch left by a cancelled revision is restarted from the base commit", async () => {
+  const gh = fakeGitHub();
+  gh.refs.set("me/app:heads/main", "base");
+  gh.refs.set("me/app:heads/release/v1.1", "stale");
+
+  await ensureBranch(gh.octokit, "me", "app", "release/v1.1", "base");
+  assert.equal(gh.refs.get("me/app:heads/release/v1.1"), "base");
+
+  // A fresh branch name must not need the delete step.
+  await ensureBranch(gh.octokit, "me", "app", "release/v1.2", "base");
+  assert.equal(gh.refs.get("me/app:heads/release/v1.2"), "base");
 });

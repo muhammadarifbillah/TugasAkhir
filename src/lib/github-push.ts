@@ -91,3 +91,21 @@ export async function pushFiles(
   await octokit.rest.git.updateRef({ owner, repo, ref: `heads/${branch}`, sha });
   return sha;
 }
+
+/** Points `branch` at `sha`, replacing a release branch left behind by a cancelled revision. */
+export async function ensureBranch(
+  octokit: Octokit,
+  owner: string,
+  repo: string,
+  branch: string,
+  sha: string,
+): Promise<void> {
+  try {
+    await octokit.rest.git.createRef({ owner, repo, ref: `refs/heads/${branch}`, sha });
+  } catch (err) {
+    if ((err as { status?: unknown }).status !== 422) throw err;
+    // Retrying the same version after a cancel would otherwise fail forever.
+    await octokit.rest.git.deleteRef({ owner, repo, ref: `heads/${branch}` });
+    await octokit.rest.git.createRef({ owner, repo, ref: `refs/heads/${branch}`, sha });
+  }
+}

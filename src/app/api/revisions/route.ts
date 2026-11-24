@@ -8,6 +8,7 @@ import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { buildProjectFiles } from "@/lib/export-files";
 import { githubRevisionWarning } from "@/lib/github-push-error";
+import { ensureBranch } from "@/lib/github-push";
 
 const bodySchema = z.object({
   projectId: z.string().min(1),
@@ -125,12 +126,7 @@ export async function POST(request: Request) {
       });
       const baseSha = baseRef.data.object.sha;
 
-      await octokit.rest.git.createRef({
-        owner,
-        repo,
-        ref: `refs/heads/${branchName}`,
-        sha: baseSha,
-      });
+      await ensureBranch(octokit, owner, repo, branchName, baseSha);
 
       // Push the current generated code onto the release branch.
       const treeItems = await Promise.all(
