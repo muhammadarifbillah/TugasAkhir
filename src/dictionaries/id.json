@@ -84,7 +84,10 @@
         "title": "Serah Terima & Deliverables",
         "artifact": "Buku manual, laporan ISO 27001"
       }
-    ]
+    ],
+    "demoPause": "Jeda animasi",
+    "demoPlay": "Putar animasi",
+    "storyTitle": "Ikuti satu proyek melewati lima gerbang"
   },
   "nav": {
     "dashboard": "Dasbor",

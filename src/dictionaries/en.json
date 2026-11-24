@@ -84,7 +84,10 @@
         "title": "Handover & Deliverables",
         "artifact": "Manual book, ISO 27001 report"
       }
-    ]
+    ],
+    "demoPause": "Pause animation",
+    "demoPlay": "Play animation",
+    "storyTitle": "Follow one project through the five gates"
   },
   "nav": {
     "dashboard": "Dashboard",
