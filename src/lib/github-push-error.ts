@@ -16,3 +16,14 @@ export function githubPushError(err: unknown, opts?: { hasWorkflows?: boolean })
   }
   return "GitHub push failed. Check the repository URL, token, and permissions.";
 }
+
+/** Warning shown when a revision started but its release branch/PR could not be created. */
+export function githubRevisionWarning(err: unknown): string {
+  const status = (err as { status?: unknown } | null)?.status;
+  const base = "Revision started, but the GitHub release branch/PR could not be created.";
+  // A fine-grained token without Pull requests write gets 403 here, and the
+  // response body does not say which permission is missing.
+  return status === 403
+    ? `${base} A fine-grained token needs Pull requests: Read and write.`
+    : `${base} Check the linked token and repository.`;
+}

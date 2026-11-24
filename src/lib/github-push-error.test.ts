@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { githubPushError } from "./github-push-error";
+import { githubPushError, githubRevisionWarning } from "./github-push-error";
 
 const fail = (status: number, message: string) => Object.assign(new Error(message), { status });
 
@@ -16,6 +16,12 @@ test("githubPushError maps Octokit failures by status, not only by message text"
   assert.match(githubPushError(new Error("Bad credentials")), /authentication failed/);
   assert.match(githubPushError(fail(500, "Server Error")), /GitHub push failed/);
   assert.match(githubPushError("boom"), /GitHub push failed/);
+});
+
+test("githubRevisionWarning names the Pull requests permission on 403", () => {
+  const err = Object.assign(new Error("Resource not accessible by personal access token"), { status: 403 });
+  assert.match(githubRevisionWarning(err), /Pull requests: Read and write/);
+  assert.match(githubRevisionWarning(new Error("boom")), /Check the linked token and repository/);
 });
 
 test("githubPushError names the Workflows permission when the project ships a CI file", () => {

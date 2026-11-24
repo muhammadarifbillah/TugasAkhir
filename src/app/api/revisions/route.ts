@@ -7,6 +7,7 @@ import { requestIp, writeAudit } from "@/lib/audit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { buildProjectFiles } from "@/lib/export-files";
+import { githubRevisionWarning } from "@/lib/github-push-error";
 
 const bodySchema = z.object({
   projectId: z.string().min(1),
@@ -175,8 +176,7 @@ export async function POST(request: Request) {
       });
     } catch (err) {
       console.error("[api/revisions] github branch/pr", err);
-      githubWarning =
-        "Revision started, but the GitHub release branch/PR could not be created. Check the linked token and repository.";
+      githubWarning = githubRevisionWarning(err);
     }
   }
 
