@@ -32,6 +32,8 @@
 
 ### Task 1: Tombol Jalankan di tahap Serah Terima
 
+**Dibatalkan pemilik proyek pada 2026-11-24.** Tombol Jalankan tetap hanya di tahap Pengembangan.
+
 **Files:**
 - Modify: `src/lib/stages.ts` (tambah fungsi setelah `getStageDefinition`, sekitar baris 286)
 - Modify: `src/components/studio/studio-workspace.tsx:1384`

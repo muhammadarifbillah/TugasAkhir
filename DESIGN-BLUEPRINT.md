@@ -1,42 +1,37 @@
 # ShieldForge Design Blueprint
 
 > Versi: 1.0 | Terakhir diperbarui: September 2026
-> Tools: Next.js 16, Tailwind CSS v4, komponen UI lokal (Radix primitives), Geist Font
+> Tools: Next.js 16, Tailwind CSS v4, komponen UI lokal (Radix primitives), Archivo + Geist Mono (self-hosted)
 
 ---
 
 ## 1. Design System
 
-### 1.1 Color Palette (OKLCH)
+### 1.1 Color Palette
 
 #### Primary Colors
 
 | Token | Light | Dark | Kegunaan |
 |-------|-------|------|----------|
-| `--primary` | `oklch(0.585 0.233 277.117)` | `oklch(0.704 0.19 256.87)` | Tombol aktif, link, brand |
-| `--primary-foreground` | `oklch(0.985 0 0)` | `oklch(0.985 0 0)` | Teks di atas primary |
-| `--background` | `oklch(0.985 0 0)` | `oklch(0.09 0.006 285.88)` | Background halaman |
-| `--foreground` | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` | Teks utama |
+| `--primary` | `#2f5e9e` | `#7fa6dc` | Tombol aktif, link, brand |
+| `--primary-foreground` | `#ffffff` | `#1e2227` | Teks di atas primary |
+| `--background` | `#f4f6f8` | `#1e2227` | Background halaman |
+| `--foreground` | `#15191e` | `#e7eaee` | Teks utama |
 
 #### Semantic Colors
 
-| Token | Light | Dark | Kegunaan |
-|-------|-------|------|----------|
-| `--success` | `oklch(0.596 0.145 163.225)` | `oklch(0.696 0.17 162.48)` | Selesai, aman, skor tinggi |
-| `--warning` | `oklch(0.769 0.188 70.08)` | `oklch(0.837 0.128 66.29)` | Peringatan, skor sedang |
-| `--danger` | `oklch(0.637 0.237 25.331)` | `oklch(0.704 0.191 22.216)` | Error, skor rendah |
-| `--destructive` | `oklch(0.577 0.245 27.325)` | `oklch(0.704 0.191 22.216)` | Hapus, fatal |
+Token status (`--success`, `--warning`, `--danger`, `--destructive`, `--info`) didefinisikan di `src/app/globals.css`.
 
 #### Surface Colors
 
 | Token | Light | Dark | Kegunaan |
 |-------|-------|------|----------|
-| `--card` | `oklch(1 0 0)` | `oklch(0.13 0.005 285.82)` | Background kartu |
-| `--card-foreground` | `oklch(0.145 0 0)` | `oklch(0.985 0 0)` | Teks kartu |
-| `--muted` | `oklch(0.97 0 0)` | `oklch(0.18 0.006 285.885)` | Background halus |
-| `--muted-foreground` | `oklch(0.556 0 0)` | `oklch(0.708 0 0)` | Teks sekunder |
-| `--border` | `oklch(0.922 0 0)` | `oklch(1 0 0 / 12%)` | Semua border |
-| `--accent` | `oklch(0.97 0 0)` | `oklch(0.205 0 0)` | Hover background |
+| `--card` | `#ffffff` | `#272c33` | Background kartu |
+| `--card-foreground` | `#15191e` | `#e7eaee` | Teks kartu |
+| `--muted` | `#e9edf1` | `#2f353d` | Background halus |
+| `--muted-foreground` | `#5b6470` | `#a3acb7` | Teks sekunder |
+| `--border` | `#d5dbe2` | `#3a414a` | Semua border |
+| `--accent` | `#e3e8ee` | `#323942` | Hover background |
 
 ### 1.2 Typography Scale
 
@@ -49,12 +44,12 @@
 | `text-xl` | 20px | Section title |
 | `text-2xl` | 24px | Page title |
 | `text-4xl` | 36px | Hero title (mobile) |
-| `text-6xl` | 60px | Hero title (desktop) |
+| `md:text-5xl` | 48px | Hero title (desktop) |
 
 #### Font Families
 
 ```
-Sans: Geist, ui-sans-serif, system-ui, sans-serif
+Sans: Archivo (self-hosted), ui-sans-serif, system-ui, sans-serif
 Mono: Geist_Mono, ui-monospace, monospace
 ```
 
@@ -85,19 +80,16 @@ Mono: Geist_Mono, ui-monospace, monospace
 | Token | Nilai | Contoh |
 |-------|-------|--------|
 | `rounded-sm` | 4px | Badge kecil |
-| `rounded-md` | 8px | Tombol, input, card kecil |
-| `rounded-lg` | 10px | Card, panel |
-| `rounded-xl` | 14px | Dialog, modal |
+| `rounded-md` | 6px | Tombol, input, card kecil |
+| `rounded-lg` | 8px | Card, panel |
+| `rounded-xl` | 12px | Dialog, modal |
 | `rounded-full` | 9999px | Avatar, pill |
+
+Turunan dari `--radius: 0.5rem` di `src/app/globals.css` (`sm = radius - 4px`, `md = radius - 2px`, `lg = radius`, `xl = radius + 4px`).
 
 ### 1.5 Shadow System
 
-```css
---shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
---shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
---shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
---shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-```
+Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` berbasis `--shadow-color` di `src/app/globals.css`.
 
 ---
 
@@ -113,30 +105,29 @@ Mono: Geist_Mono, ui-monospace, monospace
 │              🛡️ ShieldForge                              │
 │   AI-Powered Secure Development Lifecycle Generator     │
 │                                                         │
-│   [Get Started]  [View on GitHub]                       │
+│   [Start a project]  [See the control mapping]          │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐               │
-│  │ 🔄 SDLC  │ │ 🔒 ISO   │ │ 🔑 BYOK  │               │
-│  │ Workflow │ │ 27001    │ │ Keys     │               │
-│  └──────────┘ └──────────┘ └──────────┘               │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐               │
-│  │ 🐙 GitHub│ │ 💬 AI    │ │ 🛡️ Secure│               │
-│  │ Push     │ │ Prompts  │ │ Coding   │               │
-│  └──────────┘ └──────────┘ └──────────┘               │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
+│  │ 🔄 5-Stage   │ │ 🔒 ISO 27001 │ │ 🔑 Bring     │     │
+│  │ Secure SDLC  │ │ Crosswalk    │ │ Your Own Key │     │
+│  └──────────────┘ └──────────────┘ └──────────────┘     │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
+│  │ 🐙 GitHub    │ │ 💬 Prompt-   │ │ 🛡️ Secure by  │     │
+│  │ Native       │ │ Driven       │ │ Design       │     │
+│  └──────────────┘ └──────────────┘ └──────────────┘     │
 │                                                         │
 ├─────────────────────────────────────────────────────────┤
-│ FOOTER: ShieldForge v1.0 — Built with Next.js 16        │
+│ FOOTER: ShieldForge — AI-powered secure website generator. NIST SP 800-218 engine → ISO 27001:2022 crosswalk (concept). │
 └─────────────────────────────────────────────────────────┘
 ```
 
 **Spesifikasi:**
-- Container: `max-w-5xl mx-auto px-4 py-16 md:py-24`
-- Hero: Centered text, H1 `text-4xl md:text-6xl font-bold`
-- Badge: `rounded-full border bg-success/10 px-4 py-1.5 text-xs text-success`
-- CTA: `Button size="lg"` dengan icon
-- Features: `grid gap-4 sm:grid-cols-2 lg:grid-cols-3`
+- Container: `max-w-6xl px-4 py-14 md:py-20`
+- Hero: rata kiri di grid, H1 `text-4xl md:text-5xl` dengan kelas `display-type`
+- CTA: dua `Button size="lg"` tanpa ikon: "Start a project" dan "See the control mapping"
+- Features: `grid gap-x-12 gap-y-7 sm:grid-cols-2`
 
 ### 2.2 Dashboard
 
@@ -169,7 +160,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 
 **Spesifikasi:**
 - Container: `max-w-7xl mx-auto px-4 py-8`
-- Header: `flex justify-between items-center mb-6`
+- Header: `mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between`
 - Search: `Input` dengan icon `pl-9`
 - Filter: `Button size="sm"` chips
 - Grid: `grid gap-4 md:grid-cols-2 xl:grid-cols-3`
@@ -203,7 +194,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 │             │ │ └───────────────────┘ │ │ │ Add input valid  │  │
 │             │ └───────────────────────┘ │ └─────────────────┘  │
 ├─────────────┴───────────────────────────┴───────────────────────┤
-│ [Navigate] [Chat] [Security]                    ← Mobile tabs  │
+│ [Sub-steps & Deliverables] [AI Prompt Engine] [Security & Compliance] ← Mobile tabs │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -213,7 +204,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 - Left: `md:col-span-4 lg:col-span-3` — Sub-steps (current step highlighted, `aria-current="step"`) + Deliverables
 - Center: `md:col-span-8 lg:col-span-6` — tablist **Results & editor / Chat** (both panels stay mounted so Monaco keeps its state) + a composer that is always visible
 - Right: `lg:col-span-3` — Security & Compliance with tabs **Score / Findings / Compliance / Traceability** (Traceability only in testing & handover)
-- Mobile: Tab switching (Navigate/Chat/Security)
+- Mobile: tab "Sub-steps & Deliverables", "AI Prompt Engine", dan "Security & Compliance"
 
 **Next Action Bar** (under the stepper, `next-action-bar.tsx`): shows the current sub-step + the list of remaining gaps (chip → opens the step result) + an "Ask AI" button that fills in the composer. When every requirement is met it shows a **Complete Stage** button → ConfirmDialog → toast → `router.push` to the next stage. Once the stage is completed it shows a link to the next stage.
 
@@ -241,14 +232,14 @@ Mono: Geist_Mono, ui-monospace, monospace
 │                                                         │
 │  🔑 BYOK Manager                                        │
 │  ┌─────────────────────────────────────────────────┐   │
-│  │ API Keys                                        │   │
-│  │ [+ Add Key]                                     │   │
+│  │ AI Models & API Keys                            │   │
+│  │ [Add API Key]                                   │   │
 │  │ ┌───────────────────────────────────────────┐   │   │
 │  │ │ Google AI | AIza...x9K | My Key | [Active]│   │   │
 │  │ └───────────────────────────────────────────┘   │   │
 │  │                                                 │   │
 │  │ AI Models                                       │   │
-│  │ [+ Add Model]                                   │   │
+│  │ [Add model]                                     │   │
 │  │ ┌───────────────────────────────────────────┐   │   │
 │  │ │ gemini-3.6-flash | temp:0.7 | [Default ⭐]│   │   │
 │  │ └───────────────────────────────────────────┘   │   │
@@ -266,7 +257,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │ Sign In                                          │   │
-│  │ Welcome back to ShieldForge                       │   │
+│  │ Welcome back                                      │   │
 │  │                                                  │   │
 │  │ Email                                           │   │
 │  │ [you@example.com________________________]       │   │
@@ -278,9 +269,9 @@ Mono: Geist_Mono, ui-monospace, monospace
 │  │                                                  │   │
 │  │ ──────── or ────────                             │   │
 │  │                                                  │   │
-│  │ [Sign in with GitHub]                            │   │
+│  │ [Continue with GitHub]                           │   │
 │  │                                                  │   │
-│  │ Don't have an account? [Register]                │   │
+│  │ Don't have an account? [Sign up]                 │   │
 │  └─────────────────────────────────────────────────┘   │
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
@@ -301,7 +292,7 @@ Mono: Geist_Mono, ui-monospace, monospace
 ```
 Height: h-14 (56px)
 Position: sticky top-0 z-40
-Background: bg-background/80 backdrop-blur
+Background: bg-background
 Border: border-b
 
 Left:  [Logo 28px] [App Name] [Nav Links (hidden mobile)]
@@ -317,22 +308,22 @@ Right: [Locale] [Theme] [Avatar Pill] [Logout]
 │                                     │
 │ [React] [Node] [v1.0]              │
 │                                     │
-│ 🔒 Score: 72/100                    │
+│ 🔒 Security score: 72%               │
 │ ████████░░░░░░░░░░░░ (72%)          │
 │                                     │
 │ Stage: Analysis  [Revise] [Open]    │
 └─────────────────────────────────────┘
 
-Border: border rounded-lg
+Border: rounded-xl border
 Hover: hover:border-primary/50
-Padding: p-0 (CardHeader) + p-6 (CardContent)
+Padding: CardHeader p-6 + CardContent p-6 pt-0
 ```
 
 ### 3.3 Stage Stepper
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ [1] Analysis > [2] Design > [3] Dev > [4] Test > [5]   │
+│ 1. Analysis & Requirements > 2. Design & Architecture > 3. Secure Development > 4. Security Testing & Audit > 5. Handover & Deliverables │
 ├─────────────────────────────────────────────────────────┤
 │ States:                                                 │
 │ - Active: bg-primary text-primary-foreground            │
@@ -370,7 +361,7 @@ Padding: p-0 (CardHeader) + p-6 (CardContent)
 
 User msg: bg-primary text-primary-foreground rounded-lg
 Bot msg: border bg-card rounded-lg
-Input: font-mono text-xs resize-none
+Input: min-h-[3rem] resize-none text-sm
 ```
 
 ### 3.5 Plan Card
@@ -397,8 +388,8 @@ Input: font-mono text-xs resize-none
 │ [Approve & Build ✅]  [Cancel ❌]   │
 └─────────────────────────────────────┘
 
-Border: border-blue-700 bg-blue-950/50
-Button: bg-emerald-600 hover:bg-emerald-500
+Border: border-primary/30 bg-primary/5
+Button: bg-primary hover:bg-primary/90
 ```
 
 ### 3.6 Step Result Dialog (Tabbed)
@@ -433,7 +424,7 @@ Button: bg-emerald-600 hover:bg-emerald-500
 └─────────────────────────────────────────────────────┘
 
 Tab bar: border-b, active bg-primary/15 text-primary
-Content: max-h-[60vh] overflow-y-auto p-4
+Content: max-h-[70vh] overflow-y-auto p-3 sm:p-4
 ```
 
 ### 3.7 Security Score Panel
@@ -463,6 +454,8 @@ Content: max-h-[60vh] overflow-y-auto p-4
 Progress: color coded (green >=85, amber >=60, red <60)
 ```
 
+Skor tampil di tab **Score**; Stage Security Parameters, NIST Checks, dan ISO Mapping tampil di tab **Compliance** (NIST/ISO hanya bila ada rekomendasi).
+
 ### 3.8 Recommendation Card
 
 ```
@@ -478,11 +471,7 @@ Progress: color coded (green >=85, amber >=60, red <60)
 │ [Apply Fix] [✓ Applied]            │
 └─────────────────────────────────────┘
 
-Severity colors:
-- critical: bg-red-900 text-red-300
-- high: bg-orange-900 text-orange-300
-- medium: bg-yellow-900 text-yellow-300
-- low: bg-green-900 text-green-300
+Severity colors: mengikuti token tema — critical/high `danger`, medium `warning`, low `info`.
 ```
 
 ---
@@ -496,16 +485,16 @@ Severity colors:
 | Default | <640px | Single column, mobile tabs |
 | `sm` | 640px+ | 2-column grids |
 | `md` | 768px+ | Desktop nav, 2-column layouts |
-| `lg` | 1024px+ | 3-column studio, 3-column features |
+| `lg` | 1024px+ | Studio tiga kolom; daftar fitur landing tetap dua kolom |
 
 ### 4.2 Studio Workspace Responsive
 
 ```
 Desktop (lg+):           Tablet (md):            Mobile (<md):
 ┌────┬────────┬────┐    ┌──────┬────────┐      ┌──────────┐
-│Left│ Center │Rght│    │ Left │ Center │      │ [Navigate]│
-│3/12│ 6/12   │3/12│    │4/12  │ 8/12   │      │ [Chat]    │
-│    │        │    │    │      │        │      │ [Security] │
+│Left│ Center │Rght│    │ Left │ Center │      │ [Sub-steps & Deliverables]│
+│3/12│ 6/12   │3/12│    │4/12  │ 8/12   │      │ [AI Prompt Engine]    │
+│    │        │    │    │      │        │      │ [Security & Compliance] │
 └────┴────────┴────┘    └──────┴────────┘      └──────────┘
                         Security = drawer      Content switches
                         on the right (button   per active tab
@@ -516,7 +505,7 @@ Desktop (lg+):           Tablet (md):            Mobile (<md):
 
 ```
 ┌─────────────────────────────────────┐
-│ [Navigate] [Chat] [Security]        │
+│ [Sub-steps & Deliverables] [AI Prompt Engine] [Security & Compliance] │
 ├─────────────────────────────────────┤
 │ Active: border-b-2 border-primary   │
 │ Inactive: text-muted-foreground     │
@@ -531,7 +520,7 @@ Desktop (md+):                    Mobile (<md):
 ┌──────────────────────────┐     ┌──────────────────────┐
 │ [Logo] Name [Nav] [User] │     │ [Logo] Name [≡ Menu] │
 └──────────────────────────┘     └──────────────────────┘
-                                  Menu slides from right
+                                  Menu tampil di sisi kanan, tanpa animasi slide
                                   w-64, overlay bg-black/50
 ```
 
@@ -552,7 +541,7 @@ Desktop (md+):                    Mobile (<md):
 8. Auto-send build prompt
 9. POST /api/chat/build
 10. AI executes plan
-11. Toast: "Build complete! 3 files created"
+11. Toast: "Build complete: {created} files created, {modified} modified"
 12. BuildResultCard shows summary
 13. Auto-switch back to Plan mode
 ```
@@ -574,7 +563,7 @@ Desktop (md+):                    Mobile (<md):
 ```
 1. User sends prompt
 2. Optimistic UI (user message appears)
-3. API call to /api/chat
+3. API call ke /api/chat/plan (mode Plan) atau /api/chat/build (mode Build)
 4. Loading indicator (Bot + spinner)
 5. Response received
 6. Parse structured JSON
@@ -616,7 +605,7 @@ Desktop (md+):                    Mobile (<md):
 | `text-primary` | Brand, active states |
 | `text-success` | Safe, completed, high score |
 | `text-warning` | Caution, medium score |
-| `text-destructive` | Error, danger, low score |
+| `text-destructive` | Error; skor rendah memakai `text-danger` |
 | `text-muted-foreground` | Secondary, inactive |
 
 ---
@@ -626,8 +615,8 @@ Desktop (md+):                    Mobile (<md):
 ### 7.1 Transitions
 
 ```css
-/* Standard transition */
-transition-colors duration-200
+/* Standard transition: durasi bawaan; duration-200 hanya pada animasi angkat kartu proyek */
+transition-colors
 
 /* Slide in for toasts */
 @keyframes slide-in {
@@ -665,8 +654,8 @@ focus-visible:ring-offset-2
 
 - Tab order follows visual layout
 - Enter/Space activates buttons
-- Escape closes dialogs
-- Arrow keys navigate menus, tablists and the Plan/Build radiogroup (roving tabindex, Home/End)
+- Escape closes dialogs and menus
+- Arrow keys (and Home/End) move focus within tablists (studio panels and the step result dialog), the Plan/Build radiogroup, and menus (user menu and the studio "..." menu)
 - Ctrl+Enter sends chat
 - Ctrl/Cmd+K opens the command palette (stages, sub-steps, panels, actions)
 - Alt+1..5 switches to that stage (if it is not locked)
@@ -674,10 +663,11 @@ focus-visible:ring-offset-2
 
 ### 8.3 Screen Reader
 
-- All icons have `aria-hidden="true"`
-- Interactive elements have `aria-label`
-- Dialogs have `aria-labelledby`
-- Progress bars have `aria-valuenow`
+- Ikon lucide menyembunyikan diri secara otomatis dengan `aria-hidden="true"`; ikon yang diberi prop `aria-*` sengaja tetap terbaca
+- Setiap tombol ikon (`size="icon"`) punya `aria-label`; tombol berteks memakai teksnya sebagai nama
+- Dialog Radix (confirm, command palette) diberi nama lewat `DialogTitle`
+- Tiga popup layar penuh (design studio, fullscreen viewer, run workspace) memakai `role="dialog"`, `aria-modal="true"`, dan `aria-labelledby`
+- Progress bar Radix menerima `aria-valuenow` lewat `value`; tidak ada `role="progressbar"` kustom
 
 ---
 
@@ -686,12 +676,7 @@ focus-visible:ring-offset-2
 ### 9.1 Implementation
 
 ```tsx
-<ThemeProvider
-  attribute="class"
-  defaultTheme="dark"
-  enableSystem
-  disableTransitionOnChange
->
+<ThemeProvider attribute="class" defaultTheme="light" enableSystem>
 ```
 
 ### 9.2 Toggle
@@ -706,7 +691,7 @@ focus-visible:ring-offset-2
 
 - Both light and dark mode variables defined in `:root` and `.dark`
 - All semantic tokens have both variants
-- OKLCH color space for better color perception
+- Nilai warna didefinisikan sebagai variabel CSS di `src/app/globals.css`
 
 ---
 
@@ -716,9 +701,8 @@ focus-visible:ring-offset-2
 src/
 ├── app/
 │   ├── globals.css          ← Design tokens
-│   ├── layout.tsx           ← Root layout
 │   └── [lang]/
-│       ├── layout.tsx       ← Lang layout
+│       ├── layout.tsx       ← Root layout (per-locale)
 │       ├── page.tsx         ← Landing
 │       ├── dashboard/       ← Dashboard
 │       ├── studio/          ← Studio workspace
@@ -737,7 +721,7 @@ src/
 │   ├── theme-provider.tsx   ← Theme context
 │   ├── theme-toggle.tsx     ← Dark/light toggle
 │   └── locale-switcher.tsx  ← Language selector
+├── dictionaries/            ← Translation files (en.json, id.json)
 └── lib/
-    ├── i18n.ts              ← 4 locales
-    └── dictionaries/        ← Translation files
+    └── i18n.ts              ← 2 locales: en, id
 ```

@@ -200,7 +200,7 @@ Smoke test manual mencakup pergantian bahasa, parameter keamanan per tahap, secu
 
 - Rate limiter saat ini berbasis memori proses tunggal. Untuk deployment multi-instance, pindahkan bucket ke Redis atau penyimpanan bersama.
 - Chat AI nyata membutuhkan provider dan API key yang valid.
-- Provider login `dev` hanya terdaftar saat `NODE_ENV != production` atau GitHub OAuth belum dikonfigurasi.
+- Provider login `dev` hanya terdaftar saat `NODE_ENV` bukan production; di production tanpa GitHub OAuth aplikasi menolak melayani (HTTP 503).
 - Badge hanya membuka metadata untuk proyek `completed` yang di-opt-in pemiliknya (`badgePublic`).
 - IP audit hanya mempercayai `x-forwarded-for` saat `TRUSTED_PROXY=1`.
 - Laporan ISO adalah crosswalk konseptual untuk kebutuhan pengembangan dan tugas akhir, bukan bukti sertifikasi.

@@ -12,7 +12,7 @@ Tugas Akhir - Sistem Informasi
 
 ShieldForge adalah aplikasi web yang membantu pengembang website membangun aplikasi web yang aman melalui panduan terstruktur 5 tahap Secure Software Development Lifecycle (Secure SDLC). Aplikasi ini menggunakan AI (Artificial Intelligence) untuk menganalisis kebutuhan proyek, memberikan rekomendasi arsitektur, menghasilkan source code yang aman, melakukan security testing, serta menyediakan deliverables yang siap deploy.
 
-Pendekatan keamanan aplikasi ini berbasis pada dua standar internasional: NIST SP 800-218 (Secure Software Development Framework / SSDF v1.1) dan ISO/IEC 27001:2022 Annex A. Seluruh 42 task SSDF dipetakan (crosswalk) ke kontrol Annex A dan dihubungkan ke setiap tahap pengembangan.
+Pendekatan keamanan aplikasi ini berbasis pada dua standar internasional: NIST SP 800-218 (Secure Software Development Framework / SSDF v1.1) dan ISO/IEC 27001:2022 Annex A. Seluruh 42 task SSDF dipetakan ke kontrol Annex A; 29 di antaranya dihubungkan langsung ke lima tahap pengembangan.
 
 Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode implementasinya, serta security scanning nyata (bukan estimasi AI) menggunakan Semgrep, Trivy, dan audit dependency.
 
@@ -29,7 +29,7 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 | Bahasa | TypeScript | 5.x | JavaScript dengan type safety |
 | CSS Framework | Tailwind CSS | 4.x | Utility-first CSS framework |
 | UI Components | Radix UI | - | Komponen UI yang dapat diakses (accessible) |
-| Code Editor | Monaco Editor (self-hosted) | 4.7.0 | Editor kode seperti VS Code di browser |
+| Code Editor | Monaco Editor self-hosted, dibungkus @monaco-editor/react 4.7.0 | 0.52.2 | Editor kode seperti VS Code di browser |
 | Diagram | Mermaid.js | 11.16.1 | Rendering diagram arsitektur, ERD & flowchart |
 | Icons | Lucide React | 1.31.0 | Ikon SVG yang konsisten |
 | PWA | Service Worker + Manifest | - | Dapat dipasang (installable) dan dukungan offline |
@@ -61,12 +61,12 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 | Komponen | Teknologi | Versi | Fungsi |
 |---|---|---|---|
 | AI SDK | Vercel AI SDK | 7.0.65 | Interface seragam untuk multi-provider AI |
-| Default Provider | Google Gemini | gemini-flash-latest | Model default untuk analisis & code generation |
+| Default Provider | Google Gemini (fallback OpenAI) | gemini-flash-latest | Default dari env; tanpa env, kode memakai OpenAI gpt-4o-mini |
 | OpenAI | @ai-sdk/openai | 4.0.41 | GPT-4o, GPT-4o-mini (juga OpenAI-compatible) |
 | Anthropic | @ai-sdk/anthropic | 4.0.38 | Claude 3.5 Sonnet |
 | Local AI | ollama-ai-provider | 1.2.0 | Model lokal (offline) |
 | OpenRouter | OpenRouter API | - | Akses 100+ model AI |
-| DeepSeek | DeepSeek API | - | deepseek-chat / deepseek-reasoner (OpenAI-compatible) |
+| DeepSeek | DeepSeek API | - | OpenAI-compatible; model default deepseek-flash, daftar lain diambil dari API DeepSeek |
 | BYOK | Bring Your Own Key | - | Enam provider dengan kunci terenkripsi |
 
 ### 2.5 Keamanan & Pemindaian
@@ -127,8 +127,8 @@ ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. 
 | Chat | /api/chat/plan | Mode perencanaan (plan sebelum build) |
 | Chat | /api/chat/build | Eksekusi plan yang disetujui |
 | Chat | /api/chat/reparse | Parse ulang respons AI sebelumnya |
-| Projects | /api/projects | CRUD proyek |
-| Projects | /api/projects/[id] | Detail/update/delete proyek |
+| Projects | /api/projects | Membuat proyek (POST) |
+| Projects | /api/projects/[id] | Memperbarui proyek (PATCH) |
 | Projects | /api/projects/[id]/artifacts | Simpan hasil edit kode + snapshot |
 | Projects | /api/projects/[id]/snapshots/[snapshotId]/restore | Pulihkan source dari snapshot |
 | Projects | /api/projects/[id]/design | Simpan desain (Design Studio) |
@@ -137,8 +137,8 @@ ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. 
 | Projects | /api/projects/[id]/database | Buat/hapus database persisten |
 | Projects | /api/projects/[id]/scan | Jalankan security scanner & ambil temuan |
 | Stages | /api/stages/complete | Tandai tahap selesai (dengan validasi) |
-| Keys | /api/keys, /api/keys/[id], /api/keys/test | CRUD & tes koneksi API key (BYOK) |
-| Models | /api/models, /api/models/[id], /api/models/list | CRUD & daftar model AI |
+| Keys | /api/keys, /api/keys/[id], /api/keys/test | Tambah, ubah, hapus kunci, dan tes koneksi API key (BYOK) |
+| Models | /api/models, /api/models/[id], /api/models/list | Tambah, ubah, hapus model; daftar dibaca halaman Settings |
 | Recommendations | /api/recommendations/[id] | Terapkan rekomendasi keamanan |
 | Revisions | /api/revisions, /api/revisions/[id] | Revisi versi & merge/cancel |
 | GitHub | /api/github/push, /api/user/github | Push kode & koneksi akun GitHub |
@@ -203,7 +203,7 @@ ShieldForge mengimplementasikan **42 task** NIST SP 800-218 SSDF v1.1 yang di-cr
 | Task Code | Judul | Tahap SDLC | ISO 27001:2022 |
 |---|---|---|---|
 | PO.1.1 | Define security requirements for software development | Analysis | A.5.1, A.5.8 |
-| PO.1.2 | Define security requirements for software | Analysis | A.5.8, A.8.26 |
+| PO.1.2 | Define security requirements for software | Analysis | A.5.8, A.8.26, A.5.34 |
 | PW.1.1 | Risk modeling (threat modeling) | Analysis, Design | A.8.26, A.8.27 |
 | PW.2.1 | Review the software design | Design | A.8.26, A.8.27, A.8.29 |
 | PW.5.1 | Follow secure coding practices | Development | A.8.28 |
@@ -224,7 +224,7 @@ ShieldForge mengimplementasikan **42 task** NIST SP 800-218 SSDF v1.1 yang di-cr
 1. **System Prompt Composition** - Mengambil StageDefinition, mengisi template dengan nama/deskripsi proyek, output language, preferensi UI, requirement (termasuk ID `REQ-SEC-*`), global spec, dan latest code.
 2. **Model Resolution** - Mengambil model default user dari database atau konfigurasi env (DEFAULT_AI_PROVIDER + DEFAULT_AI_MODEL + DEFAULT_AI_API_KEY).
 3. **AI Generation** - Mengirim request via `generateText()` (Vercel AI SDK), `maxRetries` untuk transient error.
-4. **Result Parsing & Persistence** - Mengekstrak structured JSON (`stage_result`), menyimpan chat, rekomendasi, code artifacts, snapshot, requirement, dan link traceability dalam satu transaksi.
+4. **Result Parsing & Persistence** - Mengekstrak structured JSON (`stage_result`); pesan chat disimpan dalam satu transaksi, lalu rekomendasi, code artifacts, snapshot, requirement, dan link traceability disimpan dalam transaksi kedua setelah parsing.
 5. **Recommendation Top-Up** - Jika rekomendasi kurang dari 3, engine melakukan second pass untuk melengkapinya.
 
 ---
@@ -263,7 +263,7 @@ ShieldForge berhasil direalisasikan dengan memanfaatkan teknologi modern pada ek
 
 Fitur utama yang telah diimplementasikan meliputi:
 
-- 5 tahap Secure SDLC dengan 30+ sub-step
+- 5 tahap Secure SDLC dengan 26 sub-step
 - 30+ REST API endpoint
 - 42 task NIST SSDF v1.1 dengan crosswalk ISO/IEC 27001:2022 Annex A
 - Multi-provider AI (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, OpenRouter) dengan BYOK
