@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { AlertTriangle, Check, Eraser, ExternalLink, Loader2, Monitor, Pause, Play, RotateCw, Search, Smartphone, Square, Tablet, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -111,6 +111,7 @@ export function RunWorkspace({
   onClose,
   labels,
 }: RunWorkspaceProps) {
+  const headingId = useId();
   const [status, setStatus] = useState<RunStatus>("idle");
   const [url, setUrl] = useState<string | null>(null);
   const [stackLabel, setStackLabel] = useState<string>("");
@@ -340,10 +341,10 @@ export function RunWorkspace({
   );
 
   return (
-    <div className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
+    <div role="dialog" aria-modal="true" aria-labelledby={headingId} className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <h2 className="truncate text-sm font-semibold">{projectName}</h2>
+          <h2 id={headingId} className="truncate text-sm font-semibold">{projectName}</h2>
           {stackLabel && <Badge variant="secondary">{stackLabel}</Badge>}
           <Badge variant={STATUS_VARIANT[status]}>{labels[STATUS_LABEL[status]]}</Badge>
           {services.length > 0 && <Badge variant="outline">{services.join(", ")}</Badge>}

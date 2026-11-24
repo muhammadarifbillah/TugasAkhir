@@ -430,10 +430,11 @@ export function ByokManager({
                       size="icon"
                       onClick={() => toggleKeyActive(k.id, k.isActive)}
                       title={k.isActive ? dict.settings.deactivate : dict.settings.activate}
+                      aria-label={k.isActive ? dict.settings.deactivate : dict.settings.activate}
                     >
                       <Check className={`size-4 ${k.isActive ? "text-success" : "text-muted-foreground"}`} />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteKey(k.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => deleteKey(k.id)} aria-label={dict.settings.delete}>
                       <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </div>
@@ -571,6 +572,7 @@ export function ByokManager({
                           className="shrink-0"
                           onClick={() => fetchModels(modelProvider, modelKey)}
                           title="Refresh"
+                          aria-label={dict.settings.refreshModels}
                         >
                           <RefreshCw className="size-3.5" />
                         </Button>
@@ -629,11 +631,11 @@ export function ByokManager({
                   </div>
                   <div className="flex items-center gap-1">
                     {!m.isDefault && (
-                      <Button variant="ghost" size="icon" onClick={() => setDefaultModel(m.id)} title={dict.settings.setDefault}>
+                      <Button variant="ghost" size="icon" onClick={() => setDefaultModel(m.id)} title={dict.settings.setDefault} aria-label={dict.settings.setDefault}>
                         <Check className="size-4" />
                       </Button>
                     )}
-                    <Button variant="ghost" size="icon" onClick={() => deleteModel(m.id)}>
+                    <Button variant="ghost" size="icon" onClick={() => deleteModel(m.id)} aria-label={dict.settings.delete}>
                       <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </div>

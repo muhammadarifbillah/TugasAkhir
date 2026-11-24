@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Maximize2, Minimize2, RotateCcw, X, ZoomIn, ZoomOut } from "lucide-react";
 
 interface FullscreenViewerProps {
@@ -22,6 +22,7 @@ export function FullscreenViewer({
   onToggleMaximize,
   children,
 }: FullscreenViewerProps) {
+  const headingId = useId();
   const [zoom, setZoom] = useState(1);
   const [isPanning, setIsPanning] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -102,9 +103,9 @@ export function FullscreenViewer({
     "flex size-9 shrink-0 items-center justify-center rounded-md hover:bg-muted disabled:opacity-40";
 
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col bg-background">
+    <div role="dialog" aria-modal="true" aria-labelledby={headingId} className="fixed inset-0 z-[60] flex flex-col bg-background">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-x-2 gap-y-1 border-b px-2 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-4 sm:py-3 md:px-6">
-        <h2 className="min-w-0 flex-1 truncate text-sm font-semibold sm:text-base md:text-lg">{title}</h2>
+        <h2 id={headingId} className="min-w-0 flex-1 truncate text-sm font-semibold sm:text-base md:text-lg">{title}</h2>
         <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-0.5">
           <button onClick={zoomOut} disabled={zoom <= MIN_ZOOM} aria-label="Zoom out" title="Zoom out" className={iconBtn}>
             <ZoomOut className="size-4" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   ChevronDown,
   Loader2,
@@ -99,6 +99,7 @@ export function DesignStudioDialog({
   onSaved,
   onAiFinished,
 }: DesignStudioDialogProps) {
+  const headingId = useId();
   const [saved, setSaved] = useState<DesignScreenType[]>(savedScreens);
   const [drafts, setDrafts] = useState<DesignScreenType[]>([]);
   const [plan, setPlan] = useState<DesignPlan>(() => normalizePlan(designPlan));
@@ -440,10 +441,10 @@ export function DesignStudioDialog({
   );
 
   return (
-    <div className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
+    <div role="dialog" aria-modal="true" aria-labelledby={headingId} className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
-          <h2 className="truncate text-sm font-semibold">{labels.title}</h2>
+          <h2 id={headingId} className="truncate text-sm font-semibold">{labels.title}</h2>
           <Badge variant="secondary">
             {saved.length} / {MAX_SCREENS} {labels.savedCount}
           </Badge>
@@ -742,11 +743,11 @@ export function DesignStudioDialog({
                                 size="icon"
                                 variant="ghost"
                                 className="size-6"
+                                aria-label={`${labels.title}: ${screen.name}`}
                                 onClick={() => {
                                   setFsMaximized(false);
                                   setFullscreen(screen);
                                 }}
-                                aria-label={`${labels.title}: ${screen.name}`}
                               >
                                 <Maximize2 className="size-3.5" />
                               </Button>
