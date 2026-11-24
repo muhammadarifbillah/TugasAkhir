@@ -1,7 +1,7 @@
 import type { RawFinding, ScanSeverity } from "./types";
 import { enrichFinding } from "./mapping";
 
-const SEVERITY_WEIGHT: Record<ScanSeverity, number> = {
+export const SCORE_WEIGHTS: Record<ScanSeverity, number> = {
   critical: 20,
   high: 10,
   medium: 4,
@@ -14,7 +14,7 @@ const SEVERITY_WEIGHT: Record<ScanSeverity, number> = {
  * is reproducible and tied to actual tool output.
  */
 export function computeSecurityScore(findings: Pick<RawFinding, "severity">[]): number {
-  const penalty = findings.reduce((sum, f) => sum + (SEVERITY_WEIGHT[f.severity] ?? 0), 0);
+  const penalty = findings.reduce((sum, f) => sum + (SCORE_WEIGHTS[f.severity] ?? 0), 0);
   return Math.max(0, Math.min(100, 100 - penalty));
 }
 

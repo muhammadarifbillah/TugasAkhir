@@ -50,7 +50,7 @@
    * status colours above so a stage never reads as a warning.
    */
   --stage-1: #8a6812;
-  --stage-2: #a5662f;
+  --stage-2: #9f622d;
   --stage-3: #6e4a93;
   --stage-4: #2f5e9e;
   --stage-5: #5e6f80;
@@ -268,72 +268,74 @@ html[data-contrast="high"].dark {
 }
 
 /*
- * Landing "Smooth Soft" surfaces. Scoped to .landing so the app keeps its flat
- * report look. Soft shadows always sit next to a real border (projector
- * contrast); no backdrop blur anywhere.
+ * Landing "Forge Ledger": a technical report built on the steel tempering
+ * ramp. Hairline rules instead of floating cards; elevation only for the hero
+ * rail, screenshot frames and the vignette. Scoped to .landing so the app keeps
+ * its own look. No backdrop blur, no decorative loops.
  */
 .landing {
-  --soft-shadow:
-    0 1px 2px hsl(var(--shadow-color) / 0.06),
-    0 8px 24px -12px hsl(var(--shadow-color) / 0.18),
-    0 24px 48px -32px hsl(var(--shadow-color) / 0.22);
-  --soft-shadow-hover:
-    0 2px 4px hsl(var(--shadow-color) / 0.08),
-    0 16px 40px -16px hsl(var(--shadow-color) / 0.28);
-  --soft-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.7);
-  --aurora-strength: 12%;
+  --ledger-rule: var(--border);
+  --ledger-leader: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
+  --coupon-radius: 2px;
+  --coupon-raise:
+    0 1px 0 var(--ledger-rule),
+    0 6px 16px -10px hsl(var(--shadow-color) / 0.35);
+  interpolate-size: allow-keywords;
 }
-.dark .landing {
-  --soft-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.06);
-  --aurora-strength: 18%;
+.font-wide {
+  font-stretch: 125%;
+  font-weight: 800;
+  letter-spacing: -0.022em;
+  line-height: 1.04;
 }
-.soft-card {
-  border-radius: 1rem;
-  border: 1px solid var(--border);
-  background-color: var(--card);
-  box-shadow: var(--soft-highlight), var(--soft-shadow);
-  transition:
-    box-shadow 200ms var(--ease-out),
-    background-color 400ms var(--ease-out),
-    border-color 400ms var(--ease-out);
+/* Narrow labels replace all-caps eyebrows (Archivo's width axis does the work). */
+.font-narrow {
+  font-stretch: 75%;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
-.soft-card-hover:hover {
-  box-shadow: var(--soft-highlight), var(--soft-shadow-hover);
+/* Ledger row: label ........ value */
+.leader {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
 }
-/* Tint a surface with one stage colour: style={{ "--tint": "var(--stage-3)" }}. */
-.stage-tint {
-  background-color: color-mix(in oklab, var(--tint) 8%, var(--card));
-  border-color: color-mix(in oklab, var(--tint) 35%, var(--border));
+.leader::after {
+  content: "";
+  order: 1;
+  flex: 1;
+  min-width: 1.5rem;
+  border-bottom: 1px dotted var(--ledger-leader);
+  transform: translateY(-0.3em);
 }
-.aurora {
-  background-image:
-    radial-gradient(40% 50% at 15% 20%, color-mix(in oklab, var(--stage-1) var(--aurora-strength), transparent), transparent 70%),
-    radial-gradient(35% 45% at 85% 15%, color-mix(in oklab, var(--stage-3) var(--aurora-strength), transparent), transparent 70%),
-    radial-gradient(45% 55% at 70% 85%, color-mix(in oklab, var(--stage-4) var(--aurora-strength), transparent), transparent 70%),
-    radial-gradient(30% 40% at 25% 80%, color-mix(in oklab, var(--primary) var(--aurora-strength), transparent), transparent 70%);
-  background-size: 140% 140%;
-  animation: aurora-drift 24s ease-in-out infinite alternate;
+.leader > dt {
+  order: 0;
 }
-.aurora[data-paused="true"] {
-  animation-play-state: paused;
+.leader > dd {
+  order: 2;
+  font-variant-numeric: tabular-nums;
 }
-@keyframes aurora-drift {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 100% 100%;
-  }
-}
-/* Spotlight that follows the pointer (--x/--y set in JS, no React state). */
-.spotlight:hover {
-  background-image: radial-gradient(
-    240px circle at var(--x, 50%) var(--y, 50%),
-    color-mix(in oklab, var(--primary) 10%, transparent),
-    transparent 70%
+/* Temper coupon: a small steel plate with a faint oxide banding. Set --tint. */
+.coupon {
+  border-radius: var(--coupon-radius);
+  border: 1px solid color-mix(in oklab, var(--tint) 45%, var(--border));
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--tint) 10%, var(--card)),
+    color-mix(in oklab, var(--tint) 4%, var(--card)) 60%,
+    color-mix(in oklab, var(--tint) 12%, var(--card))
   );
+  transition:
+    box-shadow 150ms var(--ease-out),
+    outline-color 150ms var(--ease-out);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
-/* Carousel progress: one fill per slide, paused with the carousel. */
+.coupon[data-selected="true"] {
+  box-shadow: var(--coupon-raise);
+  outline-color: var(--tint);
+}
+/* Carousel progress: the selected coupon's bottom edge fills, paused with the carousel. */
 .gate-progress {
   transform-origin: left;
   animation: gate-fill var(--gate-ms, 4500ms) linear both;
@@ -359,38 +361,23 @@ html[data-contrast="high"].dark {
 .faq-item[open]::details-content {
   height: auto;
 }
-.landing {
-  interpolate-size: allow-keywords;
-}
 /* Landing motion is desktop-only: below lg everything renders in its final state. */
 @media (max-width: 1023.98px) {
-  .landing .aurora {
-    animation: none;
-  }
   .landing .gate-progress {
     display: none;
   }
   .landing .faq-item::details-content {
     transition: none;
   }
-  .landing .spotlight:hover {
-    background-image: none;
-  }
 }
 @media (prefers-contrast: more) {
-  .landing .aurora {
-    display: none;
-  }
-  .landing .stage-tint {
-    background-color: var(--card);
+  .landing .coupon {
+    background-image: none;
     border-color: var(--border);
   }
 }
-html[data-contrast="high"] .landing .aurora {
-  display: none;
-}
-html[data-contrast="high"] .landing .stage-tint {
-  background-color: var(--card);
+html[data-contrast="high"] .landing .coupon {
+  background-image: none;
   border-color: var(--border);
 }
 
@@ -486,12 +473,8 @@ html[data-contrast="high"] .landing .stage-tint {
     --tw-exit-rotate: 0 !important;
   }
   .animate-bounce,
-  .animate-ping,
-  .aurora {
+  .animate-ping {
     animation: none !important;
-  }
-  .spotlight {
-    background-image: none;
   }
   /* Route changes crossfade instead of sliding; shared elements jump, not fly. */
   ::view-transition-group(*) {
