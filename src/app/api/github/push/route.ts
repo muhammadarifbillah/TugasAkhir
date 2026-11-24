@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Octokit } from "octokit";
 import { auth } from "@/auth";
 import { decryptSecret, encryptSecret } from "@/lib/crypto";
+import { githubPushError } from "@/lib/github-push-error";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { buildProjectFiles } from "@/lib/export-files";
@@ -178,16 +179,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, repoUrl, owner: target.owner, repo: target.repo });
   } catch (err) {
     console.error("[api/github/push]", err);
-    const message = err instanceof Error ? err.message : "GitHub push failed";
-    const error = message.includes("already exists")
-      ? "Repository name already exists on your GitHub."
-      : /401|bad credentials|authentication/i.test(message)
-        ? "GitHub authentication failed. Provide a valid Personal Access Token or reconnect GitHub."
-        : /403|permission|forbidden/i.test(message)
-          ? "GitHub denied write access to this repository. Check the token scope and repository permissions."
-          : "GitHub push failed. Check the repository URL, token, and permissions.";
     return NextResponse.json(
-      { error },
+      { error: githubPushError(err) },
       { status: 400 },
     );
   }
