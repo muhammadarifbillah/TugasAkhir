@@ -21,7 +21,7 @@ import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n";
-import { LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "@/lib/landing-facts";
+import { GATE_MAPPING, LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "@/lib/landing-facts";
 import { computeSecurityScore } from "@/lib/scanner/score";
 
 // Real screenshots of the studio (public/landing), captured from a demo project.
@@ -55,6 +55,7 @@ export default async function HomePage({ params }: HomePageProps) {
     why: l.steps[i].why,
     artifact: l.steps[i].artifact,
     temper: TEMPER[i],
+    mapping: GATE_MAPPING[i],
     colourName: l.rail.colours[TEMPER[i].colour],
   }));
   const scanScore = computeSecurityScore([...EXAMPLE_FINDINGS]);
@@ -84,7 +85,7 @@ export default async function HomePage({ params }: HomePageProps) {
                 <TemperRail
                   gates={gates.map((g) => ({
                     title: g.title,
-                    nist: g.steps[0].nist[0],
+                    nist: g.mapping.nist,
                     celsius: g.temper.celsius,
                     colourName: g.colourName,
                   }))}
@@ -132,8 +133,8 @@ export default async function HomePage({ params }: HomePageProps) {
                     artifact: g.artifact,
                     celsius: fmt(l.gatesCelsius, { n: g.temper.celsius }),
                     colourName: g.colourName,
-                    nist: g.nist,
-                    iso: g.iso,
+                    nist: [g.mapping.nist],
+                    iso: g.mapping.iso,
                   }))}
                   labels={{
                     tabs: l.gatesTabs,
@@ -202,7 +203,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   ]}
                   formulaTitle={l.proofFormulaTitle}
                   formula={l.proofFormula}
-                  rows={gates.map((g) => ({ title: g.title, nist: g.nist, iso: g.iso, artifact: g.artifact }))}
+                  rows={gates.map((g) => ({ title: g.title, nist: [g.mapping.nist], iso: g.mapping.iso, artifact: g.artifact }))}
                   matrix={gates.flatMap((g) =>
                     g.steps.map((s) => ({ gate: g.title, subStep: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
                   )}

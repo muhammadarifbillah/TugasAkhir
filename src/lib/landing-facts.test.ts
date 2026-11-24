@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { locales } from "@/lib/i18n";
-import { AI_PROVIDERS, LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "./landing-facts";
+import { AI_PROVIDERS, GATE_MAPPING, LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "./landing-facts";
 
 const read = (rel: string) => fs.readFileSync(path.join(process.cwd(), rel), "utf8");
 
@@ -51,6 +51,12 @@ describe("gateFacts", () => {
         expect(Number(m![2]), c).toBeGreaterThanOrEqual(1);
         expect(Number(m![2]), c).toBeLessThanOrEqual(max[m![1]]);
       }
+  });
+
+  it("uses a gate mapping whose NIST tasks and ISO controls are all in the seed crosswalk", () => {
+    const seed = read("prisma/seed.ts");
+    expect(GATE_MAPPING).toHaveLength(5);
+    for (const g of GATE_MAPPING) for (const c of [g.nist, ...g.iso]) expect(seed).toContain(`"${c}"`);
   });
 
   it("has the five temper temperatures in order", () => {

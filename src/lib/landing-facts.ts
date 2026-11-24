@@ -29,6 +29,20 @@ export const TEMPER: readonly { stage: 1 | 2 | 3 | 4 | 5; celsius: number; colou
   { stage: 5, celsius: 371, colour: "grey" },
 ];
 
+/**
+ * Gate-level crosswalk shown on the landing page (rail, coupons, mapping
+ * table): one SSDF task per gate with its ISO 27001 Annex A controls, taken
+ * from the NIST → ISO crosswalk in prisma/seed.ts. Sub-step detail still comes
+ * from STAGE_DEFINITIONS via gateFacts().
+ */
+export const GATE_MAPPING: readonly { nist: string; iso: string[] }[] = [
+  { nist: "PO.1.1", iso: ["A.5.1", "A.5.8"] },
+  { nist: "PW.1.1", iso: ["A.8.26", "A.8.27"] },
+  { nist: "PW.5.1", iso: ["A.8.28"] },
+  { nist: "PW.8.1", iso: ["A.8.29"] },
+  { nist: "PS.3.1", iso: ["A.8.13", "A.8.10"] },
+];
+
 export interface GateFact {
   code: string;
   order: number;
