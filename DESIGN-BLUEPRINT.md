@@ -44,7 +44,8 @@ Token status (`--success`, `--warning`, `--danger`, `--destructive`, `--info`) d
 | `text-xl` | 20px | Section title |
 | `text-2xl` | 24px | Page title |
 | `text-4xl` | 36px | Hero title (mobile) |
-| `md:text-5xl` | 48px | Hero title (desktop) |
+| `md:text-5xl` | 48px | Hero title (tablet) |
+| `lg:text-6xl` | 60px | Hero title (desktop) |
 
 #### Font Families
 
@@ -97,32 +98,29 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 
 ### 2.1 Landing Page
 
+Theme "Smooth Soft": the report palette plus soft gradients from the five stage colours, `rounded-2xl` soft cards (`.soft-card`: layered shadow + a real border for projector contrast) and stage tints (`.stage-tint` with `--tint`). Scoped under `.landing`; no `backdrop-blur`. Content sells problem → how it works → proof → action, and every number comes from `lib/landing-facts.ts` (pinned by `landing-facts.test.ts`). No testimonials or customer logos.
+
 ```
-┌─────────────────────────────────────────────────────────┐
-│ HEADER: Logo | Dashboard | Settings     [Lang] [Theme] │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│              🛡️ ShieldForge                              │
-│   AI-Powered Secure Development Lifecycle Generator     │
-│                                                         │
-│   [Start a project]  [See the control mapping]          │
-│                                                         │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  🔄 5-Stage Secure SDLC       🔒 ISO 27001 Crosswalk    │
-│  🔑 Bring Your Own Key        🐙 GitHub Native          │
-│  💬 Prompt-Driven             🛡️ Secure by Design      │
-│                                                         │
-├─────────────────────────────────────────────────────────┤
-│ FOOTER: ShieldForge — AI-powered secure website generator. NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept). │
-└─────────────────────────────────────────────────────────┘
+HEADER (unchanged)
+1  HERO          eyebrow (problem) · H1 word reveal · lede · [CTA] [How it works]
+                 "Mapped to" NIST SP 800-218 · ISO 27001:2022 · Semgrep · Trivy  |  trace demo (tilt)
+2  #masalah      3 problem cards
+3  #angka        5 stages · 42 NIST tasks · 26 sub-steps · 6 AI providers · 2 languages
+4  #gerbang      5-dot timeline + auto carousel (stage, why, artefact, NIST, ISO)
+5  #cara-kerja   6 steps (Prompt, Plan, Build, Scan, Fix with AI, Export) + live vignette
+6  #pratinjau    3 real studio screenshots in browser frames (public/landing/*.jpg)
+7  #pemetaan     NIST → ISO table (stage-colour edge, row tint on hover)
+8  #fitur        bento: SDLC (2×2), ISO, BYOK, GitHub, Docker, Database, Secure, Prompt
+9  #hasil        5 deliverables checklist + CTA
+10 #faq          6 native <details> questions
+11 closing CTA   gradient band
+FOOTER (unchanged)
 ```
 
 **Spesifikasi:**
-- Container: `max-w-6xl px-4 py-14 md:py-20`
-- Hero: rata kiri di grid, H1 `text-4xl md:text-5xl` dengan kelas `display-type`
-- CTA: dua `Button size="lg"` tanpa ikon: "Start a project" dan "See the control mapping"
-- Features: enam butir daftar ber-ikon (bukan kartu), `grid gap-x-12 gap-y-7 sm:grid-cols-2`
+- Hero: full-width aurora (`components/landing/aurora-backdrop.tsx`), inner grid `max-w-6xl lg:grid-cols-[1.05fr_1fr] py-16 md:py-24`, H1 `display-type text-4xl md:text-5xl lg:text-6xl`.
+- Sections: `max-w-6xl px-4`, spacing `mt-24 md:mt-32`, heading block = eyebrow + H2 `display-type text-2xl md:text-4xl` + lede (`section-heading.tsx`).
+- Components live in `src/components/landing/` (one per section); `page.tsx` only composes them and stays a server component.
 
 ### 2.2 Dashboard
 
@@ -485,7 +483,7 @@ Severity colors: mengikuti token tema — critical/high `danger`, medium `warnin
 | Default | <640px | Single column, mobile tabs |
 | `sm` | 640px+ | 2-column grids |
 | `md` | 768px+ | Desktop nav, 2-column layouts |
-| `lg` | 1024px+ | Studio tiga kolom; daftar fitur landing tetap dua kolom |
+| `lg` | 1024px+ | Studio tiga kolom; fitur landing bento empat kolom, cerita 5 gerbang menampilkan label tahap |
 
 ### 4.2 Studio Workspace Responsive
 
@@ -621,16 +619,14 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | CSS | Tailwind + `tw-animate-css` | Dialog/Select open-close (`data-[state]:animate-in`), InlineAlert, security drawer (md), hero text, button press `active:scale-[0.98]` |
 | Route change | React `<ViewTransition>` (`components/page-transition.tsx`) | Landing, dashboard, studio pages |
 | In-app | `motion` (`motion/react`) via `LazyMotion strict` + `domMax` loaded async (`components/motion-provider.tsx`) | Tab indicators, toasts, menus, chat messages, plan/build cards, score, sub-step icons, project grid, landing reveals |
-| Scroll story | `gsap` + `ScrollTrigger` (`components/landing/stage-scroll-story.tsx`), landing route only | Pinned five-stage story between the hero and the mapping table |
 
-**Scroll story (GSAP):**
-- Pins at `(min-width: 1024px)`. Under reduced motion it still pins, but panels only crossfade (no `y` travel) and auto-snap is off.
-- Uses `scroller` = `<main id="main">` element (passed as an element, not a selector), `pinType: "transform"`, `scrub: 0.5`.
-- Snaps one stage per scroll step (`inertia: false`).
-- Below 1024px and without JS the five panels render stacked and static.
-- Panels are hidden with opacity only, so screen readers read all five; the mapping table stays as the text equivalent.
-- `useGSAP` + `matchMedia` revert on unmount and on breakpoint change, so no pin spacer leaks to other pages.
-- License: GSAP Standard "No Charge" License (Webflow), proprietary and free, not OSI open source. Use on our own site is a Permitted Use. GSAP must not power a no-code visual animation builder for users, and its copyright notices must stay intact.
+**Landing motion** (`components/landing/`, shared vocabulary in `motion.ts`: `EASE`, `reveal()`, `stagger()`):
+- Hero: aurora drifts 24 s (CSS, paused offscreen); H1 words fade/rise with CSS so they show before hydration; lede, CTA and standards strip reveal in sequence; CTA arrow nudges on hover; the trace demo tilts up to ±4° towards a mouse pointer.
+- Problem cards and feature tiles reveal with a stagger; numbers count up once when they scroll into view (`count-up.tsx`; server HTML holds the final value).
+- Five gates carousel (`stage-carousel.tsx`): auto-advances every 4.5 s, timed by the active segment's CSS fill (`onAnimationEnd`), so pausing the animation pauses the carousel exactly. Pauses on hover, focus inside, offscreen, hidden tab and via the button; ←/→/Home/End, prev/next and swipe; page scroll is never captured.
+- How it works: `layoutId` indicator between steps; each step's vignette plays once (typing, staggered plan, code lines, score 0→100 + badge pop, diff flash, ticks).
+- Product preview: frames scale/slide in; small frames drift ±24 px against the scroll of `#main` (md+).
+- Bento: hover lift + pointer spotlight (CSS vars, no state); deliverable ticks draw in (`pathLength`); FAQ opens with `::details-content` height transition.
 
 Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fast: 120ms`, `--dur-base: 200ms`, `--dur-slow: 300ms`. In-app interactions stay within 120–300 ms and never block input.
 
@@ -651,13 +647,14 @@ Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fas
 - Sub-step icons pop when their status changes.
 - The Complete button pops with a one-time ring.
 - Project cards reflow on filter (`layout`).
-- The landing hero demo cycles through the five stages, pauses offscreen and has a pause button (WCAG 2.2.2); landing sections reveal on scroll.
+- Landing: see "Landing motion" above.
 
 **Rules**
 - Animate only `transform`, `opacity` and colour.
 - Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
-- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score count-up and the hero stage demo (it changes text/colour/bar fill only and has a pause button). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
-- No smooth-scroll library and no glassmorphism (`backdrop-blur`).
+- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the hero stage demo and the gates carousel (crossfade; both have a pause button). Also removed on the landing page: aurora drift, tilt, parallax and spotlight. Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
+- No smooth-scroll library, no GSAP, and no glassmorphism (`backdrop-blur`).
+- `prefers-contrast: more` / high-contrast toggle: landing aurora hidden and stage tints removed.
 
 ### 7.2 Hover States
 
