@@ -129,5 +129,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Skip internal (_next), api, assets, and files with extensions
-  matcher: ["/((?!_next|api|favicon.ico|.*\\..*).*)"],
+  // opengraph-image has no file extension; without this it was redirected to /{locale}/… and 404'd.
+  matcher: ["/((?!_next|api|favicon.ico|opengraph-image|.*\\..*).*)"],
 };

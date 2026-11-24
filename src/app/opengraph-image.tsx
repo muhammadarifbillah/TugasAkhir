@@ -1,8 +1,18 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "ShieldForge — AI-Powered Secure Website Generator";
+export const alt = "ShieldForge: every stage is checked before any code ships";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+// Forge Ledger OG image: report paper, the five temper colours with their
+// temperatures and hallmark shapes, in the finished (all gates passed) state.
+const GATES = [
+  { name: "Analysis", c: 205, color: "#8a6812", shape: "M12 3 21 12 12 21 3 12Z" },
+  { name: "Design", c: 260, color: "#9f622d", shape: "M12 3.5a8.5 8.5 0 1 0 0.01 0Z" },
+  { name: "Development", c: 282, color: "#6e4a93", shape: "M12 3.5 21 19.5 3 19.5Z" },
+  { name: "Testing", c: 310, color: "#2f5e9e", shape: "M4.5 4.5h15v15h-15Z" },
+  { name: "Handover", c: 371, color: "#5e6f80", shape: "M12 3 19.8 7.5 19.8 16.5 12 21 4.2 16.5 4.2 7.5Z" },
+];
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -13,30 +23,38 @@ export default function OpengraphImage() {
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
-          padding: "80px",
-          background: "linear-gradient(135deg,#0f1115 0%,#1b1b33 60%,#12233a 100%)",
-          color: "#ffffff",
+          justifyContent: "space-between",
+          padding: "72px 80px",
+          background: "#f4f6f8",
+          color: "#15191e",
           fontFamily: "sans-serif",
         }}
       >
-        <svg width="88" height="88" viewBox="0 0 32 32">
-          <rect width="32" height="32" rx="7" fill="#6d5efc" />
-          <path
-            d="M16 4.4l9.6 3.4v6.6c0 5.7-4.1 10.2-9.6 12.3-5.5-2.1-9.6-6.6-9.6-12.3V7.8L16 4.4z"
-            fill="rgba(255,255,255,0.18)"
-          />
-          <path
-            d="M16 10.4l1.5 4.6 4.6 1.5-4.6 1.5L16 22.6l-1.5-4.6L9.9 16.5l4.6-1.5z"
-            fill="#ffffff"
-          />
-        </svg>
-        <div style={{ fontSize: 28, color: "#8ab4ff", letterSpacing: 1, marginTop: 12 }}>
-          NIST SP 800-218 · ISO 27001:2022
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontSize: 30, fontWeight: 700, color: "#2f5e9e" }}>ShieldForge</div>
+          <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.05, marginTop: 20, maxWidth: 980, letterSpacing: -1.5 }}>
+            Every stage is checked before any code ships.
+          </div>
         </div>
-        <div style={{ fontSize: 76, fontWeight: 700, marginTop: 18 }}>ShieldForge</div>
-        <div style={{ fontSize: 32, color: "#c7c9d9", marginTop: 14 }}>
-          Generate secure websites guided by AI
+
+        <div style={{ display: "flex", gap: 14 }}>
+          {GATES.map((g) => (
+            <div key={g.name} style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <svg width="30" height="30" viewBox="0 0 24 24">
+                  <path d={g.shape} fill="none" stroke={g.color} strokeWidth="2" strokeLinejoin="round" />
+                </svg>
+                <div style={{ fontSize: 24, color: "#5b6470" }}>{`${g.c}°C`}</div>
+              </div>
+              <div style={{ height: 14, background: g.color, borderRadius: 3, marginTop: 14 }} />
+              <div style={{ fontSize: 24, marginTop: 12 }}>{g.name}</div>
+              <div style={{ fontSize: 20, color: "#1f7a52", marginTop: 4 }}>Passed</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 22, color: "#5b6470", borderTop: "1px solid #d5dbe2", paddingTop: 18, display: "flex" }}>
+          Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A
         </div>
       </div>
     ),

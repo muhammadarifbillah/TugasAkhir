@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { m } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import { RotateCcw } from "lucide-react";
 import { Hallmark } from "@/components/landing/hallmark";
 import { isDesktop } from "@/components/landing/landing-motion";
@@ -34,6 +34,7 @@ export function TemperRail({
   const timers = useRef<number[]>([]);
   const [step, setStep] = useState(gates.length);
   const [run, setRun] = useState(0);
+  const reduce = useReducedMotion();
 
   const play = useCallback(() => {
     timers.current.forEach(clearTimeout);
@@ -82,12 +83,12 @@ export function TemperRail({
                   <m.span
                     className="inline-flex"
                     initial={false}
-                    animate={{ scale: passed && run > 0 ? [1.15, 1] : 1, opacity: passed ? 1 : 0.35 }}
+                    animate={{ scale: passed && run > 0 && !reduce ? [1.15, 1] : 1, opacity: passed ? 1 : 0.35 }}
                     transition={{ duration: 0.22, ease: EASE }}
                   >
                     <Hallmark stage={stage} className="size-4 md:size-5" />
                   </m.span>
-                  {passed && run > 0 && (
+                  {passed && run > 0 && !reduce && (
                     <m.span
                       key={`ring-${run}`}
                       aria-hidden="true"
@@ -107,7 +108,7 @@ export function TemperRail({
                   className="block h-full origin-left"
                   style={{ background: `var(--stage-${stage})` }}
                   initial={false}
-                  animate={{ scaleX: passed ? (run > 0 ? [0, 1.04, 1] : 1) : 0 }}
+                  animate={{ scaleX: passed ? (run > 0 && !reduce ? [0, 1.04, 1] : 1) : 0 }}
                   // A replay resets instantly; only the heating is animated.
                   transition={passed ? { duration: 0.6, ease: EASE } : { duration: 0 }}
                 />
