@@ -614,19 +614,50 @@ Desktop (md+):                    Mobile (<md):
 
 ### 7.1 Transitions
 
-```css
-/* Standard transition: durasi bawaan; duration-200 hanya pada animasi angkat kartu proyek */
-transition-colors
+Motion is there to make the app feel responsive, not to decorate it. It uses three layers, cheapest first:
 
-/* Slide in for toasts */
-@keyframes slide-in {
-  from { opacity: 0; transform: translateX(100%); }
-  to { opacity: 1; transform: translateX(0); }
-}
+| Layer | Tool | Used for |
+|---|---|---|
+| CSS | Tailwind + `tw-animate-css` | Dialog/Select open-close (`data-[state]:animate-in`), InlineAlert, security drawer (md), hero text, button press `active:scale-[0.98]` |
+| Route change | React `<ViewTransition>` (`components/page-transition.tsx`) | Landing, dashboard, studio pages |
+| In-app | `motion` (`motion/react`) via `LazyMotion strict` + `domMax` loaded async (`components/motion-provider.tsx`) | Tab indicators, toasts, menus, chat messages, plan/build cards, score, sub-step icons, project grid, landing reveals |
+| Scroll story | `gsap` + `ScrollTrigger` (`components/landing/stage-scroll-story.tsx`), landing route only | Pinned five-stage story between the hero and the mapping table |
 
-/* Spin for loaders */
-animate-spin
-```
+**Scroll story (GSAP):**
+- Runs only when `(min-width: 1024px) and (prefers-reduced-motion: no-preference)` matches.
+- Uses `scroller` = `<main id="main">` element (passed as an element, not a selector), `pinType: "transform"`, `scrub: 0.5`.
+- Snaps one stage per scroll step (`inertia: false`).
+- Everywhere else (mobile, tablet, reduced motion, no JS) the five panels render stacked and static.
+- Panels are hidden with opacity only, so screen readers read all five; the mapping table stays as the text equivalent.
+- `useGSAP` + `matchMedia` revert on unmount and on breakpoint change, so no pin spacer leaks to other pages.
+- License: GSAP Standard "No Charge" License (Webflow), proprietary and free, not OSI open source. Use on our own site is a Permitted Use. GSAP must not power a no-code visual animation builder for users, and its copyright notices must stay intact.
+
+Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fast: 120ms`, `--dur-base: 200ms`, `--dur-slow: 300ms`. In-app interactions stay within 120–300 ms and never block input.
+
+**View-transition types** (set via `<Link transitionTypes>` / `router.push(href, { transitionTypes })`):
+- `nav-forward`: 60px slide left + fade (next stage, open studio, complete stage).
+- `nav-back`: 60px slide right (earlier stage, back to dashboard). The direction comes from `navDirection()` in `lib/nav-direction.ts`.
+- `page-fade`: crossfade for untyped navigations.
+- `default="none"`, so `router.refresh()` never animates.
+- `site-header` and `studio-topbar` are anchored and do not move.
+- The project title morphs from the dashboard card to the studio breadcrumb (`project-title-<id>`).
+
+**Motion components** (always `m.*`, never `motion.*`):
+- Sliding indicators (`layoutId`): `center-tab-indicator`, `panel-tab-indicator`, `composer-mode-indicator`, `mobile-tab-indicator`.
+- Toasts enter/exit and can be swiped right to dismiss.
+- Menus scale/fade.
+- New chat messages slide up (loaded history stays still).
+- `AnimatedNumber` springs the security score.
+- Sub-step icons pop when their status changes.
+- The Complete button pops with a one-time ring.
+- Project cards reflow on filter (`layout`).
+- The landing hero demo cycles through the five stages, pauses offscreen and has a pause button (WCAG 2.2.2); landing sections reveal on scroll.
+
+**Rules**
+- Animate only `transform`, `opacity` and colour.
+- Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
+- `prefers-reduced-motion: reduce` removes all movement: a global CSS override, `MotionConfig reducedMotion="user"`, and view transitions set to `none`.
+- No smooth-scroll library and no glassmorphism (`backdrop-blur`).
 
 ### 7.2 Hover States
 
