@@ -159,7 +159,7 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 - Search: `Input` dengan icon `pl-9`
 - Filter: `Button size="sm"` chips
 - Grid: `grid gap-4 md:grid-cols-2 xl:grid-cols-3`
-- Card: `hover:border-primary/50 transition-colors`
+- Card: `transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50`
 
 ### 2.3 Studio Workspace (3-Column)
 
@@ -427,7 +427,7 @@ Content: max-h-[70vh] overflow-y-auto p-3 sm:p-4
 ```
 Tab "Score":
 ┌─────────────────────────────────────────┐
-│ Security Score                [72 / 100]│
+│ Score                         [72 / 100]│
 │ ████████░░░░░░░░░░░░                    │
 │ [Verified by scanner]                   │
 └─────────────────────────────────────────┘
@@ -440,19 +440,21 @@ Tab "Compliance":
 │ [PO.1.1] [PW.1.1] [PS.1.1]              │
 │ [A.5.1] [A.8.2] [A.8.3]                 │
 │                                         │
-│ Secure params                           │
+│ Secure parameters for this stage        │
 │ ✓ scope refinement                      │
 │                                         │
-│ NIST Checks                             │
-│ ☑ PO.1.1                                │
-│ ISO Mapping                             │
-│ ☑ A.5.1                                 │
+│ NIST SSDF Checks                        │
+│ ┌ PO ────────────────────────────── ✓ ┐ │
+│ │ PO.1.1                            ✓ │ │
+│ └─────────────────────────────────────┘ │
+│ ISO 27001 Mapping                       │
+│ A.5.1                                 · │
 └─────────────────────────────────────────┘
 
 Progress: color coded (green >=85, amber >=60, red <60)
 ```
 
-Skor tampil di tab **Score**; Stage Security Parameters, NIST Checks, dan ISO Mapping tampil di tab **Compliance** (NIST/ISO hanya bila ada rekomendasi).
+Skor tampil di tab **Score**; Stage Security Parameters, NIST SSDF Checks (dikelompokkan per PO/PW/PS/RV), dan ISO 27001 Mapping tampil di tab **Compliance** (NIST/ISO hanya bila ada rekomendasi). Tanda ✓ berarti kontrol sudah diterapkan, `·` berarti belum.
 
 ### 3.8 Recommendation Card
 
