@@ -7,7 +7,7 @@ import { detectStack } from "@/lib/runner/registry";
 import { runnerDisabled } from "@/lib/runner/mode";
 import { filterSafeArtifacts } from "@/lib/artifact-paths";
 import type { RawFinding, ScanReport, ScanFinding } from "./types";
-import { parseNpmAudit, parsePipAudit, parseSarif, parseTrivy } from "./parse";
+import { isAuditReport, parseNpmAudit, parsePipAudit, parseSarif, parseTrivy } from "./parse";
 import { computeSecurityScore, enrichFindings } from "./score";
 
 const SEMGREP_IMAGE = "semgrep/semgrep:latest";
@@ -69,9 +69,11 @@ export function scannerDockerArgs(tool: ScannerTool, dir: string): string[] {
         "-w",
         "/app",
         NODE_IMAGE,
-        "npm",
-        "audit",
-        "--json",
+        "sh",
+        "-c",
+        // Generated projects ship package.json only; npm audit needs a lockfile.
+        // --package-lock-only resolves versions without downloading or running package scripts.
+        "npm install --package-lock-only --ignore-scripts --no-audit --no-fund --loglevel=error >/dev/null && npm audit --json",
       ];
     case "pip-audit":
       return [
@@ -85,7 +87,7 @@ export function scannerDockerArgs(tool: ScannerTool, dir: string): string[] {
         PYTHON_IMAGE,
         "sh",
         "-c",
-        "pip install --quiet pip-audit && pip-audit -r requirements.txt -f json || true",
+        "pip install --quiet pip-audit && pip-audit -r requirements.txt -f json",
       ];
   }
 }
@@ -95,10 +97,11 @@ async function runTool(
   args: string[],
   parse: (stdout: string) => RawFinding[],
   timeoutMs: number,
+  isReport?: (stdout: string) => boolean,
 ): Promise<{ tool: string; findings: RawFinding[] } | { tool: string; reason: string }> {
   try {
     const res = await docker(args, timeoutMs);
-    if (res.code !== 0) {
+    if (res.code !== 0 && !isReport?.(res.stdout)) {
       return { tool, reason: (res.stderr || "tool exited non-zero").trim().slice(0, 300) };
     }
     return { tool, findings: parse(res.stdout) };
@@ -162,6 +165,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
           scannerDockerArgs("npm-audit", dir),
           parseNpmAudit,
           180_000,
+          (out) => isAuditReport("npm-audit", out),
         );
         if ("findings" in audit) {
           toolsRun.push("npm-audit");
@@ -173,6 +177,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
           scannerDockerArgs("pip-audit", dir),
           parsePipAudit,
           300_000,
+          (out) => isAuditReport("pip-audit", out),
         );
         if ("findings" in audit) {
           toolsRun.push("pip-audit");

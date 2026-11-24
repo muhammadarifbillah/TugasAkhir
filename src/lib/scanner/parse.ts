@@ -130,6 +130,19 @@ export function parseTrivy(text: string): RawFinding[] {
   return out;
 }
 
+/** True when stdout is a real audit report; both tools exit 1 when they find vulnerabilities. */
+export function isAuditReport(tool: "npm-audit" | "pip-audit", text: string): boolean {
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return false;
+  }
+  if (!data || typeof data !== "object") return false;
+  if (tool === "pip-audit") return Array.isArray(data.dependencies);
+  return !data.error && !!data.vulnerabilities && typeof data.vulnerabilities === "object";
+}
+
 /** Parses `npm audit --json` (npm v7+ shape). */
 export function parseNpmAudit(text: string): RawFinding[] {
   let data: unknown;

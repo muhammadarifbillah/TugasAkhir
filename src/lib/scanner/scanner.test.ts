@@ -1,7 +1,7 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
 
-import { parseNpmAudit, parseSarif, parseTrivy } from "./parse";
+import { isAuditReport, parseNpmAudit, parseSarif, parseTrivy } from "./parse";
 import { SCANNER_HARDENING, scannerDockerArgs } from "./run";
 import { computeSecurityScore, enrichFindings, severityCounts } from "./score";
 import { inferCategory, normalizeSeverity } from "./mapping";
@@ -147,4 +147,22 @@ test("scannerDockerArgs hardens every scanner container", () => {
   }
   assert.ok(scannerDockerArgs("semgrep", "/tmp/x").includes("p/owasp-top-ten"));
   assert.ok(scannerDockerArgs("trivy", "/tmp/x").includes("vuln,secret,misconfig"));
+});
+
+test("dependency audits build a lockfile without scripts and do not mask failures", () => {
+  const npm = scannerDockerArgs("npm-audit", "/tmp/x").join(" ");
+  assert.match(npm, /npm install --package-lock-only --ignore-scripts/);
+  assert.match(npm, /npm audit --json/);
+  assert.doesNotMatch(scannerDockerArgs("pip-audit", "/tmp/x").join(" "), /\|\| true/);
+});
+
+test("isAuditReport accepts real reports and rejects tool errors", () => {
+  // npm and pip-audit exit 1 when they find vulnerabilities; only a real report may pass.
+  assert.equal(isAuditReport("npm-audit", JSON.stringify({ vulnerabilities: { lodash: {} } })), true);
+  assert.equal(isAuditReport("npm-audit", JSON.stringify({ vulnerabilities: {} })), true);
+  assert.equal(isAuditReport("npm-audit", JSON.stringify({ error: { code: "ENOLOCK" } })), false);
+  assert.equal(isAuditReport("npm-audit", JSON.stringify({ vulnerabilities: {}, error: { code: "E500" } })), false);
+  assert.equal(isAuditReport("pip-audit", JSON.stringify({ dependencies: [{ name: "django", vulns: [] }] })), true);
+  assert.equal(isAuditReport("pip-audit", ""), false);
+  assert.equal(isAuditReport("npm-audit", "npm notice"), false);
 });
