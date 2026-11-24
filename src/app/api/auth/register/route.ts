@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { requestIp } from "@/lib/audit";
+import { requestIp, writeAudit } from "@/lib/audit";
 import { rateLimitedByIp } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 
@@ -61,6 +61,8 @@ export async function POST(request: Request) {
     },
     select: { id: true, name: true, email: true },
   });
+
+  await writeAudit(user.id, "REGISTER", { method: "credentials" }, requestIp(request));
 
   return NextResponse.json(
     { message: "Account created successfully", user },

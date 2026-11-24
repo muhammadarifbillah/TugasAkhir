@@ -68,6 +68,7 @@ enum DeliverableType {
 enum AuditAction {
   LOGIN
   LOGOUT
+  REGISTER
   ADD_API_KEY
   REMOVE_API_KEY
   TEST_CONNECTION

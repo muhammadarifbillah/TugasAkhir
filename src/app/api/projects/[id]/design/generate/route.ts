@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
+import { requestIp, writeAudit } from "@/lib/audit";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
 import {
@@ -212,6 +213,7 @@ export async function POST(request: Request, { params }: RouteProps) {
       });
     });
 
+    await writeAudit(session.user.id, "UPDATE_PROJECT", { projectId: id, action: "generate_design", screens: screens.length }, requestIp(request));
     return NextResponse.json({ ok: true, screens, screen: screens[0] });
   } catch (err) {
     const classified = classifyProviderError(err);
