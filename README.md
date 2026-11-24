@@ -100,7 +100,7 @@ AUTH_GITHUB_ID=...
 AUTH_GITHUB_SECRET=...
 ```
 
-Push ke GitHub dapat dilakukan dengan OAuth token tersimpan atau Personal Access Token dengan izin `repo`. Sistem mendukung:
+Push ke GitHub dapat dilakukan dengan OAuth token tersimpan atau Personal Access Token dengan izin `repo`. Untuk fine-grained token, izin yang dibutuhkan adalah **Contents: Read and write**, **Workflows: Read and write** (proyek selalu membawa `.github/workflows/security.yml`), **Pull requests: Read and write**, dan **Administration: Read and write** bila ingin membuat repository baru. Sistem mendukung:
 
 - Membuat repository baru
 - Push ke repository existing
