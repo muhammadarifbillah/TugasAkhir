@@ -1,6 +1,8 @@
 "use client";
 
+import { m } from "motion/react";
 import { CheckCircle2, Clock, ShieldCheck, ShieldQuestion, X } from "lucide-react";
+import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InlineAlert } from "@/components/ui/inline-alert";
@@ -87,12 +89,18 @@ export function StudioRightPanel(props: StudioRightPanelProps) {
             tabIndex={tab === t ? 0 : -1}
             onClick={() => onTabChange(t)}
             className={cn(
-              "-mb-px shrink-0 border-b-2 px-2.5 py-2 text-xs font-medium transition-colors",
-              tab === t
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+              "relative shrink-0 px-2.5 py-2 text-xs font-medium transition-colors",
+              tab === t ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >
+            {tab === t && (
+              <m.span
+                layoutId="panel-tab-indicator"
+                className="absolute inset-x-0 bottom-0 h-0.5 bg-primary"
+                transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                aria-hidden="true"
+              />
+            )}
             {panelTabLabel(t, dict)}
           </button>
         ))}
@@ -139,7 +147,7 @@ function ScoreSection({ dict, lang, scoreInfo }: StudioRightPanelProps) {
           <Badge variant="secondary">{dict.studio.notScored}</Badge>
         ) : (
           <Badge variant={scoreBadgeVariant(score)} className="tabular-nums">
-            {score} / 100
+            <AnimatedNumber value={score} /> / 100
           </Badge>
         )}
       </div>

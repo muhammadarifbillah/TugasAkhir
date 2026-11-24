@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { AnimatePresence, m } from "motion/react";
+import { ViewTransition, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import {
   ArrowRight,
   Bot,
@@ -71,6 +72,7 @@ import { menuKeyNav, tabKeyNav } from "@/components/studio/tab-key-nav";
 import { csrfFetch } from "@/lib/csrf-client";
 import { normalizeScreens, type DesignScreen as DesignScreenType } from "@/lib/design";
 import { fmt } from "@/lib/format";
+import { navDirection } from "@/lib/nav-direction";
 import type { PlanResult } from "@/lib/ai/result";
 import type { Dictionary } from "@/lib/i18n";
 import type { ScoreInfo } from "@/lib/project-stats";
@@ -277,7 +279,7 @@ function focusComposerInput() {
 
 export function StudioWorkspace(props: StudioWorkspaceProps) {
   return (
-    <ToastProvider>
+    <ToastProvider dismissLabel={props.dict.workspace.dismiss}>
       <StudioWorkspaceInner {...props} />
     </ToastProvider>
   );
@@ -737,7 +739,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         return;
       }
       addToast("success", fmt(w.stageCompletedToast, { stage: stageName(stage.code) }));
-      if (props.nextStageCode && !isHandover) router.push(`/${lang}/studio/${project.id}/${props.nextStageCode}`);
+      if (props.nextStageCode && !isHandover) router.push(`/${lang}/studio/${project.id}/${props.nextStageCode}`, { transitionTypes: ["nav-forward"] });
       else router.refresh();
     } catch {
       setAreaError("stage", dict.studio.networkError);
@@ -974,7 +976,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         const target = stageLinks[Number(e.code.slice(5)) - 1];
         if (target && !target.locked && !target.active) {
           e.preventDefault();
-          router.push(target.href);
+          router.push(target.href, { transitionTypes: [navDirection(stage.orderIndex, target.orderIndex)] });
         }
         return;
       }
@@ -995,7 +997,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         group: w.groupNavigation,
         label: fmt(w.cmdGoStage, { stage: stageName(s.code) }),
         hint: `Alt+${s.orderIndex + 1}`,
-        run: () => router.push(s.href),
+        run: () => router.push(s.href, { transitionTypes: [navDirection(stage.orderIndex, s.orderIndex)] }),
       })),
     ...stage.steps.map((s) => ({
       id: `step-${s.id}`,
@@ -1093,14 +1095,16 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   return (
     <div className="flex h-auto min-h-0 flex-col md:h-[calc(100dvh-3.5rem)]">
       {/* Top bar + stepper + next action */}
-      <div className="sticky top-0 z-30 border-b bg-background">
+      <div className="sticky top-0 z-30 border-b bg-background" style={{ viewTransitionName: "studio-topbar" }}>
         <div className="flex flex-col gap-2 px-4 py-2 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
           <div className="flex min-w-0 items-center gap-2 text-sm">
-            <Link href={`/${lang}/dashboard`} className="shrink-0 text-muted-foreground hover:text-foreground">
+            <Link href={`/${lang}/dashboard`} transitionTypes={["nav-back"]} className="shrink-0 text-muted-foreground hover:text-foreground">
               {dict.studio.back}
             </Link>
             <ArrowRight className="size-3 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <span className="truncate font-medium">{project.name}</span>
+            <ViewTransition name={`project-title-${project.id}`} share="morph" default="none">
+              <span className="truncate font-medium">{project.name}</span>
+            </ViewTransition>
             <Badge variant="secondary">{project.version}</Badge>
             <ArrowRight className="size-3 shrink-0 text-muted-foreground" aria-hidden="true" />
             <span className="truncate text-muted-foreground" title={stageDesc}>
@@ -1134,6 +1138,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       ) : (
                         <Link
                           href={s.href}
+                          transitionTypes={[navDirection(stage.orderIndex, s.orderIndex)]}
                           className={linkClass}
                           aria-current={s.active ? "step" : undefined}
                           aria-keyshortcuts={`Alt+${s.orderIndex + 1}`}
@@ -1213,12 +1218,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 tabIndex={mobileTab === tab ? 0 : -1}
                 onClick={() => setMobileTab(tab)}
                 className={cn(
-                  "flex min-h-11 flex-1 items-center justify-center gap-1.5 px-3 py-3 text-xs font-medium transition-colors",
-                  mobileTab === tab
-                    ? "border-b-2 border-primary text-primary"
-                    : "text-muted-foreground hover:text-foreground",
+                  "relative flex min-h-11 flex-1 items-center justify-center gap-1.5 px-3 py-3 text-xs font-medium transition-colors",
+                  mobileTab === tab ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
               >
+                {mobileTab === tab && (
+                  <m.span
+                    layoutId="mobile-tab-indicator"
+                    className="absolute inset-x-0 bottom-0 h-0.5 bg-primary"
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    aria-hidden="true"
+                  />
+                )}
                 <Icon className="size-3.5" aria-hidden="true" />
                 {tab === "navigate"
                   ? dict.studio.subSteps
@@ -1261,13 +1272,24 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     className={cn("flex items-start gap-2 rounded-md p-1", s.current && "bg-warning/5")}
                     aria-current={s.current ? "step" : undefined}
                   >
-                    {s.met ? (
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" aria-hidden="true" />
-                    ) : s.locked ? (
-                      <Lock className="mt-0.5 size-4 shrink-0 text-muted-foreground/40" aria-hidden="true" />
-                    ) : (
-                      <X className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
-                    )}
+                    {/* Pops only when the status changes; the loaded checklist stays still. */}
+                    <AnimatePresence initial={false}>
+                      <m.span
+                        key={s.met ? "met" : s.locked ? "locked" : "open"}
+                        initial={{ scale: 0.6, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 25 }}
+                        className="mt-0.5 shrink-0"
+                      >
+                        {s.met ? (
+                          <CheckCircle2 className="size-4 text-success" aria-hidden="true" />
+                        ) : s.locked ? (
+                          <Lock className="size-4 text-muted-foreground/40" aria-hidden="true" />
+                        ) : (
+                          <X className="size-4 text-warning" aria-hidden="true" />
+                        )}
+                      </m.span>
+                    </AnimatePresence>
                     <div className="min-w-0 flex-1">
                       <p
                         className={cn(
@@ -1373,10 +1395,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                     tabIndex={selected ? 0 : -1}
                     onClick={() => setCenterTab(t)}
                     className={cn(
-                      "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
-                      selected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                      "relative isolate flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                      selected ? "text-foreground" : "text-muted-foreground hover:text-foreground",
                     )}
                   >
+                    {selected && (
+                      <m.span
+                        layoutId="center-tab-indicator"
+                        className="absolute inset-0 -z-10 rounded-md bg-background shadow-sm"
+                        transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <Icon className="size-3.5" aria-hidden="true" />
                     {t === "workspace" ? w.tabWorkspace : w.tabChat}
                     {t === "chat" && messages.length > 0 && (
@@ -1834,51 +1864,78 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   className="py-8"
                 />
               )}
-              {messages.map((m) => (
-                <div key={m.id} className={cn("flex min-w-0 gap-2", m.role === "user" && "justify-end")}>
-                  {m.role === "assistant" && (
-                    <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
-                      <Bot className="size-3.5" aria-hidden="true" />
-                    </span>
-                  )}
-                  {m.role === "assistant" ? (
-                    <div className="min-w-0 rounded-lg border bg-card px-3 py-2 text-sm [overflow-wrap:anywhere]">
-                      <Markdown source={displayAssistantText(m.content)} />
-                    </div>
-                  ) : (
-                    <div className="min-w-0 whitespace-pre-wrap break-words rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground [overflow-wrap:anywhere]">
-                      {m.content}
-                    </div>
-                  )}
-                  {m.role === "user" && (
-                    <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
-                      <User className="size-3.5" aria-hidden="true" />
-                    </span>
-                  )}
-                </div>
-              ))}
+              {/* Index keys: router.refresh() swaps client ids for server ids, which must not re-run the
+                  enter animation. initial={false} keeps the loaded history static. */}
+              <AnimatePresence initial={false}>
+                {messages.map((msg, i) => (
+                  <m.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className={cn("flex min-w-0 gap-2", msg.role === "user" && "justify-end")}
+                  >
+                    {msg.role === "assistant" && (
+                      <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
+                        <Bot className="size-3.5" aria-hidden="true" />
+                      </span>
+                    )}
+                    {msg.role === "assistant" ? (
+                      <div className="min-w-0 rounded-lg border bg-card px-3 py-2 text-sm [overflow-wrap:anywhere]">
+                        <Markdown source={displayAssistantText(msg.content)} />
+                      </div>
+                    ) : (
+                      <div className="min-w-0 whitespace-pre-wrap break-words rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground [overflow-wrap:anywhere]">
+                        {msg.content}
+                      </div>
+                    )}
+                    {msg.role === "user" && (
+                      <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
+                        <User className="size-3.5" aria-hidden="true" />
+                      </span>
+                    )}
+                  </m.div>
+                ))}
+              </AnimatePresence>
 
-              {activePlan && (
-                <PlanCard
-                  plan={activePlan}
-                  labels={planLabels}
-                  onApprove={approvePlan}
-                  onCancel={() => {
-                    setActivePlan(null);
-                    setChatMode("plan");
-                  }}
-                  loading={buildLoading}
-                />
-              )}
-              {buildResult && (
-                <BuildResultCard result={buildResult} labels={planLabels} onOpenFile={(f) => openFile(f)} />
-              )}
-              {loading && (
-                <div role="status" className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                  <Bot className="size-4" aria-hidden="true" /> {dict.studio.thinking}
-                </div>
-              )}
+              <AnimatePresence initial={false}>
+                {activePlan && (
+                  <m.div key="plan" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                    <PlanCard
+                      plan={activePlan}
+                      labels={planLabels}
+                      onApprove={approvePlan}
+                      onCancel={() => {
+                        setActivePlan(null);
+                        setChatMode("plan");
+                      }}
+                      loading={buildLoading}
+                    />
+                  </m.div>
+                )}
+                {buildResult && (
+                  <m.div key="build" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                    <BuildResultCard result={buildResult} labels={planLabels} onOpenFile={(f) => openFile(f)} />
+                  </m.div>
+                )}
+                {loading && (
+                  <m.div
+                    key="thinking"
+                    role="status"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2 text-xs text-muted-foreground"
+                  >
+                    <span className="flex items-center gap-1" aria-hidden="true">
+                      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                      <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground" />
+                    </span>
+                    <Bot className="size-4" aria-hidden="true" /> {dict.studio.thinking}
+                  </m.div>
+                )}
+              </AnimatePresence>
               <div ref={messagesEndRef} />
             </div>
           </div>
@@ -1929,18 +1986,19 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         {/* Right: security & compliance (column on lg, drawer on md, tab on mobile) */}
         {panelOpen && (
           <div
-            className="fixed inset-0 z-40 hidden bg-black/40 md:block lg:hidden"
+            className="fixed inset-0 z-40 hidden bg-black/40 animate-in fade-in-0 md:block lg:hidden"
             onClick={() => setPanelOpen(false)}
             aria-hidden="true"
           />
         )}
         <aside
           id="studio-security-panel"
+          data-open={panelOpen}
           aria-label={dict.studio.securityPanel}
           className={cn(
             "flex min-h-0 min-w-0 flex-col bg-background lg:col-span-3 lg:border-s",
             mobileTab !== "security" && "max-md:hidden",
-            "md:max-lg:fixed md:max-lg:inset-y-0 md:max-lg:end-0 md:max-lg:z-50 md:max-lg:w-[min(380px,90vw)] md:max-lg:border-s md:max-lg:shadow-xl",
+            "md:max-lg:fixed md:max-lg:inset-y-0 md:max-lg:end-0 md:max-lg:z-50 md:max-lg:w-[min(380px,90vw)] md:max-lg:border-s md:max-lg:shadow-xl md:max-lg:data-[open=true]:animate-in md:max-lg:data-[open=true]:slide-in-from-right md:max-lg:data-[open=true]:duration-200",
             !panelOpen && "md:max-lg:hidden",
           )}
         >

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, m } from "motion/react";
 import { ChevronDown, LayoutDashboard, LogOut, Settings } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
 import { menuKeyNav } from "@/components/studio/tab-key-nav";
@@ -77,10 +78,16 @@ export function UserMenu({
         <ChevronDown className={`size-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
 
+      <AnimatePresence>
       {open && (
-        <div
+        <m.div
           role="menu"
           onKeyDown={menuKeyNav}
+          initial={{ opacity: 0, y: -4, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -4, scale: 0.98 }}
+          transition={{ duration: 0.15 }}
+          style={{ transformOrigin: "top right" }}
           className="card-elevated absolute end-0 top-[calc(100%+6px)] z-50 w-56 overflow-hidden rounded-lg border bg-popover p-1 text-popover-foreground"
         >
           <div className="px-3 py-2">
@@ -118,8 +125,9 @@ export function UserMenu({
               <LogOut className="size-4" /> {labels.signOut}
             </button>
           </form>
-        </div>
+        </m.div>
       )}
+      </AnimatePresence>
     </div>
   );
 }

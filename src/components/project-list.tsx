@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { ViewTransition, useMemo, useState } from "react";
+import { AnimatePresence, m } from "motion/react";
 import {
   ArrowRight,
   FolderGit2,
@@ -167,108 +168,120 @@ export function ProjectList({
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((p) => {
-            const status = p.status === "completed"
-              ? { variant: "success" as const, text: dict.dashboard.statusCompleted }
-              : p.status === "in_revision"
-                ? { variant: "warning" as const, text: dict.dashboard.statusInRevision }
-                : p.status === "draft"
-                  ? { variant: "default" as const, text: dict.dashboard.statusDraft }
-                  : { variant: "muted" as const, text: dict.dashboard.statusInProgress };
-            return (
-              <Card
-                key={p.id}
-                className="group relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50"
-              >
-                <span
-                  className={`absolute inset-x-0 top-0 h-1 ${
-                    p.status === "completed"
-                      ? "bg-success"
-                      : p.status === "in_revision"
-                        ? "bg-warning"
-                        : p.status === "draft"
-                          ? "bg-muted-foreground/40"
-                          : "bg-primary"
-                  }`}
-                  aria-hidden="true"
-                />
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{p.name}</p>
-                      {p.description && (
-                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>
-                      )}
-                    </div>
-                    <Badge variant={status.variant}>{status.text}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-3">
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <Badge variant="secondary">#{p.stack}</Badge>
-                    <Badge variant="outline">{dict.dashboard.version}: {p.version}</Badge>
-                    {p.revisionCount > 0 && (
-                      <Badge variant="outline">
-                        <GitPullRequest className="size-3" /> {p.revisionCount}
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 text-xs">
-                    <ShieldCheck className={`size-4 ${scoreColorClass(p.score)}`} />
-                    <span className={`tabular-nums ${scoreColorClass(p.score)}`}>
-                      {p.score != null
-                        ? `${dict.dashboard.securityScore}: ${p.score}%`
-                        : `${dict.dashboard.securityScore}: ${dict.studio.notScored}`}
-                    </span>
-                    {p.scoreSource && (
-                      <Badge variant={p.scoreSource === "scanner" ? "success" : "info"}>
-                        {p.scoreSource === "scanner" ? dict.workspace.trustVerified : dict.workspace.trustAi}
-                      </Badge>
-                    )}
-                    {p.scoreStale && <Badge variant="warning">{dict.workspace.trustStale}</Badge>}
-                  </div>
-                  <Progress
-                    value={p.score ?? 0}
-                    aria-label={`${dict.dashboard.securityScore}: ${p.score ?? 0}%`}
-                    indicatorClassName={scoreBgClass(p.score)}
-
-                  />
-
-                  <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1" aria-hidden="true">
-                        {Array.from({ length: p.stageProgress.total }).map((_, i) => (
-                          <span
-                            key={i}
-                            className={`h-1.5 w-4 rounded-full ${
-                              i < p.stageProgress.completed ? "bg-primary" : "bg-muted"
-                            }`}
-                          />
-                        ))}
+          <AnimatePresence mode="popLayout" initial={false}>
+            {filtered.map((p) => {
+              const status = p.status === "completed"
+                ? { variant: "success" as const, text: dict.dashboard.statusCompleted }
+                : p.status === "in_revision"
+                  ? { variant: "warning" as const, text: dict.dashboard.statusInRevision }
+                  : p.status === "draft"
+                    ? { variant: "default" as const, text: dict.dashboard.statusDraft }
+                    : { variant: "muted" as const, text: dict.dashboard.statusInProgress };
+              return (
+                <m.div
+                  key={p.id}
+                  layout
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Card
+                    className="group relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50"
+                  >
+                    <span
+                      className={`absolute inset-x-0 top-0 h-1 ${
+                        p.status === "completed"
+                          ? "bg-success"
+                          : p.status === "in_revision"
+                            ? "bg-warning"
+                            : p.status === "draft"
+                              ? "bg-muted-foreground/40"
+                              : "bg-primary"
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <CardHeader>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <ViewTransition name={`project-title-${p.id}`} share="morph" default="none">
+                            <p className="truncate font-semibold">{p.name}</p>
+                          </ViewTransition>
+                          {p.description && (
+                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>
+                          )}
+                        </div>
+                        <Badge variant={status.variant}>{status.text}</Badge>
                       </div>
-                      <span className="text-[11px] text-muted-foreground">
-                        {dict.dashboard.stageLabel} <span className="tabular-nums">{p.stageProgress.completed}/{p.stageProgress.total}</span>
-                      </span>
-                    </div>
-                    <div className="flex gap-2">
-                      {p.status === "completed" && (
-                        <Button size="sm" variant="outline" onClick={() => revise(p)} disabled={revisingId === p.id}>
-                          <RefreshCw className={`size-3 ${revisingId === p.id ? "animate-spin" : ""}`} />
-                          {dict.dashboard.revise}
-                        </Button>
-                      )}
-                      <Button asChild size="sm" variant="outline">
-                        <Link href={`/${lang}/studio/${p.id}/${p.activeStage}`}>
-                          {dict.dashboard.openStudio} <ArrowRight className="size-3" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-3">
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <Badge variant="secondary">#{p.stack}</Badge>
+                        <Badge variant="outline">{dict.dashboard.version}: {p.version}</Badge>
+                        {p.revisionCount > 0 && (
+                          <Badge variant="outline">
+                            <GitPullRequest className="size-3" /> {p.revisionCount}
+                          </Badge>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs">
+                        <ShieldCheck className={`size-4 ${scoreColorClass(p.score)}`} />
+                        <span className={`tabular-nums ${scoreColorClass(p.score)}`}>
+                          {p.score != null
+                            ? `${dict.dashboard.securityScore}: ${p.score}%`
+                            : `${dict.dashboard.securityScore}: ${dict.studio.notScored}`}
+                        </span>
+                        {p.scoreSource && (
+                          <Badge variant={p.scoreSource === "scanner" ? "success" : "info"}>
+                            {p.scoreSource === "scanner" ? dict.workspace.trustVerified : dict.workspace.trustAi}
+                          </Badge>
+                        )}
+                        {p.scoreStale && <Badge variant="warning">{dict.workspace.trustStale}</Badge>}
+                      </div>
+                      <Progress
+                        value={p.score ?? 0}
+                        aria-label={`${dict.dashboard.securityScore}: ${p.score ?? 0}%`}
+                        indicatorClassName={scoreBgClass(p.score)}
+
+                      />
+
+                      <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1" aria-hidden="true">
+                            {Array.from({ length: p.stageProgress.total }).map((_, i) => (
+                              <span
+                                key={i}
+                                className={`h-1.5 w-4 rounded-full ${
+                                  i < p.stageProgress.completed ? "bg-primary" : "bg-muted"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-[11px] text-muted-foreground">
+                            {dict.dashboard.stageLabel} <span className="tabular-nums">{p.stageProgress.completed}/{p.stageProgress.total}</span>
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          {p.status === "completed" && (
+                            <Button size="sm" variant="outline" onClick={() => revise(p)} disabled={revisingId === p.id}>
+                              <RefreshCw className={`size-3 ${revisingId === p.id ? "animate-spin" : ""}`} />
+                              {dict.dashboard.revise}
+                            </Button>
+                          )}
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/${lang}/studio/${p.id}/${p.activeStage}`} transitionTypes={["nav-forward"]}>
+                              {dict.dashboard.openStudio} <ArrowRight className="size-3" />
+                            </Link>
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </m.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { m } from "motion/react";
 import { ArrowRight, CheckCheck, CheckCircle2, Eye, Loader2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fmt } from "@/lib/format";
@@ -49,7 +50,7 @@ export function NextActionBar({
         </span>
         {nextStage && (
           <Button asChild size="sm" variant="outline" className="h-7 ms-auto">
-            <Link href={nextStage.href}>
+            <Link href={nextStage.href} transitionTypes={["nav-forward"]}>
               {fmt(w.goToNextStage, { stage: nextStage.name })} <ArrowRight className="size-3.5" />
             </Link>
           </Button>
@@ -64,10 +65,22 @@ export function NextActionBar({
         <span className="flex items-center gap-1.5 font-medium text-foreground">
           <CheckCircle2 className="size-4 text-success" aria-hidden="true" /> {w.nextActionReady}
         </span>
-        <Button size="sm" className="h-7 ms-auto" onClick={onComplete} disabled={completing}>
-          {completing ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCheck className="size-3.5" />}
-          {isHandover ? dict.studio.finishProject : dict.studio.completeStage}
-        </Button>
+        {/* Mounts when the last requirement is met: a one-time pop + ring draws the eye. */}
+        <m.div
+          className="relative ms-auto"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-primary animate-[ping_1s_ease-out_1_forwards]"
+          />
+          <Button size="sm" className="h-7" onClick={onComplete} disabled={completing}>
+            {completing ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCheck className="size-3.5" />}
+            {isHandover ? dict.studio.finishProject : dict.studio.completeStage}
+          </Button>
+        </m.div>
       </div>
     );
   }

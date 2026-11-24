@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, createContext, useContext } from "react";
+import { AnimatePresence, m } from "motion/react";
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from "lucide-react";
 
 type ToastType = "success" | "error" | "warning" | "info";
@@ -32,7 +33,13 @@ export function useToast() {
   return ctx;
 }
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
+export function ToastProvider({
+  children,
+  dismissLabel = "Dismiss",
+}: {
+  children: React.ReactNode;
+  dismissLabel?: string;
+}) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: string) => {
@@ -55,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
       {children}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      <ToastContainer toasts={toasts} removeToast={removeToast} dismissLabel={dismissLabel} />
     </ToastContext.Provider>
   );
 }
@@ -63,9 +70,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 function ToastContainer({
   toasts,
   removeToast,
+  dismissLabel,
 }: {
   toasts: Toast[];
   removeToast: (id: string) => void;
+  dismissLabel: string;
 }) {
   return (
     <div
@@ -76,14 +85,21 @@ function ToastContainer({
       aria-atomic="false"
       className="fixed bottom-4 end-4 z-[9999] flex max-w-sm flex-col gap-2"
     >
-      {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
-      ))}
+      <AnimatePresence initial={false}>
+        {toasts.map((toast) => (
+          <ToastItem
+            key={toast.id}
+            toast={toast}
+            onClose={() => removeToast(toast.id)}
+            dismissLabel={dismissLabel}
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
 
-function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
+function ToastItem({ toast, onClose, dismissLabel }: { toast: Toast; onClose: () => void; dismissLabel: string }) {
   useEffect(() => {
     if (toast.duration && toast.duration > 0) {
       const timer = setTimeout(onClose, toast.duration);
@@ -100,8 +116,20 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   const { Icon, accent, border } = styles[toast.type];
 
   return (
-    <div
-      className={`card-elevated flex items-start gap-2 rounded-lg border ${border} bg-card px-3 py-2.5 text-foreground animate-slide-in`}
+    <m.div
+      layout
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 24, transition: { duration: 0.15 } }}
+      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      // Swipe right to dismiss (pointer/touch); the close button stays the keyboard path.
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={{ left: 0, right: 0.6 }}
+      onDragEnd={(_, info) => {
+        if (info.offset.x > 80) onClose();
+      }}
+      className={`card-elevated flex touch-pan-y items-start gap-2 rounded-lg border ${border} bg-card px-3 py-2.5 text-foreground`}
     >
       <Icon className={`mt-0.5 size-4 shrink-0 ${accent}`} aria-hidden="true" />
       <p className="flex-1 text-xs leading-relaxed">{toast.message}</p>
@@ -120,11 +148,11 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
       <button
         type="button"
         onClick={onClose}
-        aria-label="Dismiss notification"
+        aria-label={dismissLabel}
         className="mt-0.5 shrink-0 rounded text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="size-3" aria-hidden="true" />
       </button>
-    </div>
+    </m.div>
   );
 }

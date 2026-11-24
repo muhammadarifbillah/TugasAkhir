@@ -23,7 +23,7 @@ export function InlineAlert({
     <div
       role={tone === "danger" ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-2 rounded-md border px-3 py-2 text-xs",
+        "flex items-start gap-2 rounded-md border px-3 py-2 text-xs animate-in fade-in-0 slide-in-from-top-1 duration-200",
         tone === "danger"
           ? "border-danger/40 bg-danger/10 text-danger"
           : "border-warning/40 bg-warning/10 text-warning",

@@ -1,5 +1,6 @@
 "use client";
 
+import { m } from "motion/react";
 import { Hammer, ListTodo, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,28 +46,39 @@ export function StudioComposer({
           className="flex rounded-lg border bg-muted p-0.5"
           onKeyDown={(e) => tabKeyNav(e, MODES, mode, onModeChange)}
         >
-          {MODES.map((m) => {
-            const checked = mode === m;
-            const Icon = m === "plan" ? ListTodo : Hammer;
+          {MODES.map((opt) => {
+            const checked = mode === opt;
+            const Icon = opt === "plan" ? ListTodo : Hammer;
             return (
               <button
-                key={m}
+                key={opt}
                 type="button"
                 role="radio"
                 aria-checked={checked}
                 tabIndex={checked ? 0 : -1}
-                onClick={() => onModeChange(m)}
+                onClick={() => onModeChange(opt)}
                 className={cn(
-                  "flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                  "relative isolate flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                   checked
-                    ? m === "plan"
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-success text-success-foreground shadow-sm"
+                    ? mode === "plan"
+                      ? "text-primary-foreground"
+                      : "text-success-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
+                {checked && (
+                  <m.span
+                    layoutId="composer-mode-indicator"
+                    className={cn(
+                      "absolute inset-0 -z-10 rounded-md shadow-sm transition-colors",
+                      mode === "plan" ? "bg-primary" : "bg-success",
+                    )}
+                    transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                    aria-hidden="true"
+                  />
+                )}
                 <Icon className="size-3.5" aria-hidden="true" />
-                {m === "plan" ? w.modePlan : w.modeBuild}
+                {opt === "plan" ? w.modePlan : w.modeBuild}
               </button>
             );
           })}
