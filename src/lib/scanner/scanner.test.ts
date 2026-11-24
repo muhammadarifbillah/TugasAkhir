@@ -2,6 +2,7 @@ import { test } from "vitest";
 import assert from "node:assert/strict";
 
 import { parseNpmAudit, parseSarif, parseTrivy } from "./parse";
+import { SCANNER_HARDENING, scannerDockerArgs } from "./run";
 import { computeSecurityScore, enrichFindings, severityCounts } from "./score";
 import { inferCategory, normalizeSeverity } from "./mapping";
 import type { RawFinding } from "./types";
@@ -135,4 +136,15 @@ test("enrichFindings attaches NIST and ISO controls", () => {
   ]);
   assert.equal(enriched.nistTask, "PW.4.1");
   assert.ok(enriched.isoControls.includes("A.8.28"));
+});
+
+test("scannerDockerArgs hardens every scanner container", () => {
+  for (const tool of ["semgrep", "trivy", "npm-audit", "pip-audit"] as const) {
+    const args = scannerDockerArgs(tool, "/tmp/x");
+    assert.deepEqual(args.slice(0, 2), ["run", "--rm"]);
+    assert.deepEqual(args.slice(2, 6), [...SCANNER_HARDENING]);
+    assert.ok(args.some((a) => a.startsWith("/tmp/x:")), `${tool} mounts the scan dir`);
+  }
+  assert.ok(scannerDockerArgs("semgrep", "/tmp/x").includes("p/owasp-top-ten"));
+  assert.ok(scannerDockerArgs("trivy", "/tmp/x").includes("vuln,secret,misconfig"));
 });
