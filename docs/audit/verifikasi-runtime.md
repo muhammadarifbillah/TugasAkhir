@@ -39,7 +39,7 @@ Sesi lanjutan 2026-11-24 (commit `d5a333f`) memakai Personal Access Token fine-g
 | 13 | Repo baru dalam satu alur | `POST /api/github/push` dengan `repoName: shieldforge-uji-baru`, `visibility: private` | 200; repo private branch `main`; GitHub menulis `Initial commit` bf227ff, aplikasi menulis 6a9f1e5 berisi 8 berkas termasuk `.github/workflows/security.yml` | Terealisasi |
 | 13 | Push ke repo existing | `POST /api/github/push` dengan `existingRepoUrl` repo `shieldforge-uji-dev` | 200; commit efc82ad di atas c80b560; isi root `.env.example .github README.md app.js docs index.html` | Terealisasi |
 | 13 | Nama repo yang sudah dipakai | `repoName: shieldforge-uji-dev` tanpa `existingRepoUrl` | 400 "Repository name already exists on your GitHub." | Terealisasi |
-| 13, 81b | PR revisi | tidak dijalankan | `src/app/api/revisions/route.ts:45` mensyaratkan `project.status === "completed"`; belum ada proyek Dev User yang kelima tahapnya selesai | Belum dijalankan |
+| 13, 81b | PR revisi | dicoba pada sesi ketiga dengan proyek eduvista yang completed | Branch `release/v1.1` terbuat, tetapi `pulls.create` ditolak 403 karena token belum punya `pull_requests=read/write` | Belum dijalankan |
 
 Bukti izin token diperiksa langsung ke API tanpa menulis data pada repo orang lain: `POST /user/repos` dengan body kosong menjawab 403 sebelum izin Administration diberikan dan 422 sesudahnya; `PUT /contents/probe2.txt` menjawab 201 setelah izin Contents diberikan; `PATCH /git/refs/heads/main` dengan SHA yang sama menjawab 200.
 
@@ -49,13 +49,27 @@ Proyek hasil generate selalu membawa `.github/workflows/security.yml`, dan GitHu
 
 Perbaikan di commit `d5a333f`: `githubPushError` menerima `{ hasWorkflows }`, dan route menghitungnya dari daftar berkas `buildProjectFiles`. Pesan sekarang menyebut `Contents: Read and write` dan `Workflows: Read and write`. README juga diperbarui (commit `d5b9c9f`) karena sebelumnya hanya menyebut PAT klasik `repo` scope.
 
+## Uji AI, PDF, dan revisi
+
+Sesi ketiga 2026-11-24 memakai akun pemilik `arifbillahv19@gmail.com` (kunci Gemini dan DeepSeek tersimpan, proyek `eduvista` berstatus completed, 113 berkas artefak). Login memakai provider kredensial aplikasi di instance lokal; sesi dikembalikan ke Dev User setelah uji.
+
+| # | Langkah | Hasil | Status |
+|---|---|---|---|
+| 87b | Jawaban model sungguhan | `POST /api/chat` pada proyek Pengelolaan Tiket tahap 1 dengan prompt "Jelaskan dalam dua kalimat apa itu NIST SSDF." | Pesan `assistant` tersimpan berisi jawaban model (NIST SP 800-218 SSDF, empat kelompok PO/PS/PW/RV, dipetakan ke ISO/IEC 27001:2022 Annex A) beserta hasil Tahap 1 | Terealisasi |
+| 19 | PDF Manual Book | `GET /api/export/doc?projectId=<eduvista>&type=manual&format=pdf` | 200 `application/pdf`, `attachment; filename="MANUAL-BOOK.pdf"`, 8.459 byte, 4 halaman, `%PDF-1.3` sampai `%%EOF` | Terealisasi |
+| 19 | PDF laporan ISO | `GET /api/export/doc?type=iso&format=pdf` | 200 `application/pdf`, 5.100 byte, 1 halaman | Terealisasi |
+| 91b | Export PDF dan GitHub push | gabungan #19 dan #13 | keduanya terbukti di sesi ini | Terealisasi |
+| 81b | Release branch | `POST /api/revisions` pada eduvista (`v1.0` → `v1.1`) | 200; branch `release/v1.1` terbuat di repo uji dengan commit 5d6fb0a berisi 113 berkas; `githubPrUrl: null` | Terealisasi |
+| 81b | Pull Request | lanjutan langkah di atas | Gagal: `GET /repos/.../pulls` menjawab 403 dengan `x-accepted-github-permissions: pull_requests=read`. Revisi tetap berstatus `in_progress` dan aplikasi mengembalikan `githubWarning` | Belum dijalankan |
+| 81b | Pembatalan revisi | `PATCH /api/revisions/<id>` dengan `{"status":"cancelled"}` | 200; proyek kembali `completed`, tahap 1 kembali `completed/100%`, dasbor menampilkan "Selesai (1), Revisi (0)" | Terealisasi |
+
+Bug yang ditemukan di sesi ini: warning PR hanya menyuruh memeriksa token. Commit `3f2f0f8` menambahkan `githubRevisionWarning`, yang menyebut `Pull requests: Read and write` bila galatnya 403, dengan test di `src/lib/github-push-error.test.ts`.
+
 ## Belum diverifikasi
 
 | # | Klaim | Alasan |
 |---|---|---|
-| 19 | Unduh Manual Book dan laporan ISO PDF | Export hanya tersedia setelah kelima tahap selesai (`src/app/api/export/doc/route.ts:49`); proyek di sesi Dev User belum selesai |
-| 81b | Release branch dan Pull Request revisi | Butir run, log SSE, dan push GitHub terbukti (lihat #24, #25, #13); PR revisi butuh proyek berstatus completed |
-| 87b | Respons model AI sungguhan | Dev User tidak punya kunci AI, dan `DEFAULT_AI_API_KEY` kosong |
-| 91b | Export PDF | Butir runner preview, log live, dan GitHub push terbukti (lihat #24, #25, #13); butir PDF seperti #19 |
+| 13 | Butir PR pada push GitHub | Membutuhkan izin Pull requests: Read and write pada token; repo, commit, dan push sudah terbukti |
+| 81b | Pull Request revisi | Sama: `pulls.create` menjawab 403 tanpa izin Pull requests |
 
-Risiko yang tetap terbuka: di host Linux, folder scan yang dibuat `mkdtemp` (mode 0700) mungkin tidak terbaca oleh root di container tanpa `CAP_DAC_OVERRIDE`. Sesi ini hanya membuktikan Docker Desktop Windows.
+Seluruh klaim lain sudah diuji. Risiko yang tetap terbuka: di host Linux, folder scan yang dibuat `mkdtemp` (mode 0700) mungkin tidak terbaca oleh root di container tanpa `CAP_DAC_OVERRIDE`. Sesi ini hanya membuktikan Docker Desktop Windows.
