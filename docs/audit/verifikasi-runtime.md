@@ -30,14 +30,32 @@ Perbaikan di commit `e843abb`, `src/lib/scanner/run.ts` dan `src/lib/scanner/par
 
 Flag `--cap-drop ALL` dan `no-new-privileges` dari run keamanan tidak berperan dalam bug ini: `npm audit` memberi exit dan keluaran yang sama dengan maupun tanpa flag.
 
+## Uji push GitHub
+
+Sesi lanjutan 2026-11-24 (commit `d5a333f`) memakai Personal Access Token fine-grained milik pemilik repo, tersimpan terenkripsi di baris Dev User (`githubAccessTokenEncrypted`). Setiap langkah dikirim ke route aplikasi sendiri (`POST /api/github/push` lewat tab Playwright yang login sebagai Dev User); API GitHub hanya dipakai untuk memeriksa hasil, dan tidak ada token yang dicetak.
+
+| # | Langkah | Hasil | Status |
+|---|---|---|---|
+| 13 | Repo baru dalam satu alur | `POST /api/github/push` dengan `repoName: shieldforge-uji-baru`, `visibility: private` | 200; repo private branch `main`; GitHub menulis `Initial commit` bf227ff, aplikasi menulis 6a9f1e5 berisi 8 berkas termasuk `.github/workflows/security.yml` | Terealisasi |
+| 13 | Push ke repo existing | `POST /api/github/push` dengan `existingRepoUrl` repo `shieldforge-uji-dev` | 200; commit efc82ad di atas c80b560; isi root `.env.example .github README.md app.js docs index.html` | Terealisasi |
+| 13 | Nama repo yang sudah dipakai | `repoName: shieldforge-uji-dev` tanpa `existingRepoUrl` | 400 "Repository name already exists on your GitHub." | Terealisasi |
+| 13, 81b | PR revisi | tidak dijalankan | `src/app/api/revisions/route.ts:45` mensyaratkan `project.status === "completed"`; belum ada proyek Dev User yang kelima tahapnya selesai | Belum dijalankan |
+
+Bukti izin token diperiksa langsung ke API tanpa menulis data pada repo orang lain: `POST /user/repos` dengan body kosong menjawab 403 sebelum izin Administration diberikan dan 422 sesudahnya; `PUT /contents/probe2.txt` menjawab 201 setelah izin Contents diberikan; `PATCH /git/refs/heads/main` dengan SHA yang sama menjawab 200.
+
+## Bug yang ditemukan saat uji GitHub
+
+Proyek hasil generate selalu membawa `.github/workflows/security.yml`, dan GitHub menolak penulisan berkas workflow tanpa izin `Workflows`. Galatnya menyesatkan: status 403, **body kosong**, dan header `x-accepted-github-permissions: contents=write`, sehingga pesan lama menyuruh pengguna memeriksa izin yang salah. Dua probe membuktikannya: `POST /git/trees` tanpa berkas workflow menjawab 201, sedangkan dengan `.github/workflows/probe5.yml` saja menjawab 403.
+
+Perbaikan di commit `d5a333f`: `githubPushError` menerima `{ hasWorkflows }`, dan route menghitungnya dari daftar berkas `buildProjectFiles`. Pesan sekarang menyebut `Contents: Read and write` dan `Workflows: Read and write`. README juga diperbarui (commit `d5b9c9f`) karena sebelumnya hanya menyebut PAT klasik `repo` scope.
+
 ## Belum diverifikasi
 
 | # | Klaim | Alasan |
 |---|---|---|
-| 13 | Push GitHub: repo baru, existing, commit, PR | Tidak ada user dengan token GitHub, dan `AUTH_GITHUB_ID` kosong. Pemilik proyek memilih tidak memberi PAT |
 | 19 | Unduh Manual Book dan laporan ISO PDF | Export hanya tersedia setelah kelima tahap selesai (`src/app/api/export/doc/route.ts:49`); proyek di sesi Dev User belum selesai |
-| 81b | Release branch dan Pull Request revisi | Butir run dan log SSE terbukti (lihat #24, #25); butir GitHub butuh kredensial (#13) |
+| 81b | Release branch dan Pull Request revisi | Butir run, log SSE, dan push GitHub terbukti (lihat #24, #25, #13); PR revisi butuh proyek berstatus completed |
 | 87b | Respons model AI sungguhan | Dev User tidak punya kunci AI, dan `DEFAULT_AI_API_KEY` kosong |
-| 91b | Export PDF dan GitHub push | Butir runner preview dan log live terbukti (lihat #24, #25); butir PDF dan GitHub seperti #19 dan #13 |
+| 91b | Export PDF | Butir runner preview, log live, dan GitHub push terbukti (lihat #24, #25, #13); butir PDF seperti #19 |
 
 Risiko yang tetap terbuka: di host Linux, folder scan yang dibuat `mkdtemp` (mode 0700) mungkin tidak terbaca oleh root di container tanpa `CAP_DAC_OVERRIDE`. Sesi ini hanya membuktikan Docker Desktop Windows.
