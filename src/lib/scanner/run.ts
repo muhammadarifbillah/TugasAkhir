@@ -15,6 +15,81 @@ const TRIVY_IMAGE = "aquasec/trivy:latest";
 const NODE_IMAGE = "node:20-alpine";
 const PYTHON_IMAGE = "python:3.12-alpine";
 
+export type ScannerTool = "semgrep" | "trivy" | "npm-audit" | "pip-audit";
+
+// Scanned code is untrusted: even a malicious manifest must not gain root
+// capabilities or escalate inside the scanner container.
+export const SCANNER_HARDENING = ["--cap-drop", "ALL", "--security-opt", "no-new-privileges"] as const;
+
+export function scannerDockerArgs(tool: ScannerTool, dir: string): string[] {
+  switch (tool) {
+    case "semgrep":
+      return [
+        "run",
+        "--rm",
+        ...SCANNER_HARDENING,
+        "-v",
+        `${dir}:/src`,
+        "-w",
+        "/src",
+        SEMGREP_IMAGE,
+        "semgrep",
+        "scan",
+        "--config",
+        "p/owasp-top-ten",
+        "--config",
+        "p/security-audit",
+        "--sarif",
+        "--metrics=off",
+        "--quiet",
+      ];
+    case "trivy":
+      return [
+        "run",
+        "--rm",
+        ...SCANNER_HARDENING,
+        "-v",
+        `${dir}:/src`,
+        TRIVY_IMAGE,
+        "fs",
+        "--scanners",
+        "vuln,secret,misconfig",
+        "--format",
+        "json",
+        "--quiet",
+        "/src",
+      ];
+    case "npm-audit":
+      return [
+        "run",
+        "--rm",
+        ...SCANNER_HARDENING,
+        "-v",
+        `${dir}:/app`,
+        "-w",
+        "/app",
+        NODE_IMAGE,
+        "npm",
+        "audit",
+        "--json",
+      ];
+    case "pip-audit":
+      return [
+        "run",
+        "--rm",
+        ...SCANNER_HARDENING,
+        "-v",
+        `${dir}:/app`,
+        "-w",
+        "/app",
+        PYTHON_IMAGE,
+        "sh",
+        "-c",
+        "pip install --quiet pip-audit && pip-audit -r requirements.txt -f json || true",
+      ];
+  }
+}
+
 async function runTool(
   tool: string,
   args: string[],
@@ -60,24 +135,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
     } else {
       const semgrep = await runTool(
         "semgrep",
-        [
-          "run",
-          "--rm",
-          "-v",
-          `${dir}:/src`,
-          "-w",
-          "/src",
-          SEMGREP_IMAGE,
-          "semgrep",
-          "scan",
-          "--config",
-          "p/owasp-top-ten",
-          "--config",
-          "p/security-audit",
-          "--sarif",
-          "--metrics=off",
-          "--quiet",
-        ],
+        scannerDockerArgs("semgrep", dir),
         parseSarif,
         300_000,
       );
@@ -88,20 +146,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
 
       const trivy = await runTool(
         "trivy",
-        [
-          "run",
-          "--rm",
-          "-v",
-          `${dir}:/src`,
-          TRIVY_IMAGE,
-          "fs",
-          "--scanners",
-          "vuln,secret,misconfig",
-          "--format",
-          "json",
-          "--quiet",
-          "/src",
-        ],
+        scannerDockerArgs("trivy", dir),
         parseTrivy,
         300_000,
       );
@@ -114,7 +159,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
       if (stack?.id === "node") {
         const audit = await runTool(
           "npm-audit",
-          ["run", "--rm", "-v", `${dir}:/app`, "-w", "/app", NODE_IMAGE, "npm", "audit", "--json"],
+          scannerDockerArgs("npm-audit", dir),
           parseNpmAudit,
           180_000,
         );
@@ -125,18 +170,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
       } else if (stack?.id === "python") {
         const audit = await runTool(
           "pip-audit",
-          [
-            "run",
-            "--rm",
-            "-v",
-            `${dir}:/app`,
-            "-w",
-            "/app",
-            PYTHON_IMAGE,
-            "sh",
-            "-c",
-            "pip install --quiet pip-audit && pip-audit -r requirements.txt -f json || true",
-          ],
+          scannerDockerArgs("pip-audit", dir),
           parsePipAudit,
           300_000,
         );
