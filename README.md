@@ -25,7 +25,7 @@ Setiap tahap menggunakan NIST SP 800-218 sebagai panduan, memetakan kontrol ke I
 
 Persyaratan:
 
-- Node.js 20 atau lebih baru
+- Node.js 22 atau lebih baru (Vercel AI SDK 7 mensyaratkan Node ≥ 22)
 - Docker Desktop
 - PostgreSQL melalui container Docker
 - API key AI jika ingin menjalankan chat AI nyata

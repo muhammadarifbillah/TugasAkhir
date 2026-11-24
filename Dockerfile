@@ -1,21 +1,21 @@
 # syntax=docker/dockerfile:1
 
 # ---- deps: install production+dev dependencies once ----
-FROM node:20-alpine AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 # postinstall only copies Monaco (handled by the build stage's prebuild step).
 RUN npm ci --ignore-scripts
 
 # ---- build: generate Prisma client + Next.js production build ----
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run db:generate && npm run build
 
 # ---- runtime: Next.js server + Docker CLI for the Run/Scan sandbox ----
-FROM node:20-alpine AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 # The Run and Security Scan features shell out to the host's Docker daemon.
 RUN apk add --no-cache docker-cli
