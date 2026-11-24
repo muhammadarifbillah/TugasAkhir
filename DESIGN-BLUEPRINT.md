@@ -18,6 +18,18 @@
 | `--background` | `#f4f6f8` | `#1e2227` | Background halaman |
 | `--foreground` | `#15191e` | `#e7eaee` | Teks utama |
 
+#### Stage (temper) Colors
+
+The five Secure SDLC stages use the real steel tempering colours in physical order. They identify stages only, never status. Light values are pinned by `src/lib/contrast.test.ts` (each ≥ 4.5:1 as text on `#f4f6f8` and `#ffffff`).
+
+| Token | Light | Temper colour | Temperature |
+|-------|-------|---------------|-------------|
+| `--stage-1` | `#8a6812` | straw | 205 °C |
+| `--stage-2` | `#9f622d` | brown (was `#a5662f`, 4.27:1, fixed for AA) | 260 °C |
+| `--stage-3` | `#6e4a93` | purple | 282 °C |
+| `--stage-4` | `#2f5e9e` | dark blue | 310 °C |
+| `--stage-5` | `#5e6f80` | grey-blue | 371 °C |
+
 #### Semantic Colors
 
 Token status (`--success`, `--warning`, `--danger`, `--destructive`, `--info`) didefinisikan di `src/app/globals.css`.
@@ -98,29 +110,30 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 
 ### 2.1 Landing Page
 
-Theme "Smooth Soft": the report palette plus soft gradients from the five stage colours, `rounded-2xl` soft cards (`.soft-card`: layered shadow + a real border for projector contrast) and stage tints (`.stage-tint` with `--tint`). Scoped under `.landing`; no `backdrop-blur`. Content sells problem → how it works → proof → action, and every number comes from `lib/landing-facts.ts` (pinned by `landing-facts.test.ts`). No testimonials or customer logos.
+Concept "Forge Ledger": the landing page reads like a signed technical report built on ShieldForge's own identity. The five stage colours are the steel tempering colours (205 → 371 °C), each gate has a **hallmark** shape (◇ ○ △ □ ⬡, `components/landing/hallmark.tsx`) so a stage is never identified by colour alone, and sections are numbered `§1–§11` in a margin rail with hairline rules instead of floating cards. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()` reads `STAGE_DEFINITIONS`, `SCORE_WEIGHTS` comes from the scanner) and pinned by tests. No testimonials or customer logos; the page states its limits.
 
 ```
-HEADER (unchanged)
-1  HERO          eyebrow (problem) · H1 word reveal · lede · [CTA] [How it works]
-                 "Mapped to" NIST SP 800-218 · ISO 27001:2022 · Semgrep · Trivy  |  trace demo (tilt)
-2  #masalah      3 problem cards
-3  #angka        5 stages · 42 NIST tasks · 26 sub-steps · 6 AI providers · 2 languages
-4  #gerbang      5-dot timeline + auto carousel (stage, why, artefact, NIST, ISO)
-5  #cara-kerja   6 steps (Prompt, Plan, Build, Scan, Fix with AI, Export) + live vignette
-6  #pratinjau    3 real studio screenshots in browser frames (public/landing/*.jpg)
-7  #pemetaan     NIST → ISO table (stage-colour edge, row tint on hover)
-8  #fitur        bento: SDLC (2×2), ISO, BYOK, GitHub, Docker, Database, Secure, Prompt
-9  #hasil        5 deliverables checklist + CTA
-10 #faq          6 native <details> questions
-11 closing CTA   gradient band
-FOOTER (unchanged)
+Hero        H1 (wide) · lede · [Start a project] See the five gates · standards line | TEMPER RAIL
+§1  #masalah     cited Veracode figure (45% of tests) + 3 problems
+§2  #tentang     what ShieldForge is · done by the AI vs guarded by the gates · who it is for
+§3  #gerbang     5 temper coupons (auto carousel, desktop) · all 26 sub-steps in <details>
+§4  #cara-kerja  6 steps with a live vignette (scan example = real scoring function)
+§5  #arsitektur  6-node architecture (plain sentence → technical detail → limit) + platform security
+§6  #bukti       facts ledger · score formula · gate → NIST/ISO table · CSV of 26 sub-steps
+§7  #pratinjau   3 real studio screenshots as numbered figures
+§8  #fitur       feature ledger: Build / Verify / Deliver
+§9  #hasil       deliverables | limits
+§10 #glosarium   9 plain-language terms
+§11 #faq         7 questions
+Closing          temper hairline "quench" + CTA
 ```
 
 **Spesifikasi:**
-- Hero: full-width aurora (`components/landing/aurora-backdrop.tsx`), inner grid `max-w-6xl lg:grid-cols-[1.05fr_1fr] py-16 md:py-24`, H1 `display-type text-4xl md:text-5xl lg:text-6xl`.
-- Sections: `max-w-6xl px-4`, spacing `mt-24 md:mt-32`, heading block = eyebrow + H2 `display-type text-2xl md:text-4xl` + lede (`section-heading.tsx`).
-- Components live in `src/components/landing/` (one per section); `page.tsx` only composes them and stays a server component.
+- Container `max-w-6xl px-4`; sections `py-20 md:py-28` with `border-t` (`components/landing/ledger-section.tsx`); on lg a 12-column grid with the `§n` index in a 2-column rail.
+- Type: Archivo width axis, `.font-wide` (125% / 800) for H1/H2/figures, `.font-narrow` (75% / 600) for ledger labels (no all-caps eyebrows); Geist Mono only for real codes.
+- Surfaces: hairline ledgers (`.leader` dotted rows); elevation (`card-elevated`, `rounded-xl`) only for the temper rail, screenshot frames and the vignette; temper coupons are 2px-radius plates (`.coupon`) with a faint oxide banding.
+- Components: `temper-rail`, `gate-coupons`, `substeps-disclosure`, `gate-link` (coupon ↔ table highlight), `architecture-flow`, `proof-section`, `feature-ledger`, `deliverables`, `glossary`, `faq`, `product-preview`, `quench-rule`.
+- OG image (`src/app/opengraph-image.tsx`): report paper, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
 
 ### 2.2 Dashboard
 
@@ -483,7 +496,7 @@ Severity colors: mengikuti token tema — critical/high `danger`, medium `warnin
 | Default | <640px | Single column, mobile tabs |
 | `sm` | 640px+ | 2-column grids |
 | `md` | 768px+ | Desktop nav, 2-column layouts |
-| `lg` | 1024px+ | Studio tiga kolom; fitur landing bento empat kolom, cerita 5 gerbang menampilkan label tahap |
+| `lg` | 1024px+ | Studio tiga kolom; landing memakai margin rail `§n`, kupon gerbang menampilkan label tahap, motion landing aktif |
 
 ### 4.2 Studio Workspace Responsive
 
@@ -620,14 +633,21 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | Route change | React `<ViewTransition>` (`components/page-transition.tsx`) | Landing, dashboard, studio pages |
 | In-app | `motion` (`motion/react`) via `LazyMotion strict` + `domMax` loaded async (`components/motion-provider.tsx`) | Tab indicators, toasts, menus, chat messages, plan/build cards, score, sub-step icons, project grid, landing reveals |
 
-**Landing motion** (`components/landing/`, shared vocabulary in `motion.ts`: `EASE`, `reveal()`, `stagger()`):
-- **Desktop only (≥ 1024px).** Below that the landing page is static: LandingMotion sets MotionConfig skipAnimations, timers check isDesktop(), and CSS turns off the aurora, the H1 word reveal, the carousel fill and the FAQ transition. The hero demo and the gates carousel do not auto-advance on mobile (manual tap/swipe/arrows only, so no pause button is shown).
-- Hero: aurora drifts 24 s (CSS, paused offscreen); H1 words fade/rise with CSS so they show before hydration; lede, CTA and standards strip reveal in sequence; CTA arrow nudges on hover; the trace demo tilts up to ±4° towards a mouse pointer.
-- Problem cards and feature tiles reveal with a stagger; numbers count up once when they scroll into view (`count-up.tsx`; server HTML holds the final value).
-- Five gates carousel (`stage-carousel.tsx`): auto-advances every 4.5 s, timed by the active segment's CSS fill (`onAnimationEnd`), so pausing the animation pauses the carousel exactly. Pauses on hover, focus inside, offscreen, hidden tab and via the button; ←/→/Home/End, prev/next and swipe; page scroll is never captured.
-- How it works: `layoutId` indicator between steps; each step's vignette plays once (typing, staggered plan, code lines, score 0→100 + badge pop, diff flash, ticks).
-- Product preview: frames scale/slide in; small frames drift ±24 px against the scroll of `#main` (md+).
-- Bento: hover lift + pointer spotlight (CSS vars, no state); deliverable ticks draw in (`pathLength`); FAQ opens with `::details-content` height transition.
+**Landing motion** (`components/landing/`, easing `EASE = [0.16, 1, 0.3, 1]` in `motion.ts`). One load-time moment; everything else answers the user. **Desktop only (≥ 1024px):** below that `LandingMotion` sets `MotionConfig skipAnimations`, timers check `isDesktop()`, and the page renders final states (no auto-advance, no pause buttons).
+
+| # | Element | Trigger | Motion | Reduced motion |
+|---|---|---|---|---|
+| M1 | Temper rail (hero) | Load, once, if on screen | heat fill per gate (`scaleX` overshoot-settle), hallmark stamp + ring, status Waiting→Passed; ≈ 4 s total (`railSchedule(750, 5)`), so no pause is needed (WCAG 2.2.2) | colour/opacity only, no ring |
+| M2 | Replay | Click | restarts M1, clearing pending timers | as M1 |
+| M3 | Gate coupons | In view | the selected coupon's bottom edge fills over 4.5 s (CSS, `onAnimationEnd` advances); panel crossfade + x ±24 px; pauses on hover, focus, offscreen, hidden tab, button | crossfade, still rotating, pause button |
+| M4 | Coupon ↔ table row | Hover/focus | row tint in the stage colour | same |
+| M5 | How-it-works vignette | Tab change | typing, staggered rows, score 0→91, diff flash, ticks | final state |
+| M6 | Proof ledger numbers | First in view | count-up | kept |
+| M7 | Closing hairline | First in view | temper ramp desaturates (quench) | kept |
+| M8 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
+| M9 | Architecture node | Click/focus | outline + highlighted connectors, note crossfade | same |
+
+Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, section fade-ups and the looping hero demo. No scroll-linked animation.
 
 Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fast: 120ms`, `--dur-base: 200ms`, `--dur-slow: 300ms`. In-app interactions stay within 120–300 ms and never block input.
 
@@ -653,9 +673,9 @@ Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fas
 **Rules**
 - Animate only `transform`, `opacity` and colour.
 - Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
-- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the hero stage demo and the gates carousel (crossfade; both have a pause button). Also removed on the landing page: aurora drift, tilt, parallax and spotlight. Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
+- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the temper rail (colour only) and the gates carousel (crossfade, with a pause button). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
 - No smooth-scroll library, no GSAP, and no glassmorphism (`backdrop-blur`).
-- `prefers-contrast: more` / high-contrast toggle: landing aurora hidden and stage tints removed.
+- `prefers-contrast: more` / high-contrast toggle: landing coupon texture removed and borders at full strength.
 
 ### 7.2 Hover States
 
