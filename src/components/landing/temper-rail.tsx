@@ -114,7 +114,7 @@ export function TemperRail({
                 />
               </span>
 
-              <p className="font-narrow mt-2 line-clamp-2 min-h-[2lh] text-xs leading-tight md:text-sm">
+              <p className="font-narrow mt-2 line-clamp-2 min-h-[2lh] text-xs leading-tight [overflow-wrap:anywhere] md:text-sm">
                 {g.title}
               </p>
               <p className="truncate font-mono text-[11px] text-muted-foreground">{g.nist}</p>
