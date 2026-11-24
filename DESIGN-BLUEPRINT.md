@@ -520,7 +520,7 @@ Desktop (md+):                    Mobile (<md):
 ┌──────────────────────────┐     ┌──────────────────────┐
 │ [Logo] Name [Nav] [User] │     │ [Logo] Name [≡ Menu] │
 └──────────────────────────┘     └──────────────────────┘
-                                  Menu tampil di sisi kanan, tanpa animasi slide
+                                  Menu tampil di sisi kanan, fade + scale 150ms (tanpa slide)
                                   w-64, overlay bg-black/50
 ```
 
