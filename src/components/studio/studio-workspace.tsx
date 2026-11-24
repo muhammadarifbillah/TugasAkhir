@@ -67,7 +67,7 @@ import {
   ThreatModelView,
   type RecommendationRow,
 } from "@/components/studio/studio-views";
-import { tabKeyNav } from "@/components/studio/tab-key-nav";
+import { menuKeyNav, tabKeyNav } from "@/components/studio/tab-key-nav";
 import { csrfFetch } from "@/lib/csrf-client";
 import { normalizeScreens, type DesignScreen as DesignScreenType } from "@/lib/design";
 import { fmt } from "@/lib/format";
@@ -411,7 +411,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       if (!moreBtnRef.current?.contains(t) && !moreMenuRef.current?.contains(t)) setMoreOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMoreOpen(false);
+      if (e.key === "Escape") {
+        setMoreOpen(false);
+        moreBtnRef.current?.querySelector<HTMLElement>("button")?.focus();
+      }
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -420,6 +423,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       document.removeEventListener("keydown", onKey);
     };
   }, [moreOpen]);
+
+  useEffect(() => {
+    if (moreOpen && morePos) moreMenuRef.current?.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus();
+  }, [moreOpen, morePos]);
 
   // Stable identity: StepResultDialog syncs this in an effect, so an inline
   // callback would re-run it on every render and immediately undo maximize.
@@ -1455,6 +1462,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       <div
                         ref={moreMenuRef}
                         role="menu"
+                        onKeyDown={menuKeyNav}
                         style={{ top: morePos.top, right: morePos.right }}
                         className="fixed z-[90] w-64 rounded-md border bg-card p-1 text-xs shadow-lg"
                       >

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, LayoutDashboard, LogOut, Settings } from "lucide-react";
 import type { Locale } from "@/lib/i18n";
+import { menuKeyNav } from "@/components/studio/tab-key-nav";
 
 interface UserMenuProps {
   lang: Locale;
@@ -44,6 +45,10 @@ export function UserMenu({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (open) ref.current?.querySelector<HTMLElement>('[role="menuitem"]:not([disabled])')?.focus();
+  }, [open]);
+
   const display = username ?? name ?? email ?? labels.user;
 
   return (
@@ -75,6 +80,7 @@ export function UserMenu({
       {open && (
         <div
           role="menu"
+          onKeyDown={menuKeyNav}
           className="card-elevated absolute end-0 top-[calc(100%+6px)] z-50 w-56 overflow-hidden rounded-lg border bg-popover p-1 text-popover-foreground"
         >
           <div className="px-3 py-2">

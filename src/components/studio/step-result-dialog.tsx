@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Eye, FileText, Database, type LucideIcon } from "lucide-react";
 import { FullscreenViewer } from "./fullscreen-viewer";
+import { tabKeyNav } from "./tab-key-nav";
 import { VisualCard } from "./visual-card";
 
 export interface VisualCardDef {
@@ -49,7 +50,12 @@ export function StepResultDialog({
   return (
     <div className="flex flex-col relative">
       {/* Tab bar */}
-      <div role="tablist" aria-label={title} className="flex items-center gap-1 border-b px-1 py-1">
+      <div
+        role="tablist"
+        aria-label={title}
+        onKeyDown={(e) => tabKeyNav(e, tabs.map((t) => t.id), activeTab, setActiveTab)}
+        className="flex items-center gap-1 border-b px-1 py-1"
+      >
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
