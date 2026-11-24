@@ -65,7 +65,7 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 | OpenAI | @ai-sdk/openai | 4.0.41 | GPT-4o, GPT-4o-mini (juga OpenAI-compatible) |
 | Anthropic | @ai-sdk/anthropic | 4.0.38 | Claude 3.5 Sonnet |
 | Local AI | ollama-ai-provider | 1.2.0 | Model lokal (offline) |
-| OpenRouter | OpenRouter API | - | Akses 100+ model AI |
+| OpenRouter | OpenRouter API | - | Katalog model OpenRouter (OpenAI, Anthropic, Google, dan lainnya) lewat API OpenAI-compatible |
 | DeepSeek | DeepSeek API | - | OpenAI-compatible; model default deepseek-flash, daftar lain diambil dari API DeepSeek |
 | BYOK | Bring Your Own Key | - | Enam provider dengan kunci terenkripsi |
 
