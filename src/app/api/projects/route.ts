@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
 import { locales } from "@/lib/i18n";
 import { recommendStackForProject } from "@/lib/ai/recommend-stack";
+import { createProjectSchema, parseJsonBody } from "@/lib/api-schemas";
 
 const ALLOWED_TEMPLATES = new Set(["custom", "e-commerce", "saas", "rest-api", "lms"]);
 
@@ -27,19 +28,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too many project creations. Slow down." }, { status: 429 });
   }
 
-  const body = (await request.json()) as {
-    name?: string;
-    description?: string;
-    template?: string;
-    scopeRequirements?: string;
-    uiPreferences?: string;
-    outputLanguage?: string;
-  };
+  const parsed = await parseJsonBody(request, createProjectSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
-  const name = body.name?.trim();
-  if (!name || name.length > 120) {
-    return NextResponse.json({ error: "Project name is required (max 120 chars)" }, { status: 400 });
-  }
+  const name = body.name;
   if (body.template && !ALLOWED_TEMPLATES.has(body.template)) {
     return NextResponse.json({ error: "Invalid template." }, { status: 400 });
   }

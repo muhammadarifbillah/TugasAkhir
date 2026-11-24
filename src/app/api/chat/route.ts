@@ -4,6 +4,7 @@ import { runStageTurn } from "@/lib/ai/engine";
 import { classifyProviderError } from "@/lib/ai/errors";
 import { rateLimitedAny } from "@/lib/rate-limit";
 import { requestIp } from "@/lib/audit";
+import { chatPromptSchema, parseJsonBody } from "@/lib/api-schemas";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 
 export async function POST(request: Request) {
@@ -27,19 +28,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Rate limit exceeded. Slow down." }, { status: 429 });
   }
 
-  const body = (await request.json()) as {
-    projectId?: string;
-    projectStageId?: string;
-    prompt?: string;
-  };
-
-  if (!body.projectStageId || typeof body.prompt !== "string" || !body.prompt.trim()) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
-  }
-
-  if (body.prompt.length > 8000) {
-    return NextResponse.json({ error: "Prompt too long" }, { status: 400 });
-  }
+  const parsed = await parseJsonBody(request, chatPromptSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   try {
     const result = await runStageTurn({

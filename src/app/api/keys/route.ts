@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { encryptSecret, maskSecret } from "@/lib/crypto";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { rateLimited } from "@/lib/rate-limit";
+import { createKeySchema, parseJsonBody } from "@/lib/api-schemas";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 
@@ -19,15 +20,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Too many key changes. Slow down." }, { status: 429 });
   }
 
-  const body = (await request.json()) as {
-    providerCode?: string;
-    apiKey?: string;
-    label?: string;
-  };
-
-  if (!body.providerCode || !body.apiKey) {
-    return NextResponse.json({ error: "providerCode and apiKey are required" }, { status: 400 });
-  }
+  const parsed = await parseJsonBody(request, createKeySchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
 
   const provider = await prisma.modelProvider.findUnique({
     where: { code: body.providerCode },
