@@ -48,8 +48,8 @@ export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
     i < running ? "var(--success)" : i === running ? "var(--primary)" : "var(--muted-foreground)";
 
   return (
-    <div ref={ref} className="rounded-lg border bg-card">
-      <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+    <div ref={ref} className="soft-card overflow-hidden">
+      <div className="flex items-center justify-between gap-3 border-b px-5 py-3.5">
         <p className="text-sm font-semibold">{labels.title}</p>
         <div className="flex items-center gap-2">
           <p className="text-xs text-muted-foreground">{labels.meta}</p>
@@ -64,10 +64,10 @@ export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
           </button>
         </div>
       </div>
-      <div className="px-4 pt-3" aria-hidden="true">
+      <div className="px-5 pt-4" aria-hidden="true">
         <div className="grid grid-cols-5 gap-1">
           {codes.map((c, i) => (
-            <span key={c.nist} className="relative h-1.5 overflow-hidden rounded-sm bg-muted">
+            <span key={c.nist} className="relative h-1.5 overflow-hidden rounded-full bg-muted">
               <m.span
                 className="absolute inset-y-0 left-0"
                 style={{ background: `var(--stage-${i + 1})` }}
@@ -79,7 +79,7 @@ export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
           ))}
         </div>
       </div>
-      <ol className="px-4 pb-2 pt-2">
+      <ol className="px-5 pb-3 pt-2">
         {steps.map((step, i) => (
           <li
             key={step.title}
