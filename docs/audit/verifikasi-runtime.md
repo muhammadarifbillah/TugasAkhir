@@ -39,7 +39,7 @@ Sesi lanjutan 2026-11-24 (commit `d5a333f`) memakai Personal Access Token fine-g
 | 13 | Repo baru dalam satu alur | `POST /api/github/push` dengan `repoName: shieldforge-uji-baru`, `visibility: private` | 200; repo private branch `main`; GitHub menulis `Initial commit` bf227ff, aplikasi menulis 6a9f1e5 berisi 8 berkas termasuk `.github/workflows/security.yml` | Terealisasi |
 | 13 | Push ke repo existing | `POST /api/github/push` dengan `existingRepoUrl` repo `shieldforge-uji-dev` | 200; commit efc82ad di atas c80b560; isi root `.env.example .github README.md app.js docs index.html` | Terealisasi |
 | 13 | Nama repo yang sudah dipakai | `repoName: shieldforge-uji-dev` tanpa `existingRepoUrl` | 400 "Repository name already exists on your GitHub." | Terealisasi |
-| 13, 81b | PR revisi | dicoba pada sesi ketiga dengan proyek eduvista yang completed | Branch `release/v1.1` terbuat, tetapi `pulls.create` ditolak 403 karena token belum punya `pull_requests=read/write` | Belum dijalankan |
+| 13, 81b | PR revisi | dicoba pada sesi ketiga dengan proyek eduvista yang completed | Percobaan pertama 403 (`pull_requests` belum diizinkan); setelah izin diberikan, PR #1 terbuka | Terealisasi |
 
 Bukti izin token diperiksa langsung ke API tanpa menulis data pada repo orang lain: `POST /user/repos` dengan body kosong menjawab 403 sebelum izin Administration diberikan dan 422 sesudahnya; `PUT /contents/probe2.txt` menjawab 201 setelah izin Contents diberikan; `PATCH /git/refs/heads/main` dengan SHA yang sama menjawab 200.
 
@@ -60,16 +60,18 @@ Sesi ketiga 2026-11-24 memakai akun pemilik `arifbillahv19@gmail.com` (kunci Gem
 | 19 | PDF laporan ISO | `GET /api/export/doc?type=iso&format=pdf` | 200 `application/pdf`, 5.100 byte, 1 halaman | Terealisasi |
 | 91b | Export PDF dan GitHub push | gabungan #19 dan #13 | keduanya terbukti di sesi ini | Terealisasi |
 | 81b | Release branch | `POST /api/revisions` pada eduvista (`v1.0` → `v1.1`) | 200; branch `release/v1.1` terbuat di repo uji dengan commit 5d6fb0a berisi 113 berkas; `githubPrUrl: null` | Terealisasi |
-| 81b | Pull Request | lanjutan langkah di atas | Gagal: `GET /repos/.../pulls` menjawab 403 dengan `x-accepted-github-permissions: pull_requests=read`. Revisi tetap berstatus `in_progress` dan aplikasi mengembalikan `githubWarning` | Belum dijalankan |
+| 81b | Pull Request | `POST /api/revisions` diulang setelah izin Pull requests diberikan; branch `release/v1.1` sengaja dibiarkan ada untuk menguji `ensureBranch` | 200; branch lama dihapus dan dibuat ulang, PR #1 "Release v1.1 — eduvista" terbuka (`release/v1.1` → `main`), `prUrl` terisi, `githubWarning: null` | Terealisasi |
 | 81b | Pembatalan revisi | `PATCH /api/revisions/<id>` dengan `{"status":"cancelled"}` | 200; proyek kembali `completed`, tahap 1 kembali `completed/100%`, dasbor menampilkan "Selesai (1), Revisi (0)" | Terealisasi |
 
-Bug yang ditemukan di sesi ini: warning PR hanya menyuruh memeriksa token. Commit `3f2f0f8` menambahkan `githubRevisionWarning`, yang menyebut `Pull requests: Read and write` bila galatnya 403, dengan test di `src/lib/github-push-error.test.ts`.
+Bug yang ditemukan di sesi ini:
+
+1. Warning PR hanya menyuruh memeriksa token. Commit `3f2f0f8` menambahkan `githubRevisionWarning`, yang menyebut `Pull requests: Read and write` bila galatnya 403.
+2. Percobaan ulang revisi setelah pembatalan tidak akan pernah membuat PR: `createRef` menjawab 422 karena branch `release/vX.Y` sudah ada, dan galatnya tertelan jadi warning. Commit `0886b22` menambahkan `ensureBranch` yang menghapus ref lama lalu membuatnya ulang dari commit dasar; terbukti pada percobaan kedua di atas.
 
 ## Belum diverifikasi
 
-| # | Klaim | Alasan |
-|---|---|---|
-| 13 | Butir PR pada push GitHub | Membutuhkan izin Pull requests: Read and write pada token; repo, commit, dan push sudah terbukti |
-| 81b | Pull Request revisi | Sama: `pulls.create` menjawab 403 tanpa izin Pull requests |
+Tidak ada klaim yang tersisa. Batas metode yang tetap berlaku:
 
-Seluruh klaim lain sudah diuji. Risiko yang tetap terbuka: di host Linux, folder scan yang dibuat `mkdtemp` (mode 0700) mungkin tidak terbaca oleh root di container tanpa `CAP_DAC_OVERRIDE`. Sesi ini hanya membuktikan Docker Desktop Windows.
+- Host Linux belum diuji; folder scan `mkdtemp` (mode 0700) mungkin tidak terbaca oleh root di container tanpa `CAP_DAC_OVERRIDE`. Sesi ini hanya membuktikan Docker Desktop Windows.
+- Isi PDF diperiksa dari header, ukuran, dan jumlah halaman, bukan secara visual.
+- Login OAuth GitHub tidak dijalankan (`AUTH_GITHUB_ID` kosong); jalur yang terbukti adalah Personal Access Token.
