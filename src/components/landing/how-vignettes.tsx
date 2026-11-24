@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import { Check, FileCode2, Folder, ShieldCheck } from "lucide-react";
+import { isDesktop } from "@/components/landing/landing-motion";
 import { EASE, stagger } from "@/components/landing/motion";
 
 /**
@@ -34,7 +35,7 @@ function PromptVignette({ text }: { text: string }) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     // Starts empty on server and client alike; reduced motion fills it in one step.
-    const step = reduce ? text.length : 1;
+    const step = reduce || !isDesktop() ? text.length : 1;
     const id = setInterval(() => setCount((n) => Math.min(text.length, n + step)), 30);
     return () => clearInterval(id);
   }, [reduce, text.length]);

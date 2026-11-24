@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m, useInView } from "motion/react";
 import { Check, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { useDesktopMotion } from "@/components/landing/landing-motion";
 import { EASE } from "@/components/landing/motion";
 import { tabKeyNav } from "@/components/studio/tab-key-nav";
 import { nextIndex } from "@/lib/carousel";
@@ -41,7 +42,9 @@ export function StageCarousel({ steps, codes, labels }: StageCarouselProps) {
   const [hover, setHover] = useState(false);
   const [focusWithin, setFocusWithin] = useState(false);
   const [docHidden, setDocHidden] = useState(false);
-  const running = !userPaused && !hover && !focusWithin && inView && !docHidden;
+  const desktop = useDesktopMotion();
+  // Auto-advance is a desktop feature; on mobile the stages change only by tap, swipe or arrows.
+  const running = desktop && !userPaused && !hover && !focusWithin && inView && !docHidden;
   const ids = steps.map((_, i) => String(i));
 
   useEffect(() => {
@@ -222,7 +225,7 @@ export function StageCarousel({ steps, codes, labels }: StageCarouselProps) {
           onClick={() => setUserPaused((p) => !p)}
           aria-label={userPaused ? labels.play : labels.pause}
           title={userPaused ? labels.play : labels.pause}
-          className="ms-2 rounded-full border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="ms-2 rounded-full border bg-card p-2 max-lg:hidden text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {userPaused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
         </button>

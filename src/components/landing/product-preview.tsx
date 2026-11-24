@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { m, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { isDesktop } from "@/components/landing/landing-motion";
 import { EASE } from "@/components/landing/motion";
 
 export interface PreviewShot {
@@ -39,7 +40,7 @@ function BrowserFrame({ shot, url, priority }: { shot: PreviewShot; url: string;
 }
 
 /**
- * One large studio screenshot with two smaller ones overlapping it. On md+ the
+ * One large studio screenshot with two smaller ones overlapping it. On desktop the
  * small frames drift a little against the scroll of <main id="main"> (the
  * app's scroll container); off under reduced motion.
  */
@@ -53,7 +54,7 @@ export function ProductPreview({ shots, url }: { shots: [PreviewShot, PreviewSho
   useEffect(() => {
     const main = document.getElementById("main");
     const el = ref.current;
-    if (!main || !el || reduce || !window.matchMedia("(min-width: 768px)").matches) return;
+    if (!main || !el || reduce || !isDesktop()) return;
     const onScroll = () => {
       const r = el.getBoundingClientRect();
       const vh = main.clientHeight;

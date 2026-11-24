@@ -11,7 +11,7 @@ export function HeroHeadline({ text }: { text: string }) {
         <span
           key={i}
           aria-hidden="true"
-          className="inline-block animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both duration-500"
+          className="inline-block animate-in fade-in-0 slide-in-from-bottom-3 fill-mode-both duration-500 max-lg:animate-none"
           style={{ animationDelay: `${i * 40}ms` }}
         >
           {word}

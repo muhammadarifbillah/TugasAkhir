@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { animate, m, useMotionValue, useTransform } from "motion/react";
+import { isDesktop } from "@/components/landing/landing-motion";
 import { EASE } from "@/components/landing/motion";
 
 /**
@@ -17,7 +18,8 @@ export function CountUp({ value, className }: { value: number; className?: strin
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    // Desktop only; mobile keeps the final value from the server HTML.
+    if (!el || !isDesktop()) return;
     let armed = false;
     let first = true;
     const io = new IntersectionObserver(([entry]) => {

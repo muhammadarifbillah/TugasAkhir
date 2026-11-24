@@ -362,6 +362,21 @@ html[data-contrast="high"].dark {
 .landing {
   interpolate-size: allow-keywords;
 }
+/* Landing motion is desktop-only: below lg everything renders in its final state. */
+@media (max-width: 1023.98px) {
+  .landing .aurora {
+    animation: none;
+  }
+  .landing .gate-progress {
+    display: none;
+  }
+  .landing .faq-item::details-content {
+    transition: none;
+  }
+  .landing .spotlight:hover {
+    background-image: none;
+  }
+}
 @media (prefers-contrast: more) {
   .landing .aurora {
     display: none;

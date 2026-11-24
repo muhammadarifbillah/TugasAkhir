@@ -621,6 +621,7 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | In-app | `motion` (`motion/react`) via `LazyMotion strict` + `domMax` loaded async (`components/motion-provider.tsx`) | Tab indicators, toasts, menus, chat messages, plan/build cards, score, sub-step icons, project grid, landing reveals |
 
 **Landing motion** (`components/landing/`, shared vocabulary in `motion.ts`: `EASE`, `reveal()`, `stagger()`):
+- **Desktop only (≥ 1024px).** Below that the landing page is static: LandingMotion sets MotionConfig skipAnimations, timers check isDesktop(), and CSS turns off the aurora, the H1 word reveal, the carousel fill and the FAQ transition. The hero demo and the gates carousel do not auto-advance on mobile (manual tap/swipe/arrows only, so no pause button is shown).
 - Hero: aurora drifts 24 s (CSS, paused offscreen); H1 words fade/rise with CSS so they show before hydration; lede, CTA and standards strip reveal in sequence; CTA arrow nudges on hover; the trace demo tilts up to ±4° towards a mouse pointer.
 - Problem cards and feature tiles reveal with a stagger; numbers count up once when they scroll into view (`count-up.tsx`; server HTML holds the final value).
 - Five gates carousel (`stage-carousel.tsx`): auto-advances every 4.5 s, timed by the active segment's CSS fill (`onAnimationEnd`), so pausing the animation pauses the carousel exactly. Pauses on hover, focus inside, offscreen, hidden tab and via the button; ←/→/Home/End, prev/next and swipe; page scroll is never captured.

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { m, useInView } from "motion/react";
+import { isDesktop, useDesktopMotion } from "@/components/landing/landing-motion";
 import { Pause, Play } from "lucide-react";
 
 const START = 2; // matches the static server HTML: two stages passed, the third running
@@ -23,7 +24,7 @@ export interface StageTraceDemoProps {
 
 /**
  * The landing hero card: one project moving through the five gates. It cycles
- * only while visible and playing. Only text, colour and bar fill change (no
+ * only on desktop, while visible and playing (static on mobile). Only text, colour and bar fill change (no
  * travel), so it also runs under reduced motion; the pause button covers
  * WCAG 2.2.2 for auto-updating content.
  */
@@ -32,10 +33,11 @@ export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
   const inView = useInView(ref);
   const [playing, setPlaying] = useState(true);
   const [running, setRunning] = useState(START);
-  const active = inView && playing;
+  const desktop = useDesktopMotion();
+  const active = inView && playing && desktop;
 
   useEffect(() => {
-    if (!active) return;
+    if (!active || !isDesktop()) return;
     // steps.length is the "all passed" frame before starting over.
     const id = setInterval(() => setRunning((r) => (r >= steps.length ? 0 : r + 1)), TICK_MS);
     return () => clearInterval(id);
@@ -58,7 +60,7 @@ export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
             onClick={() => setPlaying((p) => !p)}
             aria-label={playing ? labels.pause : labels.play}
             title={playing ? labels.pause : labels.play}
-            className="rounded p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded p-1 text-muted-foreground transition-colors max-lg:hidden hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {playing ? <Pause className="size-3.5" aria-hidden="true" /> : <Play className="size-3.5" aria-hidden="true" />}
           </button>
