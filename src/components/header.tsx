@@ -15,7 +15,7 @@ export async function Header({ lang }: { lang: Locale }) {
   const dict = await getDictionary(lang);
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background">
+    <header className="sticky top-0 z-40 border-b bg-background" style={{ viewTransitionName: "site-header" }}>
       <div className="stage-ramp h-px w-full" aria-hidden="true" />
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-2 px-4 sm:gap-4">
         <div className="flex items-center gap-4 sm:gap-6">

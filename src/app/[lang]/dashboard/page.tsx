@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Plus, Rocket } from "lucide-react";
 import { auth } from "@/auth";
+import { PageTransition } from "@/components/page-transition";
 import { ProjectList } from "@/components/project-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,44 +50,48 @@ export default async function DashboardPage({ params }: DashboardProps) {
   }));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{dict.dashboard.title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{dict.dashboard.subtitle}</p>
+    <PageTransition>
+      <PageTransition>
+        <div className="mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">{dict.dashboard.title}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">{dict.dashboard.subtitle}</p>
+            </div>
+            <Button asChild>
+              <a href={`/${lang}/projects/new`}>
+                <Plus /> {dict.dashboard.newProject}
+              </a>
+            </Button>
+          </div>
+
+          {projects.length === 0 && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Rocket className="size-4 text-primary" /> {dict.dashboard.onboardingTitle}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ol className="grid gap-3 text-sm sm:grid-cols-3">
+                  {[dict.dashboard.onboardingStep1, dict.dashboard.onboardingStep2, dict.dashboard.onboardingStep3].map(
+                    (step, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
+                          {i + 1}
+                        </span>
+                        <span className="text-muted-foreground">{step}</span>
+                      </li>
+                    ),
+                  )}
+                </ol>
+              </CardContent>
+            </Card>
+          )}
+
+          <ProjectList projects={cards} dict={dict} lang={lang} />
         </div>
-        <Button asChild>
-          <a href={`/${lang}/projects/new`}>
-            <Plus /> {dict.dashboard.newProject}
-          </a>
-        </Button>
-      </div>
-
-      {projects.length === 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Rocket className="size-4 text-primary" /> {dict.dashboard.onboardingTitle}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ol className="grid gap-3 text-sm sm:grid-cols-3">
-              {[dict.dashboard.onboardingStep1, dict.dashboard.onboardingStep2, dict.dashboard.onboardingStep3].map(
-                (step, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
-                      {i + 1}
-                    </span>
-                    <span className="text-muted-foreground">{step}</span>
-                  </li>
-                ),
-              )}
-            </ol>
-          </CardContent>
-        </Card>
-      )}
-
-      <ProjectList projects={cards} dict={dict} lang={lang} />
-    </div>
+      </PageTransition>
+    </PageTransition>
   );
 }

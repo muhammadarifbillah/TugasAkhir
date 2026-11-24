@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { PageTransition } from "@/components/page-transition";
 import { StudioWorkspace } from "@/components/studio/studio-workspace";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
@@ -101,118 +102,120 @@ export default async function StudioPage(props: StudioPageProps) {
   });
 
   return (
-    <StudioWorkspace
-      lang={lang}
-      dict={dict}
-      initialPlan={initialPlan}
-      project={{
-        id: project.id,
-        name: project.name,
-        version: project.currentVersion,
-        outputLanguage: project.outputLanguage,
-        status: project.status,
-        badgePublic: project.badgePublic,
-        finalizedAt: project.finalizedAt ? project.finalizedAt.toISOString() : null,
-        database: (() => {
-          const db = project.database as Record<string, unknown> | null;
-          // The connection URL (with credentials) is never sent to the client.
-          if (!db || typeof db.urlEncrypted !== "string") return null;
-          return {
-            service: String(db.service ?? ""),
-            hostPort: Number(db.hostPort ?? 0),
-            status: String(db.status ?? "ready"),
-          };
-        })(),
-      }}
-      stage={{
-        code: stageDef.code,
-        name: stageDef.name,
-        description: stageDef.description,
-        orderIndex: stageDef.orderIndex,
-        nistGroups: stageDef.nistGroups,
-        nistTasks: stageDef.nistTasks,
-        isoControls: stageDef.isoControls,
-        secureParams: stageDef.secureParams,
-        steps: stageDef.steps.map((s) => ({
+    <PageTransition key={`${projectId}-${stage}`}>
+      <StudioWorkspace
+        lang={lang}
+        dict={dict}
+        initialPlan={initialPlan}
+        project={{
+          id: project.id,
+          name: project.name,
+          version: project.currentVersion,
+          outputLanguage: project.outputLanguage,
+          status: project.status,
+          badgePublic: project.badgePublic,
+          finalizedAt: project.finalizedAt ? project.finalizedAt.toISOString() : null,
+          database: (() => {
+            const db = project.database as Record<string, unknown> | null;
+            // The connection URL (with credentials) is never sent to the client.
+            if (!db || typeof db.urlEncrypted !== "string") return null;
+            return {
+              service: String(db.service ?? ""),
+              hostPort: Number(db.hostPort ?? 0),
+              status: String(db.status ?? "ready"),
+            };
+          })(),
+        }}
+        stage={{
+          code: stageDef.code,
+          name: stageDef.name,
+          description: stageDef.description,
+          orderIndex: stageDef.orderIndex,
+          nistGroups: stageDef.nistGroups,
+          nistTasks: stageDef.nistTasks,
+          isoControls: stageDef.isoControls,
+          secureParams: stageDef.secureParams,
+          steps: stageDef.steps.map((s) => ({
+            id: s.id,
+            nistTasks: s.nistTasks,
+            isoControls: s.isoControls,
+          })),
+          projectStageId: current.id,
+        }}
+        completionGaps={stageGaps}
+        nextStageCode={
+          stages.find((ps) => ps.stage.orderIndex === stageDef.orderIndex + 1)?.stage.code ?? null
+        }
+        stages={stages.map((ps) => ({
+          code: ps.stage.code,
+          name: ps.stage.name,
+          orderIndex: ps.stage.orderIndex,
+          status: ps.status,
+          id: ps.stageId,
+        }))}
+        messages={
+          chat?.messages.map((m) => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            createdAt: m.createdAt.toISOString(),
+          })) ?? []
+        }
+        recommendations={current.recommendations.map((r) => ({
+          id: r.id,
+          category: r.category,
+          severity: r.severity,
+          title: r.title,
+          content: r.content,
+          suggestedCode: r.suggestedCode,
+          filePath: r.filePath,
+          isApplied: r.isApplied,
+          nistControl: r.nistControl
+            ? {
+                taskCode: r.nistControl.taskCode,
+                iso27001Mapping: r.nistControl.iso27001Mapping as string[],
+              }
+            : null,
+        }))}
+        codeArtifacts={codeArtifacts}
+        scoreInfo={scoreInfo}
+        latestRevision={
+          project.revisions.find((r) => r.status === "in_progress") ?? project.revisions[0] ?? null
+        }
+        designDiagrams={(design?.mermaid as string[] | undefined) ?? []}
+        designArchitecture={(design?.architecture as string[] | undefined) ?? []}
+        designThreatModel={(design?.threatModel as Record<string, unknown>[] | undefined) ?? []}
+        designUiDesign={(design?.uiDesign as string[] | undefined) ?? []}
+        designScreens={design?.designScreens ?? []}
+        designPlan={effectiveDesignPlan(globalSpec)}
+        analysisDataClassification={
+          (analysis?.dataClassification as string[] | undefined) ?? []
+        }
+        analysisStack={
+          analysis || analysisStackInfo
+            ? {
+                recommendedStack: analysisStackInfo ?? (analysis?.recommendedStack as Record<string, unknown> | null) ?? null,
+                securityRequirements: analysisRequirements,
+                summary: (analysis?.summary as string | undefined) ?? "",
+              }
+            : null
+        }
+        designDatabaseSchema={(design?.databaseSchema as string[] | undefined) ?? []}
+        designErdDiagram={(design?.erdDiagram as string | undefined) ?? ""}
+        designAuthFlowDiagram={(design?.authFlowDiagram as string | undefined) ?? ""}
+        testingFindings={(testing?.findings as Record<string, unknown>[] | undefined) ?? []}
+        testingFixedArtifacts={(testing?.fixedArtifacts as Record<string, string> | null) ?? null}
+        handoverManualBook={(globalSpec.handover as Record<string, unknown> | null)?.manualBook as string ?? ""}
+        handoverComplianceReport={(globalSpec.handover as Record<string, unknown> | null)?.complianceReport as string ?? ""}
+        handoverReleaseChecklist={Array.isArray((globalSpec.handover as Record<string, unknown> | null)?.releaseChecklist) ? ((globalSpec.handover as Record<string, unknown>).releaseChecklist as string[]) : []}
+        snapshots={snapshots.map((s) => ({
           id: s.id,
-          nistTasks: s.nistTasks,
-          isoControls: s.isoControls,
-        })),
-        projectStageId: current.id,
-      }}
-      completionGaps={stageGaps}
-      nextStageCode={
-        stages.find((ps) => ps.stage.orderIndex === stageDef.orderIndex + 1)?.stage.code ?? null
-      }
-      stages={stages.map((ps) => ({
-        code: ps.stage.code,
-        name: ps.stage.name,
-        orderIndex: ps.stage.orderIndex,
-        status: ps.status,
-        id: ps.stageId,
-      }))}
-      messages={
-        chat?.messages.map((m) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          createdAt: m.createdAt.toISOString(),
-        })) ?? []
-      }
-      recommendations={current.recommendations.map((r) => ({
-        id: r.id,
-        category: r.category,
-        severity: r.severity,
-        title: r.title,
-        content: r.content,
-        suggestedCode: r.suggestedCode,
-        filePath: r.filePath,
-        isApplied: r.isApplied,
-        nistControl: r.nistControl
-          ? {
-              taskCode: r.nistControl.taskCode,
-              iso27001Mapping: r.nistControl.iso27001Mapping as string[],
-            }
-          : null,
-      }))}
-      codeArtifacts={codeArtifacts}
-      scoreInfo={scoreInfo}
-      latestRevision={
-        project.revisions.find((r) => r.status === "in_progress") ?? project.revisions[0] ?? null
-      }
-      designDiagrams={(design?.mermaid as string[] | undefined) ?? []}
-      designArchitecture={(design?.architecture as string[] | undefined) ?? []}
-      designThreatModel={(design?.threatModel as Record<string, unknown>[] | undefined) ?? []}
-      designUiDesign={(design?.uiDesign as string[] | undefined) ?? []}
-      designScreens={design?.designScreens ?? []}
-      designPlan={effectiveDesignPlan(globalSpec)}
-      analysisDataClassification={
-        (analysis?.dataClassification as string[] | undefined) ?? []
-      }
-      analysisStack={
-        analysis || analysisStackInfo
-          ? {
-              recommendedStack: analysisStackInfo ?? (analysis?.recommendedStack as Record<string, unknown> | null) ?? null,
-              securityRequirements: analysisRequirements,
-              summary: (analysis?.summary as string | undefined) ?? "",
-            }
-          : null
-      }
-      designDatabaseSchema={(design?.databaseSchema as string[] | undefined) ?? []}
-      designErdDiagram={(design?.erdDiagram as string | undefined) ?? ""}
-      designAuthFlowDiagram={(design?.authFlowDiagram as string | undefined) ?? ""}
-      testingFindings={(testing?.findings as Record<string, unknown>[] | undefined) ?? []}
-      testingFixedArtifacts={(testing?.fixedArtifacts as Record<string, string> | null) ?? null}
-      handoverManualBook={(globalSpec.handover as Record<string, unknown> | null)?.manualBook as string ?? ""}
-      handoverComplianceReport={(globalSpec.handover as Record<string, unknown> | null)?.complianceReport as string ?? ""}
-      handoverReleaseChecklist={Array.isArray((globalSpec.handover as Record<string, unknown> | null)?.releaseChecklist) ? ((globalSpec.handover as Record<string, unknown>).releaseChecklist as string[]) : []}
-      snapshots={snapshots.map((s) => ({
-        id: s.id,
-        version: s.version,
-        diffSummary: s.diffSummary,
-        createdAt: s.createdAt.toISOString(),
-        fileCount: Object.keys((s.codeArtifacts as Record<string, string>) ?? {}).length,
-      }))}
-    />
+          version: s.version,
+          diffSummary: s.diffSummary,
+          createdAt: s.createdAt.toISOString(),
+          fileCount: Object.keys((s.codeArtifacts as Record<string, string>) ?? {}).length,
+        }))}
+      />
+    </PageTransition>
   );
 }
