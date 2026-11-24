@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -53,6 +54,12 @@
   --stage-3: #6e4a93;
   --stage-4: #2f5e9e;
   --stage-5: #5e6f80;
+
+  /* Motion tokens: short, decelerating, never blocking input. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
 
   --border: #d5dbe2;
   --input: #8a94a0;
@@ -231,36 +238,6 @@ body {
     0 12px 28px -22px hsl(var(--shadow-color) / 0.35);
 }
 
-@keyframes slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in {
-  animation: slide-in 0.3s ease-out;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.25s ease-out;
-}
-
 /* Respect the OS high-contrast preference with stronger borders/text. */
 @media (prefers-contrast: more) {
   :root {
@@ -290,11 +267,86 @@ html[data-contrast="high"].dark {
   --muted-foreground: oklch(0.88 0.01 286);
 }
 
+/*
+ * Route view transitions (React <ViewTransition>, see PageTransition).
+ * nav-forward / nav-back slide 60px to signal direction; page-fade covers
+ * untyped navigations. Anchored chrome (header, studio top bar) never moves.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(.nav-forward) {
+  --slide-offset: -60px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    400ms var(--ease-out) both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 60px;
+  animation:
+    210ms ease-out 150ms both vt-fade,
+    400ms var(--ease-out) both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 60px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    400ms var(--ease-out) both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -60px;
+  animation:
+    210ms ease-out 150ms both vt-fade,
+    400ms var(--ease-out) both vt-slide;
+}
+::view-transition-old(.page-fade) {
+  animation: 120ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.page-fade) {
+  animation: 180ms ease-out 60ms both vt-fade;
+}
+
+::view-transition-group(site-header),
+::view-transition-group(studio-topbar) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header),
+::view-transition-old(studio-topbar) {
+  display: none;
+}
+::view-transition-new(site-header),
+::view-transition-new(studio-topbar) {
+  animation: none;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-slide {
+  from {
+    translate: var(--slide-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  body,
-  .animate-slide-in,
-  .animate-fade-in {
-    transition: none;
-    animation: none;
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

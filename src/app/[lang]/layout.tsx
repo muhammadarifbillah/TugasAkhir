@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import { Header } from "@/components/header";
+import { MotionProvider } from "@/components/motion-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { OfflineBanner } from "@/components/offline-banner";
 import { PwaRegister } from "@/components/pwa-register";
@@ -95,16 +96,18 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
         </a>
         <PwaRegister />
         <ThemeProvider>
-          <div className="flex h-svh flex-col overflow-hidden">
-            <OfflineBanner label={dict.app.offline} />
-            <Header lang={lang} />
-            <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-              {children}
-              <SiteFooter
-                label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
-              />
-            </main>
-          </div>
+          <MotionProvider>
+            <div className="flex h-svh flex-col overflow-hidden">
+              <OfflineBanner label={dict.app.offline} />
+              <Header lang={lang} />
+              <main id="main" className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+                {children}
+                <SiteFooter
+                  label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
+                />
+              </main>
+            </div>
+          </MotionProvider>
         </ThemeProvider>
       </body>
     </html>
