@@ -7,8 +7,9 @@ import { useGSAP } from "@gsap/react";
 
 if (typeof window !== "undefined") gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-// Large screens with motion allowed get the pinned story; everyone else gets the stacked list.
-const PINNED_QUERY = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
+// Large screens get the pinned story; smaller ones get the stacked list. Under reduced
+// motion the story still pins but panels only crossfade (no travel, no auto-snap).
+const CONDITIONS = { large: "(min-width: 1024px)", reduce: "(prefers-reduced-motion: reduce)" };
 
 export interface StageScrollStoryProps {
   title: string;
@@ -20,8 +21,8 @@ export interface StageScrollStoryProps {
 /**
  * Landing scroll story: the section pins and each scroll step reveals the next
  * Secure SDLC stage with its artefact and NIST -> ISO mapping. The server
- * renders all five panels stacked, so the content is complete without JS, under
- * reduced motion, and for screen readers (panels are hidden with opacity only).
+ * renders all five panels stacked, so the content is complete without JS and
+ * for screen readers (panels are hidden with opacity only).
  */
 export function StageScrollStory({ title, steps, codes, labels }: StageScrollStoryProps) {
   const container = useRef<HTMLElement>(null);
@@ -31,7 +32,10 @@ export function StageScrollStory({ title, steps, codes, labels }: StageScrollSto
       const root = container.current;
       if (!root) return;
       const mm = gsap.matchMedia();
-      mm.add(PINNED_QUERY, () => {
+      mm.add(CONDITIONS, (ctx) => {
+        const { large, reduce } = ctx.conditions as { large: boolean; reduce: boolean };
+        if (!large) return;
+        const shift = reduce ? 0 : 24;
         const panels = gsap.utils.toArray<HTMLElement>("[data-panel]", root);
         const segments = gsap.utils.toArray<HTMLElement>("[data-segment]", root);
         const last = panels.length - 1;
@@ -41,7 +45,7 @@ export function StageScrollStory({ title, steps, codes, labels }: StageScrollSto
         if (!scroller || last < 1) return;
         root.dataset.pinned = "true";
 
-        gsap.set(panels.slice(1), { opacity: 0, y: 24 });
+        gsap.set(panels.slice(1), { opacity: 0, y: shift });
         gsap.set(segments.slice(1), { scaleX: 0 });
 
         const tl = gsap.timeline({
@@ -55,12 +59,15 @@ export function StageScrollStory({ title, steps, codes, labels }: StageScrollSto
             start: "top top+=24",
             end: () => `+=${last * 90}%`,
             // inertia off: a fast wheel flick must land on the next stage, not fly to the last one.
-            snap: { snapTo: 1 / last, inertia: false, duration: { min: 0.2, max: 0.5 }, ease: "power1.inOut" },
+            // Snapping auto-scrolls the page, so it is skipped under reduced motion.
+            snap: reduce
+              ? undefined
+              : { snapTo: 1 / last, inertia: false, duration: { min: 0.2, max: 0.5 }, ease: "power1.inOut" },
             invalidateOnRefresh: true,
           },
         });
         for (let i = 1; i <= last; i++) {
-          tl.to(panels[i - 1], { opacity: 0, y: -24 }, i - 1)
+          tl.to(panels[i - 1], { opacity: 0, y: -shift }, i - 1)
             .to(panels[i], { opacity: 1, y: 0 }, i - 1)
             .to(segments[i], { scaleX: 1 }, i - 1);
         }

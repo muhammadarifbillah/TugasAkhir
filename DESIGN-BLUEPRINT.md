@@ -624,10 +624,10 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | Scroll story | `gsap` + `ScrollTrigger` (`components/landing/stage-scroll-story.tsx`), landing route only | Pinned five-stage story between the hero and the mapping table |
 
 **Scroll story (GSAP):**
-- Runs only when `(min-width: 1024px) and (prefers-reduced-motion: no-preference)` matches.
+- Pins at `(min-width: 1024px)`. Under reduced motion it still pins, but panels only crossfade (no `y` travel) and auto-snap is off.
 - Uses `scroller` = `<main id="main">` element (passed as an element, not a selector), `pinType: "transform"`, `scrub: 0.5`.
 - Snaps one stage per scroll step (`inertia: false`).
-- Everywhere else (mobile, tablet, reduced motion, no JS) the five panels render stacked and static.
+- Below 1024px and without JS the five panels render stacked and static.
 - Panels are hidden with opacity only, so screen readers read all five; the mapping table stays as the text equivalent.
 - `useGSAP` + `matchMedia` revert on unmount and on breakpoint change, so no pin spacer leaks to other pages.
 - License: GSAP Standard "No Charge" License (Webflow), proprietary and free, not OSI open source. Use on our own site is a Permitted Use. GSAP must not power a no-code visual animation builder for users, and its copyright notices must stay intact.
@@ -656,7 +656,7 @@ Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fas
 **Rules**
 - Animate only `transform`, `opacity` and colour.
 - Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
-- `prefers-reduced-motion: reduce` removes all movement: a global CSS override, `MotionConfig reducedMotion="user"`, and view transitions set to `none`.
+- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score count-up and the hero stage demo (it changes text/colour/bar fill only and has a pause button). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
 - No smooth-scroll library and no glassmorphism (`backdrop-blur`).
 
 ### 7.2 Hover States

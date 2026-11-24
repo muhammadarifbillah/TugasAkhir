@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { m, useInView, useReducedMotion } from "motion/react";
+import { m, useInView } from "motion/react";
 import { Pause, Play } from "lucide-react";
 
 const START = 2; // matches the static server HTML: two stages passed, the third running
@@ -23,16 +23,16 @@ export interface StageTraceDemoProps {
 
 /**
  * The landing hero card: one project moving through the five gates. It cycles
- * only while visible, playing, and when the user allows motion; the pause
- * button covers WCAG 2.2.2 for auto-moving content.
+ * only while visible and playing. Only text, colour and bar fill change (no
+ * travel), so it also runs under reduced motion; the pause button covers
+ * WCAG 2.2.2 for auto-updating content.
  */
 export function StageTraceDemo({ steps, codes, labels }: StageTraceDemoProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref);
-  const reduce = useReducedMotion();
   const [playing, setPlaying] = useState(true);
   const [running, setRunning] = useState(START);
-  const active = inView && playing && !reduce;
+  const active = inView && playing;
 
   useEffect(() => {
     if (!active) return;

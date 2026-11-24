@@ -74,7 +74,7 @@ export function NextActionBar({
         >
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-primary animate-[ping_1s_ease-out_1_forwards]"
+            className="pointer-events-none absolute inset-0 rounded-md ring-2 ring-primary animate-[ping_1s_ease-out_1_forwards] motion-reduce:hidden"
           />
           <Button size="sm" className="h-7" onClick={onComplete} disabled={completing}>
             {completing ? <Loader2 className="size-3.5 animate-spin" /> : <CheckCheck className="size-3.5" />}
