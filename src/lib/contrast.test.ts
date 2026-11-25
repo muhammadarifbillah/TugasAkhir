@@ -54,6 +54,33 @@ describe("stage colours as text", () => {
     for (const bg of ["#e6e9f8", "#f8f9ff"]) expect(contrastRatio("#2c3152", bg)).toBeGreaterThanOrEqual(7);
   });
 
+  it("keeps Pita Pindai tape and finding pairs readable", () => {
+    for (const bg of ["#ede6d3", "#f6f1e3"]) expect(contrastRatio("#222222", bg)).toBeGreaterThanOrEqual(7);
+    for (const bg of ["#f7c6c6", "#f5d9a8"]) expect(contrastRatio("#222222", bg)).toBeGreaterThanOrEqual(7);
+    expect(contrastRatio("#eef0ff", "#0f1226")).toBeGreaterThanOrEqual(7);
+    // brake jaw is a graphic object on the tape paper (SC 1.4.11)
+    for (const bg of ["#ede6d3", "#f6f1e3"]) expect(contrastRatio("#e5484d", bg)).toBeGreaterThanOrEqual(3);
+  });
+
+  it("pins the Pita Pindai tokens in globals.css", () => {
+    const css = fs.readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8");
+    const block = (selector: string) => {
+      const start = css.indexOf(selector);
+      return start < 0 ? "" : css.slice(start, css.indexOf("}", start));
+    };
+    expect(block("html.dark:has(.landing) {")).toContain("--tape-paper: #ede6d3;");
+    expect(block("html:not(.dark):has(.landing) {")).toContain("--tape-paper: #f6f1e3;");
+    const landing = block(".landing {");
+    for (const decl of [
+      "--tape-ink: #222222;",
+      "--finding-medium: #f7c6c6;",
+      "--finding-low: #f5d9a8;",
+      "--brake: #e5484d;",
+      "--odometer-bg: #0f1226;",
+    ])
+      expect(landing).toContain(decl);
+  });
+
   it("matches a known pair", () => {
     expect(contrastRatio("#000000", "#ffffff")).toBeCloseTo(21, 1);
   });
