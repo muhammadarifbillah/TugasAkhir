@@ -1,7 +1,9 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { MotionConfig } from "motion/react";
+import { shouldLoadLandingMotion } from "./motion";
+import { initLandingScroll } from "./landing-scroll-init";
 
 /** Landing animations are a desktop feature; below this width the page is static. */
 export const DESKTOP_QUERY = "(min-width: 1024px)";
@@ -26,5 +28,27 @@ export function useDesktopMotion() {
  */
 export function LandingMotion({ children }: { children: React.ReactNode }) {
   const desktop = useDesktopMotion();
+
+  // shortcut: the gate is read once at mount; resizing across 1024px neither loads nor unloads. Add a listener when M2 needs it.
+  useEffect(() => {
+    if (!shouldLoadLandingMotion(window.matchMedia.bind(window))) return;
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("lenis")]).then(([g, st, l]) => {
+      const main = document.getElementById("main");
+      const content = document.getElementById("main-content");
+      if (cancelled || !main || !content) return;
+      cleanup = initLandingScroll(
+        { gsap: g.gsap, ScrollTrigger: st.ScrollTrigger, Lenis: l.default },
+        main,
+        content,
+      );
+    });
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, []);
+
   return <MotionConfig skipAnimations={!desktop}>{children}</MotionConfig>;
 }
