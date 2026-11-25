@@ -12,7 +12,7 @@ import { scanProjectArtifacts } from "../src/lib/scanner/run";
  */
 const FIXTURE: Record<string, string> = {
   "package.json": JSON.stringify(
-    { name: "shieldforge-e2e-fixture", version: "1.0.0", private: true },
+    { name: "saksi-e2e-fixture", version: "1.0.0", private: true },
     null,
     2,
   ),
@@ -37,7 +37,7 @@ const FIXTURE: Record<string, string> = {
 };
 
 async function main() {
-  console.log("ShieldForge - E2E scanner check");
+  console.log("Saksi - E2E scanner check");
 
   if (process.env.RUNNER_MODE === "disabled") {
     console.log("SKIP: RUNNER_MODE=disabled.");

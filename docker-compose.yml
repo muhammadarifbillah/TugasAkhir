@@ -33,8 +33,9 @@ services:
       # Expose the host Docker socket to the app so Run/Scan can start containers.
       # NOTE: the runner bind-mounts a path created *inside* this container; the
       # host daemon cannot see that path. For fully working Run/Scan, run
-      # ShieldForge directly on the host instead of in a container.
+      # Saksi directly on the host instead of in a container.
       - /var/run/docker.sock:/var/run/docker.sock
 
+# legacy name: renaming orphans the Postgres data; migrate first (see DEPLOY.md)
 volumes:
   shieldforge-db:
