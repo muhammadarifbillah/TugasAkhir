@@ -110,30 +110,31 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 
 ### 2.1 Landing Page
 
-Concept "Forge Ledger": the landing page reads like a signed technical report built on ShieldForge's own identity. The five stage colours are the steel tempering colours (205 → 371 °C), each gate has a **hallmark** shape (◇ ○ △ □ ⬡, `components/landing/hallmark.tsx`) so a stage is never identified by colour alone, and sections are numbered `§1–§11` in a margin rail with hairline rules instead of floating cards. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()` reads `STAGE_DEFINITIONS`, `SCORE_WEIGHTS` comes from the scanner) and pinned by tests. No testimonials or customer logos; the page states its limits.
+Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. The landing is always dark: `html:has(.landing)` swaps the tokens for the whole document (header and footer included) whatever the theme toggle says; other pages are unaffected. The five gates keep the steel temper colours (dark-theme variants) and hallmark shapes (◇ ○ △ □ ⬡). Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
 
 ```
-Hero        H1 (wide) · lede · [Start a project] See the five gates · standards line | TEMPER RAIL
-§1  #masalah     cited Veracode figure (45% of tests) + 3 problems
-§2  #tentang     what ShieldForge is · done by the AI vs guarded by the gates · who it is for
-§3  #gerbang     5 temper coupons (auto carousel, desktop) · all 26 sub-steps in <details>
-§4  #cara-kerja  6 steps with a live vignette (scan example = real scoring function)
-§5  #arsitektur  6-node architecture (plain sentence → technical detail → limit) + platform security
-§6  #bukti       facts ledger · score formula · gate → NIST/ISO table · CSV of 26 sub-steps
-§7  #pratinjau   3 real studio screenshots as numbered figures
-§8  #fitur       feature ledger: Build / Verify / Deliver
-§9  #hasil       deliverables | limits
-§10 #glosarium   9 plain-language terms
-§11 #faq         7 questions
-Closing          temper hairline "quench" + CTA
+Hero        giant spaced wordmark (aria-hidden) · SVG clay shield on a neon forge platform · H1 · lede · [Start a project] [See the five gates]
+Strip       standards & tools as text chips (not logos)
+#dijaga      5 clay cards "what it guards" around the shield emblem
+#masalah     cited Veracode figure (45% of tests) + 3 problems
+#tentang     AI vs gates · facts card (count-up) · studio screenshot
+#gerbang     5 temper coupons (auto carousel, desktop) · all 26 sub-steps in <details>
+#pengguna    3 audience tiles
+#pratinjau   3 real studio screenshots as clay cards
+#cara-kerja  6 steps with a live vignette (scan example = real scoring function)
+#arsitektur  6 clay nodes with neon connectors + platform security
+#bukti       facts · score formula · gate → NIST/ISO table · CSV of 26 sub-steps
+#hasil       deliverables | limits
+#pelajari    9 glossary cards · 7 FAQ
+Closing      clay CTA panel with violet glow
 ```
 
 **Spesifikasi:**
-- Container `max-w-6xl px-4`; sections `py-20 md:py-28` with `border-t` (`components/landing/ledger-section.tsx`); on lg a 12-column grid with the `§n` index in a 2-column rail.
-- Type: Archivo width axis, `.font-wide` (125% / 800) for H1/H2/figures, `.font-narrow` (75% / 600) for ledger labels (no all-caps eyebrows); Geist Mono only for real codes.
-- Surfaces: hairline ledgers (`.leader` dotted rows); elevation (`card-elevated`, `rounded-xl`) only for the temper rail, screenshot frames and the vignette; temper coupons are 2px-radius plates (`.coupon`) with a faint oxide banding.
-- Components: `temper-rail`, `gate-coupons`, `substeps-disclosure`, `gate-link` (coupon ↔ table highlight), `architecture-flow`, `proof-section`, `feature-ledger`, `deliverables`, `glossary`, `faq`, `product-preview`, `quench-rule`.
-- OG image (`src/app/opengraph-image.tsx`): report paper, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
+- Container `max-w-7xl px-4`; sections `py-24 md:py-32`, centred pill label + H2 + lede (`components/landing/clay-section.tsx`), alternate sections on `--clay-bg-2`.
+- Type: Archivo width axis, `.font-wide` for H1/H2/figures, `.hero-wordmark` (125% / 800, tracking .18em, white→violet gradient); Geist Mono only for real codes.
+- Surfaces (`globals.css`): `.clay-card` (24px radius, gradient, outer + inner double shadow, faint 1px edge), `.clay-btn` (violet gradient pill, glow, press squash), `.clay-btn-ghost`, `.clay-chip`, `.clay-pill`, `.coupon` (stage-tinted clay, glow ring when selected). No backdrop blur; glow is `box-shadow` only; high contrast drops shadows for 2px borders. Text pairs pinned in `src/lib/contrast.test.ts`.
+- Components: `hero-shield`, `standards-strip`, `guard-grid`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`.
+- OG image (`src/app/opengraph-image.tsx`): navy with violet glow, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
 
 ### 2.2 Dashboard
 
@@ -637,15 +638,14 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 
 | # | Element | Trigger | Motion | Reduced motion |
 |---|---|---|---|---|
-| M1 | Temper rail (hero) | Load, once, if on screen | heat fill per gate (`scaleX` overshoot-settle), hallmark stamp + ring, status Waiting→Passed; ≈ 4 s total (`railSchedule(750, 5)`), so no pause is needed (WCAG 2.2.2) | colour/opacity only, no ring |
-| M2 | Replay | Click | restarts M1, clearing pending timers | as M1 |
-| M3 | Gate coupons | In view | the selected coupon's bottom edge fills over 4.5 s (CSS, `onAnimationEnd` advances); panel crossfade + x ±24 px; pauses on hover, focus, offscreen, hidden tab, button | crossfade, still rotating, pause button |
-| M4 | Coupon ↔ table row | Hover/focus | row tint in the stage colour | same |
+| M1 | Hero shield + wordmark | Load | shield fades in and rises 24 px (600 ms); wordmark fades in | fade only |
+| M2 | Hero shield idle | While visible | slow float y −6 px over 6 s (CSS `.hero-float`), paused offscreen; the only continuous effect | off |
+| M3 | Gate coupons | In view | the selected coupon's bottom edge fills over 4.5 s (CSS, `onAnimationEnd` advances); selected coupon glows in its stage colour; panel crossfade; pauses on hover, focus, offscreen, hidden tab, button | crossfade, still rotating, pause button |
+| M4 | Clay cards / buttons | Hover, focus / press | cards lift 4 px with a deeper shadow; buttons squash (`translateY(1px) scale(.98)`) | shadow/colour only |
 | M5 | How-it-works vignette | Tab change | typing, staggered rows, score 0→91, diff flash, ticks | final state |
-| M6 | Proof ledger numbers | First in view | count-up | kept |
-| M7 | Closing hairline | First in view | temper ramp desaturates (quench) | kept |
-| M8 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
-| M9 | Architecture node | Click/focus | outline + highlighted connectors, note crossfade | same |
+| M6 | Facts numbers | First in view | count-up | kept |
+| M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
+| M8 | Architecture node | Click/focus | glow outline + highlighted connectors, note crossfade | same |
 
 Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, section fade-ups and the looping hero demo. No scroll-linked animation.
 

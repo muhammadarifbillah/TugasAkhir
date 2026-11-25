@@ -7,11 +7,11 @@ export const contentType = "image/png";
 // Forge Ledger OG image: report paper, the five temper colours with their
 // temperatures and hallmark shapes, in the finished (all gates passed) state.
 const GATES = [
-  { name: "Analysis", c: 205, color: "#8a6812", shape: "M12 3 21 12 12 21 3 12Z" },
-  { name: "Design", c: 260, color: "#9f622d", shape: "M12 3.5a8.5 8.5 0 1 0 0.01 0Z" },
-  { name: "Development", c: 282, color: "#6e4a93", shape: "M12 3.5 21 19.5 3 19.5Z" },
-  { name: "Testing", c: 310, color: "#2f5e9e", shape: "M4.5 4.5h15v15h-15Z" },
-  { name: "Handover", c: 371, color: "#5e6f80", shape: "M12 3 19.8 7.5 19.8 16.5 12 21 4.2 16.5 4.2 7.5Z" },
+  { name: "Analysis", c: 205, color: "#d9b45e", shape: "M12 3 21 12 12 21 3 12Z" },
+  { name: "Design", c: 260, color: "#d08a4e", shape: "M12 3.5a8.5 8.5 0 1 0 0.01 0Z" },
+  { name: "Development", c: 282, color: "#b394db", shape: "M12 3.5 21 19.5 3 19.5Z" },
+  { name: "Testing", c: 310, color: "#86ace0", shape: "M4.5 4.5h15v15h-15Z" },
+  { name: "Handover", c: 371, color: "#9cadbd", shape: "M12 3 19.8 7.5 19.8 16.5 12 21 4.2 16.5 4.2 7.5Z" },
 ];
 
 export default function OpengraphImage() {
@@ -25,13 +25,13 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          background: "#f4f6f8",
-          color: "#15191e",
+          background: "radial-gradient(900px 500px at 50% -10%, rgba(124,58,237,0.45), #0b0d1a 70%)",
+          color: "#eef0ff",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 30, fontWeight: 700, color: "#2f5e9e" }}>ShieldForge</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: "#b9a6ff" }}>ShieldForge</div>
           <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.05, marginTop: 20, maxWidth: 980, letterSpacing: -1.5 }}>
             Every stage is checked before any code ships.
           </div>
@@ -44,16 +44,16 @@ export default function OpengraphImage() {
                 <svg width="30" height="30" viewBox="0 0 24 24">
                   <path d={g.shape} fill="none" stroke={g.color} strokeWidth="2" strokeLinejoin="round" />
                 </svg>
-                <div style={{ fontSize: 24, color: "#5b6470" }}>{`${g.c}°C`}</div>
+                <div style={{ fontSize: 24, color: "#a6abd6" }}>{`${g.c}°C`}</div>
               </div>
-              <div style={{ height: 14, background: g.color, borderRadius: 3, marginTop: 14 }} />
+              <div style={{ height: 14, background: g.color, borderRadius: 999, marginTop: 14, boxShadow: "0 0 18px " + g.color }} />
               <div style={{ fontSize: 24, marginTop: 12 }}>{g.name}</div>
-              <div style={{ fontSize: 20, color: "#1f7a52", marginTop: 4 }}>Passed</div>
+              <div style={{ fontSize: 20, color: "#6ee7b7", marginTop: 4 }}>Passed</div>
             </div>
           ))}
         </div>
 
-        <div style={{ fontSize: 22, color: "#5b6470", borderTop: "1px solid #d5dbe2", paddingTop: 18, display: "flex" }}>
+        <div style={{ fontSize: 22, color: "#a6abd6", borderTop: "1px solid #2a2f57", paddingTop: 18, display: "flex" }}>
           Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A
         </div>
       </div>
