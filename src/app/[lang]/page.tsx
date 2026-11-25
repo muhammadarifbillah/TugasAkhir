@@ -10,7 +10,7 @@ import { GateCoupons } from "@/components/landing/gate-coupons";
 import { GateLinkProvider } from "@/components/landing/gate-link";
 import { Glossary } from "@/components/landing/glossary";
 import { GuardGrid } from "@/components/landing/guard-grid";
-import { HeroShield } from "@/components/landing/hero-shield";
+import { HeroTape } from "@/components/landing/hero-tape/hero-tape";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { ProblemSection } from "@/components/landing/problem-section";
@@ -71,29 +71,27 @@ export default async function HomePage({ params }: HomePageProps) {
     <PageTransition>
       <div className="landing">
         <LandingMotion>
-          {/* Hero: giant spaced wordmark, the clay shield on its forge platform, then the real headline. */}
+          {/* Hero: headline first (LCP), then the Pita Pindai stage and its findings table. */}
           <section className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
-            <p
-              aria-hidden="true"
-              className="hero-wordmark animate-in fade-in-0 fill-mode-both text-center duration-700 max-lg:animate-none"
-            >
-              {l.heroWordmark}
-            </p>
-            <div className="-mt-[6%] px-4">
-              <HeroShield />
-            </div>
-            <div className="mx-auto -mt-6 max-w-4xl px-4 text-center md:-mt-10">
+            <div className="mx-auto max-w-4xl px-4 text-center">
               <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.headline}</h1>
-              <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.heroLede}</p>
+              <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">
+                {fmt(l.heroSub, { name: dict.app.name })}
+              </p>
+              <p className="mx-auto mt-4 max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
+                {fmt(l.heroLede, { name: dict.app.name })}
+              </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
                 <Link href={primaryHref} className="clay-btn">
                   {primaryLabel}
                 </Link>
-                <Link href="#gerbang" className="clay-btn-ghost">
-                  {l.ctaGates}
+                <Link href="#bukti" className="clay-btn-ghost">
+                  {l.ctaSample}
                 </Link>
               </div>
-              <p className="font-narrow mt-8 text-sm text-muted-foreground">{l.heroStandards}</p>
+            </div>
+            <div className="mx-auto mt-12 max-w-5xl px-4">
+              <HeroTape copy={l.heroTape} />
             </div>
           </section>
 

@@ -110,10 +110,10 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 
 ### 2.1 Landing Page
 
-Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. It follows the theme toggle, with Dark Clay as the default (`defaultTheme="dark"` app-wide): `html.dark:has(.landing)` gives Dark Clay and `html:not(.dark):has(.landing)` gives Light Clay (lavender paper, same layout and accents), each swapping the tokens for the whole document (header and footer included); other pages are unaffected, and high contrast overrides both. The five gates keep the steel temper colours (dark variants on Dark Clay, deepened light variants on Light Clay so they stay ≥ 4.5:1) and hallmark shapes (◇ ○ △ □ ⬡). The hero is fully server-rendered and visible without JavaScript: its entrance is CSS, desktop-only, and there is no route `loading.tsx` above the landing. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
+Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. It follows the theme toggle, with Dark Clay as the default (`defaultTheme="dark"` app-wide): `html.dark:has(.landing)` gives Dark Clay and `html:not(.dark):has(.landing)` gives Light Clay (lavender paper, same layout and accents), each swapping the tokens for the whole document (header and footer included); other pages are unaffected, and high contrast overrides both. The five gates keep the steel temper colours (dark variants on Dark Clay, deepened light variants on Light Clay so they stay ≥ 4.5:1) and hallmark shapes (◇ ○ △ □ ⬡). The hero is fully server-rendered and visible without JavaScript: H1, sub-headline and lede come first and are the LCP element, then the Pita Pindai stage (aria-hidden) and an HTML findings table that carries the same information; there is no route `loading.tsx` above the landing. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
 
 ```
-Hero        giant spaced wordmark (aria-hidden) · SVG clay shield on a neon forge platform · H1 · lede · [Start a project] [See the five gates]
+Hero        H1 · sub-headline (ISO/IEC 27001:2022 first) · lede · [Start a free project] [See a sample report → #bukti] · Pita Pindai stage (aria-hidden) · findings table (example scan: 2 medium + 1 low = 91, gate 4 stamp A.8.29 · PW.8.1)
 Strip       standards & tools as text chips (not logos)
 #dijaga      5 clay cards "what it guards" around the shield emblem
 #masalah     cited Veracode figure (45% of tests) + 3 problems
@@ -131,12 +131,15 @@ Closing      clay CTA panel with violet glow
 
 **Spesifikasi:**
 - Container `max-w-7xl px-4`; sections `py-24 md:py-32`, centred pill label + H2 + lede (`components/landing/clay-section.tsx`), alternate sections on `--clay-bg-2`.
-- Type: Archivo width axis, `.font-wide` for H1/H2/figures, `.hero-wordmark` (125% / 800, tracking .18em, white→violet gradient); Geist Mono only for real codes.
+- Type: Archivo width axis, `.font-wide` for H1/H2/figures; Geist Mono only for real codes.
 - Surfaces (`globals.css`): `.clay-card` (24px radius, gradient, outer + inner double shadow, faint 1px edge), `.clay-btn` (violet gradient pill, glow, press squash), `.clay-btn-ghost`, `.clay-chip`, `.clay-pill`, `.coupon` (stage-tinted clay, glow ring when selected). No backdrop blur; glow is `box-shadow` only; high contrast drops shadows for 2px borders. Text pairs pinned in `src/lib/contrast.test.ts`.
-- Components: `hero-shield`, `standards-strip`, `guard-grid`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`.
+- Components: `hero-tape`, `standards-strip`, `guard-grid`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`.
 - OG image (`src/app/opengraph-image.tsx`): navy with violet glow, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
+- Hero tape (PRD 2026-11-26 landing-dashboard-3d, bab 10 and 13): `components/landing/hero-tape/model.ts` holds the example findings, the running score (`computeSecurityScore`), the finding codes (`enrichFinding`), the gate 4 stamp (`GATE_MAPPING`) and `poseOf(progress)`, a pure function of scroll progress (0/25/50/75/100% = PRD table); `POSTER_POSE` is the 50% pose with the stamp shown. Tokens `--tape-paper` (dark #ede6d3, light #f6f1e3), `--tape-ink`, `--finding-medium`, `--finding-low`, `--brake`, `--odometer-bg` are pinned in `src/lib/contrast.test.ts`. The figure (M2b) and the scroll timeline (M2c) follow.
 
 ### 2.2 Dashboard
+
+Planned change: PRD 2026-11-26 landing-dashboard-3d, milestone M4 (project cards with the five-gate rail, score source, empty state). M2 does not change the dashboard.
 
 ```
 ┌─────────────────────────────────────────────────────────┐

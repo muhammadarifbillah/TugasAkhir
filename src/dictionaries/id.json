@@ -34,8 +34,10 @@
     "offline": "Anda sedang offline. Beberapa fitur mungkin tidak berfungsi."
   },
   "landing": {
-    "headline": "Setiap tahap diperiksa sebelum kode dikirim.",
-    "ctaPrimary": "Mulai proyek",
+    "headline": "Kode dari AI dibaca lima gerbang sebelum boleh dikirim.",
+    "heroSub": "{name} membangun website dengan AI, lalu menahan setiap rilis di kontrol pengembangan aman yang dipetakan ke ISO/IEC 27001:2022 Annex A.",
+    "ctaPrimary": "Mulai proyek gratis",
+    "ctaSample": "Lihat contoh laporan",
     "ctaDashboard": "Buka dasbor",
     "mapStage": "Tahap",
     "mapNist": "Praktik NIST SSDF",
@@ -189,9 +191,38 @@
     "closingLede": "Lima gerbang, satu ruang kerja terpandu, dan bukti yang bisa Anda tunjukkan.",
     "howPlanTitle": "Rencana usulan",
     "howApprove": "Setujui & bangun",
-    "heroLede": "ShieldForge membangun website dengan AI, lalu menahannya di lima gerbang keamanan. Tiap gerbang dipetakan ke NIST SSDF dan ISO 27001, dan dibuktikan oleh pemindai, bukan tebakan AI.",
+    "heroLede": "{name} adalah platform tempat AI membangun website, dengan lima gerbang yang mengunci urutan: analisis, desain, kode, pemindaian nyata oleh Semgrep dan Trivy, lalu serah terima. Tiap gerbang dipetakan ke ISO/IEC 27001:2022 Annex A, dengan NIST SSDF sebagai pelengkap.",
+    "heroTape": {
+      "steps": [
+        "Tulis prompt; AI membangun websitenya.",
+        "AI menulis kodenya, gerbang 1–3 mencatat urutannya.",
+        "Semgrep dan Trivy menemukan {medium} medium dan {low} low.",
+        "Diperbaiki, lalu dipetakan ke kontrol ISO/IEC 27001:2022 (dan NIST SSDF).",
+        "Bawa pulang kodenya, beserta buktinya."
+      ],
+      "tableCaption": "Contoh hasil pindai di gerbang 4 (Semgrep + Trivy). Skor = 100 dikurangi bobot severity.",
+      "cols": {
+        "finding": "Temuan",
+        "tool": "Pemindai",
+        "severity": "Severity",
+        "penalty": "Penalti",
+        "score": "Skor",
+        "mapping": "Dipetakan ke"
+      },
+      "severity": {
+        "medium": "medium",
+        "low": "low"
+      },
+      "findings": [
+        "Injeksi SQL di kueri pencarian",
+        "HTML tanpa escape di komentar (XSS)",
+        "Paket usang dengan kerentanan yang diketahui"
+      ],
+      "start": "Skor awal",
+      "final": "Skor akhir",
+      "stamp": "Cap gerbang 4"
+    },
     "ctaGates": "Lihat lima gerbang",
-    "heroStandards": "Dipetakan ke NIST SP 800-218 v1.1 dan ISO/IEC 27001:2022 Lampiran A.",
     "rail": {
       "colours": {
         "straw": "jerami",
@@ -321,7 +352,6 @@
         "definition": "Setiap kebutuhan keamanan (REQ-SEC-…) dapat ditelusuri ke rekomendasi, berkas kode, task NIST, dan kontrol ISO."
       }
     ],
-    "heroWordmark": "AMANKAN",
     "stripLabel": "Dipetakan ke dan diperiksa dengan",
     "stripItems": [
       "NIST SP 800-218 v1.1",

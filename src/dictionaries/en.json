@@ -34,8 +34,10 @@
     "offline": "You are offline. Some features may not work."
   },
   "landing": {
-    "headline": "Every stage is checked before any code ships.",
-    "ctaPrimary": "Start a project",
+    "headline": "AI code is read by five gates before it ships.",
+    "heroSub": "{name} builds websites with AI, then holds every release at secure development controls mapped to ISO/IEC 27001:2022 Annex A.",
+    "ctaPrimary": "Start a free project",
+    "ctaSample": "See a sample report",
     "ctaDashboard": "Open dashboard",
     "mapStage": "Stage",
     "mapNist": "NIST SSDF practice",
@@ -189,9 +191,38 @@
     "closingLede": "Five gates, one guided workspace, and evidence you can show.",
     "howPlanTitle": "Proposed plan",
     "howApprove": "Approve & build",
-    "heroLede": "ShieldForge builds websites with AI, then holds them at five security gates. Each gate is mapped to NIST SSDF and ISO 27001 and proven by scanners, not by AI guesses.",
+    "heroLede": "{name} is a platform where AI builds your website, with five gates that lock the order: analysis, design, code, real scans by Semgrep and Trivy, then handover. Every gate is mapped to ISO/IEC 27001:2022 Annex A, with NIST SSDF as a complement.",
+    "heroTape": {
+      "steps": [
+        "Write a prompt; AI builds the website.",
+        "AI writes the code; gates 1–3 record the order.",
+        "Semgrep and Trivy find {medium} medium and {low} low.",
+        "Fixed, then mapped to ISO/IEC 27001:2022 controls (and NIST SSDF).",
+        "Take the code home, with its evidence."
+      ],
+      "tableCaption": "Example scan at gate 4 (Semgrep + Trivy). Score = 100 minus the severity weights.",
+      "cols": {
+        "finding": "Finding",
+        "tool": "Scanner",
+        "severity": "Severity",
+        "penalty": "Penalty",
+        "score": "Score",
+        "mapping": "Mapped to"
+      },
+      "severity": {
+        "medium": "medium",
+        "low": "low"
+      },
+      "findings": [
+        "SQL injection in the search query",
+        "Unescaped HTML in a comment (XSS)",
+        "Outdated package with a known vulnerability"
+      ],
+      "start": "Starting score",
+      "final": "Final score",
+      "stamp": "Gate 4 stamp"
+    },
     "ctaGates": "See the five gates",
-    "heroStandards": "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A.",
     "rail": {
       "colours": {
         "straw": "straw",
@@ -321,7 +352,6 @@
         "definition": "Every security requirement (REQ-SEC-…) can be traced to its recommendation, code file, NIST task and ISO control."
       }
     ],
-    "heroWordmark": "SECURE",
     "stripLabel": "Mapped to and checked with",
     "stripItems": [
       "NIST SP 800-218 v1.1",

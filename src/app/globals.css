@@ -302,6 +302,7 @@ html.dark:has(.landing) {
   --input: #4a5088;
   --ring: #60a5fa;
   --shadow-color: 235 60% 3%;
+  --tape-paper: #ede6d3;
 }
 html:not(.dark):has(.landing) {
   color-scheme: light;
@@ -328,6 +329,7 @@ html:not(.dark):has(.landing) {
   --input: #8f95bd;
   --ring: #2563eb;
   --shadow-color: 240 40% 40%;
+  --tape-paper: #f6f1e3;
 }
 /* High contrast (OS or header toggle) must win over the clay tokens above. */
 @media (prefers-contrast: more) {
@@ -349,6 +351,11 @@ html:not(.dark)[data-contrast="high"]:has(.landing) {
   --border: #6b7198;
 }
 .landing {
+  --tape-ink: #222222;
+  --finding-medium: #f7c6c6;
+  --finding-low: #f5d9a8;
+  --brake: #e5484d;
+  --odometer-bg: #0f1226;
   --clay-bg: #0b0d1a;
   --clay-bg-2: #11142a;
   --clay-surface: #1a1e3a;
@@ -548,21 +555,23 @@ html:not(.dark) .landing {
     0 0 0 2px var(--tint),
     0 0 28px color-mix(in oklab, var(--tint) 45%, transparent);
 }
-/* Giant spaced wordmark behind the hero (decorative). */
-/* Sized to its container (the hero is @container) so the longest word, AMANKAN
-   at ~8.1em with tracking, always fits; the start padding balances the tracking
-   after the last letter so the word sits centred. */
-.hero-wordmark {
-  font-size: clamp(2rem, calc((100cqi - 2rem) / 8.6), 10rem);
-  padding-inline-start: 0.18em;
-  font-stretch: 125%;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  line-height: 1;
-  background: linear-gradient(180deg, var(--clay-figure-from) 15%, var(--clay-figure-to) 75%, color-mix(in oklab, var(--clay-figure-to) 35%, transparent));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Pita Pindai hero: stage slot (figure arrives in M2b) and the findings table. */
+.hero-tape-stage {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+  aspect-ratio: 760 / 590;
+}
+.hero-tape-table [data-severity] .hero-tape-sev {
+  color: var(--tape-ink);
+  border-radius: 0.375rem;
+  padding: 0.125rem 0.5rem;
+}
+.hero-tape-table [data-severity="medium"] .hero-tape-sev {
+  background: var(--finding-medium);
+}
+.hero-tape-table [data-severity="low"] .hero-tape-sev {
+  background: var(--finding-low);
 }
 .hero-float {
   animation: hero-float 6s ease-in-out infinite;
