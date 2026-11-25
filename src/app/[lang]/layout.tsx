@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import localFont from "next/font/local";
 import { Header } from "@/components/header";
@@ -79,6 +80,8 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
   if (!isLocale(lang)) notFound();
 
   const dict = await getDictionary(lang);
+  // Set by src/proxy.ts; next-themes' inline anti-flash script needs it to pass the CSP.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html
@@ -95,7 +98,7 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
           {dict.a11y.skipToContent}
         </a>
         <PwaRegister />
-        <ThemeProvider>
+        <ThemeProvider nonce={nonce}>
           <MotionProvider>
             <div className="flex h-svh flex-col overflow-hidden">
               <OfflineBanner label={dict.app.offline} />
