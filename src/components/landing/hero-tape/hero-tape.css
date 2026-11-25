@@ -1,0 +1,96 @@
+/* Pita Pindai figure: anatomy kit tones per clay theme, and the colours the pose switches on. */
+
+/* Dark Clay (default), page #0b0d1a. Keep this block before the light one. */
+.iso.hero-tape-figure {
+  --anatomy-paper: #12152b;
+  --anatomy-face: #1a1e38;
+  --anatomy-top: #1d2140;
+  --anatomy-shade-0: #0e1124;
+  --anatomy-shade-1: #121530;
+  --anatomy-shade-2: #161a36;
+  --anatomy-shade-3: #1a1e3c;
+  --anatomy-lit-top: #262b4d;
+  --anatomy-lit-shade: #1e2240;
+  --anatomy-hi: #c9cde6;
+  --anatomy-mid: #7a80a8;
+  --anatomy-lo: #4b5078;
+  --anatomy-faint: #2c3052;
+  --anatomy-lit: #ffffff;
+  --anatomy-halo: #04050c;
+  --anatomy-halo-opacity: 0.9;
+  --anatomy-dot: #e6e8f5;
+}
+
+/* Light Clay, page #eef0fb. */
+html:not(.dark) .iso.hero-tape-figure {
+  --anatomy-paper: #f8f9fe;
+  --anatomy-face: #ffffff;
+  --anatomy-top: #ffffff;
+  --anatomy-shade-0: #d9dcec;
+  --anatomy-shade-1: #e2e5f2;
+  --anatomy-shade-2: #eaecf6;
+  --anatomy-shade-3: #f1f3fa;
+  --anatomy-lit-top: #ffffff;
+  --anatomy-lit-shade: #eceef8;
+  --anatomy-hi: #23263a;
+  --anatomy-mid: #80849e;
+  --anatomy-lo: #b0b4c8;
+  --anatomy-faint: #d2d5e4;
+  --anatomy-lit: #000000;
+  --anatomy-halo: #7f8399;
+  --anatomy-halo-opacity: 0.32;
+  --anatomy-dot: #353950;
+}
+
+/* Tape paper and its print. Markers sit flush on the tape and only show when a head catches their line. */
+.hero-tape-figure [data-group="tape-run"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--tape-paper);
+}
+.hero-tape-figure [data-group="tape-run"] .iso-face-text {
+  fill: var(--tape-ink);
+}
+.hero-tape-figure [data-part^="marker-"] .iso-edge {
+  stroke: none;
+}
+.hero-tape-figure [data-part^="marker-"][data-caught] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--finding-medium);
+}
+.hero-tape-figure [data-part="marker-3"][data-caught] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--finding-low);
+}
+.hero-tape-figure [data-part^="marker-"][data-caught][data-fixed] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--tape-paper);
+}
+.hero-tape-figure [data-part="stamp-mark"] .iso-edge {
+  stroke: var(--tape-ink);
+}
+
+/* The brake shoe turns hold-red while it clamps the tape. */
+.hero-tape-figure [data-part="brake"][data-state="clamp"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--brake);
+}
+
+/* Odometer drums: dark wheels, light digits. */
+.hero-tape-figure [data-part^="drum-"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--odometer-bg);
+}
+.hero-tape-figure [data-part^="drum-"] .iso-face-text {
+  fill: #f4f1e8;
+}
+
+/* Reading lamps take their gate's temper colour when lit. */
+.hero-tape-figure [data-part^="lamp-"][data-lit][data-stage="1"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--stage-1);
+}
+.hero-tape-figure [data-part^="lamp-"][data-lit][data-stage="2"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--stage-2);
+}
+.hero-tape-figure [data-part^="lamp-"][data-lit][data-stage="3"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--stage-3);
+}
+.hero-tape-figure [data-part^="lamp-"][data-lit][data-stage="4"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--stage-4);
+}
+.hero-tape-figure [data-part^="lamp-"][data-lit][data-stage="5"] :is(.iso-fill, .iso-top, .iso-shade) {
+  fill: var(--stage-5);
+}
