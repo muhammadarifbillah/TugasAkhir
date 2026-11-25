@@ -13,7 +13,7 @@ if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
 
 export function ThemeProvider({ children, nonce }: { children: ReactNode; nonce?: string }) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="light" enableSystem nonce={nonce}>
+    <NextThemesProvider attribute="class" defaultTheme="dark" enableSystem nonce={nonce}>
       {children}
     </NextThemesProvider>
   );

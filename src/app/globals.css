@@ -367,6 +367,10 @@ html:not(.dark)[data-contrast="high"]:has(.landing) {
   --clay-figure-to: #b9a8ff;
   --clay-plate-1: #2a2f63;
   --clay-plate-2: #141733;
+  --clay-plate-3: #0d0f22;
+  --clay-shield-edge: #2a1266;
+  --clay-halo-1: rgba(139, 92, 246, 0.5);
+  --clay-halo-2: rgba(59, 130, 246, 0.12);
   --clay-drop: #05060f;
   --clay-drop-opacity: 0.7;
   --clay-ghost-bg: rgba(37, 42, 82, 0.6);
@@ -406,6 +410,10 @@ html:not(.dark) .landing {
   --clay-figure-to: #7c3aed;
   --clay-plate-1: #ffffff;
   --clay-plate-2: #dcdff4;
+  --clay-plate-3: #c3c8e6;
+  --clay-shield-edge: #3b1d8f;
+  --clay-halo-1: rgba(139, 92, 246, 0.18);
+  --clay-halo-2: rgba(59, 130, 246, 0.05);
   --clay-drop: #3b2f7a;
   --clay-drop-opacity: 0.28;
   --clay-ghost-bg: rgba(255, 255, 255, 0.8);
