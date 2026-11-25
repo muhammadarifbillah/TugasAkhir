@@ -457,7 +457,7 @@
   "dashboard": {
     "title": "Dasbor Proyek",
     "subtitle": "Buat, kelola, dan pantau kepatuhan keamanan untuk website buatan AI Anda.",
-    "newProject": "+ Proyek Baru",
+    "newProject": "Proyek Baru",
     "all": "Semua Proyek",
     "inProgress": "Berjalan",
     "completed": "Selesai",

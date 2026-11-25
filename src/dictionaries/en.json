@@ -457,7 +457,7 @@
   "dashboard": {
     "title": "Projects Dashboard",
     "subtitle": "Create, manage, and monitor security compliance for your AI-generated websites.",
-    "newProject": "+ New Project",
+    "newProject": "New Project",
     "all": "All Projects",
     "inProgress": "In Progress",
     "completed": "Completed",
