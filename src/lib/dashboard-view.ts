@@ -66,8 +66,10 @@ export function isSearchShortcut(e: {
   metaKey: boolean;
   altKey: boolean;
   target: { tagName?: string; isContentEditable?: boolean } | null;
+  defaultPrevented?: boolean;
+  isComposing?: boolean;
 }): boolean {
-  if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return false;
+  if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented || e.isComposing) return false;
   const tag = e.target?.tagName?.toUpperCase();
   return !(tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || e.target?.isContentEditable);
 }

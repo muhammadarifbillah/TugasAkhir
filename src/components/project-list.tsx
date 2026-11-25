@@ -63,7 +63,7 @@ export function ProjectList({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (!isSearchShortcut({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, target: e.target as HTMLElement | null })) return;
+      if (!isSearchShortcut({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, target: e.target as HTMLElement | null, defaultPrevented: e.defaultPrevented, isComposing: e.isComposing })) return;
       e.preventDefault();
       searchRef.current?.querySelector("input")?.focus();
     }
