@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ViewTransition, useMemo, useState } from "react";
+import { ViewTransition, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
 import {
   ArrowRight,
   FolderGit2,
   GitPullRequest,
   Search,
-  ShieldCheck,
   RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Dictionary } from "@/lib/i18n";
 import { csrfFetch } from "@/lib/csrf-client";
-import { scoreBgClass, scoreColorClass } from "@/lib/project-stats";
+import { GATE_CODES, isSearchShortcut, matchesGate, type GateCode } from "@/lib/dashboard-view";
+import { fmt } from "@/lib/format";
+import { GateRail } from "@/components/dashboard/gate-rail";
+import { ScoreBlock } from "@/components/dashboard/score-block";
 
 export interface ProjectCardData {
   id: string;
@@ -36,6 +38,7 @@ export interface ProjectCardData {
   stageProgress: { completed: number; total: number };
   revisionCount: number;
   updatedAt: string;
+  scannedAt: string | null;
 }
 
 type FilterKey = "all" | "in_progress" | "completed" | "in_revision";
@@ -51,9 +54,22 @@ export function ProjectList({
 }) {
   const [filter, setFilter] = useState<FilterKey>("all");
   const [query, setQuery] = useState("");
+  const [gate, setGate] = useState<"all" | GateCode>("all");
   const [revisingId, setRevisingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  // Input (ui/input) does not forward refs, so the ref sits on its wrapper.
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!isSearchShortcut({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, target: e.target as HTMLElement | null })) return;
+      e.preventDefault();
+      searchRef.current?.querySelector("input")?.focus();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   async function revise(p: ProjectCardData) {
     setRevisingId(p.id);
@@ -100,9 +116,9 @@ export function ProjectList({
         if (query && !`${p.name} ${p.stack} ${p.description ?? ""}`.toLowerCase().includes(query.toLowerCase())) {
           return false;
         }
-        return true;
+        return matchesGate(p, gate);
       }),
-    [projects, filter, query],
+    [projects, filter, query, gate],
   );
 
   const filterChips: { key: FilterKey; label: string }[] = [
@@ -114,20 +130,33 @@ export function ProjectList({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="relative w-full max-w-xs">
+      <div className="sticky top-0 z-20 -mx-4 flex flex-col gap-3 border-b bg-background px-4 py-3 md:flex-row md:flex-wrap md:items-center md:justify-between">
+        <div ref={searchRef} className="relative w-full max-w-xs">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="project-search"
             name="projectSearch"
             type="search"
             aria-label={dict.dashboard.search}
-            placeholder={dict.dashboard.search}
+            placeholder={dict.dashboard.searchHint}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="pl-9"
           />
         </div>
+        <Select value={gate} onValueChange={(v) => setGate(v as "all" | GateCode)}>
+          <SelectTrigger aria-label={dict.dashboard.gateFilter} className="w-full md:w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{dict.dashboard.gateFilterAll}</SelectItem>
+            {GATE_CODES.map((code, i) => (
+              <SelectItem key={code} value={code}>
+                {fmt(dict.dashboard.gateNumber, { n: i + 1 })} · {dict.stages[code].name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="flex flex-wrap gap-2">
           {filterChips.map((chip) => (
             <Button
@@ -202,16 +231,18 @@ export function ProjectList({
                       aria-hidden="true"
                     />
                     <CardHeader>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
+                      <div className="flex items-start gap-3">
+                        <div className="min-w-0 flex-1">
                           <ViewTransition name={`project-title-${p.id}`} share="morph" default="none">
-                            <p className="truncate font-semibold">{p.name}</p>
+                            <p className="line-clamp-2 break-words font-semibold">{p.name}</p>
                           </ViewTransition>
                           {p.description && (
-                            <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>
+                            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{p.description}</p>
                           )}
                         </div>
-                        <Badge variant={status.variant}>{status.text}</Badge>
+                        <span className="shrink-0">
+                          <Badge variant={status.variant}>{status.text}</Badge>
+                        </span>
                       </div>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
@@ -225,43 +256,21 @@ export function ProjectList({
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs">
-                        <ShieldCheck className={`size-4 ${scoreColorClass(p.score)}`} />
-                        <span className={`tabular-nums ${scoreColorClass(p.score)}`}>
-                          {p.score != null
-                            ? `${dict.dashboard.securityScore}: ${p.score}%`
-                            : `${dict.dashboard.securityScore}: ${dict.studio.notScored}`}
-                        </span>
-                        {p.scoreSource && (
-                          <Badge variant={p.scoreSource === "scanner" ? "success" : "info"}>
-                            {p.scoreSource === "scanner" ? dict.workspace.trustVerified : dict.workspace.trustAi}
-                          </Badge>
-                        )}
-                        {p.scoreStale && <Badge variant="warning">{dict.workspace.trustStale}</Badge>}
-                      </div>
-                      <Progress
-                        value={p.score ?? 0}
-                        aria-label={`${dict.dashboard.securityScore}: ${p.score ?? 0}%`}
-                        indicatorClassName={scoreBgClass(p.score)}
-
+                      <GateRail
+                        activeStage={p.activeStage}
+                        stageProgress={p.stageProgress}
+                        stageNames={GATE_CODES.map((code) => dict.stages[code].name)}
+                        labels={{ gates: dict.dashboard.gatesLabel, gateActive: dict.dashboard.gateActive, allDone: dict.dashboard.gatesAllDone }}
+                      />
+                      <ScoreBlock
+                        score={p.score}
+                        scoreSource={p.scoreSource}
+                        scannedAt={p.scannedAt}
+                        scoreStale={p.scoreStale}
+                        labels={dict.dashboard}
                       />
 
-                      <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-1" aria-hidden="true">
-                            {Array.from({ length: p.stageProgress.total }).map((_, i) => (
-                              <span
-                                key={i}
-                                className={`h-1.5 w-4 rounded-full ${
-                                  i < p.stageProgress.completed ? "bg-primary" : "bg-muted"
-                                }`}
-                              />
-                            ))}
-                          </div>
-                          <span className="text-[11px] text-muted-foreground">
-                            {dict.dashboard.stageLabel} <span className="tabular-nums">{p.stageProgress.completed}/{p.stageProgress.total}</span>
-                          </span>
-                        </div>
+                      <div className="mt-1 flex flex-wrap items-center justify-end gap-2">
                         <div className="flex gap-2">
                           {p.status === "completed" && (
                             <Button size="sm" variant="outline" onClick={() => revise(p)} disabled={revisingId === p.id}>

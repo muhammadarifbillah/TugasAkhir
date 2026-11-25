@@ -120,7 +120,7 @@ describe("dashboard components", () => {
     const src = read("src/components/project-list.tsx");
     expect(src).toMatch(/export function ProjectList\(\{\s*projects,\s*dict,\s*lang,\s*\}/);
     expect(src).toContain("name={`project-title-${p.id}`} share=\"morph\"");
-    const iface = src.slice(src.indexOf("export interface ProjectCardData"), src.indexOf("}", src.indexOf("export interface ProjectCardData")));
+    const iface = src.slice(src.indexOf("export interface ProjectCardData"), src.indexOf("\n}", src.indexOf("export interface ProjectCardData")));
     for (const field of [
       "id",
       "name",

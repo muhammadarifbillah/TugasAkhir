@@ -1,0 +1,9 @@
+.dashboard-poster {
+  width: min(14rem, 60vw);
+  margin-inline: auto;
+}
+
+/* No odometer digits or stamp text on the dashboard poster: the numbers would be fake. */
+.dashboard-poster .iso-face-text {
+  visibility: hidden;
+}
