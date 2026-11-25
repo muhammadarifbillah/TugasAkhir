@@ -43,14 +43,14 @@ export function generateStaticParams() {
 
 const META: Record<string, { title: string; description: string }> = {
   en: {
-    title: "ShieldForge — AI-Powered Secure Website Generator",
+    title: "Saksi — AI code ships only with a witness",
     description:
-      "Generate secure websites with an AI-guided 5-stage Secure SDLC, grounded in NIST SP 800-218 and ISO 27001:2022.",
+      "An AI website studio with five server-enforced gates. Every gate is mapped to ISO/IEC 27001:2022, with NIST SP 800-218 as a supplement.",
   },
   id: {
-    title: "ShieldForge — Generator Website Aman Bertenaga AI",
+    title: "Saksi — Kode AI lolos hanya bila ada saksinya",
     description:
-      "Hasilkan website aman dengan Secure SDLC 5 tahap berbasis AI, berlandaskan NIST SP 800-218 dan ISO 27001:2022.",
+      "Studio website berbasis AI dengan lima gerbang yang dijaga server. Setiap gerbang dipetakan ke ISO/IEC 27001:2022, dengan NIST SP 800-218 sebagai pelengkap.",
   },
 };
 
@@ -108,7 +108,7 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
                 <div id="main-content" className="flex shrink-0 grow flex-col">
                   {children}
                   <SiteFooter
-                    label={`${dict.app.name} — ${dict.app.tagline}. ${dict.app.frameworkNote}`}
+                    label={`${dict.app.name} — ${dict.app.tagline} ${dict.app.frameworkNote}`}
                   />
                 </div>
               </main>

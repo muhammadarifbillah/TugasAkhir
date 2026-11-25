@@ -42,7 +42,7 @@ function NoteParts({ note }: { note: string }) {
 }
 
 /**
- * §5 architecture: six parts of ShieldForge. On desktop a clickable diagram
+ * §5 architecture: six parts of Saksi. On desktop a clickable diagram
  * with the selected part's note beside it (user-triggered motion only); on
  * mobile an ordered list with every note visible.
  */

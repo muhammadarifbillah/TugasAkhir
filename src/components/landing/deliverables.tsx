@@ -5,7 +5,7 @@ import { Info } from "lucide-react";
 import { EASE, stagger } from "@/components/landing/motion";
 
 /**
- * §9: what a finished project leaves behind beside what ShieldForge does not
+ * §9: what a finished project leaves behind beside what Saksi does not
  * promise. The ticks draw in once (desktop; static on mobile).
  */
 export function Deliverables({
