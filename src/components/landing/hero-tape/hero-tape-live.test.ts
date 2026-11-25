@@ -292,8 +292,9 @@ describe("hero-tape-live", () => {
 
   it("poseCore matches poseOf without the odometer", () => {
     for (const p of progresses) {
-      const { odometer: _odometer, ...core } = poseOf(p);
+      const { odometer, ...core } = poseOf(p);
       expect(poseCore(p)).toEqual(core);
+      expect(poseCore(p)).not.toHaveProperty("odometer", odometer);
     }
   });
 
