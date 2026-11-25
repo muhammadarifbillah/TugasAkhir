@@ -45,3 +45,29 @@ export function frameAttributes(frame: Frame): Attributes {
   for (let i = 0; i < 3; i++) out[`drum-${i + 1}`] = { "data-digit": frame.odometer[i] };
   return out;
 }
+
+/** The part of a DOM element applyFrame needs; real elements satisfy it. */
+export interface FrameNode {
+  setAttribute(n: string, v: string): void;
+  removeAttribute(n: string): void;
+  querySelector(s: string): FrameNode | null;
+  textContent: string | null;
+}
+
+/** Writes a frame onto the server-rendered poster SVG under root. */
+export function applyFrame(root: Pick<FrameNode, "querySelector">, frame: Frame): void {
+  for (const [id, attrs] of Object.entries(frameAttributes(frame))) {
+    const el = root.querySelector(`[data-part="${id}"]`);
+    if (!el) continue;
+    for (const [k, v] of Object.entries(attrs)) {
+      if (v === undefined) el.removeAttribute(k);
+      else el.setAttribute(k, v);
+    }
+    if (id.startsWith("drum-")) {
+      const text = el.querySelector("text");
+      if (text) text.textContent = frame.odometer[Number(id.slice(5)) - 1]!;
+    }
+  }
+  root.querySelector('[data-group="tape-run"]')?.setAttribute("transform", frame.tape);
+  root.querySelector("[data-odometer]")?.setAttribute("data-odometer", frame.odometer);
+}

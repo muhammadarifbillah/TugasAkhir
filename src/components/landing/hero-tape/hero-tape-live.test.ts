@@ -269,7 +269,11 @@ describe("hero-tape-live", () => {
           null,
           createElement(m.Solid, { paths: PATHS["head-1"]!, tone: "hi", crease: "none" }),
           createElement(m.Line, { d: "M0 0 10 10", free: true }),
-          createElement(m.FaceText, { transform: "matrix(1 0 0 1 0 0)", size: 4 }, "091"),
+          createElement(
+            m.FaceText,
+            { transform: "matrix(1 0 0 1 0 0)", size: 4 } as Parameters<typeof m.FaceText>[0],
+            "091",
+          ),
         ),
       );
     expect(tree(server)).toBe(tree(kit));
