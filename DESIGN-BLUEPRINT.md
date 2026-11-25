@@ -139,42 +139,47 @@ Closing      clay CTA panel with violet glow
 
 ### 2.2 Dashboard
 
-Planned change: PRD 2026-11-26 landing-dashboard-3d, milestone M4 (project cards with the five-gate rail, score source, empty state). M2 does not change the dashboard.
+Status: M4 done (PRD 2026-11-26 landing-dashboard-3d, bab 12): sticky toolbar, four stat cards, project cards with the five-gate rail, score with a text band and source line, empty state with a small Pita Pindai poster and three steps.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ HEADER: Logo | Dashboard | Settings     [Lang] [Theme] │
+│ HEADER (global, sticky, shared with landing)            │
 ├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  My Projects                    [+ New Project]         │
-│  Manage your Secure SDLC projects                      │
-│                                                         │
-│  🔍 Search...                                           │
-│  [All] [In Progress] [Completed] [In Revision]          │
-│                                                         │
-│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐      │
-│  │ Project A   │ │ Project B   │ │ Project C   │      │
-│  │ E-commerce  │ │ SaaS App    │ │ REST API    │      │
-│  │ [Active]    │ │ [Completed] │ │ [Active]    │      │
-│  │             │ │             │ │             │      │
-│  │ React+Node  │ │ Next.js     │ │ Express     │      │
-│  │ Score: 72   │ │ Score: 95   │ │ Score: 45   │      │
-│  │ ████░░░░░░  │ │ ██████████  │ │ ████░░░░░░  │      │
-│  │             │ │             │ │             │      │
-│  │ [Revise]    │ │ [Revise]    │ │ [Revise]    │      │
-│  │ [Open]      │ │ [Open]      │ │ [Open]      │      │
-│  └─────────────┘ └─────────────┘ └─────────────┘      │
-│                                                         │
+│  Projects Dashboard                   [+ New Project]   │
+│  subtitle                                               │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐    │
+│  │In progr. │ │Completed │ │In revis. │ │Avg score │    │
+│  │ 3        │ │ 1        │ │ 1        │ │ 81       │    │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘    │
+│ ┌─ sticky toolbar (top-0 of #main) ───────────────────┐ │
+│ │ 🔍 Search (press /)  [Active gate ▾] [All][In ...]  │ │
+│ └─────────────────────────────────────────────────────┘ │
+│  ┌──────────────────┐ ┌──────────────────┐              │
+│  │ Long project     │ │ Project B  [Done]│              │
+│  │ title, 2 lines   │ │ #Next.js  v1.0   │              │
+│  │         [Active] │ │ Gates            │              │
+│  │ #React  v1.0     │ │ █ █ █ █ █        │              │
+│  │ Gates            │ │ ⬡ All gates done │              │
+│  │ █ █ ▭ ░ ░        │ │ Score 91 Good    │              │
+│  │ △ Gate 3 active  │ │ Semgrep + Trivy, │              │
+│  │ Score 72 Fair    │ │ 2026-11-24       │              │
+│  │ AI estimate      │ │ [Revise] [Open]  │              │
+│  │           [Open] │ └──────────────────┘              │
+│  └──────────────────┘                                   │
+│  Empty: poster (aria-hidden, no text) + title + lede    │
+│         1. 2. 3. steps (list-decimal) + [New Project]   │
 └─────────────────────────────────────────────────────────┘
 ```
 
 **Spesifikasi:**
-- Container: `max-w-7xl mx-auto px-4 py-8`
-- Header: `mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between`
-- Search: `Input` dengan icon `pl-9`
-- Filter: `Button size="sm"` chips
-- Grid: `grid gap-4 md:grid-cols-2 xl:grid-cols-3`
-- Card: `transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50`
+- Container: `max-w-7xl mx-auto px-4 py-8`; title `text-xl font-semibold`, one `PageTransition`
+- Stats: `DashboardStats` (server), `grid grid-cols-2 gap-3 lg:grid-cols-4`, counts from the existing project query, average of scanner scores only, no count-up animation
+- Toolbar: inside `ProjectList`, `sticky top-0 z-20 -mx-4 border-b bg-background px-4 py-3` (sticks to the top of `#main`, solid background, no backdrop); `/` focuses `#project-search` (`isSearchShortcut`, ignored in editable fields and with modifiers)
+- Gate filter: house `Select`, local state (`matchesGate`), no URL parameter; status chips keep working alongside it
+- Card: title `line-clamp-2 break-words`, status badge `shrink-0`; `GateRail` = 5 segments `--stage-1..5` (done filled, active bordered `border-2`, pending `bg-muted`) + hallmark + text label; `ScoreBlock` = number, band text (Good/Fair/Poor), source line "Semgrep + Trivy, <date>" / AI estimate / not scanned / stale
+- Empty: `DashboardEmpty` (server) with `HeroTapeFigure` in `.dashboard-poster iso hero-tape-figure` (aria-hidden, figure text hidden by `dashboard.css`, no landing motion hooks), `list-decimal` steps, CTA
+- Gate order: `GATE_CODES` in `lib/dashboard-view.ts`, locked to `STAGE_DEFINITIONS` by a test (`lib/stages` stays out of the client bundle)
+- No gsap, lenis or backdrop on the dashboard; `ProjectList` props `{ projects, dict, lang }` and `project-title-<id>` morph unchanged
 
 ### 2.3 Studio Workspace (3-Column)
 
