@@ -11,7 +11,7 @@ export function GuardGrid({ cards }: { cards: { title: string; bullets: string[]
   const items = cards.map((c, i) => ({ ...c, Icon: ICONS[i % ICONS.length] }));
   const card = (c: (typeof items)[number]) => (
     <li key={c.title} className="clay-card clay-hover p-6">
-      <span className="flex size-11 items-center justify-center rounded-2xl bg-[rgba(124,58,237,0.18)] text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+      <span className="flex size-11 items-center justify-center rounded-2xl bg-[var(--clay-tint)] text-primary shadow-[inset_0_1px_0_var(--clay-hl)]">
         <c.Icon className="size-5" aria-hidden="true" />
       </span>
       <h3 className="mt-5 text-lg font-semibold">{c.title}</h3>

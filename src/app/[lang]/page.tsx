@@ -72,10 +72,10 @@ export default async function HomePage({ params }: HomePageProps) {
       <div className="landing">
         <LandingMotion>
           {/* Hero: giant spaced wordmark, the clay shield on its forge platform, then the real headline. */}
-          <section className="relative overflow-hidden pb-16 pt-14 md:pt-20">
+          <section className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
             <p
               aria-hidden="true"
-              className="hero-wordmark animate-in fade-in-0 fill-mode-both px-4 text-center text-[clamp(3.25rem,12vw,10rem)] duration-700 max-lg:animate-none"
+              className="hero-wordmark animate-in fade-in-0 fill-mode-both text-center duration-700 max-lg:animate-none"
             >
               {l.heroWordmark}
             </p>

@@ -54,7 +54,7 @@ export function ProofSection({
             <LedgerRow key={f.label} label={f.label} value={<CountUp value={f.value} className="font-wide text-xl" />} />
           ))}
         </Ledger>
-        <div className="mt-6 rounded-2xl bg-[rgba(124,58,237,0.12)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="mt-6 rounded-2xl bg-[var(--clay-tint)] p-5 shadow-[inset_0_1px_0_var(--clay-hl)]">
           <h3 className="font-narrow text-base">{formulaTitle}</h3>
           <p className="mt-2 text-sm leading-relaxed">{formula}</p>
         </div>

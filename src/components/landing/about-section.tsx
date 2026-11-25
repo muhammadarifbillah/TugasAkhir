@@ -39,7 +39,7 @@ export function AboutSection({
   return (
     <div className="space-y-10">
       <div className="grid gap-6 md:grid-cols-2">
-        {list(aiTitle, ai, Bot, "text-[#93b4ff]")}
+        {list(aiTitle, ai, Bot, "text-[var(--clay-info)]")}
         {list(gateTitle, gate, ShieldCheck, "text-success")}
       </div>
       <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">

@@ -14,7 +14,7 @@ export function ProblemSection({
       {stat.show && (
         <figure className="clay-card p-8">
           {figure && (
-            <p className="font-wide bg-gradient-to-b from-white to-[#b9a8ff] bg-clip-text text-7xl tabular-nums text-transparent md:text-8xl" aria-hidden="true">
+            <p className="font-wide bg-gradient-to-b from-[var(--clay-figure-from)] to-[var(--clay-figure-to)] bg-clip-text text-7xl tabular-nums text-transparent md:text-8xl" aria-hidden="true">
               {figure}
             </p>
           )}
@@ -32,7 +32,7 @@ export function ProblemSection({
       <ul className={`grid gap-4 ${stat.show ? "" : "lg:col-span-2"}`}>
         {items.map((item) => (
           <li key={item} className="clay-card flex gap-4 p-6">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[rgba(244,63,94,0.14)] text-[#fda4af]">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--clay-danger-tint)] text-[var(--clay-danger)]">
               <TriangleAlert className="size-5" aria-hidden="true" />
             </span>
             <span className="leading-relaxed">{item}</span>

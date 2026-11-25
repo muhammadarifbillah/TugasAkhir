@@ -98,12 +98,13 @@ export function GateCoupons({
               onPointerLeave={() => setActive(null)}
               onFocus={() => setActive(i)}
               onBlur={() => setActive(null)}
-              className="coupon relative flex min-h-11 min-w-0 flex-col items-start gap-1 overflow-hidden p-3 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] md:p-4"
+              className="coupon relative flex min-h-11 min-w-0 flex-col items-start gap-1 overflow-hidden p-3 text-start focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)] max-sm:items-center max-sm:px-1.5 md:p-4"
               style={{ "--tint": `var(--stage-${stage})` } as React.CSSProperties}
             >
-              <span className="flex items-center gap-1.5">
+              {/* Stacked on phones: the coupon is ~60px wide there, too narrow for mark + "205 °C" in a row. */}
+              <span className="flex flex-col items-center gap-1 sm:flex-row sm:gap-1.5">
                 <Hallmark stage={stage} className="size-4 md:size-5" />
-                <span className="font-narrow text-xs tabular-nums md:text-sm">{c.celsius}</span>
+                <span className="font-narrow whitespace-nowrap text-xs tabular-nums md:text-sm">{c.celsius}</span>
               </span>
               <span className="font-narrow hidden text-xs text-muted-foreground lg:block">{c.colourName}</span>
               <span className="hidden w-full text-sm font-medium leading-snug lg:line-clamp-2">{c.title}</span>

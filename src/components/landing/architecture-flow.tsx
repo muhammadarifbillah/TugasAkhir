@@ -68,7 +68,7 @@ export function ArchitectureFlow({
               const on = a === sel || b === sel;
               return (
                 <g key={`${a}-${b}`}>
-                  <line x1={POS[a].x} y1={POS[a].y} x2={POS[b].x} y2={POS[b].y} stroke="rgba(167,139,250,0.25)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
+                  <line x1={POS[a].x} y1={POS[a].y} x2={POS[b].x} y2={POS[b].y} stroke="var(--clay-line-soft)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
                   {on && (
                     <m.line
                       key={`on-${sel}`}
@@ -76,7 +76,7 @@ export function ArchitectureFlow({
                       y1={POS[a].y}
                       x2={POS[b].x}
                       y2={POS[b].y}
-                      stroke="#a78bfa"
+                      stroke="var(--clay-line)"
                       strokeWidth={2.5}
                       vectorEffect="non-scaling-stroke"
                       initial={{ opacity: 0 }}
@@ -98,7 +98,7 @@ export function ArchitectureFlow({
               onFocus={() => setSel(i)}
               className={cn(
                 "clay-card absolute flex min-h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-2xl px-4 py-2.5 text-sm font-medium focus-visible:outline-none",
-                sel === i ? "outline-2 outline-offset-2 outline-[#a78bfa] shadow-[0_0_28px_rgba(139,92,246,0.55)]" : "outline-2 outline-transparent hover:text-primary",
+                sel === i ? "outline-2 outline-offset-2 outline-[var(--clay-line)] shadow-[0_0_28px_var(--clay-glow)]" : "outline-2 outline-transparent hover:text-primary",
               )}
               style={{ left: `${POS[i].x}%`, top: `${POS[i].y * 2}%` }}
             >

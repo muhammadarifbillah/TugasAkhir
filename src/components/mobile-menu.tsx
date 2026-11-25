@@ -72,6 +72,7 @@ export function MobileMenu({
       <Button
         variant="ghost"
         size="icon"
+        className="size-11"
         onClick={() => setOpen(!open)}
         aria-label={open ? labels.closeMenu : labels.openMenu}
         aria-expanded={open}
@@ -114,14 +115,14 @@ export function MobileMenu({
                 <>
                   <Link
                     href={`/${lang}/dashboard`}
-                    className="rounded-md px-3 py-2 text-sm hover:bg-accent"
+                    className="flex min-h-11 items-center rounded-md px-3 text-sm hover:bg-accent"
                     onClick={() => setOpen(false)}
                   >
                     {labels.dashboard}
                   </Link>
                   <Link
                     href={`/${lang}/settings`}
-                    className="rounded-md px-3 py-2 text-sm hover:bg-accent"
+                    className="flex min-h-11 items-center rounded-md px-3 text-sm hover:bg-accent"
                     onClick={() => setOpen(false)}
                   >
                     {labels.settings}

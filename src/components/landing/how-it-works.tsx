@@ -52,7 +52,7 @@ export function HowItWorks({
               {selected && (
                 <m.span
                   layoutId="how-indicator"
-                  className="absolute inset-y-3 start-0 w-1 rounded-full bg-[#8b5cf6] shadow-[0_0_12px_rgba(139,92,246,0.8)] max-lg:inset-x-3 max-lg:inset-y-auto max-lg:bottom-0 max-lg:h-1 max-lg:w-auto"
+                  className="absolute inset-y-3 start-0 w-1 rounded-full bg-[var(--clay-line)] shadow-[0_0_12px_var(--clay-glow)] max-lg:inset-x-3 max-lg:inset-y-auto max-lg:bottom-0 max-lg:h-1 max-lg:w-auto"
                   transition={{ type: "spring", stiffness: 400, damping: 34 }}
                   aria-hidden="true"
                 />

@@ -268,14 +268,14 @@ html[data-contrast="high"].dark {
 }
 
 /*
- * Landing "Dark Clay": claymorphism on a deep navy base with violet neon,
- * after the cyber-security references. The landing is always dark: when the
- * page contains .landing the whole document (header, footer included) takes
- * these tokens, whatever the app theme toggle says. No backdrop blur; glow is
- * box-shadow only; every clay edge keeps a faint border so it reads on a
- * projector. Contrast pairs are pinned in src/lib/contrast.test.ts.
+ * Landing "Clay": claymorphism after the cyber-security references. It follows
+ * the theme toggle: Dark Clay (deep navy, violet neon) under .dark, Light Clay
+ * (lavender paper, violet accents) otherwise. When the page contains .landing
+ * the whole document (header, footer included) takes these tokens. No backdrop
+ * blur; glow is box-shadow only; every clay edge keeps a faint border so it
+ * reads on a projector. Contrast pairs are pinned in src/lib/contrast.test.ts.
  */
-html:has(.landing) {
+html.dark:has(.landing) {
   color-scheme: dark;
   --background: #0b0d1a;
   --foreground: #eef0ff;
@@ -303,6 +303,51 @@ html:has(.landing) {
   --ring: #60a5fa;
   --shadow-color: 235 60% 3%;
 }
+html:not(.dark):has(.landing) {
+  color-scheme: light;
+  --background: #eef0fb;
+  --foreground: #161a33;
+  --card: #f8f9ff;
+  --card-foreground: #161a33;
+  --popover: #f8f9ff;
+  --popover-foreground: #161a33;
+  --primary: #5b21b6;
+  --primary-foreground: #ffffff;
+  --secondary: #e6e9f8;
+  --secondary-foreground: #161a33;
+  --muted: #e6e9f8;
+  --muted-foreground: #4a5075;
+  --accent: #e6e9f8;
+  --accent-foreground: #161a33;
+  --stage-1: #765a0e;
+  --stage-2: #87522a;
+  --stage-3: #6e4a93;
+  --stage-4: #2f5e9e;
+  --stage-5: #4f5f70;
+  --border: #d3d7ef;
+  --input: #8f95bd;
+  --ring: #2563eb;
+  --shadow-color: 240 40% 40%;
+}
+/* High contrast (OS or header toggle) must win over the clay tokens above. */
+@media (prefers-contrast: more) {
+  html.dark:has(.landing) {
+    --muted-foreground: #dde0fa;
+    --border: #6a70b0;
+  }
+  html:not(.dark):has(.landing) {
+    --muted-foreground: #2c3152;
+    --border: #6b7198;
+  }
+}
+html.dark[data-contrast="high"]:has(.landing) {
+  --muted-foreground: #dde0fa;
+  --border: #6a70b0;
+}
+html:not(.dark)[data-contrast="high"]:has(.landing) {
+  --muted-foreground: #2c3152;
+  --border: #6b7198;
+}
 .landing {
   --clay-bg: #0b0d1a;
   --clay-bg-2: #11142a;
@@ -310,6 +355,22 @@ html:has(.landing) {
   --clay-surface-hi: #252a52;
   --clay-edge: rgba(255, 255, 255, 0.07);
   --clay-glow: rgba(139, 92, 246, 0.5);
+  --clay-hl: rgba(255, 255, 255, 0.1);
+  --clay-tint: rgba(124, 58, 237, 0.18);
+  --clay-info: #93b4ff;
+  --clay-info-tint: rgba(59, 130, 246, 0.16);
+  --clay-danger: #fda4af;
+  --clay-danger-tint: rgba(244, 63, 94, 0.14);
+  --clay-line: #a78bfa;
+  --clay-line-soft: rgba(167, 139, 250, 0.25);
+  --clay-figure-from: #ffffff;
+  --clay-figure-to: #b9a8ff;
+  --clay-plate-1: #2a2f63;
+  --clay-plate-2: #141733;
+  --clay-drop: #05060f;
+  --clay-drop-opacity: 0.7;
+  --clay-ghost-bg: rgba(37, 42, 82, 0.6);
+  --clay-ghost-bg-hover: rgba(55, 48, 120, 0.7);
   --clay-shadow:
     12px 14px 28px rgba(0, 0, 0, 0.55),
     -8px -8px 22px rgba(120, 110, 255, 0.05),
@@ -321,10 +382,48 @@ html:has(.landing) {
     inset 2px 2px 4px rgba(255, 255, 255, 0.09),
     inset -4px -6px 12px rgba(0, 0, 0, 0.35),
     0 0 0 1px rgba(167, 139, 250, 0.35);
-  background:
+  --clay-page:
     radial-gradient(60rem 40rem at 50% -10rem, rgba(124, 58, 237, 0.22), transparent 70%),
-    radial-gradient(40rem 30rem at 100% 30%, rgba(59, 130, 246, 0.1), transparent 70%),
-    var(--clay-bg);
+    radial-gradient(40rem 30rem at 100% 30%, rgba(59, 130, 246, 0.1), transparent 70%);
+  background: var(--clay-page), var(--clay-bg);
+}
+html:not(.dark) .landing {
+  --clay-bg: #eef0fb;
+  --clay-bg-2: #e6e9f8;
+  --clay-surface: #f3f4fd;
+  --clay-surface-hi: #ffffff;
+  --clay-edge: rgba(60, 50, 140, 0.1);
+  --clay-glow: rgba(124, 58, 237, 0.35);
+  --clay-hl: rgba(255, 255, 255, 0.9);
+  --clay-tint: rgba(124, 58, 237, 0.12);
+  --clay-info: #1d4ed8;
+  --clay-info-tint: rgba(37, 99, 235, 0.12);
+  --clay-danger: #be123c;
+  --clay-danger-tint: rgba(225, 29, 72, 0.1);
+  --clay-line: #7c3aed;
+  --clay-line-soft: rgba(124, 58, 237, 0.25);
+  --clay-figure-from: #2e1065;
+  --clay-figure-to: #7c3aed;
+  --clay-plate-1: #ffffff;
+  --clay-plate-2: #dcdff4;
+  --clay-drop: #3b2f7a;
+  --clay-drop-opacity: 0.28;
+  --clay-ghost-bg: rgba(255, 255, 255, 0.8);
+  --clay-ghost-bg-hover: #ffffff;
+  --clay-shadow:
+    10px 12px 24px rgba(70, 60, 150, 0.16),
+    -8px -8px 18px rgba(255, 255, 255, 0.85),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+    inset -4px -6px 10px rgba(80, 70, 160, 0.08);
+  --clay-shadow-hover:
+    14px 18px 32px rgba(70, 60, 150, 0.22),
+    -8px -8px 18px rgba(255, 255, 255, 0.9),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+    inset -4px -6px 10px rgba(80, 70, 160, 0.08),
+    0 0 0 1px rgba(124, 58, 237, 0.3);
+  --clay-page:
+    radial-gradient(60rem 40rem at 50% -10rem, rgba(124, 58, 237, 0.14), transparent 70%),
+    radial-gradient(40rem 30rem at 100% 30%, rgba(59, 130, 246, 0.08), transparent 70%);
 }
 .font-wide {
   font-stretch: 125%;
@@ -355,7 +454,7 @@ html:has(.landing) {
   border-radius: 999px;
   border: 1px solid var(--clay-edge);
   background: var(--clay-surface-hi);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 var(--clay-hl);
 }
 /* Section label pill: real text that names the section's content. */
 .clay-pill {
@@ -411,12 +510,12 @@ html:has(.landing) {
   font-weight: 600;
   color: var(--foreground);
   border: 1px solid rgba(167, 139, 250, 0.35);
-  background: rgba(37, 42, 82, 0.6);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: var(--clay-ghost-bg);
+  box-shadow: inset 0 1px 0 var(--clay-hl);
   transition: background-color 150ms var(--ease-out);
 }
 .clay-btn-ghost:hover {
-  background: rgba(55, 48, 120, 0.7);
+  background: var(--clay-ghost-bg-hover);
 }
 .clay-btn:focus-visible,
 .clay-btn-ghost:focus-visible {
@@ -442,12 +541,17 @@ html:has(.landing) {
     0 0 28px color-mix(in oklab, var(--tint) 45%, transparent);
 }
 /* Giant spaced wordmark behind the hero (decorative). */
+/* Sized to its container (the hero is @container) so the longest word, AMANKAN
+   at ~8.1em with tracking, always fits; the start padding balances the tracking
+   after the last letter so the word sits centred. */
 .hero-wordmark {
+  font-size: clamp(2rem, calc((100cqi - 2rem) / 8.6), 10rem);
+  padding-inline-start: 0.18em;
   font-stretch: 125%;
   font-weight: 800;
   letter-spacing: 0.18em;
   line-height: 1;
-  background: linear-gradient(180deg, #ffffff 15%, #b9a8ff 75%, rgba(185, 168, 255, 0.35));
+  background: linear-gradient(180deg, var(--clay-figure-from) 15%, var(--clay-figure-to) 75%, color-mix(in oklab, var(--clay-figure-to) 35%, transparent));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -477,7 +581,7 @@ html:has(.landing) {
   order: 1;
   flex: 1;
   min-width: 1.5rem;
-  border-bottom: 1px dotted rgba(166, 171, 214, 0.35);
+  border-bottom: 1px dotted var(--border);
   transform: translateY(-0.3em);
 }
 .ledger-row > dt {
