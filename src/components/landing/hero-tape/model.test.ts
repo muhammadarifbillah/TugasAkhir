@@ -5,7 +5,8 @@ import { SCORE_WEIGHTS, computeSecurityScore } from "@/lib/scanner/score";
 import { GATE4_STAMP, HERO_FINDINGS, HERO_SCORE, POSTER_POSE, findingRows, poseOf, severityTally } from "./model";
 
 const withoutProgress = (p: number) => {
-  const { progress: _progress, ...rest } = poseOf(p);
+  const { progress, ...rest } = poseOf(p);
+  void progress;
   return rest;
 };
 
