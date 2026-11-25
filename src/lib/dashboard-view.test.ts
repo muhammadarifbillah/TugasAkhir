@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
 import {
@@ -102,5 +104,17 @@ describe("dashboard view", () => {
     for (const tagName of ["INPUT", "textarea", "Select"]) expect(isSearchShortcut(key("/", { tagName }))).toBe(false);
     expect(isSearchShortcut(key("/", { tagName: "DIV", isContentEditable: true }))).toBe(false);
     for (const mod of ["ctrlKey", "metaKey", "altKey"]) expect(isSearchShortcut(key("/", null, { [mod]: true }))).toBe(false);
+  });
+
+  it("isSearchShortcut is false when the event was already handled or an IME composition is active", () => {
+    expect(isSearchShortcut({ ...key("/"), defaultPrevented: true })).toBe(false);
+    expect(isSearchShortcut({ ...key("/"), isComposing: true })).toBe(false);
+    expect(isSearchShortcut(key("/"))).toBe(true);
+  });
+
+  it("ProjectList forwards defaultPrevented and isComposing to isSearchShortcut", () => {
+    const src = readFileSync(join(process.cwd(), "src/components/project-list.tsx"), "utf8");
+    expect(src).toContain("defaultPrevented: e.defaultPrevented");
+    expect(src).toContain("isComposing: e.isComposing");
   });
 });
