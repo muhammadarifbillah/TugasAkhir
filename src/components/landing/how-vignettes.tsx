@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
+import { useEffect } from "react";
+import { animate, m, useMotionValue, useTransform } from "motion/react";
 import { Check, FileCode2, Folder, ShieldCheck } from "lucide-react";
 import { isDesktop } from "@/components/landing/landing-motion";
 import { EASE, stagger } from "@/components/landing/motion";
@@ -33,14 +33,6 @@ const enter = (i: number) =>
   }) as const;
 
 function PromptVignette({ text }: { text: string }) {
-  const reduce = useReducedMotion();
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    // Starts empty on server and client alike; reduced motion fills it in one step.
-    const step = reduce || !isDesktop() ? text.length : 1;
-    const id = setInterval(() => setCount((n) => Math.min(text.length, n + step)), 30);
-    return () => clearInterval(id);
-  }, [reduce, text.length]);
   return (
     <div className={frame}>
       <div className="flex gap-1.5">
@@ -48,8 +40,7 @@ function PromptVignette({ text }: { text: string }) {
         <span className="rounded-md px-2.5 py-1 text-xs text-muted-foreground">Build</span>
       </div>
       <div className="min-h-24 rounded-lg border bg-background p-3 font-mono text-xs leading-relaxed">
-        {text.slice(0, count)}
-        <span className="ms-0.5 inline-block h-3.5 w-1.5 translate-y-0.5 animate-pulse bg-primary" aria-hidden="true" />
+        {text}
       </div>
     </div>
   );

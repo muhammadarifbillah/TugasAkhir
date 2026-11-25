@@ -1,16 +1,22 @@
 import Image from "next/image";
-import { Bot, ShieldCheck } from "lucide-react";
+import { Bot, Check, Database, FileCode2, PackageCheck, ScanSearch, ShieldCheck, Waypoints } from "lucide-react";
 import { CountUp } from "@/components/landing/count-up";
 
+const GUARD_ICONS = [Database, Waypoints, FileCode2, ScanSearch, PackageCheck];
+
 /**
- * "What is ShieldForge": the AI's work beside what the gates guard, then a
- * facts card (real numbers from landing-facts) next to a real studio screenshot.
+ * "What is ShieldForge": the AI's work beside what the gates guard, the five
+ * guarded areas, then a facts card (real numbers from landing-facts) next to a
+ * real studio screenshot.
  */
 export function AboutSection({
   aiTitle,
   ai,
   gateTitle,
   gate,
+  guardTitle,
+  guardLede,
+  guardCards,
   factsTitle,
   facts,
   shot,
@@ -19,6 +25,9 @@ export function AboutSection({
   ai: string[];
   gateTitle: string;
   gate: string[];
+  guardTitle: string;
+  guardLede: string;
+  guardCards: { title: string; bullets: string[] }[];
   factsTitle: string;
   facts: { label: string; value: number }[];
   shot: { src: string; width: number; height: number; alt: string };
@@ -41,6 +50,31 @@ export function AboutSection({
       <div className="grid gap-6 md:grid-cols-2">
         {list(aiTitle, ai, Bot, "text-[var(--clay-info)]")}
         {list(gateTitle, gate, ShieldCheck, "text-success")}
+      </div>
+      <div>
+        <h3 className="font-wide text-center text-2xl md:text-3xl">{guardTitle}</h3>
+        <p className="mx-auto mt-3 max-w-[60ch] text-center text-muted-foreground">{guardLede}</p>
+        <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {guardCards.map((c, i) => {
+            const Icon = GUARD_ICONS[i % GUARD_ICONS.length];
+            return (
+              <li key={c.title} className="clay-card clay-hover p-6">
+                <span className="flex size-11 items-center justify-center rounded-2xl bg-[var(--clay-tint)] text-primary shadow-[inset_0_1px_0_var(--clay-hl)]">
+                  <Icon className="size-5" aria-hidden="true" />
+                </span>
+                <h3 className="mt-5 text-lg font-semibold">{c.title}</h3>
+                <ul className="mt-3 space-y-2">
+                  {c.bullets.map((b) => (
+                    <li key={b} className="flex gap-2 text-sm text-muted-foreground">
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })}
+        </ul>
       </div>
       <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
         <div className="clay-card p-7">

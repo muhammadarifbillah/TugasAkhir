@@ -9,10 +9,10 @@ import { Faq } from "@/components/landing/faq";
 import { GateCoupons } from "@/components/landing/gate-coupons";
 import { GateLinkProvider } from "@/components/landing/gate-link";
 import { Glossary } from "@/components/landing/glossary";
-import { GuardGrid } from "@/components/landing/guard-grid";
 import { HeroTape } from "@/components/landing/hero-tape/hero-tape";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
+import { primaryCta } from "@/components/landing/primary-cta";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { ProductPreview, type PreviewShot } from "@/components/landing/product-preview";
 import { ProofSection } from "@/components/landing/proof-section";
@@ -43,8 +43,7 @@ export default async function HomePage({ params }: HomePageProps) {
   const dict = await getDictionary(lang);
   const l = dict.landing;
   const session = await auth();
-  const primaryHref = session?.user ? `/${lang}/dashboard` : `/${lang}/login`;
-  const primaryLabel = session?.user ? l.ctaDashboard : l.ctaPrimary;
+  const cta = primaryCta(lang, Boolean(session?.user));
 
   const facts = gateFacts();
   const stageDict = dict.stages as unknown as Record<string, { steps: Record<string, { label: string }> }>;
@@ -72,7 +71,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <div className="landing">
         <LandingMotion>
           {/* Hero: headline first (LCP), then the Pita Pindai stage and its findings table. */}
-          <section className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
+          <section id="mulai-hero" className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
             <div className="mx-auto max-w-4xl px-4 text-center">
               <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.headline}</h1>
               <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">
@@ -82,8 +81,8 @@ export default async function HomePage({ params }: HomePageProps) {
                 {fmt(l.heroLede, { name: dict.app.name })}
               </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-                <Link href={primaryHref} className="clay-btn">
-                  {primaryLabel}
+                <Link href={cta.href} className="clay-btn">
+                  {l[cta.label]}
                 </Link>
                 <Link href="#bukti" className="clay-btn-ghost">
                   {l.ctaSample}
@@ -96,10 +95,6 @@ export default async function HomePage({ params }: HomePageProps) {
           </section>
 
           <StandardsStrip label={l.stripLabel} items={l.stripItems} />
-
-          <ClaySection id="dijaga" pill={l.pills.guard} title={l.guardTitle} lede={l.guardLede}>
-            <GuardGrid cards={l.guardCards} />
-          </ClaySection>
 
           <ClaySection id="masalah" pill={l.pills.problem} title={l.problemTitle} band>
             <ProblemSection
@@ -114,12 +109,15 @@ export default async function HomePage({ params }: HomePageProps) {
             />
           </ClaySection>
 
-          <ClaySection id="tentang" pill={l.pills.about} title={l.aboutTitle} lede={l.aboutLede}>
+          <ClaySection id="tentang" pill={l.pills.about} title={fmt(l.aboutTitle, { name: dict.app.name })} lede={l.aboutLede}>
             <AboutSection
               aiTitle={l.aboutAiTitle}
               ai={l.aboutAi}
               gateTitle={l.aboutGateTitle}
               gate={l.aboutGate}
+              guardTitle={fmt(l.guardTitle, { name: dict.app.name })}
+              guardLede={l.guardLede}
+              guardCards={l.guardCards}
               factsTitle={l.factsTitle}
               facts={factList}
               shot={shots[0]}
@@ -230,7 +228,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </ClaySection>
 
           {/* Start: a clay panel with a violet edge glow instead of a contact form. */}
-          <section aria-labelledby="mulai-title" className="px-4 pb-28 pt-8">
+          <section id="mulai" aria-labelledby="mulai-title" className="px-4 pb-28 pt-8">
             <div className="clay-card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] px-6 py-16 text-center shadow-[var(--clay-shadow),0_0_70px_rgba(139,92,246,0.35)] md:px-12">
               <span className="clay-pill">{l.pills.start}</span>
               <h2 id="mulai-title" className="font-wide mt-5 text-balance text-3xl md:text-5xl">
@@ -238,8 +236,8 @@ export default async function HomePage({ params }: HomePageProps) {
               </h2>
               <p className="mx-auto mt-4 max-w-[48ch] text-muted-foreground">{l.closingLede}</p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-                <Link href={primaryHref} className="clay-btn">
-                  {primaryLabel}
+                <Link href={cta.href} className="clay-btn">
+                  {l[cta.label]}
                 </Link>
                 <Link href="#gerbang" className="clay-btn-ghost">
                   {l.ctaGates}

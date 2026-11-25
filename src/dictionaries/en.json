@@ -72,7 +72,7 @@
     ],
     "demoPause": "Pause animation",
     "demoPlay": "Play animation",
-    "problemTitle": "AI-written code ships fast, but is rarely checked.",
+    "problemTitle": "AI code ships fast, rarely checked.",
     "statStages": "Secure SDLC stages",
     "statNist": "NIST SSDF tasks",
     "statSubsteps": "sub-step completion criteria",
@@ -83,7 +83,7 @@
     "gatesPrev": "Previous stage",
     "gatesNext": "Next stage",
     "gatesArtifact": "Artefact",
-    "howTitle": "From prompt to an auditable release",
+    "howTitle": "From prompt to auditable release",
     "howLede": "You stay in control at every step: the AI proposes, you approve, and scanners verify.",
     "how": [
       {
@@ -120,7 +120,7 @@
     "howVerified": "Verified by scanner",
     "howFinding": "SQL query built from user input",
     "howFixed": "Parameterised query",
-    "previewTitle": "This is the studio, not an illustration.",
+    "previewTitle": "This is the studio.",
     "previewShots": [
       {
         "alt": "ShieldForge studio with sub-steps, the AI workspace and the security panel",
@@ -187,7 +187,7 @@
         "a": "NIST SP 800-218 version 1.1 (February 2022). The version 1.2 draft is still in public consultation."
       }
     ],
-    "closingTitle": "Start your first secure project",
+    "closingTitle": "Start your first project",
     "closingLede": "Five gates, one guided workspace, and evidence you can show.",
     "howPlanTitle": "Proposed plan",
     "howApprove": "Approve & build",
@@ -242,7 +242,7 @@
       "Mapping to a standard usually happens after the app is built, when every change is already expensive.",
       "Without an artefact per stage it is hard to show which control was met, and when."
     ],
-    "aboutTitle": "What is ShieldForge?",
+    "aboutTitle": "What is {name}?",
     "aboutLede": "ShieldForge is an AI website studio that works like a production line with checkpoints. The AI drafts requirements, designs, code and documents; ShieldForge makes sure each stage meets its criteria before the next one opens, then checks the result with real security scanners.",
     "aboutAiTitle": "Done by the AI",
     "aboutAi": [
@@ -258,13 +258,13 @@
       "Calculates the security score from findings, not estimates",
       "Traces every requirement to its recommendation, file and standard"
     ],
-    "gatesTitle": "Five gates, tested in order.",
+    "gatesTitle": "Five gates, in order.",
     "gatesCelsius": "{n} °C",
     "gatesSubSteps": "Show {count} sub-steps",
     "gatesSubStepsCount": "{count} sub-steps",
     "gatesSubStepCol": "Sub-step",
     "howScanExample": "{medium} medium + {low} low findings → 100 − ({medium}×{wm} + {low}×{wl}) = {score}",
-    "archTitle": "What happens behind the scenes.",
+    "archTitle": "Under the hood.",
     "archLede": "Choose a part to read how it works.",
     "archNodes": [
       {
@@ -300,12 +300,12 @@
       "Request rate limiting",
       "Account activity audit log"
     ],
-    "proofTitle": "Numbers and methods you can check yourself.",
+    "proofTitle": "Numbers you can check.",
     "proofFormulaTitle": "How the score is calculated",
     "proofFormula": "Score = 100 − (20 × critical + 10 × high + 4 × medium + 1 × low), minimum 0. Only Semgrep and Trivy findings count; a score that comes from the AI is labelled differently.",
     "proofDownload": "Download the 26 sub-step matrix (CSV)",
     "figure": "Fig. {n}",
-    "resultsTitle": "What you take home, and what is not promised.",
+    "resultsTitle": "What you take home, and what we don't promise.",
     "resultsDeliverables": "Results",
     "limitsTitle": "Limits",
     "limits": [
@@ -354,15 +354,12 @@
     ],
     "stripLabel": "Mapped to and checked with",
     "stripItems": [
-      "NIST SP 800-218 v1.1",
-      "ISO/IEC 27001:2022",
-      "OWASP Top 10",
+      "ISO/IEC 27001:2022 Annex A",
+      "NIST SSDF SP 800-218 (complement)",
       "Semgrep",
-      "Trivy",
-      "Docker"
+      "Trivy"
     ],
     "pills": {
-      "guard": "What it guards",
       "problem": "The problem",
       "about": "About",
       "gates": "Workflow",
@@ -375,7 +372,7 @@
       "learn": "Learn",
       "start": "Start"
     },
-    "guardTitle": "What ShieldForge guards in every project.",
+    "guardTitle": "What {name} guards in every project.",
     "guardLede": "Five security areas are checked before a project may move on, from requirements to handover.",
     "guardCards": [
       {
@@ -420,7 +417,7 @@
       }
     ],
     "factsTitle": "Built on a real framework",
-    "audienceTitle": "Made for three groups of people.",
+    "audienceTitle": "Built for three groups.",
     "audience": [
       {
         "title": "Students & junior developers",
@@ -435,7 +432,7 @@
         "desc": "Demonstrate Secure SDLC for real, complete with the mapping to standards."
       }
     ],
-    "learnTitle": "Learn the terms and the answers.",
+    "learnTitle": "Terms and answers.",
     "faqHeading": "Frequently asked questions"
   },
   "nav": {

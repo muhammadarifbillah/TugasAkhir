@@ -187,7 +187,7 @@
         "a": "NIST SP 800-218 versi 1.1 (Februari 2022). Draf versi 1.2 masih dalam konsultasi publik."
       }
     ],
-    "closingTitle": "Mulai proyek aman pertama Anda",
+    "closingTitle": "Mulai proyek pertama Anda",
     "closingLede": "Lima gerbang, satu ruang kerja terpandu, dan bukti yang bisa Anda tunjukkan.",
     "howPlanTitle": "Rencana usulan",
     "howApprove": "Setujui & bangun",
@@ -242,7 +242,7 @@
       "Pemetaan ke standar biasanya dibuat setelah aplikasi jadi, saat setiap perubahan sudah mahal.",
       "Tanpa artefak per tahap, sulit menunjukkan kontrol mana yang dipenuhi dan kapan."
     ],
-    "aboutTitle": "Apa itu ShieldForge?",
+    "aboutTitle": "Apa itu {name}?",
     "aboutLede": "ShieldForge adalah studio pembuat website berbasis AI yang bekerja seperti lini produksi dengan pos pemeriksaan. AI menyusun kebutuhan, desain, kode, dan dokumen; ShieldForge memastikan setiap tahap memenuhi syaratnya sebelum tahap berikutnya dibuka, lalu memeriksa hasilnya dengan pemindai keamanan sungguhan.",
     "aboutAiTitle": "Dikerjakan AI",
     "aboutAi": [
@@ -354,15 +354,12 @@
     ],
     "stripLabel": "Dipetakan ke dan diperiksa dengan",
     "stripItems": [
-      "NIST SP 800-218 v1.1",
-      "ISO/IEC 27001:2022",
-      "OWASP Top 10",
+      "ISO/IEC 27001:2022 Annex A",
+      "NIST SSDF SP 800-218 (pelengkap)",
       "Semgrep",
-      "Trivy",
-      "Docker"
+      "Trivy"
     ],
     "pills": {
-      "guard": "Yang dijaga",
       "problem": "Masalahnya",
       "about": "Tentang",
       "gates": "Alur kerja",
@@ -375,7 +372,7 @@
       "learn": "Pelajari",
       "start": "Mulai"
     },
-    "guardTitle": "Yang dijaga ShieldForge di setiap proyek.",
+    "guardTitle": "Yang dijaga {name} di setiap proyek.",
     "guardLede": "Lima area keamanan diperiksa sebelum proyek boleh melangkah, dari kebutuhan sampai serah terima.",
     "guardCards": [
       {
