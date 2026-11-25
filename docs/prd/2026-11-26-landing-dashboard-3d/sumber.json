@@ -1,0 +1,1034 @@
+[
+ {
+  "id": "S01",
+  "klaim": "GSAP 100% gratis sejak rilis 3.13 (29 April 2025), termasuk semua plugin bonus, juga untuk penggunaan komersial",
+  "url": "https://gsap.com/blog/3-13",
+  "diakses": "2026-11-26",
+  "kutipan": "3.13 release April 29, 2025 ... GSAP is now 100% FREE including ALL of the bonus plugins like SplitText , MorphSVG , and all the others ... commercial use!",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S02",
+  "klaim": "Lenis berjalan di atas scroll native sehingga position: sticky, anchor link, dan aksesibilitas tetap bekerja",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "native scroll** — wraps the browser's own scroll, so position: sticky, anchor links, and accessibility keep working",
+  "verifikasi": "dibuka ulang tukang (README raw)"
+ },
+ {
+  "id": "S03",
+  "klaim": "gsap versi terbaru 3.15.1 berlisensi Standard 'no charge', bukan MIT",
+  "url": "https://registry.npmjs.org/gsap/latest",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"3.15.1\" ... \"license\":\"Standard 'no charge' license: https://gsap.com/standard-license.\"",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S04",
+  "klaim": "lenis versi terbaru 1.3.28, lisensi MIT",
+  "url": "https://registry.npmjs.org/lenis/latest",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"1.3.28\" ... \"license\":\"MIT\"",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S05",
+  "klaim": "gsap 3.15.1 berukuran 70 628 B min / 27 434 B gzip, 0 dependensi",
+  "url": "https://bundlephobia.com/api/size?package=gsap",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"3.15.1\",\"size\":70628,\"gzip\":27434,\"dependencyCount\":0",
+  "verifikasi": "dibuka ulang tukang; angka lebih baru dari spek (27,2 kB untuk 3.13.0)"
+ },
+ {
+  "id": "S06",
+  "klaim": "lenis 1.3.28 berukuran 18 983 B min / 5 483 B gzip, 0 dependensi",
+  "url": "https://bundlephobia.com/api/size?package=lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"1.3.28\",\"size\":18983,\"gzip\":5483,\"dependencyCount\":0",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S07",
+  "klaim": "Ukur sendiri: gsap.min.js 73 357 B / 28 448 B gzip-9; ScrollTrigger.min.js 44 683 B / 17 991 B gzip-9; lenis.min.js 18 887 B / 5 423 B gzip-9",
+  "url": "https://unpkg.com/gsap@3.15.1/dist/ScrollTrigger.min.js",
+  "diakses": "2026-11-26",
+  "kutipan": "gsap@3.15.1/dist/ScrollTrigger.min.js 44683 min, 17991 gzip-9 (output _alat/ukur-gzip.txt, Python gzip level 9)",
+  "verifikasi": "diukur tukang; juga unpkg gsap@3.15.1/dist/gsap.min.js dan lenis@1.3.28/dist/lenis.min.js"
+ },
+ {
+  "id": "S08",
+  "klaim": "three versi terbaru 0.187.0, MIT, 21 030 536 B unpacked",
+  "url": "https://registry.npmjs.org/three/latest",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"0.187.0\" ... \"license\":\"MIT\" ... \"unpackedSize\":21030536",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S09",
+  "klaim": "three 0.187.0 berukuran 742 263 B min / 185 679 B gzip",
+  "url": "https://bundlephobia.com/api/size?package=three",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"0.187.0\",\"size\":742263,\"gzip\":185679,\"dependencyCount\":0",
+  "verifikasi": "dibuka ulang tukang; menggantikan angka spek 174 kB (versi 0.180.0)"
+ },
+ {
+  "id": "S10",
+  "klaim": "@react-three/fiber 9.8.2, MIT, peer react >=19 <19.4",
+  "url": "https://registry.npmjs.org/@react-three%2Ffiber/latest",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"9.8.2\" ... \"license\":\"MIT\" ... \"react\":\">=19 <19.4\"",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S11",
+  "klaim": "@react-three/fiber 9.8.2 berukuran 182 891 B min / 57 672 B gzip, 10 dependensi",
+  "url": "https://bundlephobia.com/api/size?package=%40react-three%2Ffiber",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"9.8.2\",\"size\":182891,\"gzip\":57672,\"dependencyCount\":10",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S12",
+  "klaim": "@react-three/drei 10.7.9, MIT; seluruh paket 1 680 394 B min / 521 499 B gzip, 21 dependensi",
+  "url": "https://bundlephobia.com/api/size?package=%40react-three%2Fdrei",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"10.7.9\",\"size\":1680394,\"gzip\":521499,\"dependencyCount\":21",
+  "verifikasi": "dibuka ulang tukang (registry: license MIT)"
+ },
+ {
+  "id": "S13",
+  "klaim": "@splinetool/runtime 2.0.221 berukuran 36 533 616 B unpacked",
+  "url": "https://registry.npmjs.org/@splinetool%2Fruntime/latest",
+  "diakses": "2026-11-26",
+  "kutipan": "\"version\":\"2.0.221\" ... \"unpackedSize\":36533616",
+  "verifikasi": "dibuka ulang tukang; field license tidak ada di dokumen latest"
+ },
+ {
+  "id": "S14",
+  "klaim": "Kit anatomy berlisensi MIT; runtime klien react/live.tsx 1 526 B gzip, gl.mjs 3 025 B gzip (belum minify)",
+  "url": "file:///C:/Users/Arif/.config/opencode/skills/anatomy/kit/",
+  "diakses": "2026-11-26",
+  "kutipan": "MIT License | Copyright (c) 2026 Ryan; kit/gl.mjs 8763 B raw, 3025 B gzip-9; kit/react/live.tsx 4359 B raw, 1526 B gzip-9",
+  "verifikasi": "diukur tukang (_alat/ukur-anatomy.txt)"
+ },
+ {
+  "id": "S15",
+  "klaim": "Lenis menghormati prefers-reduced-motion secara default (respectReducedMotion: true)",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "respectReducedMotion | boolean | true | Honor the user's prefers-reduced-motion setting: smoothing is disabled and programmatic scrolls are instant",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S16",
+  "klaim": "Integrasi resmi Lenis + ScrollTrigger: lenis.on('scroll', ScrollTrigger.update), gsap.ticker.add, lagSmoothing(0)",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add((time) => { lenis.raf(time * 1000); }); gsap.ticker.lagSmoothing(0);",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S17",
+  "klaim": "Batas Lenis: tanpa CSS scroll-snap, cap 60fps Safari, mati di atas iframe, nested container butuh konfigurasi",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "no support for CSS scroll-snap ... capped to 60fps on Safari ... smooth scroll will stop working over iframe ... nested scroll containers require proper configuration",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S18",
+  "klaim": "Opsi Lenis wrapper (default window) dan content (default document.documentElement) bisa diarahkan ke kontainer",
+  "url": "https://github.com/darkroomengineering/lenis",
+  "diakses": "2026-11-26",
+  "kutipan": "| wrapper | HTMLElement, Window | window | The element that will be used as the scroll container. | content | HTMLElement | document.documentElement | The element that contains the content that will be scrolled",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S19",
+  "klaim": "Veracode 2025: kode buatan AI memunculkan celah keamanan berisiko pada 45% pengujian; halaman 'October 2025 Update'",
+  "url": "https://www.veracode.com/resources/analyst-reports/2025-genai-code-security-report/",
+  "diakses": "2026-11-26",
+  "kutipan": "October 2025 Update: GenAI Code Security Report ... AI-generated code introduced risky security flaws in 45% of tests.",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S20",
+  "klaim": "Veracode menguji kode dari lebih dari 100 LLM dalam Java, JavaScript, Python, dan C#",
+  "url": "https://www.veracode.com/resources/analyst-reports/2025-genai-code-security-report/",
+  "diakses": "2026-11-26",
+  "kutipan": "analyzes the security of code generated by over 100 large language models across Java, JavaScript, Python, and C#.",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S21",
+  "klaim": "Pearce dkk. (IEEE S&P 2022): sekitar 40% dari 1 689 program yang dihasilkan Copilot rentan",
+  "url": "https://arxiv.org/abs/2108.09293",
+  "diakses": "2026-11-26",
+  "kutipan": "we produce 89 different scenarios for Copilot to complete, producing 1,689 programs. Of these, we found approximately 40% to be vulnerable.",
+  "verifikasi": "dicari dan dibuka tukang (slot wajib 13a)"
+ },
+ {
+  "id": "S22",
+  "klaim": "Perry dkk.: peserta dengan asisten AI menulis kode yang jauh kurang aman dan lebih yakin kodenya aman",
+  "url": "https://arxiv.org/abs/2211.03622",
+  "diakses": "2026-11-26",
+  "kutipan": "participants who had access to an AI assistant based on OpenAI's codex-davinci-002 model wrote significantly less secure code than those without access.",
+  "verifikasi": "dicari dan dibuka tukang (slot wajib 13b)"
+ },
+ {
+  "id": "S23",
+  "klaim": "WCAG 2.2 SC 2.3.3 Animation from Interactions adalah Level AAA",
+  "url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html",
+  "diakses": "2026-11-26",
+  "kutipan": "Understanding SC 2.3.3 Animation from Interactions (Level AAA) ... Motion animation triggered by interaction can be disabled, unless the animation is essential",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S24",
+  "klaim": "WCAG 2.2 SC 2.2.2 Pause, Stop, Hide (Level A) berlaku untuk gerak otomatis lebih dari 5 detik",
+  "url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html",
+  "diakses": "2026-11-26",
+  "kutipan": "For any moving, blinking or scrolling information that (1) starts automatically, (2) lasts more than five seconds, and (3) is presented in parallel with other content, there is a mechanism for the user to pause, stop, or hide it",
+  "verifikasi": "dibuka ulang tukang; halaman bertanda Level A"
+ },
+ {
+  "id": "S25",
+  "klaim": "WCAG 2.2 SC 2.5.8 Target Size (Minimum), Level AA: target minimal 24 by 24 CSS pixel dengan pengecualian",
+  "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+  "diakses": "2026-11-26",
+  "kutipan": "24 by 24 CSS pixels , except when: Spacing Undersized targets (those less than 24 by 24 CSS pixels) are positioned so that if a 24 CSS pixel diameter circle is centered on the bounding box",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S26",
+  "klaim": "Ambang LCP baik: 2,5 detik atau kurang",
+  "url": "https://web.dev/articles/lcp",
+  "diakses": "2026-11-26",
+  "kutipan": "2.5 seconds or less",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S27",
+  "klaim": "Ambang CLS baik: 0,1 atau kurang",
+  "url": "https://web.dev/articles/cls",
+  "diakses": "2026-11-26",
+  "kutipan": "0.1 or less",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S28",
+  "klaim": "Ambang INP baik: 200 milidetik atau kurang",
+  "url": "https://web.dev/articles/inp",
+  "diakses": "2026-11-26",
+  "kutipan": "200 milliseconds means a page has good responsiveness",
+  "verifikasi": "dibuka ulang tukang"
+ },
+ {
+  "id": "S29",
+  "klaim": "prefers-reduced-motion mendeteksi pengaturan pengguna untuk meminimalkan gerak non-esensial",
+  "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion",
+  "diakses": "2026-11-26",
+  "kutipan": "The prefers-reduced-motion CSS media feature is used to detect if a user has enabled a setting on their device to minimize the amount of non-essential motion.",
+  "verifikasi": "dicari dan dibuka tukang (slot wajib 14)"
+ },
+ {
+  "id": "S30",
+  "klaim": "Next 16: opsi ssr: false hanya bekerja di Client Component",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/node_modules/next/dist/docs/01-app/02-guides/lazy-loading.md",
+  "diakses": "2026-11-26",
+  "kutipan": "`ssr: false` option will only work for Client Components, move it into Client Components ensure the client code-splitting working properly.",
+  "verifikasi": "dibaca tukang, baris 66"
+ },
+ {
+  "id": "S31",
+  "klaim": "CSP proyek: script-src 'self' 'nonce-...' 'unsafe-eval', connect-src 'self', tanpa media-src dan tanpa 'wasm-unsafe-eval'",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/proxy.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "`script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`, ... \"connect-src 'self'\",",
+  "verifikasi": "dibaca tukang + header respons terukur (_alat/audit-hasil.json)"
+ },
+ {
+  "id": "S32",
+  "klaim": "Kontainer scroll aplikasi adalah <main id=\"main\"> dengan overflow-y-auto di dalam pembungkus h-svh overflow-hidden",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/app/[lang]/layout.tsx",
+  "diakses": "2026-11-26",
+  "kutipan": "<div className=\"flex h-svh flex-col overflow-hidden\"> ... <main id=\"main\" className=\"flex min-h-0 flex-1 flex-col overflow-y-auto\">",
+  "verifikasi": "dibaca tukang + diukur (wheel menggeser #main 1200 px, window 0)"
+ },
+ {
+  "id": "S33",
+  "klaim": "Fakta landing dari kode: 5 gerbang, 42 task NIST, 26 sub-langkah, 6 provider, 2 bahasa; temper 205/260/282/310/371 °C",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/landing-facts.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "nistTasks: 42, // unique NIST SSDF task codes seeded in prisma/seed.ts ... { stage: 1, celsius: 205, colour: \"straw\" }, ... { stage: 5, celsius: 371, colour: \"grey\" }",
+  "verifikasi": "dibaca tukang; landing-facts.test.ts mematok stages 5 dan subSteps 26"
+ },
+ {
+  "id": "S34",
+  "klaim": "Blueprint lama melarang smooth-scroll library dan GSAP serta animasi terikat scroll",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/DESIGN-BLUEPRINT.md",
+  "diakses": "2026-11-26",
+  "kutipan": "No smooth-scroll library, no GSAP, and no glassmorphism (`backdrop-blur`). ... Removed from the landing page: aurora, card tilt, parallax ... No scroll-linked animation.",
+  "verifikasi": "dibaca tukang (§7.1)"
+ },
+ {
+  "id": "S35",
+  "klaim": "PRD landing sebelumnya mewajibkan 0 logo, klien, testimoni palsu dan melarang GSAP/Lenis",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/docs/prd/2026-11-25-landing-claymorphism-prd.md",
+  "diakses": "2026-11-26",
+  "kutipan": "0 fake logos, clients, testimonials, awards or blog posts; every number comes from `landing-facts.ts` ... - No GSAP, no Lenis.",
+  "verifikasi": "dibaca tukang (baris 25, 53)"
+ },
+ {
+  "id": "S36",
+  "klaim": "Skor deterministik: 100 dikurangi bobot (critical 20, high 10, medium 4, low 1); contoh 2 medium + 1 low = 91; pemindai Semgrep dan Trivy",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/scanner/score.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "critical: 20, high: 10, medium: 4, low: 1, ... return Math.max(0, Math.min(100, 100 - penalty)); (run.ts: SEMGREP_IMAGE = \"semgrep/semgrep:latest\"; TRIVY_IMAGE = \"aquasec/trivy:latest\")",
+  "verifikasi": "dibaca tukang; 100-4-4-1 = 91"
+ },
+ {
+  "id": "S37",
+  "klaim": "Baseline landing dev: LCP 1364 ms dengan elemen H1, CLS 0, 30 request, 0 canvas, 0 video",
+  "url": "http://localhost:3000/id",
+  "diakses": "2026-11-26",
+  "kutipan": "\"lcp\": [{\"t\": 1364, \"size\": 102656, \"el\": \"H1.font-wide text-balance ...\"}], \"cls\": 0 ... \"canvasCount\": 0, \"videoCount\": 0",
+  "verifikasi": "diukur tukang (Playwright, _alat/audit-hasil.json); server dev, bukan produksi"
+ },
+ {
+  "id": "S38",
+  "klaim": "window ikut dapat di-scroll programatik sejauh 1832 px karena satu span.sr-only; dokumen 2732 px",
+  "url": "http://localhost:3000/id",
+  "diakses": "2026-11-26",
+  "kutipan": "\"windowScrollYAfterScrollTo\": 1832 ... [{\"tag\": \"SPAN\", \"cls\": \"sr-only\", \"bottom\": 2732}]",
+  "verifikasi": "diukur tukang (_alat/audit-hasil.json, _alat/probe-docheight.json)"
+ },
+ {
+  "id": "S39",
+  "klaim": "nama Sahih: pencarian web \"Sahih\" software dan \"Sahih\" security, tidak ada produk software/security relevan di hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Sahih%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Sahih\" software: 4 hasil teratas tentang Gemini/astrologi (zhihu.com, astrologyanswers.com); \"Sahih\" security: 0 hasil RSS",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S40",
+  "klaim": "nama Sahih: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/sahih",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S41",
+  "klaim": "nama Sahih: github.com/sahih HTTP 200; akun GitHub user 'sahih' ada (1 repo publik, dibuat 2017-04-20); pencarian repo nama 'sahih': 338 repo, teratas essaji/Complete-Sahih-Bukhari-Json (20 bintang)",
+  "url": "https://api.github.com/users/sahih",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":1,\"created_at\":\"2017-04-20T21:53:00Z\"; total_count 338; essaji/Complete-Sahih-Bukhari-Json ★20",
+  "verifikasi": "GET github.com/sahih (200), api.github.com/users/sahih (200), api.github.com/search/repositories?q=sahih+in:name"
+ },
+ {
+  "id": "S42",
+  "klaim": "nama Sidik: pencarian web \"Sidik\" software dan \"Sidik\" security, ada tabrakan nama sistem informasi: SIDIK (KLHK) dan SIDIK Kab. Cirebon (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Sidik%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "SIDIK - Sistem Informasi Data Indeks Kerentanan | https://sidik.kemenlh.go.id/ ; Login | Sistem Informasi Pendidik (SIDIK) Kab. Cirebon | https://sidik.disdikcirebonkab.id/",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S43",
+  "klaim": "nama Sidik: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/sidik",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S44",
+  "klaim": "nama Sidik: github.com/sidik HTTP 200; akun GitHub user 'sidik' ada (1 repo publik, dibuat 2013-10-02); pencarian repo nama 'sidik': 911 repo",
+  "url": "https://api.github.com/users/sidik",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":1,\"created_at\":\"2013-10-02T16:52:49Z\"; total_count 911; udibagas/sidik \"Sistem Informasi Pendidikan\"",
+  "verifikasi": "GET github.com/sidik (200), api.github.com/users/sidik (200), api.github.com/search/repositories?q=sidik+in:name"
+ },
+ {
+  "id": "S45",
+  "klaim": "nama Segel: pencarian web \"Segel\" software dan \"Segel\" security, hasil teratas didominasi aktor Jason Segel; tidak ada produk security bernama Segel di 4 hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Segel%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "Jason Segel - Wikipedia | https://en.wikipedia.org/wiki/Jason_Segel ; Segel - Wikipedia | https://en.wikipedia.org/wiki/Segel",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S46",
+  "klaim": "nama Segel: paket npm sudah dipakai (HTTP 200 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/segel",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 200; \"time.modified\":\"2025-10-20T19:31:58.166Z\"; description kosong",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S47",
+  "klaim": "nama Segel: github.com/segel HTTP 200; akun GitHub user 'segel' ada (0 repo publik, dibuat 2014-10-16); pencarian repo nama 'segel': 323 repo, teratas mikaeljorhult/segel (komponen Vue, 13 bintang)",
+  "url": "https://api.github.com/users/segel",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":0,\"created_at\":\"2014-10-16T10:34:40Z\"; total_count 323; mikaeljorhult/segel ★13 \"Vue component for creating Gantt-like timeline charts\"",
+  "verifikasi": "GET github.com/segel (200), api.github.com/users/segel (200), api.github.com/search/repositories?q=segel+in:name"
+ },
+ {
+  "id": "S48",
+  "klaim": "nama Lolos: pencarian web \"Lolos\" software dan \"Lolos\" security, tidak ada hasil relevan (\"Lolos\" software dan \"Lolos\" security: 0 hasil RSS yang relevan) (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Lolos%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Lolos\" software: 0 item RSS; \"Lolos\" security: 4 item tidak relevan (spam), tidak dicantumkan",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S49",
+  "klaim": "nama Lolos: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/lolos",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S50",
+  "klaim": "nama Lolos: github.com/lolos HTTP 200; akun GitHub user 'lolos' ada (nama 'Bill Lolos', 3 repo publik, dibuat 2009-07-30); pencarian repo nama 'lolos': 307 repo",
+  "url": "https://api.github.com/users/lolos",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"name\":\"Bill Lolos\",\"public_repos\":3,\"created_at\":\"2009-07-30T10:58:19Z\"; total_count 307; xintrea/LoLoSwitcher ★44",
+  "verifikasi": "GET github.com/lolos (200), api.github.com/users/lolos (200), api.github.com/search/repositories?q=lolos+in:name"
+ },
+ {
+  "id": "S51",
+  "klaim": "nama Tilik: pencarian web \"Tilik\" software dan \"Tilik\" security, tidak ada produk software/security relevan di hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Tilik%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Tilik\" software: 4 hasil tidak relevan (dailymotion, vidio, situs spam); \"Tilik\" security: 1 hasil dx.com (ponsel Meizu)",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S52",
+  "klaim": "nama Tilik: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/tilik",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S53",
+  "klaim": "nama Tilik: github.com/tilik HTTP 200; akun GitHub 'tilik' ada sebagai Organization (0 repo publik, dibuat 2019-10-11); pencarian repo nama 'tilik': 98 repo",
+  "url": "https://api.github.com/users/tilik",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"Organization\",\"public_repos\":0,\"created_at\":\"2019-10-11T16:07:36Z\"; total_count 98",
+  "verifikasi": "GET github.com/tilik (200), api.github.com/users/tilik (200), api.github.com/search/repositories?q=tilik+in:name"
+ },
+ {
+  "id": "S54",
+  "klaim": "nama Saksi: pencarian web \"Saksi\" software dan \"Saksi\" security, tidak ada produk software/security relevan di hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Saksi%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Saksi\" software: 4 hasil tidak relevan (situs dewasa dan oracle.com/java), tidak dicantumkan; \"Saksi\" security: 0 item RSS",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S55",
+  "klaim": "nama Saksi: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/saksi",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S56",
+  "klaim": "nama Saksi: github.com/saksi HTTP 200; akun GitHub user 'saksi' ada (0 repo publik, dibuat 2013-06-04); pencarian repo nama 'saksi': 246 repo, termasuk AndhikaaW/Saksi (aplikasi pengaduan)",
+  "url": "https://api.github.com/users/saksi",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":0,\"created_at\":\"2013-06-04T16:03:15Z\"; total_count 246; AndhikaaW/Saksi ★0 \"Aplikasi Pengaduan Kekerasan Seksual Internal\"",
+  "verifikasi": "GET github.com/saksi (200), api.github.com/users/saksi (200), api.github.com/search/repositories?q=saksi+in:name"
+ },
+ {
+  "id": "S57",
+  "klaim": "nama Attesta: pencarian web \"Attesta\" software dan \"Attesta\" security, tidak ada produk relevan di hasil teratas; istilah dekat 'attestation' padat dipakai di supply-chain security (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Attesta%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Attesta\" software: 4 hasil vbforums.com tidak relevan; \"Attesta\" security: 4 hasil stackoverflow.com tidak relevan",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S58",
+  "klaim": "nama Attesta: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/attesta",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S59",
+  "klaim": "nama Attesta: github.com/attesta HTTP 200; akun GitHub user 'attesta' ada (0 repo publik, dibuat 2020-10-30); pencarian repo nama 'attesta': 4 878 repo (cocok substring 'attestation'), teratas vvb2060/KeyAttestation ★2221 dan in-toto/attestation ★397",
+  "url": "https://api.github.com/users/attesta",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":0,\"created_at\":\"2020-10-30T09:23:10Z\"; total_count 4878; in-toto/attestation ★397 \"in-toto Attestation Framework\"",
+  "verifikasi": "GET github.com/attesta (200), api.github.com/users/attesta (200), api.github.com/search/repositories?q=attesta+in:name"
+ },
+ {
+  "id": "S60",
+  "klaim": "nama Telaah: pencarian web \"Telaah\" software dan \"Telaah\" security, tidak ada produk software/security relevan di hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Telaah%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Telaah\" software: 4 hasil support.microsoft.com/wikiHow tentang File Explorer; \"Telaah\" security: 4 hasil support.google.com/obsproject.com",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S61",
+  "klaim": "nama Telaah: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/telaah",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S62",
+  "klaim": "nama Telaah: github.com/telaah HTTP 200; akun GitHub user 'telaah' ada (1 repo publik, dibuat 2020-04-03); pencarian repo nama 'telaah': 45 repo, termasuk hiiamanop/Telaah \"alat bantu menyelesaikan skripsi\"",
+  "url": "https://api.github.com/users/telaah",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":1,\"created_at\":\"2020-04-03T03:39:23Z\"; total_count 45; hiiamanop/Telaah \"alat bantu menyelesaikan skripsi\"",
+  "verifikasi": "GET github.com/telaah (200), api.github.com/users/telaah (200), api.github.com/search/repositories?q=telaah+in:name"
+ },
+ {
+  "id": "S63",
+  "klaim": "nama Sahkan: pencarian web \"Sahkan\" software dan \"Sahkan\" security, tidak ada produk software/security relevan di hasil teratas (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Sahkan%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Sahkan\" software: 4 hasil tiktok.com/Wikipedia/Google Play tentang TikTok; \"Sahkan\" security: 4 hasil cnet.com",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S64",
+  "klaim": "nama Sahkan: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/sahkan",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S65",
+  "klaim": "nama Sahkan: github.com/sahkan HTTP 200; akun GitHub user 'sahkan' ada (1 repo publik, dibuat 2014-03-19); pencarian repo nama 'sahkan': 14 repo",
+  "url": "https://api.github.com/users/sahkan",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":1,\"created_at\":\"2014-03-19T19:57:45Z\"; total_count 14",
+  "verifikasi": "GET github.com/sahkan (200), api.github.com/users/sahkan (200), api.github.com/search/repositories?q=sahkan+in:name"
+ },
+ {
+  "id": "S66",
+  "klaim": "nama Tapis: pencarian web \"Tapis\" software dan \"Tapis\" security, tidak ada produk relevan di pencarian web, tetapi GitHub memuat proyek software 'Tapis' (TACC) (2026-11-26)",
+  "url": "https://www.bing.com/search?format=rss&adlt=strict&setlang=en-US&cc=US&q=%22Tapis%22%20software",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Tapis\" software: 4 hasil devforum.roblox.com/reddit tidak relevan; \"Tapis\" security: 4 hasil support.microsoft.com tentang Visual Studio",
+  "verifikasi": "dijalankan tukang lewat Bing RSS (format=rss, adlt=strict, cc=US); WebSearch alat bawaan gagal HTTP 402"
+ },
+ {
+  "id": "S67",
+  "klaim": "nama Tapis: paket npm belum ada (HTTP 404 pada 2026-11-26)",
+  "url": "https://registry.npmjs.org/tapis",
+  "diakses": "2026-11-26",
+  "kutipan": "HTTP 404",
+  "verifikasi": "GET langsung oleh tukang"
+ },
+ {
+  "id": "S68",
+  "klaim": "nama Tapis: github.com/tapis HTTP 200; akun GitHub user 'tapis' ada (2 repo publik, dibuat 2016-03-08); pencarian repo nama 'tapis': 532 repo, termasuk organisasi tapis-project (tapis-ui ★14, tapis-java \"Texas Advanced Computing Center APIs\")",
+  "url": "https://api.github.com/users/tapis",
+  "diakses": "2026-11-26",
+  "kutipan": "\"type\":\"User\",\"public_repos\":2,\"created_at\":\"2016-03-08T05:42:55Z\"; total_count 532; tapis-project/tapis-java ★5 \"Texas Advanced Computing Center APIs\"",
+  "verifikasi": "GET github.com/tapis (200), api.github.com/users/tapis (200), api.github.com/search/repositories?q=tapis+in:name"
+ },
+ {
+  "id": "S69",
+  "klaim": "Repo HEAD d6da5f8: 39 file terlacak memuat 'shieldforge' (case-insensitive), 138 kemunculan",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/",
+  "diakses": "2026-11-26",
+  "kutipan": "git grep -il shieldforge HEAD | Measure-Object -> 39; git grep -io shieldforge HEAD | Measure-Object -> 138",
+  "verifikasi": "dihitung ulang tukang, cocok dengan spek §7"
+ },
+ {
+  "id": "S70",
+  "klaim": "Landmine 1: volume Docker bernama shieldforge-db",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/docker-compose.yml",
+  "diakses": "2026-11-26",
+  "kutipan": "docker-compose.yml:9: - shieldforge-db:/var/lib/postgresql/data ... :40: shieldforge-db:",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S71",
+  "klaim": "Landmine 2: nama unduhan CSV matriks memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/components/landing/proof-section.tsx",
+  "diakses": "2026-11-26",
+  "kutipan": "proof-section.tsx:44: a.download = \"shieldforge-matriks-nist-iso.csv\";",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S72",
+  "klaim": "Landmine 3: default nama repo GitHub, nama ZIP ekspor, dan badge memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/components/studio/deliverables-panel.tsx",
+  "diakses": "2026-11-26",
+  "kutipan": "deliverables-panel.tsx:103: repoName: repoName.trim() || \"shieldforge-website\", ... :206: `shieldforge-${projectId}.zip` ... :89: [![ShieldForge](https://img.shields.io/badge/ShieldForge-NIST%20SP%20800--218-brightgreen)]",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S73",
+  "klaim": "Landmine 4: header dokumen keluaran dan nama workflow memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/docs.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "docs.ts:82: `> Generated by ShieldForge AI (NIST SP 800-218 engine).` ... :323: \"name: ShieldForge Security Pipeline\",",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S74",
+  "klaim": "Landmine 5: name dan short_name PWA memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/app/manifest.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "manifest.ts:5: name: \"ShieldForge — AI-Powered Secure Website Generator\", :6: short_name: \"ShieldForge\",",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S75",
+  "klaim": "Landmine 6: email akun dev seed memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/auth.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "auth.ts:11: const DEV_EMAIL = \"dev@shieldforge.local\";",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S76",
+  "klaim": "Nama lama masuk ke riwayat repo pengguna lewat commit message dan deskripsi repo",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/app/api/github/push/route.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "push/route.ts:95: `feat: ... ${project.currentVersion} via ShieldForge`; revisions/route.ts:147: `feat: release ${nextVersion} via ShieldForge`; github-push.ts:32: `... generated with ShieldForge (NIST SP 800-218 / ISO 27001:2022).`",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S77",
+  "klaim": "Nama paket dan nama berkas dokumen akademik memuat nama lama",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/package.json",
+  "diakses": "2026-11-26",
+  "kutipan": "package.json:2: \"name\": \"shieldforge\", ... :25: \"docs:tech\": \"tsx scripts/generate-docs.ts teknologi-shieldforge.md ...\"; scripts/generate-docs.ts:209: [\"teknologi-shieldforge.md\"]",
+  "verifikasi": "git grep -n tukang"
+ },
+ {
+  "id": "S78",
+  "klaim": "Temuan pemindai menyimpan berkas, baris, task NIST, dan kontrol ISO",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/scanner/types.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "filePath: string | null; line: number | null; ... nistTask: string | null; isoControls: string[];",
+  "verifikasi": "dibaca tukang"
+ },
+ {
+  "id": "S79",
+  "klaim": "Pemetaan kategori temuan ke NIST/ISO: injection dan xss ke PW.4.1/A.8.28, dependency ke PW.7.2/A.8.8,A.8.29",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/scanner/mapping.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "injection: { nistTask: \"PW.4.1\", isoControls: [\"A.8.28\"] }, xss: { nistTask: \"PW.4.1\", isoControls: [\"A.8.28\"] }, ... dependency: { nistTask: \"PW.7.2\", isoControls: [\"A.8.8\", \"A.8.29\"] }",
+  "verifikasi": "dibaca tukang"
+ },
+ {
+  "id": "S80",
+  "klaim": "Pemetaan tingkat gerbang di landing: G1 PO.1.1 (A.5.1, A.5.8) ... G4 PW.8.1 (A.8.29) ... G5 PS.3.1",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/landing-facts.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "{ nist: \"PO.1.1\", iso: [\"A.5.1\", \"A.5.8\"] }, ... { nist: \"PW.8.1\", iso: [\"A.8.29\"] }, { nist: \"PS.3.1\", iso: [\"A.8.13\", \"A.8.10\"] }",
+  "verifikasi": "dibaca tukang"
+ },
+ {
+  "id": "S81",
+  "klaim": "Lima tahap produk berurutan: analysis, design, development, testing, handover",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/stages.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "code: \"analysis\" ... code: \"design\" ... code: \"development\" ... code: \"testing\" ... description: \"Scan for vulnerabilities, review recommendations and auto-fix issues.\" ... code: \"handover\"",
+  "verifikasi": "dibaca tukang"
+ },
+ {
+  "id": "S82",
+  "klaim": "rea inspect_web_page pada landing lokal: DOM 1687 node, judul halaman masih memuat nama lama",
+  "url": "http://localhost:3000/id",
+  "diakses": "2026-11-26",
+  "kutipan": "evidence ev_5dd0fb17b0c9cb15060c00edba325bd0129ba485060b641150e625351b6fc336; \"total_nodes\":1687; \"title\":\"ShieldForge — Generator Website Aman Bertenaga AI\"",
+  "verifikasi": "dijalankan tukang lewat CDP 127.0.0.1:9333 (Edge headless)"
+ },
+ {
+  "id": "S83",
+  "klaim": "craft-anything web_page_screenshot_take pada landing lokal: PNG 1410x805",
+  "url": "http://localhost:3000/id",
+  "diakses": "2026-11-26",
+  "kutipan": "\"id\":\"ev_8bf727349b450f2716acfe89f57479919a77aab98e2cf26f57c2354f2c343c14\" ... \"Captured a 1410×805 PNG of http://localhost:3000/id (269667 bytes).\"",
+  "verifikasi": "dijalankan tukang (mode clean-room)"
+ },
+ {
+  "id": "S84",
+  "klaim": "Baseline v1 audit-landing-1440.png kosong (hanya latar gelap); diganti audit-landing-1440-v2.png 1440x900 yang menampilkan hero perisai dan H1",
+  "url": "http://localhost:3000/id",
+  "diakses": "2026-11-26",
+  "kutipan": "H1: \"Setiap tahap diperiksa sebelum kode dikirim.\"; audit-landing-1440.png 7 913 B tanpa konten",
+  "verifikasi": "Playwright Python tukang, viewport 1440x900, networkidle + 2,5 s"
+ },
+ {
+  "id": "S85",
+  "klaim": "Referensi 01 https://linear.app: HTTP 200, H1 \"The product development system for teams and agents The product development syst\", 0 canvas, 0 video di DOM saat halaman dimuat, logo 2, petunjuk testimoni 3",
+  "url": "https://linear.app",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"The product development system for teams and agents The product development system for teams and agents\"]; canvases: 0 canvas; mediaAssets: tanpa aset media; sticky 0, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-01.json, ref-01.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S86",
+  "klaim": "Referensi 02 https://vercel.com: HTTP 200, H1 \"Agentic Infrastructure\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 0, petunjuk testimoni 0",
+  "url": "https://vercel.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Agentic Infrastructure\"]; canvases: 1080x720 class \"absolute inset-0 blo\"; mediaAssets: tanpa aset media; sticky 2, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-02.json, ref-02.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S87",
+  "klaim": "Referensi 03 https://www.raycast.com: HTTP 200, H1 \"Your shortcut to everything.\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 0, petunjuk testimoni 0",
+  "url": "https://www.raycast.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Your shortcut to everything.\"]; canvases: 1200x967 engine three.js r186; mediaAssets: tanpa aset media; sticky 0, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-03.json, ref-03.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S88",
+  "klaim": "Referensi 04 https://supabase.com: HTTP 200, H1 \"Build in a weekend Scale to millions\", 0 canvas, 0 video di DOM saat halaman dimuat, logo 2, petunjuk testimoni 0",
+  "url": "https://supabase.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Build in a weekend Scale to millions\"]; canvases: 0 canvas; mediaAssets: https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-table-editor-light.webm; sticky 1, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-04.json, ref-04.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S89",
+  "klaim": "Referensi 05 https://resend.com: HTTP 200, H1 \"Email for developers\", 1 canvas, 5 video di DOM saat halaman dimuat, logo 1, petunjuk testimoni 31",
+  "url": "https://resend.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Email for developers\"]; canvases: 648x550; mediaAssets: https://resend.com/static/cube.splinecode; https://resend.com/static/landing-page/3d-broadcast.mp4; https://resend.com/static/landing-page/3d-integrate-morning.mp4; sticky 1, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-05.json, ref-05.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S90",
+  "klaim": "Referensi 06 https://clerk.com: HTTP 200, H1 \"Everything you need for authentication\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 1, petunjuk testimoni 0",
+  "url": "https://clerk.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Everything you need for authentication\"]; canvases: 400x566 class \"absolute inset-0 h-f\"; mediaAssets: tanpa aset media; sticky 1, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-06.json, ref-06.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S91",
+  "klaim": "Referensi 07 https://railway.com: HTTP 200, H1 \"Let agents ship products as fast as they write code\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 0, petunjuk testimoni 0",
+  "url": "https://railway.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Let agents ship products as fast as they write code\"]; canvases: 1432x647 class \"absolute inset-0 h-f\"; mediaAssets: tanpa aset media; sticky 3, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-07.json, ref-07.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S92",
+  "klaim": "Referensi 08 https://snyk.io: HTTP 200, H1 \"Unleash AI Innovators — Securely\", 0 canvas, 1 video di DOM saat halaman dimuat, logo 16, petunjuk testimoni 5",
+  "url": "https://snyk.io",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Unleash AI Innovators — Securely\"]; canvases: 0 canvas; mediaAssets: https://assets.qualified.com/static-media/piperx-loading/Gloria.mp4; https://assets.qualified.com/static-media/piperx-orb/orb-animation.mp4; https://res.cloudinary.com/snyk/video/upload/q_auto/v1782133964/homepage-video-v1_gnssle.mp4; sticky 2, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-08.json, ref-08.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S93",
+  "klaim": "Referensi 09 https://semgrep.dev: HTTP 200, H1 \"Code Security for Builders and Agents\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 14, petunjuk testimoni 3",
+  "url": "https://semgrep.dev",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Code Security for Builders and Agents\"]; canvases: 1170x334 class \"rive rive-canvas\"; mediaAssets: https://semgrep.dev/assets/home-hero-2611a.riv; https://unpkg.com/@rive-app/webgl2@2.35.4/rive.wasm; sticky 2, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-09.json, ref-09.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S94",
+  "klaim": "Referensi 10 https://cursor.com: HTTP 200, H1 \"Cursor is your coding agent for building ambitious software.\", 0 canvas, 1 video di DOM saat halaman dimuat, logo 1, petunjuk testimoni 6",
+  "url": "https://cursor.com",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"Cursor is your coding agent for building ambitious software.\"]; canvases: 0 canvas; mediaAssets: https://cursor.com/marketing-static/logo/logo-light-theme.mp4; sticky 7, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-10.json, ref-10.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S95",
+  "klaim": "Referensi 11 https://www.warp.dev: HTTP 200, H1 \"The software factory infrastructure platform\", 1 canvas, 0 video di DOM saat halaman dimuat, logo 0, petunjuk testimoni 0",
+  "url": "https://www.warp.dev",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"The software factory infrastructure platform\"]; canvases: 468x200 class \"roi-chart\"; mediaAssets: tanpa aset media; sticky 1, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-11.json, ref-11.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S96",
+  "klaim": "Referensi 12 https://socket.dev: HTTP 403, H1 \"socket.dev\", 0 canvas, 0 video di DOM saat halaman dimuat, logo 0, petunjuk testimoni 0",
+  "url": "https://socket.dev",
+  "diakses": "2026-11-26",
+  "kutipan": "h1: [\"socket.dev\"]; canvases: 0 canvas; mediaAssets: tanpa aset media; sticky 0, pinSpacer 0, lenisClass False",
+  "verifikasi": "warisan v1 (_alat/ref-12.json, ref-12.png, Playwright); berkas diperiksa ulang tukang v2, situs tidak dibuka ulang"
+ },
+ {
+  "id": "S97",
+  "klaim": "Token warna gerbang --stage-1..5: tema terang #8a6812 #9f622d #6e4a93 #2f5e9e #5e6f80; tema gelap #d9b45e #d08a4e #b394db #86ace0 #9cadbd",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/app/globals.css",
+  "diakses": "2026-11-26",
+  "kutipan": "52: --stage-1: #8a6812; ... 56: --stage-5: #5e6f80; ... 101: --stage-1: #d9b45e; ... 105: --stage-5: #9cadbd;",
+  "verifikasi": "dibaca tukang (Select-String); baris 48-49: straw -> bronze -> violet -> blue -> grey"
+ },
+ {
+  "id": "S98",
+  "klaim": "Judul skripsi resmi tidak memuat nama produk dan hanya menyebut ISO/IEC 27001:2022 sebagai standar",
+  "url": "file:///C:/Users/Arif/.claude/mandor-runs/TugasAkhir-prd-hero3d/konteks-pemilik.md",
+  "diakses": "2026-11-26",
+  "kutipan": "\"Design and Development of a Generative AI-Based Web Application Development Platform with the Implementation of Secure Development Controls Based on ISO/IEC 27001:2022.\"",
+  "verifikasi": "konteks dari pemilik, diterima saat putaran 2 berjalan; menurut berkas itu judul belum tercatat di repo (git grep kosong)"
+ },
+ {
+  "id": "S99",
+  "klaim": "Daftar kontrol Annex A ISO/IEC 27001:2022 memuat nomor 8.25 sampai 8.31 di kelompok Technological Controls (nama resmi tercantum di halaman)",
+  "url": "https://www.isms.online/iso-27001/annex-a-2022/",
+  "diakses": "2026-11-26",
+  "kutipan": "8.25 ... Secure Development Life Cycle Technological Controls; 8.26 ... Application Security Requirements; 8.27 ... Secure System Architecture and Engineering Principles; 8.28 NEW Secure Coding Technological Controls; 8.29 ... Security Testing in Development and Acceptance; 8.30 ... Outsourced Development Technological Controls; 8.31 ... Separation of Development, Test and Production Environments",
+  "verifikasi": "dibuka tukang putaran 3 (HTTP 200). Halaman iso.org/standard/27001 dan OBP: HTTP 403, tidak terbaca"
+ },
+ {
+  "id": "S100",
+  "klaim": "Sumber kedua daftar Annex A 2022: A.8.25-A.8.31 dengan nama kontrol yang sama dengan S99",
+  "url": "https://hightable.io/iso-27001-annex-a-controls-reference-guide/",
+  "diakses": "2026-11-26",
+  "kutipan": "8.25 Secure Development Life Cycle ... 8.26 Application Security Requirements ... 8.27 Secure Systems Architecture and Engineering Principles ... 8.28 Secure Coding ... 8.29 Security Testing in Development and Acceptance ... 8.30 Outsourced Development ... 8.31 Separation of Development, Test and Production Environments",
+  "verifikasi": "dibuka tukang putaran 3 (HTTP 200); bukan penerbit standar, dipakai sebagai pembanding S99"
+ },
+ {
+  "id": "S101",
+  "klaim": "Veracode menerbitkan edisi 2026 GenAI Code Security Report di situs yang sama; angka 45% di PRD dikutip dari edisi Oktober 2025 (S19). Halaman edisi 2026 yang terbuka tanpa formulir tidak memuat angka persentase",
+  "url": "https://www.veracode.com/resources/analyst-reports/2026-genai-code-security-report/",
+  "diakses": "2026-11-26",
+  "kutipan": "2026 GenAI Code Security Report: 100+ Models Tested ... In the 2026 GenAI Code Security Report, Veracode tests new models across 80 tasks",
+  "verifikasi": "dibuka tukang putaran 3 (HTTP 200); daftar laporan menulis 'Jul 27, 2026 2026 GenAI Code Security Report'; halaman edisi 2025 masih menulis 'October 2025 Update ... 45% of tests'"
+ },
+ {
+  "id": "S102",
+  "klaim": "Pemetaan ISO per gerbang di STAGE_DEFINITIONS: analysis (gerbang 1) A.8.26; design (gerbang 2) A.8.25, A.8.26, A.8.27; development (gerbang 3) A.8.28, A.8.29; testing (gerbang 4) A.8.8, A.8.29, A.8.31; handover (gerbang 5) A.8.30, A.8.31",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/stages.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "30: isoControls: [\"A.5.8\", \"A.5.31\", \"A.5.34\", \"A.8.26\"], 76: isoControls: [\"A.8.25\", \"A.8.26\", \"A.8.27\", \"A.5.15\", \"A.5.16\", \"A.5.17\", \"A.8.5\"], 151: isoControls: [\"A.8.28\", \"A.8.22\", \"A.8.33\", \"A.8.29\"], 210: isoControls: [\"A.8.8\", \"A.8.29\", \"A.8.31\"], 250: isoControls: [\"A.8.9\", \"A.8.13\", \"A.8.15\", \"A.8.30\", \"A.8.31\"]",
+  "verifikasi": "dibaca tukang putaran 3 (Select-String, HEAD d6da5f8); orderIndex 0-4 di baris 24, 71, 146, 205, 245"
+ },
+ {
+  "id": "S103",
+  "klaim": "Pemetaan kategori temuan: injection/xss PW.4.1 + A.8.28; secrets PS.1.1 + A.8.12, A.5.17; dependency PW.7.2 + A.8.8, A.8.29; misconfiguration PW.9.2 + A.8.9, A.8.31",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/scanner/mapping.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "23: injection: { nistTask: \"PW.4.1\", isoControls: [\"A.8.28\"] }, 24: xss: { nistTask: \"PW.4.1\", isoControls: [\"A.8.28\"] }, 25: secrets: { nistTask: \"PS.1.1\", isoControls: [\"A.8.12\", \"A.5.17\"] }, 26: dependency: { nistTask: \"PW.7.2\", isoControls: [\"A.8.8\", \"A.8.29\"] }, 27: misconfiguration: { nistTask: \"PW.9.2\", isoControls: [\"A.8.9\", \"A.8.31\"] }",
+  "verifikasi": "dibaca tukang putaran 3; spek-v3 menyebut baris 20-21 untuk injeksi/xss, baris nyata 23-24"
+ },
+ {
+  "id": "S104",
+  "klaim": "Elemen scroll landing adalah <main id=\"main\"> dengan overflow-y-auto",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/app/[lang]/layout.tsx",
+  "diakses": "2026-11-26",
+  "kutipan": "106: <main id=\"main\" className=\"flex min-h-0 flex-1 flex-col overflow-y-auto\">",
+  "verifikasi": "dibaca tukang putaran 3"
+ },
+ {
+  "id": "S105",
+  "klaim": "Cap gerbang 4 di landing: GATE_MAPPING entri ke-4 = PW.8.1 dengan A.8.29, sama dengan crosswalk seed PW.8.1",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/lib/landing-facts.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "landing-facts.ts:42: { nist: \"PW.8.1\", iso: [\"A.8.29\"] }; prisma/seed.ts:98: { taskCode: \"PW.8.1\", ... iso: [\"A.8.29\"] }",
+  "verifikasi": "dibaca tukang putaran 3"
+ },
+ {
+  "id": "S106",
+  "klaim": "DESIGN-BLUEPRINT.md: 2.1 Landing di baris 111, 2.2 Dashboard di 139, 7.1 Transitions di 627; baris 113 memuat Dark Clay default + Light Clay, temper, hallmark, entrance CSS desktop-only, tanpa testimoni; baris 135 tanpa backdrop blur; baris 677 larangan smooth-scroll dan GSAP",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/DESIGN-BLUEPRINT.md",
+  "diakses": "2026-11-26",
+  "kutipan": "113: ... with Dark Clay as the default ... No testimonials, customer logos, awards or blog ...; 135: No backdrop blur; glow is `box-shadow` only; 677: - No smooth-scroll library, no GSAP, and no glassmorphism (`backdrop-blur`).",
+  "verifikasi": "dibaca tukang putaran 3 (Get-Content per baris)"
+ },
+ {
+  "id": "S107",
+  "klaim": "AGENTS.md melarang npm run build di direktori kerja saat next dev dan meminta build produksi di CI atau worktree terpisah",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/AGENTS.md",
+  "diakses": "2026-11-26",
+  "kutipan": "20: - Do NOT run `npm run build` (or `next build`) in this directory while using `next dev`. 21: - Run production builds in CI or a separate clone/worktree.",
+  "verifikasi": "dibaca tukang putaran 3"
+ },
+ {
+  "id": "S108",
+  "klaim": "CSP di proxy: script-src self + nonce + unsafe-eval; connect-src self",
+  "url": "file:///C:/Users/Arif/Downloads/TugasAkhir/src/proxy.ts",
+  "diakses": "2026-11-26",
+  "kutipan": "49: `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`, 55: \"connect-src 'self'\",",
+  "verifikasi": "dibaca tukang putaran 3"
+ },
+ {
+  "id": "S109",
+  "klaim": "nama Saksi (putaran 3): npm: HTTP 404 (paket belum ada)",
+  "url": "https://registry.npmjs.org/saksi",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"error\":\"Not found\"} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S110",
+  "klaim": "nama Saksi (putaran 3): GitHub akun: github.com/saksi HTTP 200, akun User 'saksi' ada (0 repo publik, dibuat 2013-06-04)",
+  "url": "https://github.com/saksi",
+  "diakses": "2026-11-26",
+  "kutipan": "api.github.com/users/saksi: \"type\":\"User\",\"public_repos\":0,\"created_at\":\"2013-06-04T16:03:15Z\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S111",
+  "klaim": "nama Saksi (putaran 3): GitHub repo: pencarian nama 246 hasil; 3 teratas yousskh5/saksi, mustafaparabakan-maker/saksi, AndhikaaW/Saksi (aplikasi pengaduan)",
+  "url": "https://api.github.com/search/repositories?q=saksi+in:name",
+  "diakses": "2026-11-26",
+  "kutipan": "\"total_count\":246; yousskh5/saksi \"sakrim\"; mustafaparabakan-maker/saksi; AndhikaaW/Saksi \"Aplikasi Pengaduan Kekerasan Seksual Internal\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S112",
+  "klaim": "nama Saksi (putaran 3): PyPI: HTTP 404",
+  "url": "https://pypi.org/pypi/saksi/json",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"message\": \"Not Found\"} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S113",
+  "klaim": "nama Saksi (putaran 3): crates.io: HTTP 404",
+  "url": "https://crates.io/api/v1/crates/saksi",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"errors\":[{\"detail\":\"crate `saksi` does not exist\"}]} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S114",
+  "klaim": "nama Saksi (putaran 3): App Store (ID): 9 hasil untuk 'saksi', satu bernama 'Saksi — Plant Watering' (Lifestyle), bukan software dev/security",
+  "url": "https://itunes.apple.com/search?term=saksi&entity=software&limit=10&country=id",
+  "diakses": "2026-11-26",
+  "kutipan": "trackName \"Saksi — Plant Watering\", sellerName \"DIJITAL PILOT REKLAM SANAYI TICARET LIMITED SIRKETI\", primaryGenreName \"Lifestyle\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S115",
+  "klaim": "nama Saksi (putaran 3): Play Store (ID): ada aplikasi 'Saksi' (com.pnm.saksi_app, Techno Craft Studio) dan 'Saksi Partai Perindo' (saksi pemilu); bukan software dev/security",
+  "url": "https://play.google.com/store/search?q=saksi&c=apps&hl=id&gl=ID",
+  "diakses": "2026-11-26",
+  "kutipan": "<title>Saksi - Aplikasi di Google Play</title>; <title>Saksi Partai Perindo - Aplikasi di Google Play</title>",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S116",
+  "klaim": "nama Tilik (putaran 3): npm: HTTP 404 (paket belum ada)",
+  "url": "https://registry.npmjs.org/tilik",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"error\":\"Not found\"} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S117",
+  "klaim": "nama Tilik (putaran 3): GitHub akun: github.com/tilik HTTP 200, Organization 'Tilik' ada (0 repo publik, dibuat 2019-10-11)",
+  "url": "https://github.com/tilik",
+  "diakses": "2026-11-26",
+  "kutipan": "api.github.com/users/tilik: \"login\":\"Tilik\",\"type\":\"Organization\",\"public_repos\":0,\"created_at\":\"2019-10-11T16:07:36Z\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S118",
+  "klaim": "nama Tilik (putaran 3): GitHub repo: pencarian nama 98 hasil; 3 teratas nggalek-co/tilik, YantUgli/tilik, maziazi/Tilik",
+  "url": "https://api.github.com/search/repositories?q=tilik+in:name",
+  "diakses": "2026-11-26",
+  "kutipan": "\"total_count\":98; nggalek-co/tilik; YantUgli/tilik; maziazi/Tilik (tanpa deskripsi)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S119",
+  "klaim": "nama Tilik (putaran 3): PyPI: HTTP 404",
+  "url": "https://pypi.org/pypi/tilik/json",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"message\": \"Not Found\"} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S120",
+  "klaim": "nama Tilik (putaran 3): crates.io: HTTP 404",
+  "url": "https://crates.io/api/v1/crates/tilik",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"errors\":[{\"detail\":\"crate `tilik` does not exist\"}]} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S121",
+  "klaim": "nama Tilik (putaran 3): App Store (ID): 1 hasil untuk 'tilik', tidak ada yang namanya memuat 'tilik'",
+  "url": "https://itunes.apple.com/search?term=tilik&entity=software&limit=10&country=id",
+  "diakses": "2026-11-26",
+  "kutipan": "resultCount 1; nama yang memuat 'tilik': tidak ada",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S122",
+  "klaim": "nama Tilik (putaran 3): Play Store (ID): ada 'Tilik Kasir' (com.tilikdata.kas, IKA Digital Berkarya) dan 'Tilik: Pengingat Tagihan' (id.xhtml.tilik, XHTML.ID); aplikasi kasir/tagihan Indonesia, bukan software dev/security",
+  "url": "https://play.google.com/store/search?q=tilik&c=apps&hl=id&gl=ID",
+  "diakses": "2026-11-26",
+  "kutipan": "<title>Tilik Kasir - Aplikasi di Google Play</title>; <title>Tilik: Pengingat Tagihan - Aplikasi di Google Play</title>",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S123",
+  "klaim": "nama Tapis (putaran 3): npm: HTTP 404 (paket belum ada)",
+  "url": "https://registry.npmjs.org/tapis",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"error\":\"Not found\"} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S124",
+  "klaim": "nama Tapis (putaran 3): GitHub akun: github.com/tapis HTTP 200, User 'tapis' ada (2 repo publik, dibuat 2016-03-08)",
+  "url": "https://github.com/tapis",
+  "diakses": "2026-11-26",
+  "kutipan": "api.github.com/users/tapis: \"type\":\"User\",\"public_repos\":2,\"created_at\":\"2016-03-08T05:42:55Z\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S125",
+  "klaim": "nama Tapis (putaran 3): GitHub repo: pencarian nama 532 hasil; 3 teratas tapis-project/tapis-ui, grumets/TAPIS, tapis-project/tapis-java (TACC APIs)",
+  "url": "https://api.github.com/search/repositories?q=tapis+in:name",
+  "diakses": "2026-11-26",
+  "kutipan": "\"total_count\":532; tapis-project/tapis-ui \"UI for Tapis\" ★14; grumets/TAPIS; tapis-project/tapis-java \"Texas Advanced Computing Center APIs\" ★5",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S126",
+  "klaim": "nama Tapis (putaran 3): PyPI: HTTP 200, paket 'tapis' sudah ada (0.0.2, geometri simpul 3D, unggah 2026-08-02)",
+  "url": "https://pypi.org/pypi/tapis/json",
+  "diakses": "2026-11-26",
+  "kutipan": "\"name\":\"tapis\",\"version\":\"0.0.2\",\"summary\":\"The geometry of knots and the surfaces that span them, in 3D.\" (HTTP 200)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S127",
+  "klaim": "nama Tapis (putaran 3): crates.io: HTTP 404",
+  "url": "https://crates.io/api/v1/crates/tapis",
+  "diakses": "2026-11-26",
+  "kutipan": "{\"errors\":[{\"detail\":\"crate `tapis` does not exist\"}]} (HTTP 404)",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S128",
+  "klaim": "nama Tapis (putaran 3): App Store (ID): 10 hasil untuk 'tapis', satu memuat kata: 'Top Tapis - Lavage de tapis' (Lifestyle, cuci karpet)",
+  "url": "https://itunes.apple.com/search?term=tapis&entity=software&limit=10&country=id",
+  "diakses": "2026-11-26",
+  "kutipan": "trackName \"Top Tapis - Lavage de tapis\", primaryGenreName \"Lifestyle\"",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ },
+ {
+  "id": "S129",
+  "klaim": "nama Tapis (putaran 3): Play Store (ID): 10 id paket teratas tidak memuat kata 'tapis'; tidak ada hasil relevan",
+  "url": "https://play.google.com/store/search?q=tapis&c=apps&hl=id&gl=ID",
+  "diakses": "2026-11-26",
+  "kutipan": "id teratas: com.dan.tapos, com.tapi.tapi, ... (tidak ada yang memuat 'tapis')",
+  "verifikasi": "dicek tukang putaran 3 lewat fetch; respons mentah di _alat/cek-nama-v3.json"
+ }
+]
