@@ -69,7 +69,7 @@ describe("hero tape figure", () => {
   });
 
   it("tape lines come from the model findings", () => {
-    const expected = HERO_FINDINGS.map((f) => `${f.filePath.slice(f.filePath.lastIndexOf("/") + 1)}:${f.line} ${f.ruleId}`);
+    const expected = HERO_FINDINGS.map((f) => `${String(f.filePath).slice(String(f.filePath).lastIndexOf("/") + 1)}:${f.line} ${f.ruleId}`);
     expect(tapeLines()).toEqual(expected);
     expect(expected).toEqual(["route.ts:14 sql-injection", "comment.tsx:9 unescaped-html", "package.json:12 outdated-package"]);
     for (const line of tapeLines()) expect(line.length).toBeLessThanOrEqual(34);
