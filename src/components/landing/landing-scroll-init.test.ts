@@ -85,4 +85,37 @@ describe("initLandingScroll", () => {
     expect(t2.kill).toHaveBeenCalledTimes(1);
     expect(FakeLenis.last?.destroy).toHaveBeenCalledTimes(1);
   });
+
+  function withStore() {
+    const made = makeDeps();
+    const store: Record<string, unknown> = { scroller: "PREV" };
+    made.ScrollTrigger.defaults = vi.fn((cfg?: Record<string, unknown>) => Object.assign(store, cfg ?? {}));
+    return { ...made, store };
+  }
+
+  it("runs registered scenes after the scroller default is set", () => {
+    const { deps, gsap, ScrollTrigger, store } = withStore();
+    const seen: unknown[] = [];
+    const sceneA = vi.fn(() => (seen.push(store.scroller), () => {}));
+    const sceneB = vi.fn(() => (seen.push(store.scroller), () => {}));
+    initLandingScroll(deps, main, content, [sceneA, sceneB]);
+    expect(sceneA).toHaveBeenCalledTimes(1);
+    expect(sceneB).toHaveBeenCalledTimes(1);
+    expect(sceneA).toHaveBeenCalledWith({ gsap, ScrollTrigger });
+    expect(sceneB).toHaveBeenCalledWith({ gsap, ScrollTrigger });
+    expect(seen).toEqual([main, main]);
+  });
+
+  it("cleanup runs scene cleanups before killing triggers and restores the scroller default", () => {
+    const { deps, FakeLenis, store, t1 } = withStore();
+    const cleanA = vi.fn();
+    const cleanB = vi.fn();
+    const cleanup = initLandingScroll(deps, main, content, [() => cleanA, () => cleanB]);
+    cleanup();
+    const order = (f: ReturnType<typeof vi.fn>) => f.mock.invocationCallOrder[0]!;
+    expect(order(cleanB)).toBeLessThan(order(cleanA));
+    expect(order(cleanA)).toBeLessThan(order(t1.kill));
+    expect(store.scroller).toBe("PREV");
+    expect(FakeLenis.last?.destroy).toHaveBeenCalledTimes(1);
+  });
 });

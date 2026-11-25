@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FaceText, Line, Solid } from "@/components/iso/react/draw";
+import { FaceText, Line, Solid } from "./draw-server";
 import { GATE4_STAMP, type Pose } from "../model";
 import { frameAttributes, frameOf, tapeLines } from "./frame";
 import {
