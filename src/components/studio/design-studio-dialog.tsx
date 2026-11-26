@@ -86,6 +86,8 @@ interface DesignStudioDialogProps {
   designPlan?: unknown;
   /** Platforms declared at the needs step; viewports outside them stay locked. */
   targets: string[];
+  /** CSP nonce of the studio page, for the sandboxed click-through frame. */
+  nonce: string;
   labels: DesignStudioLabels;
   onClose: () => void;
   onSaved?: () => void;
@@ -111,6 +113,7 @@ export function DesignStudioDialog({
   savedScreens,
   designPlan,
   targets,
+  nonce,
   labels,
   onClose,
   onSaved,
@@ -856,6 +859,7 @@ export function DesignStudioDialog({
             device={fullscreen.device}
             scaleToFit={false}
             allowInteractive
+            nonce={nonce}
             labels={{
               start: labels.startInteractive,
               stop: labels.stopInteractive,

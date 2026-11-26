@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { PageTransition } from "@/components/page-transition";
 import { StudioWorkspace } from "@/components/studio/studio-workspace";
@@ -101,11 +102,16 @@ export default async function StudioPage(props: StudioPageProps) {
     deliverableCount,
   });
 
+  // The sandboxed mockup frame inherits this page's CSP, so the inline bridge
+  // only runs when it carries the same per-request nonce.
+  const nonce = (await headers()).get("x-nonce") ?? "";
+
   return (
     <PageTransition key={`${projectId}-${stage}`}>
       <StudioWorkspace
         lang={lang}
         dict={dict}
+        nonce={nonce}
         initialPlan={initialPlan}
         project={{
           id: project.id,

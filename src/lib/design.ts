@@ -111,12 +111,15 @@ export function screenForHref(
     }
   }
 
-  const segment = path.split("/").filter(Boolean).pop()?.toLowerCase();
+  // "/" is the root route: treat it as the home screen rather than an empty slug.
+  const segment =
+    path === "/" ? "home" : path.split("/").filter(Boolean).pop()?.toLowerCase();
   if (!segment) return null;
   return (
     screens.find((s) => {
-      const name = s.name.trim().toLowerCase();
-      return name === segment || name.replace(/\s+/g, "-") === segment;
+      const name = s.name.trim().toLowerCase().replace(/\s+/g, "-");
+      if (name === segment) return true;
+      return segment === "home" && (name === "index" || name === "landing");
     }) ?? null
   );
 }

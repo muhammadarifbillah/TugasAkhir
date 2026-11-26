@@ -214,3 +214,14 @@ test("screenForHref resolves plan routes and screen names", () => {
   assert.equal(screenForHref("#", screens, plan), null);
   assert.equal(screenForHref("mailto:a@b.test", screens, plan), null);
 });
+
+test("screenForHref maps the root route to a home-like screen", () => {
+  const screens: DesignScreen[] = [
+    { id: "scr_root", name: "Home", device: "desktop", html: "<html>home</html>" },
+    { id: "scr_index", name: "Index", device: "desktop", html: "<html>home</html>" },
+  ];
+  const plan: DesignPlan = { version: 1, roles: [] };
+  assert.equal(screenForHref("/", screens, plan)?.id, "scr_root");
+  assert.equal(screenForHref("/index", screens, plan)?.id, "scr_index");
+  assert.equal(screenForHref("#plans", screens, plan), null);
+});

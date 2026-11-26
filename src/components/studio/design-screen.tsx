@@ -17,22 +17,27 @@ const LOGICAL: Record<DesignScreenType["device"], { w: number; h: number }> = {
  * while forbidding network calls, forms and child frames. Without
  * `allow-same-origin` the document also cannot reach this app's cookies or DOM.
  */
-const MOCKUP_CSP = [
+const MOCKUP_CSP_BASE = [
   "default-src 'none'",
   "img-src * data: blob:",
   "style-src * 'unsafe-inline'",
   "font-src * data:",
-  "script-src 'unsafe-inline'",
   "connect-src 'none'",
   "form-action 'none'",
   "frame-src 'none'",
   "base-uri 'none'",
-].join("; ");
+];
+
+/** `script-src` must repeat the nonce: both the parent and this meta policy apply. */
+function mockupCsp(nonce: string): string {
+  return [...MOCKUP_CSP_BASE, nonce ? `script-src 'nonce-${nonce}'` : "script-src 'unsafe-inline'"].join(
+    "; ",
+  );
+}
 
 const MOCKUP_MESSAGE_SOURCE = "saksi-mockup";
 
-const MOCKUP_BRIDGE = `<script>
-(function () {
+const MOCKUP_BRIDGE = `(function () {
   function send(href) {
     try { parent.postMessage({ source: "${MOCKUP_MESSAGE_SOURCE}", href: href }, "*"); } catch (e) {}
   }
@@ -44,17 +49,29 @@ const MOCKUP_BRIDGE = `<script>
     send(link.getAttribute("href") || "");
   }, true);
   document.addEventListener("submit", function (e) { e.preventDefault(); }, true);
-})();
-</script>`;
+})();`;
 
-/** Injects the CSP + link bridge into a generated document. */
-function interactiveDocument(html: string): string {
-  const head = `<meta http-equiv="Content-Security-Policy" content="${MOCKUP_CSP}">${MOCKUP_BRIDGE}`;
-  if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, (tag) => `${tag}${head}`);
-  if (/<html[^>]*>/i.test(html)) {
-    return html.replace(/<html[^>]*>/i, (tag) => `${tag}<head>${head}</head>`);
+/**
+ * Injects the CSP + link bridge into a generated document.
+ *
+ * A sandboxed `srcDoc` frame inherits this app's nonce-based `script-src`, so
+ * every inline script needs that nonce to run at all. The meta policy below
+ * only tightens what the parent already allows (no network, no forms).
+ */
+export function interactiveDocument(html: string, nonce: string): string {
+  const attr = nonce ? ` nonce="${nonce}"` : "";
+  const head =
+    `<meta http-equiv="Content-Security-Policy" content="${mockupCsp(nonce)}">` +
+    `<script${attr}>${MOCKUP_BRIDGE}</script>`;
+  const inline = (doc: string) =>
+    doc.replace(/<script(?![^>]*\bnonce=)(?![^>]*\bsrc=)/gi, `<script${attr}`);
+  if (/<head[^>]*>/i.test(html)) {
+    return inline(html.replace(/<head[^>]*>/i, (tag) => `${tag}${head}`));
   }
-  return `<!doctype html><html><head>${head}</head><body>${html}</body></html>`;
+  if (/<html[^>]*>/i.test(html)) {
+    return inline(html.replace(/<html[^>]*>/i, (tag) => `${tag}<head>${head}</head>`));
+  }
+  return inline(`<!doctype html><html><head>${head}</head><body>${html}</body></html>`);
 }
 
 interface DesignScreenProps {
@@ -68,6 +85,8 @@ interface DesignScreenProps {
   className?: string;
   /** Offer the "click around" mode (fullscreen only). */
   allowInteractive?: boolean;
+  /** CSP nonce of the current page; required for the bridge to run in the sandbox. */
+  nonce?: string;
   /** Called with the href of a clicked mockup link. */
   onNavigate?: (href: string) => void;
   labels?: { start: string; stop: string };
@@ -87,6 +106,7 @@ export function DesignScreen({
   viewportHeight = 240,
   className,
   allowInteractive = false,
+  nonce = "",
   onNavigate,
   labels,
 }: DesignScreenProps) {
@@ -157,8 +177,11 @@ export function DesignScreen({
         )}
         <iframe
           ref={frameRef}
+          // Remount when the mode flips: a sandbox attribute changed after the
+          // document loaded is ignored, so the bridge would never run.
+          key={interactive ? "interactive" : "static"}
           title={title}
-          srcDoc={interactive ? interactiveDocument(html) : html}
+          srcDoc={interactive ? interactiveDocument(html, nonce) : html}
           sandbox={interactive ? "allow-scripts" : ""}
           loading="lazy"
           style={{ width: w, height: h }}

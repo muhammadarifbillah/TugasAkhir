@@ -147,6 +147,8 @@ export type ChatMode = "plan" | "build" | "direct";
 export interface StudioWorkspaceProps {
   lang: string;
   dict: Dictionary;
+  /** Per-request CSP nonce, needed by the sandboxed click-through mockup frame. */
+  nonce: string;
   project: {
     id: string;
     name: string;
@@ -2436,6 +2438,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           savedScreens={designScreens}
           designPlan={props.designPlan}
           targets={targets}
+          nonce={props.nonce}
           onClose={() => setShowDesignCanvas(false)}
           onSaved={() => router.refresh()}
           onAiFinished={notifyChangedSteps}
@@ -2498,6 +2501,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             device={designFullscreen.device}
             scaleToFit={false}
             allowInteractive
+            nonce={props.nonce}
             labels={{
               start: dict.studio.startInteractive,
               stop: dict.studio.stopInteractive,
