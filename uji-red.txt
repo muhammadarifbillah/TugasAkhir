@@ -1,0 +1,42 @@
+﻿## Bagian A
+
+ RUN  v3.2.7 C:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r3
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/components/landing/gallery/category-viewer.test.ts [ src/components/landing/gallery/category-viewer.test.ts ]
+Error: Cannot find module './category-viewer' imported from 'C:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r3/src/components/landing/gallery/category-viewer.test.ts'
+ ❯ src/components/landing/gallery/category-viewer.test.ts:9:1
+      7| import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categor…
+      8| import { STAGE_DEFINITIONS } from "@/lib/stages";
+      9| import { ViewerBody } from "./category-viewer";
+       | ^
+     10| 
+     11| type Json = Record<string, unknown>;
+
+Caused by: Error: Failed to load url ./category-viewer (resolved id: ./category-viewer) in C:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r3/src/components/landing/gallery/category-viewer.test.ts. Does the file exist?
+ ❯ loadAndTransform ../TugasAkhir/node_modules/vite/dist/node/chunks/config.js:22739:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/components/landing/gallery/gallery-logic.test.ts [ src/components/landing/gallery/gallery-logic.test.ts ]
+Error: Cannot find module './gallery-logic' imported from 'C:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r3/src/components/landing/gallery/gallery-logic.test.ts'
+ ❯ src/components/landing/gallery/gallery-logic.test.ts:2:1
+      1| import { describe, expect, it } from "vitest";
+      2| import { VIEWER_INITIAL, keyToAction, pointerTilt, viewerReducer, wall…
+       | ^
+      3| 
+      4| const opened = (page: 0 | 1 | 2 = 0): ViewerState => ({ open: "marketp…
+
+Caused by: Error: Failed to load url ./gallery-logic (resolved id: ./gallery-logic) in C:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r3/src/components/landing/gallery/gallery-logic.test.ts. Does the file exist?
+ ❯ loadAndTransform ../TugasAkhir/node_modules/vite/dist/node/chunks/config.js:22739:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  02:41:06
+   Duration  1.93s (transform 344ms, setup 0ms, collect 0ms, tests 0ms, environment 1ms, prepare 605ms)
+
