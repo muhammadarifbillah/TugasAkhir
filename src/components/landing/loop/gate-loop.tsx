@@ -9,7 +9,7 @@ import type { Dictionary } from "@/lib/i18n";
 import { buildMatrixCsv, type MatrixRow } from "@/lib/matrix-csv";
 import { EASE } from "../motion";
 import { useAmbientMotion } from "../use-ambient-motion";
-import { LOOP_VIEW, loopLayout } from "./loop-geometry";
+import { LOOP_LABEL_HALF, LOOP_VIEW, loopLayout } from "./loop-geometry";
 
 export interface LoopGate {
   code: string;
@@ -143,8 +143,9 @@ export function GateLoop({ gates, labels, matrix }: { gates: LoopGate[]; labels:
           {layout.stations.map((s, i) => (
             <div
               key={gates[i].code}
-              className="absolute w-44 -translate-x-1/2 -translate-y-8 text-center"
-              style={{ left: `${s.x / 10}%`, top: `${s.y / 5.2}%` }}
+              data-loop-col=""
+              className="absolute -translate-x-1/2 -translate-y-8 text-center"
+              style={{ left: `${s.x / 10}%`, top: `${s.y / 5.2}%`, width: `${(LOOP_LABEL_HALF * 2 * 100) / LOOP_VIEW.width}%` }}
             >
               <div className="flex justify-center">
                 <StationButton gate={gates[i]} i={i} selected={selected === i} label={stationLabel(i)} onSelect={() => setSelected(i)} />
