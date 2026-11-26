@@ -12,6 +12,7 @@ const PROVIDERS = [
   { code: "deepseek", name: "DeepSeek", baseUrl: "https://api.deepseek.com/v1", requiresKey: true, defaultModel: "deepseek-flash" },
   { code: "ollama", name: "Ollama (local)", baseUrl: "http://localhost:11434/v1", requiresKey: false, defaultModel: "llama3.2" },
   { code: "gemini", name: "Google Gemini", baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", requiresKey: true, defaultModel: "gemini-flash-latest" },
+  { code: "omniroute", name: "OmniRoute", baseUrl: "https://router.boilingac.id/v1", requiresKey: true, defaultModel: "opencode-go/deepseek-v4.1-flash" },
 ] as const;
 
 const STAGES = [

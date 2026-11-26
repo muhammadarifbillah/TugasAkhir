@@ -1,4 +1,4 @@
-﻿# PEDOMAN WAWANCARA
+# PEDOMAN WAWANCARA
 
 ## Penelitian: Pengembangan Aplikasi Saksi
 ### AI-Powered Secure SDLC Website Generator
@@ -26,7 +26,7 @@
 
 - **Framework Keamanan:** 42 task NIST SP 800-218 (SSDF v1.1) dengan crosswalk ke ISO/IEC 27001:2022 Annex A
 - **Traceability:** Requirement keamanan ber-ID (REQ-SEC-*) dilacak dari tahap analisis hingga file kode implementasinya
-- **Teknologi AI:** Mendukung berbagai provider (OpenAI, Anthropic, Gemini, OpenRouter, Ollama) dengan pendekatan BYOK (Bring Your Own Key)
+- **Teknologi AI:** Mendukung berbagai provider (OpenAI, Anthropic, Gemini, OpenRouter, DeepSeek, Ollama, OmniRoute) dengan pendekatan BYOK (Bring Your Own Key)
 - **Fitur Tambahan:** Security scanner, Design Studio, Docker runner, audit logging, multi-bahasa (Inggris & Indonesia), export PDF/dokumen, integrasi GitHub, PWA
 
 **Tujuan Aplikasi:** Membantu tim pengembang menerapkan praktik keamanan sejak awal siklus pengembangan (secure-by-design) tanpa memerlukan ahli keamanan siber khusus di setiap tahapan, sekaligus menghasilkan dokumentasi keamanan yang dibutuhkan untuk kepatuhan terhadap standar internasional.

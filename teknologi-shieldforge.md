@@ -69,7 +69,8 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 | Local AI | ollama-ai-provider | 1.2.0 | Model lokal (offline) |
 | OpenRouter | OpenRouter API | - | Katalog model OpenRouter (OpenAI, Anthropic, Google, dan lainnya) lewat API OpenAI-compatible |
 | DeepSeek | DeepSeek API | - | OpenAI-compatible; model default deepseek-flash, daftar lain diambil dari API DeepSeek |
-| BYOK | Bring Your Own Key | - | Enam provider dengan kunci terenkripsi |
+| OmniRoute | OmniRoute router | - | Gateway OpenAI-compatible (`router.boilingac.id/v1`); satu kunci untuk banyak model di balik router |
+| BYOK | Bring Your Own Key | - | Tujuh provider dengan kunci terenkripsi |
 
 ### 2.5 Keamanan & Pemindaian
 
@@ -164,7 +165,7 @@ Saksi dibangun dengan arsitektur monolith menggunakan Next.js App Router. Beriku
 
 - **Multi-Bahasa (i18n)** - English dan Bahasa Indonesia.
 - **Dark/Light Mode** - Theme toggle dengan next-themes.
-- **BYOK** - Enam provider AI: OpenAI, Anthropic, Gemini, OpenRouter, DeepSeek, Ollama.
+- **BYOK** - Tujuh provider AI: OpenAI, Anthropic, Gemini, OpenRouter, DeepSeek, Ollama, OmniRoute.
 - **Monaco Code Editor** - Editor kode seperti VS Code, self-hosted (tanpa CDN), mendukung Save/Save All + snapshot.
 - **Design Studio** - Generator mockup UI berbasis prompt (high-fidelity HTML, refine, keep).
 - **ERD & Diagram** - ERD berkardinalitas (1:1, 1:N, M:N), diagram arsitektur & auth flow.
@@ -268,7 +269,7 @@ Fitur utama yang telah diimplementasikan meliputi:
 - 5 tahap Secure SDLC dengan 26 sub-step
 - 30+ REST API endpoint
 - 42 task NIST SSDF v1.1 dengan crosswalk ISO/IEC 27001:2022 Annex A
-- Multi-provider AI (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, OpenRouter) dengan BYOK
+- Multi-provider AI (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, OpenRouter, OmniRoute) dengan BYOK
 - Traceability requirement keamanan -> NIST/ISO -> file kode
 - Security scanning nyata (Semgrep + Trivy + audit dependency) dengan skor deterministik
 - Runner Docker sandbox dengan preview dan log live

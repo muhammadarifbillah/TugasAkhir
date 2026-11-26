@@ -61,6 +61,13 @@ export function buildModel(
         name: "deepseek",
       }).chat(modelName);
       break;
+    case "omniroute":
+      model = createOpenAI({
+        apiKey,
+        baseURL: baseUrl ?? "https://router.boilingac.id/v1",
+        name: "omniroute",
+      }).chat(modelName);
+      break;
     case "openai":
     default:
       model = createOpenAI({

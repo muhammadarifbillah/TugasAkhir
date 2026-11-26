@@ -41,6 +41,10 @@ const STATIC_MODELS: Record<string, ModelEntry[]> = {
   deepseek: [
     { id: "deepseek-flash", name: "DeepSeek Flash", maxTokens: 393216 },
   ],
+  omniroute: [
+    { id: "opencode-go/deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", maxTokens: 32000 },
+    { id: "opencode-go/deepseek-v4-pro", name: "DeepSeek V4 Pro", maxTokens: 32000 },
+  ],
 };
 
 async function fetchGeminiModels(apiKey: string): Promise<ModelEntry[]> {
@@ -213,6 +217,9 @@ export async function POST(request: Request) {
         break;
       case "deepseek":
         models = await fetchDeepSeekModels(apiKey, baseUrl);
+        break;
+      case "omniroute":
+        models = await fetchOpenAIModels(apiKey, baseUrl);
         break;
       default:
         return NextResponse.json({ error: "Unknown provider" }, { status: 400 });
