@@ -217,6 +217,12 @@ describe("kept landing components", () => {
     expect(faq.indexOf('open=""')).toBeLessThan(faq.indexOf("Q2"));
   });
 
+  it("product preview bezel paints the gradient card surface as a background, not a colour", () => {
+    const src = read("src/components/landing/product-preview.tsx");
+    for (const s of ["bg-[var(--fuse-card-bg)]", "var(--fuse-card-bg)_", 'stroke="var(--fuse-card-bg)"']) expect(src, s).not.toContain(s);
+    expect(src).toContain("[background:var(--fuse-card-bg)]");
+  });
+
   it("blueprint describes the final landing and its motion", () => {
     const bp = read("DESIGN-BLUEPRINT.md");
     for (const s of ["gate-loop", "book-shelf", "| M12 |", "| M13 |", "| M14 |"]) expect(bp, s).toContain(s);

@@ -166,6 +166,11 @@ describe("gate loop", () => {
     expect(hook).toContain("useSyncExternalStore");
   });
 
+  it("stations, hallmarks and the raised path use solid surfaces, never the gradient token as a colour", () => {
+    const src = read("src/components/landing/loop/gate-loop.tsx");
+    for (const s of ["bg-[var(--fuse-card-bg)]", "var(--fuse-card-bg)_", 'stroke="var(--fuse-card-bg)"', "var(--fuse-card-bg))"]) expect(src, s).not.toContain(s);
+  });
+
   it("landing.loop keys match in id and en, keep placeholders and avoid forbidden words", () => {
     const id = DICTS.id.landing.loop as Record<string, string> | undefined;
     const en = DICTS.en.landing.loop as Record<string, string> | undefined;

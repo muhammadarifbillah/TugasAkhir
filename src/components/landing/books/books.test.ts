@@ -150,6 +150,12 @@ describe("book shelf", () => {
     for (const s of ["backdrop", "<motion.", "useAnimate", "setInterval"]) expect(src, s).not.toContain(s);
   });
 
+  it("shelf boards and the book dialog paint the gradient card surface as a background, not a colour", () => {
+    const src = read("src/components/landing/books/book-shelf.tsx");
+    for (const s of ["bg-[var(--fuse-card-bg)]", "var(--fuse-card-bg)_", 'stroke="var(--fuse-card-bg)"']) expect(src, s).not.toContain(s);
+    expect(src).toContain("[background:var(--fuse-card-bg)]");
+  });
+
   it("landing.books covers every verified book in both languages without forbidden words", () => {
     const id = DICTS.id.landing.books as Json | undefined;
     const en = DICTS.en.landing.books as Json | undefined;
