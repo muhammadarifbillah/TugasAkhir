@@ -1642,3 +1642,228 @@ gallery-focus"[39m)[33m;[39m
 
 [31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/5]ΓÄ»[22m[39m
 
+
+## Bagian C
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r5[39m
+
+ [31mΓ¥»[39m src/components/landing/gallery/gallery-logic.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 32[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mviewerReducer opens a category on page 1 and close resets[32m 4[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mnext and prev wrap around the three pages with a direction[32m 2[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mgoto sets the direction and is a no-op for the same page or a closed viewer[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mkeyToAction maps the arrow keys only[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mwallPose builds a coverflow panorama with a prominent centre[32m 6[2mms[22m[39m
+[31m   [31m├ù[31m gallery logic[2m > [22mfilterByShelf keeps one shelf or everything[39m[32m 12[2mms[22m[39m
+[31m     ΓåÆ (0 , filterByShelf) is not a function[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mpointerTilt is clamped to -1..1 and safe for zero width[32m 1[2mms[22m[39m
+ [31mΓ¥»[39m src/components/landing/gallery/template-shelf.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 98[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mgroupByShelf follows SHELF_ORDER and drops empty shelves[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22msearchCategories filters by name, pages and features in each language[32m 7[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mTemplateShelf renders four shelves of covers that open the viewer[32m 37[2mms[22m[39m
+[31m   [31m├ù[31m template shelf[2m > [22mTemplateShelf shows upright books on embossed planks with a see-all link per shelf[39m[32m 34[2mms[22m[39m
+[31m     ΓåÆ data-book=: expected +0 to be 8 // Object.is equality[39m
+[31m   [31m├ù[31m template shelf[2m > [22mshelf source lays shelves side by side and paints planks opaquely[39m[32m 11[2mms[22m[39m
+[31m     ΓåÆ expected '"use client";\n\nimport { useId, useSΓÇª' to contain 'lg:grid-cols-2'[39m
+[31m   [31m├ù[31m template shelf[2m > [22mnew shelf keys exist in id and en with placeholders[39m[32m 2[2mms[22m[39m
+[31m     ΓåÆ seeAll: expected 'undefined' to be 'string' // Object.is equality[39m
+   [32mΓ£ô[39m template shelf[2m > [22mshelf source is client-filtered, motion-safe and blur-free[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mlanding.shelf keys match in id and en[32m 1[2mms[22m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m Failed Tests 4 [49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/gallery-logic.test.ts[2m > [22mgallery logic[2m > 
+[22mfilterByShelf keeps one shelf or everything
+[31m[1mTypeError[22m: (0 , filterByShelf) is not a function[39m
+[36m [2mΓ¥»[22m src/components/landing/gallery/gallery-logic.test.ts:[2m69:17[22m[39m
+    [90m 67| [39m  [34mit[39m([32m"filterByShelf keeps one shelf or everything"[39m[33m,[39m () [33m=>[39m {
+    [90m 68| [39m    [35mconst[39m before [33m=[39m [33mSITE_CATEGORIES[39m[33m.[39m[34mmap[39m((c) 
+[33m=>[39m c[33m.[39mid)[33m;[39m
+    [90m 69| [39m    [35mconst[39m all [33m=[39m [34mfilterByShelf[39m([33mSITE_CATEGORIES[39m[33m,[39m 
+[35mnull[39m)[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 70| [39m    [34mexpect[39m(all[33m.[39m[34mmap[39m((c) [33m=>[39m 
+c[33m.[39mid))[33m.[39m[34mtoEqual[39m(before)[33m;[39m
+    [90m 71| [39m    [34mexpect[39m(all)[33m.[39m[34mtoHaveLength[39m([34m8[39m)[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mTemplateShelf shows upright books on embossed planks with a see-all link per shelf
+[31m[1mAssertionError[22m: data-book=: expected +0 to be 8 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 8[39m
+[31m+ 0[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m134:120[22m[39m
+    [90m132| [39m    [34mexpect[39m(html[33m.[39m[34mmatch[39m([36m/<h3/g[39m)[33m?.[39mlength)[33m.[39m
+[34mtoBe[39m([34m4[39m)[33m;[39m
+    [90m133| [39m    expect(html.match(/<button[^>]*data-shelf-cover/g)?.length).toBe(8ΓÇª
+    [90m134| [39m    for (const attr of ["data-book=", "data-book-spine", "data-book-tiΓÇª
+    [90m   | [39m                                                                                                    
+                   [31m^[39m
+    [90m135| [39m    [34mexpect[39m(html[33m.[39m[34mmatch[39m([36m/data-shelf-plank/g[39m)[33m?.[39mlength
+)[33m.[39m[34mtoBe[39m([34m4[39m)[33m;[39m
+    [90m136| [39m    const seeAll = [...html.matchAll(/<button[^>]*data-see-all[^>]*>([ΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mshelf source lays shelves side by side and paints planks opaquely
+[31m[1mAssertionError[22m: expected '"use client";\n\nimport { useId, useSΓÇª' to contain 'lg:grid-cols-2'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- lg:grid-cols-2[39m
+[31m+ "use client";[39m
+[31m+[39m
+[31m+ import { useId, useState } from "react";[39m
+[31m+ import { CategoryIcon } from "@/components/site-art/category-icon";[39m
+[31m+ import { SiteArt } from "@/components/site-art/site-art";[39m
+[31m+ import { fmt } from "@/lib/format";[39m
+[31m+ import type { Dictionary } from "@/lib/i18n";[39m
+[31m+ import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";[39m
+[31m+ import { groupByShelf, searchCategories } from "./gallery-logic";[39m
+[31m+ import { useGallery } from "./gallery-provider";[39m
+[31m+[39m
+[31m+ type Copy = Dictionary["landing"]["shelf"];[39m
+[31m+[39m
+[31m+ const TAB =[39m
+[31m+   "min-h-11 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:text-background";[39m
+[31m+ const ROW = "flex snap-x gap-4 overflow-x-auto px-1 pb-2 pt-4 lg:flex-wrap lg:overflow-visible";[39m
+[31m+[39m
+[31m+ /** Template shelf: covers grouped per shelf (or all in a grid), filtered client-side; each cover opens the 
+viewer. */[39m
+[31m+ export function TemplateShelf({ copy }: { copy: Copy }) {[39m
+[31m+   const gallery = useGallery();[39m
+[31m+   const [view, setView] = useState<"shelves" | "all">("shelves");[39m
+[31m+   const [query, setQuery] = useState("");[39m
+[31m+   const searchId = useId();[39m
+[31m+   const results = searchCategories(SITE_CATEGORIES, query, gallery.labels);[39m
+[31m+[39m
+[31m+   const cover = (c: SiteCategory, wide = false) => {[39m
+[31m+     const name = (gallery.labels.items[c.id] as { name: string }).name;[39m
+[31m+     return ([39m
+[31m+       <li key={c.id} className={wide ? "" : "w-40 shrink-0 snap-start sm:w-44"}>[39m
+[31m+         <button[39m
+[31m+           type="button"[39m
+[31m+           data-shelf-cover=""[39m
+[31m+           aria-label={fmt(gallery.copy.openPanel, { category: name })}[39m
+[31m+           onClick={(e) => gallery.open(c.id, e.currentTarget)}[39m
+[31m+           className="clay-card flex aspect-[3/4] w-full flex-col gap-2 rounded-[1.25rem] p-3 text-left 
+transition-transform duration-300 hover:-translate-y-2 hover:-rotate-2 focus-visible:-translate-y-2 
+focus-visible:-rotate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
+motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:rotate-0 
+motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:rotate-0"[39m
+[31m+         >[39m
+[31m+           <CategoryIcon id={c.id} className="size-6 text-[var(--fuse-accent-text)]" />[39m
+[31m+           <span className="font-narrow text-sm uppercase tracking-wider text-foreground">{name}</span>[39m
+[31m+           <span className="mt-auto block overflow-hidden rounded-xl border border-border">[39m
+[31m+             <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-full" />[39m
+[31m+           </span>[39m
+[31m+           <span className="text-xs text-muted-foreground">{copy.pagesCount}</span>[39m
+[31m+         </button>[39m
+[31m+       </li>[39m
+[31m+     );[39m
+[31m+   };[39m
+[31m+[39m
+[31m+   return ([39m
+[31m+     <div>[39m
+[31m+       <div className="flex flex-wrap items-center gap-4">[39m
+[31m+         <div role="group" aria-label={copy.tabsLabel} className="flex gap-1 rounded-full border border-border 
+p-1">[39m
+[31m+           <button type="button" aria-pressed={view === "shelves"} onClick={() => setView("shelves")} 
+className={TAB}>[39m
+[31m+             {copy.tabShelves}[39m
+[31m+           </button>[39m
+[31m+           <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} 
+className={TAB}>[39m
+[31m+             {copy.tabAll}[39m
+[31m+           </button>[39m
+[31m+         </div>[39m
+[31m+         <label htmlFor={searchId} className="sr-only">[39m
+[31m+           {copy.searchLabel}[39m
+[31m+         </label>[39m
+[31m+         <input[39m
+[31m+           type="search"[39m
+[31m+           id={searchId}[39m
+[31m+           value={query}[39m
+[31m+           onChange={(e) => setQuery(e.target.value)}[39m
+[31m+           placeholder={copy.searchPlaceholder}[39m
+[31m+           className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-transparent px-5 text-sm 
+text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
+focus-visible:ring-ring"[39m
+[31m+         />[39m
+[31m+         <p aria-live="polite" className="text-sm text-muted-foreground">[39m
+[31m+           {fmt(copy.count, { n: results.length })}[39m
+[31m+         </p>[39m
+[31m+       </div>[39m
+[31m+[39m
+[31m+       {results.length === 0 ? ([39m
+[31m+         <p className="mt-10 text-center text-muted-foreground">{fmt(copy.empty, { q: query.trim() })}</p>[39m
+[31m+       ) : view === "shelves" ? ([39m
+[31m+         groupByShelf(results).map((g) => ([39m
+[31m+           <section key={g.shelf} className="mt-10">[39m
+[31m+             <h3 className="font-wide text-lg">{gallery.labels.shelves[g.shelf]}</h3>[39m
+[31m+             <ul className={ROW}>{g.items.map((c) => cover(c))}</ul>[39m
+[31m+             <div aria-hidden="true" className="h-3 rounded-full bg-card bg-[image:var(--fuse-card-bg)] 
+shadow-[0_10px_18px_-8px_rgb(0_0_0/0.45)]" />[39m
+[31m+           </section>[39m
+[31m+         ))[39m
+[31m+       ) : ([39m
+[31m+         <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{results.map((c) => cover(c, 
+true))}</ul>[39m
+[31m+       )}[39m
+[31m+     </div>[39m
+[31m+   );[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 03:58:08
+[2m   Duration [22m 2.64s[2m (transform 310ms, setup 0ms, collect 1.72s, tests 131ms, environment 1ms, prepare 454ms)[22m
+
+[31m+ }[39m
+[31m+[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m147:135[22m[39m
+    [90m145| [39m  it("shelf source lays shelves side by side and paints planks opaquelΓÇª
+    [90m146| [39m    const src = read("src/components/landing/gallery/template-shelf.tsΓÇª
+    [90m147| [39m    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "filterByShelf"ΓÇª
+    [90m   | [39m                                                                                                    
+                                  [31m^[39m
+    [90m148| [39m    for (const s of ["bg-[var(--fuse-card-bg)]", "backdrop", "setInterΓÇª
+    [90m149| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mnew shelf keys exist in id and en with placeholders
+[31m[1mAssertionError[22m: seeAll: expected 'undefined' to be 'string' // Object.is equality[39m
+
+Expected: [32m"string"[39m
+Received: [31m"undefined"[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m155:100[22m[39m
+    [90m153| [39m    [35mconst[39m en [33m=[39m [33mDICTS[39m[33m.[39men[33m.[39mlanding[33m.[39mshelf 
+[35mas[39m [33mRecord[39m[33m<[39mstring[33m,[39m string[33m>[39m[33m;[39m
+    [90m154| [39m    [35mfor[39m ([35mconst[39m s [35mof[39m [id[33m,[39m en]) {
+    [90m155| [39m      for (const k of ["seeAll", "seeAllShelf", "shelfOnly", "allShelvΓÇª
+    [90m   | [39m                                                                                                   
+[31m^[39m
+    [90m156| [39m      
+[34mexpect[39m(s[33m.[39mseeAllShelf)[33m.[39m[34mtoContain[39m([32m"{shelf}"[39m)[33m;[39m
+    [90m157| [39m      
+[34mexpect[39m(s[33m.[39mshelfOnly)[33m.[39m[34mtoContain[39m([32m"{shelf}"[39m)[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/4]ΓÄ»[22m[39m
+

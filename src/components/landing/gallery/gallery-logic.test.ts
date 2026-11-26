@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { VIEWER_INITIAL, keyToAction, pointerTilt, viewerReducer, wallPose, type ViewerState } from "./gallery-logic";
+import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { VIEWER_INITIAL, filterByShelf, keyToAction, pointerTilt, viewerReducer, wallPose, type ViewerState } from "./gallery-logic";
 
 const opened = (page: 0 | 1 | 2 = 0): ViewerState => ({ open: "marketplace", page, dir: 1 });
 
@@ -61,6 +62,17 @@ describe("gallery logic", () => {
     expect(steps[1]).toBeGreaterThan(steps[2]);
     const odd = wallPose(1, 3);
     for (const v of [odd.rotateY, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
+  });
+
+  it("filterByShelf keeps one shelf or everything", () => {
+    const before = SITE_CATEGORIES.map((c) => c.id);
+    const all = filterByShelf(SITE_CATEGORIES, null);
+    expect(all.map((c) => c.id)).toEqual(before);
+    expect(all).toHaveLength(8);
+    expect(all).not.toBe(SITE_CATEGORIES);
+    expect(filterByShelf(SITE_CATEGORIES, "learn").map((c) => c.id)).toEqual(["lms", "news"]);
+    expect(filterByShelf(SITE_CATEGORIES, "tech").map((c) => c.id)).toEqual(["api"]);
+    expect(SITE_CATEGORIES.map((c) => c.id)).toEqual(before);
   });
 
   it("pointerTilt is clamped to -1..1 and safe for zero width", () => {
