@@ -102,6 +102,28 @@ describe("hero wall", () => {
     for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
   });
 
+  it("hover slide of the panel art never exceeds the column's spare height, and the static row scrolls", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const art = read("src/components/site-art/site-art.tsx");
+    const W = Number(art.match(/const W = (\d+)/)![1]);
+    const H = Number(art.match(/const H = (\d+)/)![1]);
+    const column = 3 * (H / W); // three stacked pages, in panel widths
+    const frames = [...src.matchAll(/aspect-\[(\d+)\/(\d+)\]/g)]
+      .filter((m) => m[1] !== "100") // the reflection strip, not a frame
+      .map((m) => Number(m[2]) / Number(m[1]));
+    expect(frames.sort()).toEqual([4 / 3, 3 / 2]);
+    const shifts = [...src.matchAll(/group-(?:hover|focus-visible):-translate-y-\[(\d+(?:\.\d+)?)%\]/g)].map((m) => Number(m[1]));
+    expect(shifts.length).toBeGreaterThanOrEqual(2);
+    for (const frame of frames)
+      for (const s of shifts) expect(s / 100, `shift ${s}% in frame ${frame}`).toBeLessThanOrEqual((column - frame) / column);
+
+    const row = src.match(/<ul className="([^"]+)"/)![1].split(/\s+/);
+    for (const c of ["snap-x", "snap-mandatory", "overflow-x-auto", "lg:pointer-fine:motion-safe:overflow-visible", "lg:pointer-fine:motion-safe:justify-center"])
+      expect(row, c).toContain(c);
+    // Without motion the flat row is wider than the screen: it must stay scrollable and not centred (centring clips the left edge).
+    for (const c of ["lg:pointer-fine:overflow-visible", "lg:pointer-fine:justify-center"]) expect(row, c).not.toContain(c);
+  });
+
   it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {
     const css = read("src/app/globals.css");
     for (const s of ["@keyframes gallery-focus", "animation-timeline: view(inline)", "@supports (animation-timeline: view())", "prefers-reduced-motion: no-preference"])

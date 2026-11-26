@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { fmt } from "@/lib/format";
 import { GATE_MAPPING, gateFacts } from "@/lib/landing-facts";
 import { GateLoop } from "./gate-loop";
-import { loopLayout } from "./loop-geometry";
+import { LOOP_LABEL_HALF, LOOP_VIEW, loopLayout } from "./loop-geometry";
 
 type Json = Record<string, unknown>;
 type Props = Parameters<typeof GateLoop>[0];
@@ -58,6 +58,42 @@ function points(d: string): { x: number; y: number }[] {
   return out;
 }
 
+/** Points sampled along an "M p (C c c p | L p)*" path, so bounds check the drawn curve, not only control points. */
+function sample(d: string): { x: number; y: number }[] {
+  const tokens = d.match(/[MCL]|-?\d+(\.\d+)?/g) ?? [];
+  const out: { x: number; y: number }[] = [];
+  let cur = { x: 0, y: 0 };
+  let cmd = "";
+  const nums: number[] = [];
+  const flush = () => {
+    if (cmd === "M" || cmd === "L") cur = { x: nums[0], y: nums[1] };
+    if (cmd === "C") {
+      const [c1x, c1y, c2x, c2y, x, y] = nums;
+      for (let k = 0; k <= 20; k++) {
+        const t = k / 20;
+        const u = 1 - t;
+        out.push({
+          x: u ** 3 * cur.x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t ** 3 * x,
+          y: u ** 3 * cur.y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t ** 3 * y,
+        });
+      }
+      cur = { x, y };
+    }
+    out.push(cur);
+    nums.length = 0;
+  };
+  for (const tok of tokens) {
+    if (/[MCL]/.test(tok)) {
+      if (cmd) flush();
+      cmd = tok;
+    } else nums.push(Number(tok));
+  }
+  if (cmd) flush();
+  return out;
+}
+
+const LANE_HALF = 14; // half the raised lane stroke (strokeWidth 28)
+
 function keys(value: unknown, prefix = ""): string[] {
   if (value === null || typeof value !== "object" || Array.isArray(value)) return [prefix];
   return Object.entries(value as Json).flatMap(([k, v]) => keys(v, prefix ? `${prefix}.${k}` : k));
@@ -68,19 +104,20 @@ describe("gate loop geometry", () => {
     const { stations } = loopLayout(5);
     expect(stations).toHaveLength(5);
     for (let i = 1; i < 5; i++) expect(stations[i].x).toBeGreaterThan(stations[i - 1].x);
-    expect(stations[0].x).toBe(90);
-    expect(stations[4].x).toBe(910);
+    expect(stations[0].x).toBe(LOOP_VIEW.margin);
+    expect(stations[4].x).toBe(LOOP_VIEW.width - LOOP_VIEW.margin);
     expect(stations.map((s) => s.y)).toEqual([110, 230, 110, 230, 110]);
   });
 
   it("forward path runs through every station and the back path returns below to station 1", () => {
     const { forward, back, stations } = loopLayout(5);
     const last = stations[4];
-    expect(forward.startsWith("M90 110")).toBe(true);
+    const start = `${stations[0].x} ${stations[0].y}`;
+    expect(forward.startsWith(`M${start}`)).toBe(true);
     expect(forward.trim().endsWith(`${last.x} ${last.y}`)).toBe(true);
     expect(forward.match(/C/g)).toHaveLength(4);
     expect(back.startsWith(`M${last.x} ${last.y}`)).toBe(true);
-    expect(back.trim().endsWith("90 110")).toBe(true);
+    expect(back.trim().endsWith(start)).toBe(true);
     expect(back).toContain("470");
     for (const d of [forward, back])
       for (const p of points(d)) {
@@ -102,6 +139,32 @@ describe("gate loop geometry", () => {
     expect(back[0].angle).toBe(180);
     expect(back[0].y).toBe(470);
   });
+
+  it("the return lane passes outside the text columns of the first and last station", () => {
+    const { back, stations } = loopLayout(5);
+    const first = stations[0];
+    const last = stations[4];
+    expect(LOOP_LABEL_HALF).toBeGreaterThan(0);
+    const ctrl = points(back).map((p) => p.x);
+    expect(Math.min(...ctrl)).toBeLessThanOrEqual(first.x - LOOP_LABEL_HALF - 16);
+    expect(Math.max(...ctrl)).toBeGreaterThanOrEqual(last.x + LOOP_LABEL_HALF + 16);
+    // The drawn curve itself, not only its control points, clears the columns.
+    const drawn = sample(back).map((p) => p.x);
+    expect(Math.min(...drawn)).toBeLessThanOrEqual(first.x - LOOP_LABEL_HALF - 16);
+    expect(Math.max(...drawn)).toBeGreaterThanOrEqual(last.x + LOOP_LABEL_HALF + 16);
+  });
+
+  it("the whole loop, lane width included, stays inside the viewBox", () => {
+    const { forward, back } = loopLayout(5);
+    expect(LOOP_VIEW.margin).toBeGreaterThanOrEqual(LOOP_LABEL_HALF + 16 + LANE_HALF);
+    for (const d of [forward, back])
+      for (const p of [...points(d), ...sample(d)]) {
+        expect(p.x - LANE_HALF).toBeGreaterThanOrEqual(0);
+        expect(p.x + LANE_HALF).toBeLessThanOrEqual(LOOP_VIEW.width);
+        expect(p.y - LANE_HALF).toBeGreaterThanOrEqual(0);
+        expect(p.y + LANE_HALF).toBeLessThanOrEqual(LOOP_VIEW.height);
+      }
+  });
 });
 
 describe("gate loop", () => {
@@ -120,6 +183,21 @@ describe("gate loop", () => {
     expect(html.match(/aria-pressed="true"/g)).toHaveLength(2);
     const pressed = tags.filter((t) => t.includes('aria-pressed="true"'));
     for (const t of pressed) expect(t).toMatch(/data-loop-station(-m)?="0"/);
+  });
+
+  it("station text columns are as wide as 2 x LOOP_LABEL_HALF viewBox units, centred on the station", () => {
+    const html = render("id");
+    const cols = [...html.matchAll(/<div[^>]*data-loop-col=[^>]*>/g)].map((m) => m[0]);
+    expect(cols).toHaveLength(5);
+    // The overlay spans the full viewBox width, so viewBox units map to % of its width.
+    const width = `width:${(LOOP_LABEL_HALF * 2 * 100) / LOOP_VIEW.width}%`;
+    const { stations } = loopLayout(5);
+    cols.forEach((tag, i) => {
+      expect(tag).toContain(width);
+      expect(tag).toContain(`left:${stations[i].x / 10}%`);
+      expect(tag).toContain("-translate-x-1/2");
+      expect(tag).not.toMatch(/\bw-\d/);
+    });
   });
 
   it("sub-step counts are 5, 6, 6, 4, 5 and total 26", () => {
