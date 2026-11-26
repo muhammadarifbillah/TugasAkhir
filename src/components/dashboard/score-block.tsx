@@ -21,12 +21,14 @@ export function ScoreBlock({
   scannedAt,
   scoreStale,
   labels,
+  compact = false,
 }: {
   score: number | null;
   scoreSource: "scanner" | "ai" | null;
   scannedAt: string | null;
   scoreStale: boolean;
   labels: Labels;
+  compact?: boolean;
 }) {
   const band = scoreBand(score);
   const bandText = { good: labels.scoreGood, fair: labels.scoreFair, poor: labels.scorePoor, none: null }[band];
@@ -41,10 +43,10 @@ export function ScoreBlock({
     },
   );
   return (
-    <div className="rounded-lg border px-3 py-2">
+    <div className={compact ? undefined : "rounded-lg border px-3 py-2"}>
       <span className="text-[11px] text-muted-foreground">{labels.scoreLabel}</span>
       <div className={`flex items-baseline gap-2 ${scoreColorClass(score)}`}>
-        <span className="text-3xl font-semibold tabular-nums">{score ?? "—"}</span>
+        <span className={`${compact ? "text-xl" : "text-3xl"} font-semibold tabular-nums`}>{score ?? "—"}</span>
         {bandText && <span className="text-sm font-medium">{bandText}</span>}
       </div>
       <p className="text-[11px] text-muted-foreground">{source}</p>

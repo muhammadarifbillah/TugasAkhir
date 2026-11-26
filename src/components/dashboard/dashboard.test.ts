@@ -204,7 +204,7 @@ describe("dashboard components", () => {
     expect(css).not.toContain(".dashboard-poster");
   });
 
-  const STATS_FIXTURE = [
+  const STATS_FIXTURE: { status: string; score: number | null; scoreSource: string | null }[] = [
     { status: "in_progress", score: 80, scoreSource: "scanner" },
     { status: "draft", score: 70, scoreSource: "ai" },
     { status: "completed", score: 91, scoreSource: "scanner" },

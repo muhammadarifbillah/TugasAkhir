@@ -1,9 +1,18 @@
-.dashboard-poster {
-  width: min(14rem, 60vw);
-  margin-inline: auto;
+.project-card { border-radius: 1.75rem; border: 1px solid var(--border); padding: 0.75rem; background: var(--fuse-card-bg, var(--card)); box-shadow: var(--fuse-sheen, none), var(--fuse-shadow-soft, none); transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
+.project-card-bezel { position: relative; border-radius: 1.25rem; padding: 0.5rem; background: var(--fuse-bg, var(--muted)); box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.25), var(--fuse-sheen, none); }
+.project-card-screen { aspect-ratio: 16 / 10; overflow: hidden; border-radius: 0.875rem; background: #ffffff; }
+.project-card-art { display: flex; flex-direction: column; transition: transform 1.6s var(--ease-out); }
+.project-card-enter { animation: project-card-in 360ms var(--ease-out) both; animation-delay: calc(var(--card-index, 0) * 50ms); }
+@keyframes project-card-in { from { opacity: 0; transform: translateY(12px); } }
+@media (hover: hover) {
+  .project-card:hover, .project-card:focus-within { transform: translateY(-4px); box-shadow: var(--fuse-sheen, none), var(--fuse-shadow-soft, none), 0 0 0 1px var(--fuse-glow, var(--ring)); }
+  .project-card:hover .project-card-art, .project-card:focus-within .project-card-art { transform: translateY(-50%); }
 }
-
-/* No odometer digits or stamp text on the dashboard poster: the numbers would be fake. */
-.dashboard-poster .iso-face-text {
-  visibility: hidden;
+@media (prefers-reduced-motion: reduce) {
+  .project-card, .project-card-art, .project-card-enter { transition: none; animation: none; }
+  .project-card:hover, .project-card:focus-within, .project-card:hover .project-card-art, .project-card:focus-within .project-card-art { transform: none; }
 }
+.dashboard-stat { border-radius: 1.25rem; border: 1px solid var(--border); background: var(--fuse-card-bg, var(--card)); box-shadow: var(--fuse-sheen, none), var(--fuse-shadow-soft, none); }
+.dashboard-collage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; width: min(36rem, 100%); }
+.dashboard-collage > svg { border-radius: 0.75rem; box-shadow: var(--fuse-shadow-soft, none); }
+.dashboard-collage > svg:nth-child(2) { transform: translateY(-0.75rem); }

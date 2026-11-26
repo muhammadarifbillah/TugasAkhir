@@ -7,16 +7,19 @@ export function GateRail({
   stageProgress,
   stageNames,
   labels,
+  compact = false,
 }: {
   activeStage: string;
   stageProgress: { completed: number; total: number };
   stageNames: string[];
   labels: { gates: string; gateActive: string; allDone: string };
+  /** Card already shows the hallmark + label row, so drop it here. */
+  compact?: boolean;
 }) {
   const { segments, activeIndex } = gateRail(activeStage, stageProgress);
   return (
     <div className="flex flex-col gap-1.5">
-      <span className="text-[11px] text-muted-foreground">{labels.gates}</span>
+      <span className={compact ? "sr-only" : "text-[11px] text-muted-foreground"}>{labels.gates}</span>
       <div aria-hidden="true" className="flex gap-1.5">
         {segments.map((s) => (
           <span
@@ -36,14 +39,16 @@ export function GateRail({
           />
         ))}
       </div>
-      <p className="flex items-center gap-1.5 text-xs">
-        <Hallmark stage={activeIndex === null ? 5 : segments[activeIndex]!.n} className="size-4" />
-        <span>
-          {activeIndex === null
-            ? labels.allDone
-            : `${fmt(labels.gateActive, { n: activeIndex + 1 })} · ${stageNames[activeIndex] ?? ""}`}
-        </span>
-      </p>
+      {!compact && (
+        <p className="flex items-center gap-1.5 text-xs">
+          <Hallmark stage={activeIndex === null ? 5 : segments[activeIndex]!.n} className="size-4" />
+          <span>
+            {activeIndex === null
+              ? labels.allDone
+              : `${fmt(labels.gateActive, { n: activeIndex + 1 })} · ${stageNames[activeIndex] ?? ""}`}
+          </span>
+        </p>
+      )}
     </div>
   );
 }

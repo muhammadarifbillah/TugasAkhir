@@ -4,16 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ViewTransition, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
-import {
-  ArrowRight,
-  FolderGit2,
-  GitPullRequest,
-  Search,
-  RefreshCw,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { FolderGit2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,8 +13,7 @@ import type { Dictionary } from "@/lib/i18n";
 import { csrfFetch } from "@/lib/csrf-client";
 import { GATE_CODES, isSearchShortcut, matchesGate, type GateCode } from "@/lib/dashboard-view";
 import { fmt } from "@/lib/format";
-import { GateRail } from "@/components/dashboard/gate-rail";
-import { ScoreBlock } from "@/components/dashboard/score-block";
+import { ProjectCard } from "@/components/dashboard/project-card";
 
 export interface ProjectCardData {
   id: string;
@@ -39,6 +30,7 @@ export interface ProjectCardData {
   revisionCount: number;
   updatedAt: string;
   scannedAt: string | null;
+  template: string | null;
 }
 
 type FilterKey = "all" | "in_progress" | "completed" | "in_revision";
@@ -141,11 +133,11 @@ export function ProjectList({
             placeholder={dict.dashboard.searchHint}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="pl-9"
+            className="h-11 pl-9 md:h-10"
           />
         </div>
         <Select value={gate} onValueChange={(v) => setGate(v as "all" | GateCode)}>
-          <SelectTrigger aria-label={dict.dashboard.gateFilter} className="w-full md:w-56">
+          <SelectTrigger aria-label={dict.dashboard.gateFilter} className="h-11 w-full md:h-10 md:w-56">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -162,6 +154,7 @@ export function ProjectList({
             <Button
               key={chip.key}
               size="sm"
+              className="h-11 md:h-8"
               variant={filter === chip.key ? "default" : "outline"}
               onClick={() => setFilter(chip.key)}
             >
@@ -198,98 +191,29 @@ export function ProjectList({
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false}>
-            {filtered.map((p) => {
-              const status = p.status === "completed"
-                ? { variant: "success" as const, text: dict.dashboard.statusCompleted }
-                : p.status === "in_revision"
-                  ? { variant: "warning" as const, text: dict.dashboard.statusInRevision }
-                  : p.status === "draft"
-                    ? { variant: "default" as const, text: dict.dashboard.statusDraft }
-                    : { variant: "muted" as const, text: dict.dashboard.statusInProgress };
-              return (
-                <m.div
-                  key={p.id}
-                  layout
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.97 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card
-                    className="group relative overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:border-primary/50"
-                  >
-                    <span
-                      className={`absolute inset-x-0 top-0 h-1 ${
-                        p.status === "completed"
-                          ? "bg-success"
-                          : p.status === "in_revision"
-                            ? "bg-warning"
-                            : p.status === "draft"
-                              ? "bg-muted-foreground/40"
-                              : "bg-primary"
-                      }`}
-                      aria-hidden="true"
-                    />
-                    <CardHeader>
-                      <div className="flex items-start gap-3">
-                        <div className="min-w-0 flex-1">
-                          <ViewTransition name={`project-title-${p.id}`} share="morph" default="none">
-                            <p className="line-clamp-2 break-words font-semibold">{p.name}</p>
-                          </ViewTransition>
-                          {p.description && (
-                            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{p.description}</p>
-                          )}
-                        </div>
-                        <span className="shrink-0">
-                          <Badge variant={status.variant}>{status.text}</Badge>
-                        </span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="flex flex-col gap-3">
-                      <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <Badge variant="secondary">#{p.stack}</Badge>
-                        <Badge variant="outline">{dict.dashboard.version}: {p.version}</Badge>
-                        {p.revisionCount > 0 && (
-                          <Badge variant="outline">
-                            <GitPullRequest className="size-3" /> {p.revisionCount}
-                          </Badge>
-                        )}
-                      </div>
-
-                      <GateRail
-                        activeStage={p.activeStage}
-                        stageProgress={p.stageProgress}
-                        stageNames={GATE_CODES.map((code) => dict.stages[code].name)}
-                        labels={{ gates: dict.dashboard.gatesLabel, gateActive: dict.dashboard.gateActive, allDone: dict.dashboard.gatesAllDone }}
-                      />
-                      <ScoreBlock
-                        score={p.score}
-                        scoreSource={p.scoreSource}
-                        scannedAt={p.scannedAt}
-                        scoreStale={p.scoreStale}
-                        labels={dict.dashboard}
-                      />
-
-                      <div className="mt-1 flex flex-wrap items-center justify-end gap-2">
-                        <div className="flex gap-2">
-                          {p.status === "completed" && (
-                            <Button size="sm" variant="outline" onClick={() => revise(p)} disabled={revisingId === p.id}>
-                              <RefreshCw className={`size-3 ${revisingId === p.id ? "animate-spin" : ""}`} />
-                              {dict.dashboard.revise}
-                            </Button>
-                          )}
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/${lang}/studio/${p.id}/${p.activeStage}`} transitionTypes={["nav-forward"]}>
-                              {dict.dashboard.openStudio} <ArrowRight className="size-3" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </m.div>
-              );
-            })}
+            {filtered.map((p, i) => (
+              <m.div
+                key={p.id}
+                layout
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.2 }}
+                className="project-card-enter"
+                style={{ "--card-index": Math.min(i, 8) } as React.CSSProperties}
+              >
+                <ProjectCard
+                  project={p}
+                  dict={dict}
+                  lang={lang}
+                  revising={revisingId === p.id}
+                  onRevise={() => revise(p)}
+                  renderTitle={(t) => (
+                    <ViewTransition name={`project-title-${p.id}`} share="morph" default="none">
+                      {t}
+                    </ViewTransition>
+                  )}
+                />
+              </m.div>
+            ))}
           </AnimatePresence>
         </div>
       )}
