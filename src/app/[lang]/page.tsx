@@ -9,7 +9,9 @@ import { Faq } from "@/components/landing/faq";
 import { GateCoupons } from "@/components/landing/gate-coupons";
 import { GateLinkProvider } from "@/components/landing/gate-link";
 import { Glossary } from "@/components/landing/glossary";
-import { HeroTape } from "@/components/landing/hero-tape/hero-tape";
+import { GalleryProvider } from "@/components/landing/gallery/gallery-provider";
+import { HeroWall } from "@/components/landing/gallery/hero-wall";
+import { TemplateShelf } from "@/components/landing/gallery/template-shelf";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { primaryCta } from "@/components/landing/primary-cta";
@@ -70,31 +72,32 @@ export default async function HomePage({ params }: HomePageProps) {
     <PageTransition>
       <div className="landing">
         <LandingMotion>
-          {/* Hero: headline first (LCP), then the Pita Pindai stage and its findings table. */}
-          <section id="mulai-hero" className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
-            <div className="mx-auto max-w-4xl px-4 text-center">
-              <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.headline}</h1>
-              <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">
-                {fmt(l.heroSub, { name: dict.app.name })}
-              </p>
-              <p className="mx-auto mt-4 max-w-[62ch] text-sm leading-relaxed text-muted-foreground">
-                {fmt(l.heroLede, { name: dict.app.name })}
-              </p>
-              <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-                <Link href={cta.href} className="clay-btn">
-                  {l[cta.label]}
-                </Link>
-                <Link href="#bukti" className="clay-btn-ghost">
-                  {l.ctaSample}
-                </Link>
+          <GalleryProvider lang={lang} appName={dict.app.name} labels={dict.categories} copy={l.gallery}>
+            {/* Hero: headline first (LCP), then the gallery wall of the eight categories. */}
+            <section id="mulai-hero" className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
+              <div className="mx-auto max-w-4xl px-4 text-center">
+                <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.gallery.headline}</h1>
+                <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.gallery.sub}</p>
+                <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+                  <Link href={cta.href} className="clay-btn">
+                    {l[cta.label]}
+                  </Link>
+                  <Link href="#rak" className="clay-btn-ghost">
+                    {l.gallery.ctaShelf}
+                  </Link>
+                </div>
               </div>
-            </div>
-            <div className="mx-auto mt-12 max-w-5xl px-4">
-              <HeroTape copy={l.heroTape} />
-            </div>
-          </section>
+              <div className="mt-12">
+                <HeroWall />
+              </div>
+            </section>
 
-          <StandardsStrip label={l.stripLabel} items={l.stripItems} />
+            <StandardsStrip label={l.stripLabel} items={l.stripItems} />
+
+            <ClaySection id="rak" pill={l.shelf.pill} title={l.shelf.title} lede={l.shelf.lede}>
+              <TemplateShelf copy={l.shelf} />
+            </ClaySection>
+          </GalleryProvider>
 
           <ClaySection id="masalah" pill={l.pills.problem} title={l.problemTitle} band>
             <ProblemSection

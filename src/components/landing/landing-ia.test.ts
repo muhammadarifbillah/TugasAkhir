@@ -42,6 +42,7 @@ describe("landing information architecture", () => {
     const ids = [...read(PAGE).matchAll(/\bid="([a-z-]+)"/g)].map((m) => m[1]).filter((id) => !id.endsWith("-title"));
     expect(ids).toEqual([
       "mulai-hero",
+      "rak",
       "masalah",
       "tentang",
       "gerbang",
@@ -54,6 +55,13 @@ describe("landing information architecture", () => {
       "pelajari",
       "mulai",
     ]);
+  });
+
+  it("template shelf sits between the standards strip and the problem section", () => {
+    const page = read(PAGE);
+    const at = ["<HeroWall", "<StandardsStrip", "<TemplateShelf", 'id="masalah"'].map((s) => page.indexOf(s));
+    expect(at.every((i) => i >= 0)).toBe(true);
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
   });
 
   it("guard cards live inside the about section", () => {
