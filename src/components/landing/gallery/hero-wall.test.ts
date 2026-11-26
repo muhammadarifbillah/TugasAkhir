@@ -24,7 +24,7 @@ const escape = (s: string) =>
 
 const html = () =>
   renderToStaticMarkup(
-    createElement(GalleryProvider, { lang: "id", appName: id.app.name, labels, copy }, createElement(HeroWall)),
+    createElement(GalleryProvider, { lang: "id", appName: id.app.name, labels, copy } as ProviderProps, createElement(HeroWall)),
   );
 
 describe("hero wall", () => {
