@@ -103,14 +103,18 @@ describe("section heading entrance", () => {
     expect(files.filter((f) => staticImport.test(read(f)))).toEqual([]);
   });
 
-  it("scenes run hero first, then the entrance", () => {
+  it("LandingMotion loads only gsap, ScrollTrigger, lenis and the entrance scene", () => {
     const motion = read(MOTION);
-    const call = motion.indexOf("initLandingScroll(", motion.indexOf("Promise.all(["));
+    const all = motion.indexOf("Promise.all([");
+    expect(all).toBeGreaterThan(-1);
+    const group = motion.slice(all, motion.indexOf("])", all) + 2);
+    const loaded = [...group.matchAll(/import\(\s*"([^"]+)"\s*\)/g)].map((m) => m[1]);
+    expect(group.match(/import\(/g)).toHaveLength(4);
+    expect(loaded).toEqual(["gsap", "gsap/ScrollTrigger", "lenis", "./section-entrance"]);
+    const call = motion.indexOf("initLandingScroll(", all);
     expect(call).toBeGreaterThan(-1);
     const args = motion.slice(call, motion.indexOf(");", call));
-    const hero = args.indexOf("heroTapeScene");
-    const entrance = args.indexOf("entranceScene");
-    expect(hero).toBeGreaterThan(-1);
-    expect(entrance).toBeGreaterThan(hero);
+    expect(args).toContain("entranceScene");
+    expect(args).not.toContain("heroTapeScene");
   });
 });
