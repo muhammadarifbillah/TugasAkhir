@@ -42,21 +42,25 @@ describe("gallery logic", () => {
     for (const k of ["Enter", "a", "ArrowUp"]) expect(keyToAction(k)).toBeNull();
   });
 
-  it("wallPose curves eight panels symmetrically", () => {
+  it("wallPose builds a coverflow panorama with a prominent centre", () => {
     const n = 8;
     const poses = Array.from({ length: n }, (_, i) => wallPose(i, n));
+    expect(poses.map((p) => p.rotateY)).toEqual([39, 24, 12, 3, -3, -12, -24, -39]);
+    expect(poses.map((p) => p.z)).toEqual([-216, -108, -36, 0, 0, -36, -108, -216]);
+    expect(poses.map((p) => p.scale)).toEqual([1, 1, 1, 1.06, 1.06, 1, 1, 1]);
     poses.forEach((p, i) => {
       const mirror = poses[n - 1 - i];
       expect(p.rotateY).toBe(-mirror.rotateY);
       expect(p.z).toBe(mirror.z);
-      expect(Math.abs(p.rotateY)).toBeLessThanOrEqual(21);
-      expect(p.z).toBeGreaterThanOrEqual(0);
-      expect(Object.is(p.rotateY, -0)).toBe(false);
-      expect(Object.is(p.z, -0)).toBe(false);
-      if (i > 0) expect(p.rotateY).toBeLessThan(poses[i - 1].rotateY);
+      expect(p.scale).toBe(mirror.scale);
+      for (const v of [p.rotateY, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
     });
-    expect(poses[0].z).toBeGreaterThan(poses[3].z);
-    expect(Object.is(wallPose(1, 3).rotateY, -0)).toBe(false);
+    // Step between neighbours grows towards the edges (left half, mirrored on the right).
+    const steps = [0, 1, 2].map((i) => Math.abs(poses[i].rotateY) - Math.abs(poses[i + 1].rotateY));
+    expect(steps[0]).toBeGreaterThan(steps[1]);
+    expect(steps[1]).toBeGreaterThan(steps[2]);
+    const odd = wallPose(1, 3);
+    for (const v of [odd.rotateY, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
   });
 
   it("pointerTilt is clamped to -1..1 and safe for zero width", () => {
