@@ -18,14 +18,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HelpTip } from "@/components/ui/help-tip";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/toast";
 import { DesignScreen } from "@/components/studio/design-screen";
 import { FullscreenViewer } from "@/components/studio/fullscreen-viewer";
 import { csrfFetch } from "@/lib/csrf-client";
 import {
   MAX_SCREENS,
+  mockupDevicesFor,
   normalizePlan,
   planPageKey,
+  screenForHref,
   uniqueScreensById,
   type DesignPlan,
   type DesignPlanRole,
@@ -64,12 +68,23 @@ export interface DesignStudioLabels {
   addPage: string;
   stale: string;
   revise: string;
+  targetsLocked: string;
+  startInteractive: string;
+  stopInteractive: string;
+  noMockupForLink: string;
+  help: string;
+  helpLabel: string;
+  saveDone: string;
+  generateDone: string;
+  planSaved: string;
 }
 
 interface DesignStudioDialogProps {
   projectId: string;
   savedScreens: DesignScreenType[];
   designPlan?: unknown;
+  /** Platforms declared at the needs step; viewports outside them stay locked. */
+  targets: string[];
   labels: DesignStudioLabels;
   onClose: () => void;
   onSaved?: () => void;
@@ -94,12 +109,15 @@ export function DesignStudioDialog({
   projectId,
   savedScreens,
   designPlan,
+  targets,
   labels,
   onClose,
   onSaved,
   onAiFinished,
 }: DesignStudioDialogProps) {
   const headingId = useId();
+  const { addToast } = useToast();
+  const allowedDevices = useMemo(() => mockupDevicesFor(targets), [targets]);
   const [saved, setSaved] = useState<DesignScreenType[]>(savedScreens);
   const [drafts, setDrafts] = useState<DesignScreenType[]>([]);
   const [plan, setPlan] = useState<DesignPlan>(() => normalizePlan(designPlan));
@@ -111,7 +129,7 @@ export function DesignStudioDialog({
   const [selectedId, setSelectedId] = useState<string | null>(savedScreens[0]?.id ?? null);
   const [prompt, setPrompt] = useState("");
   const [refinePrompt, setRefinePrompt] = useState("");
-  const [device, setDevice] = useState<Device>("desktop");
+  const [device, setDevice] = useState<Device>(() => allowedDevices[0] ?? "desktop");
   const [loading, setLoading] = useState(false);
   const [busyKind, setBusyKind] = useState<"generate" | "refine" | "generate-all" | null>(null);
   const [saving, setSaving] = useState(false);
@@ -187,6 +205,7 @@ export function DesignStudioDialog({
         return false;
       }
       setSaved(unique);
+        addToast("success", labels.saveDone);
         onSaved?.();
         return true;
       } catch {
@@ -196,7 +215,7 @@ export function DesignStudioDialog({
         setSaving(false);
       }
     },
-    [projectId, labels.error, onSaved],
+    [projectId, labels.error, labels.saveDone, addToast, onSaved],
   );
 
   const generate = useCallback(
@@ -252,6 +271,7 @@ export function DesignStudioDialog({
             return [...prev, ...list.filter((s) => !have.has(s.id))];
           });
           setSelectedId(first.id);
+          addToast("success", labels.generateDone);
         }
       } catch {
         setError(labels.error);
@@ -260,7 +280,7 @@ export function DesignStudioDialog({
         setBusyKind(null);
       }
     },
-    [projectId, device, labels.error, saved, persist, plan.version],
+    [projectId, device, labels.error, labels.generateDone, addToast, saved, persist, plan.version],
   );
 
   const generateAllForRole = useCallback(
@@ -395,6 +415,7 @@ export function DesignStudioDialog({
       }
       setPlan(normalizePlan(data.plan));
       setPlanEditing(false);
+      addToast("success", labels.planSaved);
       onAiFinishedRef.current?.(["ui"]);
       onSaved?.();
     } catch {
@@ -418,6 +439,7 @@ export function DesignStudioDialog({
       const next = normalizePlan(data.plan);
       setPlan(next);
       setActiveRoleId((id) => (next.roles.some((r) => r.id === id) ? id : next.roles[0]?.id ?? GENERAL));
+      addToast("success", labels.planSaved);
       onAiFinishedRef.current?.(["ui"]);
     } catch {
       setError(labels.error);
@@ -427,24 +449,30 @@ export function DesignStudioDialog({
     }
   }
 
-  const deviceBtn = (value: Device, Icon: typeof Monitor) => (
-    <button
-      type="button"
-      onClick={() => setDevice(value)}
-      aria-pressed={device === value}
-      className={`flex flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
-        device === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
-      }`}
-    >
-      <Icon className="size-3.5" /> {value}
-    </button>
-  );
+  const deviceBtn = (value: Device, Icon: typeof Monitor) => {
+    const allowed = allowedDevices.includes(value);
+    return (
+      <button
+        type="button"
+        onClick={() => setDevice(value)}
+        aria-pressed={device === value}
+        disabled={!allowed}
+        title={allowed ? undefined : labels.targetsLocked}
+        className={`flex flex-1 items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
+          device === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+        }`}
+      >
+        <Icon className="size-3.5" /> {value}
+      </button>
+    );
+  };
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby={headingId} className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
           <h2 id={headingId} className="truncate text-sm font-semibold">{labels.title}</h2>
+          <HelpTip text={labels.help} label={labels.helpLabel} />
           <Badge variant="secondary">
             {saved.length} / {MAX_SCREENS} {labels.savedCount}
           </Badge>
@@ -469,6 +497,11 @@ export function DesignStudioDialog({
             {deviceBtn("tablet", Tablet)}
             {deviceBtn("mobile", Smartphone)}
           </div>
+          {allowedDevices.length < 3 && (
+            <p className="-mt-1 text-[11px] leading-snug text-muted-foreground">
+              {labels.targetsLocked}
+            </p>
+          )}
 
           {/* Regular (free-form) generate */}
           <label htmlFor="design-prompt" className="sr-only">
@@ -807,6 +840,16 @@ export function DesignStudioDialog({
             title={fullscreen.name}
             device={fullscreen.device}
             scaleToFit={false}
+            allowInteractive
+            labels={{
+              start: labels.startInteractive,
+              stop: labels.stopInteractive,
+            }}
+            onNavigate={(href) => {
+              const target = screenForHref(href, all, plan);
+              if (target) setFullscreen(target);
+              else addToast("info", labels.noMockupForLink);
+            }}
           />
         </FullscreenViewer>
       )}

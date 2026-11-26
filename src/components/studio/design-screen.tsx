@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { MousePointerClick } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DesignScreen as DesignScreenType } from "@/lib/design";
 
@@ -11,6 +12,51 @@ const LOGICAL: Record<DesignScreenType["device"], { w: number; h: number }> = {
   mobile: { w: 390, h: 844 },
 };
 
+/**
+ * Allows inline scripts (the mockup's own visual interactions and our bridge)
+ * while forbidding network calls, forms and child frames. Without
+ * `allow-same-origin` the document also cannot reach this app's cookies or DOM.
+ */
+const MOCKUP_CSP = [
+  "default-src 'none'",
+  "img-src * data: blob:",
+  "style-src * 'unsafe-inline'",
+  "font-src * data:",
+  "script-src 'unsafe-inline'",
+  "connect-src 'none'",
+  "form-action 'none'",
+  "frame-src 'none'",
+  "base-uri 'none'",
+].join("; ");
+
+const MOCKUP_MESSAGE_SOURCE = "saksi-mockup";
+
+const MOCKUP_BRIDGE = `<script>
+(function () {
+  function send(href) {
+    try { parent.postMessage({ source: "${MOCKUP_MESSAGE_SOURCE}", href: href }, "*"); } catch (e) {}
+  }
+  document.addEventListener("click", function (e) {
+    var node = e.target;
+    var link = node && node.closest ? node.closest("a[href]") : null;
+    if (!link) return;
+    e.preventDefault();
+    send(link.getAttribute("href") || "");
+  }, true);
+  document.addEventListener("submit", function (e) { e.preventDefault(); }, true);
+})();
+</script>`;
+
+/** Injects the CSP + link bridge into a generated document. */
+function interactiveDocument(html: string): string {
+  const head = `<meta http-equiv="Content-Security-Policy" content="${MOCKUP_CSP}">${MOCKUP_BRIDGE}`;
+  if (/<head[^>]*>/i.test(html)) return html.replace(/<head[^>]*>/i, (tag) => `${tag}${head}`);
+  if (/<html[^>]*>/i.test(html)) {
+    return html.replace(/<html[^>]*>/i, (tag) => `${tag}<head>${head}</head>`);
+  }
+  return `<!doctype html><html><head>${head}</head><body>${html}</body></html>`;
+}
+
 interface DesignScreenProps {
   html: string;
   title: string;
@@ -20,13 +66,18 @@ interface DesignScreenProps {
   /** Card height when scaled to fit. */
   viewportHeight?: number;
   className?: string;
+  /** Offer the "click around" mode (fullscreen only). */
+  allowInteractive?: boolean;
+  /** Called with the href of a clicked mockup link. */
+  onNavigate?: (href: string) => void;
+  labels?: { start: string; stop: string };
 }
 
 /**
- * Renders an AI-generated UI mockup in a locked-down iframe (`sandbox=""` gives
- * it an opaque origin and disables scripts). When `scaleToFit` is on, the mockup
- * is laid out at its logical device width and scaled down to fit the card, so
- * the whole screen is visible instead of being cropped.
+ * Renders an AI-generated UI mockup in a locked-down iframe. By default scripts
+ * are disabled and the frame is inert; the viewer can opt into an interactive
+ * mode where inline scripts run in an opaque origin and only link clicks are
+ * bridged back to the parent.
  */
 export function DesignScreen({
   html,
@@ -35,11 +86,32 @@ export function DesignScreen({
   scaleToFit = true,
   viewportHeight = 240,
   className,
+  allowInteractive = false,
+  onNavigate,
+  labels,
 }: DesignScreenProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [interactive, setInteractive] = useState(false);
   const { w, h } = LOGICAL[device] ?? LOGICAL.desktop;
   const [scale, setScale] = useState(0.3);
   const [left, setLeft] = useState(0);
+
+  const onMessage = useCallback(
+    (event: MessageEvent) => {
+      if (event.source !== frameRef.current?.contentWindow) return;
+      const data = event.data as { source?: unknown; href?: unknown } | null;
+      if (!data || data.source !== MOCKUP_MESSAGE_SOURCE || typeof data.href !== "string") return;
+      onNavigate?.(data.href);
+    },
+    [onNavigate],
+  );
+
+  useEffect(() => {
+    if (!interactive) return;
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [interactive, onMessage]);
 
   useEffect(() => {
     if (!scaleToFit) return;
@@ -64,14 +136,35 @@ export function DesignScreen({
 
   if (!scaleToFit) {
     return (
-      <iframe
-        title={title}
-        srcDoc={html}
-        sandbox=""
-        loading="lazy"
-        style={{ width: w, height: h }}
-        className={cn("border-0 bg-white", className)}
-      />
+      <div className="relative" style={{ width: w, height: h }}>
+        {allowInteractive && (
+          <button
+            type="button"
+            onClick={() => setInteractive((v) => !v)}
+            aria-pressed={interactive}
+            className={cn(
+              "absolute end-2 top-2 z-10 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors",
+              interactive
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-foreground hover:bg-muted",
+            )}
+          >
+            <MousePointerClick className="size-3.5" aria-hidden="true" />
+            {interactive
+              ? (labels?.stop ?? "Stop clicking")
+              : (labels?.start ?? "Click around")}
+          </button>
+        )}
+        <iframe
+          ref={frameRef}
+          title={title}
+          srcDoc={interactive ? interactiveDocument(html) : html}
+          sandbox={interactive ? "allow-scripts" : ""}
+          loading="lazy"
+          style={{ width: w, height: h }}
+          className={cn("border-0 bg-white", className)}
+        />
+      </div>
     );
   }
 

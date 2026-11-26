@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { resolveUserModel, NoModelConfiguredError } from "@/lib/ai/resolve-model";
 import { classifyProviderError } from "@/lib/ai/errors";
 import { parseStageResult } from "@/lib/ai/result";
+import { recordAiUsage } from "@/lib/ai/usage";
 import { sanitizePrompt } from "@/lib/sanitize";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -19,7 +20,7 @@ export async function recommendStackForProject(projectId: string): Promise<void>
     const resolved = await resolveUserModel(project.userId);
     const lang = project.outputLanguage || "en";
 
-    const { text } = await generateText({
+    const { text, usage } = await generateText({
       model: resolved.model,
       system: sanitizePrompt(
         `You are a senior software architect. Recommend a technology stack for a website project.\n` +
@@ -35,6 +36,16 @@ export async function recommendStackForProject(projectId: string): Promise<void>
       maxOutputTokens: 1024,
       maxRetries: 2,
       temperature: 0.4,
+    });
+
+    await recordAiUsage({
+      userId: project.userId,
+      projectId,
+      source: "stack",
+      providerCode: resolved.providerCode,
+      modelName: resolved.modelName,
+      promptTokens: usage.inputTokens,
+      completionTokens: usage.outputTokens,
     });
 
     const result = parseStageResult(text);

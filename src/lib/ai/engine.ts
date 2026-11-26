@@ -10,6 +10,7 @@ import { writeAudit } from "@/lib/audit";
 import {
   parseStageResult,
   persistStageResult,
+  type DesignChoice,
   type PersistedRecommendation,
   type PlanResult,
   type StageResult,
@@ -38,7 +39,7 @@ function composeSystemPrompt(opts: {
     ? `${opts.uiPreferences ?? "Not specified"}\n\n${approvedDesign}`
     : opts.uiPreferences ?? "Not specified";
 
-  return def.systemPromptTemplate
+  const prompt = def.systemPromptTemplate
     .replaceAll("{{PROJECT_NAME}}", sanitizePrompt(opts.projectName))
     .replaceAll("{{PROJECT_DESCRIPTION}}", sanitizePrompt(opts.projectDescription ?? "Not specified"))
     .replaceAll("{{OUTPUT_LANGUAGE}}", sanitizePrompt(opts.outputLanguage || "en"))
@@ -56,6 +57,24 @@ function composeSystemPrompt(opts: {
       "{{TEMPLATE}}",
       opts.template ? sanitizePrompt(opts.template) : "custom",
     );
+
+  // Clarifying questions are opt-in and structured so the UI can render them as
+  // choices instead of burying them in prose.
+  return `${prompt}
+
+=== CLARIFICATION ===
+Ask a question ONLY when a missing answer would materially change the deliverable.
+When you do, put ONE question in the stage_result JSON with this exact shape:
+"choices": {
+  "question": "short question",
+  "options": [
+    { "label": "option shown to the user", "value": "answer sent back", "description": "one-line trade-off", "recommended": true },
+    { "label": "alternative", "value": "alternative answer" }
+  ]
+}
+Rules: 2-4 options, exactly one with "recommended": true, and the recommended
+option must be the one you would choose. Never ask more than one question per
+turn. If a reasonable assumption is enough, clearly state it and omit "choices".`;
 }
 
 function summarizeCodeArtifacts(artifacts: Record<string, string> | null): string | null {
@@ -86,6 +105,8 @@ export interface StageTurnResult {
   snapshotSaved: boolean;
   truncated: boolean;
   recommendations: PersistedRecommendation[];
+  /** Clarifying question the user can answer with one click, when the AI asked. */
+  choices: DesignChoice | null;
   usage: { promptTokens: number; completionTokens: number } | null;
   /** Sub-step ids whose results changed in this turn (for studio notifications). */
   changedSteps: string[];
@@ -307,10 +328,30 @@ export async function runStageTurn(input: {
         truncated: finishReason === "length",
         recommendations: [],
         changedSteps: [],
+        choices: null,
         usage: usage
           ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
           : null,
       };
+    }
+  }
+
+  if (result.choices) {
+    const assistant = await prisma.message.findFirst({
+      where: { chatId: chat.id, role: "assistant" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (assistant) {
+      const meta =
+        assistant.promptMeta && typeof assistant.promptMeta === "object"
+          ? (assistant.promptMeta as Record<string, unknown>)
+          : {};
+      await prisma.message
+        .update({
+          where: { id: assistant.id },
+          data: { promptMeta: { ...meta, choices: result.choices } },
+        })
+        .catch(() => undefined);
     }
   }
 
@@ -368,6 +409,7 @@ export async function runStageTurn(input: {
     truncated: finishReason === "length",
     recommendations: allRecommendations,
     changedSteps,
+    choices: result.choices ?? null,
     usage: usage
       ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
       : null,
@@ -693,10 +735,30 @@ Rules:
         truncated: finishReason === "length",
         recommendations: [],
         changedSteps: [],
+        choices: null,
         usage: usage
           ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
           : null,
       };
+    }
+  }
+
+  if (result.choices) {
+    const assistant = await prisma.message.findFirst({
+      where: { chatId: chat.id, role: "assistant" },
+      orderBy: { createdAt: "desc" },
+    });
+    if (assistant) {
+      const meta =
+        assistant.promptMeta && typeof assistant.promptMeta === "object"
+          ? (assistant.promptMeta as Record<string, unknown>)
+          : {};
+      await prisma.message
+        .update({
+          where: { id: assistant.id },
+          data: { promptMeta: { ...meta, choices: result.choices } },
+        })
+        .catch(() => undefined);
     }
   }
 
@@ -753,6 +815,7 @@ Rules:
     truncated: finishReason === "length",
     recommendations: allRecommendations,
     changedSteps,
+    choices: result.choices ?? null,
     usage: usage
       ? { promptTokens: usage.inputTokens ?? 0, completionTokens: usage.outputTokens ?? 0 }
       : null,

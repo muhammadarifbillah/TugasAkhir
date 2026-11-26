@@ -16,6 +16,7 @@ import {
   Eye,
   FileCode2,
   GitPullRequestArrow,
+  Globe,
   Languages,
   Layout,
   ListChecks,
@@ -27,6 +28,7 @@ import {
   Play,
   RotateCcw,
   ShieldCheck,
+  Smartphone,
   Trash2,
   User,
   Wand2,
@@ -36,7 +38,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
+import { HelpTip } from "@/components/ui/help-tip";
 import { InlineAlert } from "@/components/ui/inline-alert";
+import { Input } from "@/components/ui/input";
 import { Markdown } from "@/components/ui/markdown";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -70,10 +74,15 @@ import {
 } from "@/components/studio/studio-views";
 import { menuKeyNav, tabKeyNav } from "@/components/studio/tab-key-nav";
 import { csrfFetch } from "@/lib/csrf-client";
-import { normalizeScreens, type DesignScreen as DesignScreenType } from "@/lib/design";
+import {
+  normalizePlan,
+  normalizeScreens,
+  screenForHref,
+  type DesignScreen as DesignScreenType,
+} from "@/lib/design";
 import { fmt } from "@/lib/format";
 import { navDirection } from "@/lib/nav-direction";
-import type { PlanResult } from "@/lib/ai/result";
+import type { DesignChoice, PlanResult } from "@/lib/ai/result";
 import type { Dictionary } from "@/lib/i18n";
 import type { ScoreInfo } from "@/lib/project-stats";
 import { useSyncedState } from "@/lib/use-synced-state";
@@ -112,6 +121,9 @@ interface MessageRow {
   id: string;
   role: string;
   content: string;
+  promptMeta?: unknown;
+  /** Live choices returned with this turn (stored ones live in promptMeta). */
+  choices?: DesignChoice | null;
   createdAt: string;
 }
 
@@ -144,6 +156,8 @@ export interface StudioWorkspaceProps {
     badgePublic: boolean;
     finalizedAt: string | null;
     database: DatabaseInfo | null;
+    /** Platforms the project needs (web/mobile); unlocks the mockup viewports. */
+    targets: string[];
   };
   stage: StudioStage;
   completionGaps: string[];
@@ -197,6 +211,7 @@ interface ChatResponse {
   securityScore?: number | null;
   recommendations?: RecommendationRow[];
   changedSteps?: string[];
+  choices?: DesignChoice | null;
   truncated?: boolean;
   error?: string;
   message?: string;
@@ -219,6 +234,17 @@ function displayAssistantText(content: string): string {
   if (jsonStart >= 0) text = text.slice(0, jsonStart);
   const trimmed = text.trim();
   return trimmed.length > 0 ? trimmed : content;
+}
+
+/** Reads the clarifying question attached to an assistant message. */
+function messageChoices(msg: MessageRow): DesignChoice | null {
+  if (msg.choices?.options?.length) return msg.choices;
+  const meta = msg.promptMeta;
+  if (!meta || typeof meta !== "object") return null;
+  const value = (meta as Record<string, unknown>).choices;
+  if (!value || typeof value !== "object") return null;
+  const options = (value as { options?: unknown }).options;
+  return Array.isArray(options) && options.length > 0 ? (value as DesignChoice) : null;
 }
 
 /**
@@ -320,6 +346,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [truncatedWarning, setTruncatedWarning] = useState(false);
   const [savingLanguage, setSavingLanguage] = useState(false);
   const [outputLanguage, setOutputLanguage] = useState(props.project.outputLanguage);
+  const [targets, setTargets] = useState<string[]>(() =>
+    props.project.targets.length > 0 ? props.project.targets : ["web", "mobile"],
+  );
+  const [savingTargets, setSavingTargets] = useState(false);
 
   const [activeFile, setActiveFile] = useState<string | null>(null);
   const [reveal, setReveal] = useState<{ file: string; line: number; nonce: number } | null>(null);
@@ -335,6 +365,13 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   const [confirmDeleteDb, setConfirmDeleteDb] = useState(false);
   const [confirmComplete, setConfirmComplete] = useState(false);
   const [dbBusy, setDbBusy] = useState(false);
+  const [fixingAll, setFixingAll] = useState(false);
+  const [confirmFixAll, setConfirmFixAll] = useState(false);
+  const [choiceCustom, setChoiceCustom] = useState<{
+    messageId: string;
+    index: number;
+    text: string;
+  } | null>(null);
   const [chatMode, setChatMode] = useState<ChatMode>("plan");
   const [activePlan, setActivePlan] = useState<PlanResult | null>(props.initialPlan);
   const [buildLoading, setBuildLoading] = useState(false);
@@ -347,6 +384,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
   } | null>(null);
 
   const designScreens = useMemo(() => normalizeScreens(props.designScreens), [props.designScreens]);
+  const designPlan = useMemo(() => normalizePlan(props.designPlan), [props.designPlan]);
   const hasCode = !!codeArtifacts && Object.keys(codeArtifacts).length > 0;
   const stageHasResults = isAnalysis
     ? !!props.analysisStack?.recommendedStack
@@ -639,7 +677,13 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
 
       setMessages((m) => [
         ...m,
-        { id: crypto.randomUUID(), role: "assistant", content: data.reply ?? "", createdAt: new Date().toISOString() },
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: data.reply ?? "",
+          choices: data.choices ?? null,
+          createdAt: new Date().toISOString(),
+        },
       ]);
       if (data.truncated) setTruncatedWarning(true);
 
@@ -799,6 +843,57 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     }
   }
 
+  /** Applies every pending recommendation that ships a suggested file patch. */
+  async function applyAllFixes() {
+    const pending = recommendations.filter(
+      (r) => r.suggestedCode && r.filePath && !r.isApplied,
+    );
+    if (pending.length === 0) return;
+    setFixingAll(true);
+    setAreaError("files", null);
+    let failed = 0;
+    for (const rec of pending) {
+      try {
+        const res = await csrfFetch("/api/artifacts/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectStageId: stage.projectStageId,
+            file: rec.filePath,
+            content: rec.suggestedCode,
+          }),
+        });
+        if (!res.ok) {
+          failed += 1;
+          continue;
+        }
+        setCodeArtifacts((prev) => ({ ...(prev ?? {}), [rec.filePath!]: rec.suggestedCode! }));
+        await toggleApplied({ ...rec, isApplied: false });
+      } catch {
+        failed += 1;
+      }
+    }
+    setFixingAll(false);
+    setConfirmFixAll(false);
+    if (failed > 0) setAreaError("files", fmt(w.fixAllFailed, { count: failed }));
+    else addToast("success", fmt(w.fixAllDone, { count: pending.length }));
+    router.refresh();
+  }
+
+  /** Sends every open scan finding to the AI in one plan turn (capped at 10). */
+  function fixAllWithAi(findings: ScanFinding[]) {
+    const capped = findings.slice(0, 10);
+    const lines = capped
+      .map(
+        (f, i) =>
+          `${i + 1}. [${f.severity}] ${f.title} (${f.tool}) — ${f.filePath ?? "-"}${f.line != null ? `:${f.line}` : ""}`,
+      )
+      .join("\n");
+    setInput(fmt(w.fixAllPrompt, { count: capped.length, findings: lines }));
+    setChatMode("plan");
+    focusComposer();
+  }
+
   const dirtyFiles = useMemo(
     () => new Set(Object.keys(drafts).filter((f) => drafts[f] !== codeArtifacts?.[f])),
     [drafts, codeArtifacts],
@@ -949,6 +1044,38 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       setOutputLanguage(props.project.outputLanguage);
     } finally {
       setSavingLanguage(false);
+    }
+  }
+
+  async function toggleTarget(value: "web" | "mobile") {
+    const next = targets.includes(value)
+      ? targets.filter((t) => t !== value)
+      : [...targets, value];
+    // At least one platform must stay selected: the mockup stage needs a target.
+    if (next.length === 0) return;
+    const previous = targets;
+    setTargets(next);
+    setSavingTargets(true);
+    setAreaError("stage", null);
+    try {
+      const res = await csrfFetch(`/api/projects/${project.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targets: next }),
+      });
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        setAreaError("stage", data.error ?? dict.studio.requestFailed);
+        setTargets(previous);
+        return;
+      }
+      addToast("success", dict.studio.targetsSaved);
+      router.refresh();
+    } catch {
+      setAreaError("stage", dict.studio.networkError);
+      setTargets(previous);
+    } finally {
+      setSavingTargets(false);
     }
   }
 
@@ -1587,6 +1714,47 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                   </div>
                 </div>
                 <div className="rounded-lg border p-4">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-1.5">
+                      <h3 className="text-sm font-semibold">{dict.studio.targetsTitle}</h3>
+                      <HelpTip text={dict.studio.targetsHint} label={dict.a11y.help} />
+                    </span>
+                    {savingTargets && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {(
+                      [
+                        { value: "web", icon: Globe, label: dict.studio.targetWeb, detail: dict.studio.targetWebDetail },
+                        { value: "mobile", icon: Smartphone, label: dict.studio.targetMobile, detail: dict.studio.targetMobileDetail },
+                      ] as const
+                    ).map(({ value, icon: Icon, label, detail }) => {
+                      const active = targets.includes(value);
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          aria-pressed={active}
+                          disabled={savingTargets}
+                          onClick={() => toggleTarget(value)}
+                          className={`flex items-start gap-2 rounded-lg border p-3 text-left transition-colors ${
+                            active ? "border-primary bg-primary/5" : "hover:bg-muted"
+                          }`}
+                        >
+                          <Icon className={`mt-0.5 size-4 ${active ? "text-primary" : "text-muted-foreground"}`} aria-hidden="true" />
+                          <span className="min-w-0">
+                            <span className="block text-sm font-medium">{label}</span>
+                            <span className="block text-xs text-muted-foreground">{detail}</span>
+                          </span>
+                          <span className="ms-auto text-xs font-medium text-primary">
+                            {active ? dict.studio.targetActive : ""}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">{dict.studio.targetsHint}</p>
+                </div>
+                <div className="rounded-lg border p-4">
                   <h3 className="mb-2 text-sm font-semibold">{dict.studio.stackTitle}</h3>
                   {analysisInfo?.recommendedStack ? (
                     <dl className="space-y-1 font-mono text-xs">
@@ -1867,35 +2035,149 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
               {/* Index keys: router.refresh() swaps client ids for server ids, which must not re-run the
                   enter animation. initial={false} keeps the loaded history static. */}
               <AnimatePresence initial={false}>
-                {messages.map((msg, i) => (
-                  <m.div
-                    key={i}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    className={cn("flex min-w-0 gap-2", msg.role === "user" && "justify-end")}
-                  >
-                    {msg.role === "assistant" && (
-                      <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
-                        <Bot className="size-3.5" aria-hidden="true" />
-                      </span>
-                    )}
-                    {msg.role === "assistant" ? (
-                      <div className="min-w-0 rounded-lg border bg-card px-3 py-2 text-sm [overflow-wrap:anywhere]">
-                        <Markdown source={displayAssistantText(msg.content)} />
-                      </div>
-                    ) : (
-                      <div className="min-w-0 whitespace-pre-wrap break-words rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground [overflow-wrap:anywhere]">
-                        {msg.content}
-                      </div>
-                    )}
-                    {msg.role === "user" && (
-                      <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
-                        <User className="size-3.5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </m.div>
-                ))}
+                {messages.map((msg, i) => {
+                  const choices = msg.role === "assistant" ? messageChoices(msg) : null;
+                  const showChoices = Boolean(choices) && i === messages.length - 1 && !loading;
+                  return (
+                    <m.div
+                      key={i}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                      className={cn("flex min-w-0 gap-2", msg.role === "user" && "justify-end")}
+                    >
+                      {msg.role === "assistant" && (
+                        <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
+                          <Bot className="size-3.5" aria-hidden="true" />
+                        </span>
+                      )}
+                      {msg.role === "assistant" ? (
+                        <div className="min-w-0 rounded-lg border bg-card px-3 py-2 text-sm [overflow-wrap:anywhere]">
+                          <Markdown source={displayAssistantText(msg.content)} />
+                          {showChoices && choices && (
+                            <div className="mt-2 border-t pt-2">
+                              <p className="mb-1.5 text-xs font-semibold">{choices.question}</p>
+                              <div className="flex flex-col gap-1.5">
+                                {choices.options.map((opt, oi) => {
+                                  const customizing =
+                                    choiceCustom?.messageId === msg.id && choiceCustom.index === oi;
+                                  return (
+                                    <div
+                                      key={`${msg.id}-${oi}`}
+                                      className={cn(
+                                        "rounded-md border p-2",
+                                        opt.recommended && "border-primary/50 bg-primary/5",
+                                      )}
+                                    >
+                                      <div className="flex flex-wrap items-start gap-2">
+                                        <div className="min-w-0 flex-1">
+                                          <p className="text-xs font-medium">
+                                            {opt.recommended && (
+                                              <span className="me-1 text-primary" aria-hidden="true">★</span>
+                                            )}
+                                            {opt.label}
+                                            {opt.recommended && (
+                                              <Badge variant="secondary" className="ms-1.5">
+                                                {dict.studio.choiceRecommended}
+                                              </Badge>
+                                            )}
+                                          </p>
+                                          {opt.description && (
+                                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                                              {opt.description}
+                                            </p>
+                                          )}
+                                        </div>
+                                        <div className="flex gap-1">
+                                          <Button
+                                            size="sm"
+                                            variant={opt.recommended ? "default" : "outline"}
+                                            className="h-7 text-[11px]"
+                                            onClick={() => {
+                                              setChoiceCustom(null);
+                                              void sendPrompt(opt.value ?? opt.label);
+                                            }}
+                                          >
+                                            {dict.studio.choicePick}
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-7 text-[11px]"
+                                            aria-expanded={customizing}
+                                            onClick={() =>
+                                              setChoiceCustom(
+                                                customizing
+                                                  ? null
+                                                  : { messageId: msg.id, index: oi, text: "" },
+                                              )
+                                            }
+                                          >
+                                            {dict.studio.choiceCustomize}
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      {customizing && (
+                                        <div className="mt-1.5 flex gap-1.5">
+                                          <Input
+                                            value={choiceCustom.text}
+                                            onChange={(e) =>
+                                              setChoiceCustom((cur) =>
+                                                cur ? { ...cur, text: e.target.value } : cur,
+                                              )
+                                            }
+                                            onKeyDown={(e) => {
+                                              if (e.key !== "Enter" || !choiceCustom.text.trim()) return;
+                                              e.preventDefault();
+                                              const value = `${opt.label} — ${choiceCustom.text.trim()}`;
+                                              setChoiceCustom(null);
+                                              void sendPrompt(value);
+                                            }}
+                                            placeholder={dict.studio.choiceCustomPlaceholder}
+                                            aria-label={dict.studio.choiceCustomPlaceholder}
+                                            className="h-7 text-xs"
+                                          />
+                                          <Button
+                                            size="sm"
+                                            className="h-7 shrink-0 text-[11px]"
+                                            disabled={!choiceCustom.text.trim()}
+                                            onClick={() => {
+                                              const value = `${opt.label} — ${choiceCustom.text.trim()}`;
+                                              setChoiceCustom(null);
+                                              void sendPrompt(value);
+                                            }}
+                                          >
+                                            {dict.studio.choiceSend}
+                                          </Button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                              <button
+                                type="button"
+                                className="mt-1.5 text-[11px] text-primary hover:underline"
+                                onClick={focusComposerInput}
+                              >
+                                {dict.studio.choiceOwn}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="min-w-0 whitespace-pre-wrap break-words rounded-lg bg-primary px-3 py-2 text-sm text-primary-foreground [overflow-wrap:anywhere]">
+                          {msg.content}
+                        </div>
+                      )}
+                      {msg.role === "user" && (
+                        <span className="mt-1 flex size-6 shrink-0 items-center justify-center rounded-md bg-muted">
+                          <User className="size-3.5" aria-hidden="true" />
+                        </span>
+                      )}
+                    </m.div>
+                  );
+                })}
               </AnimatePresence>
 
               <AnimatePresence initial={false}>
@@ -2018,8 +2300,11 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             onDismissError={() => setAreaError("findings", null)}
             onToggleApplied={toggleApplied}
             onAutoFix={startAutoFix}
+            onFixAll={() => setConfirmFixAll(true)}
+            fixingAll={fixingAll}
             onOpenFile={openFile}
             onFixWithAi={fixWithAi}
+            onFixAllWithAi={fixAllWithAi}
             onScanComplete={() => router.refresh()}
             onClose={() => setPanelOpen(false)}
           />
@@ -2086,6 +2371,18 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
         onConfirm={completeStage}
       />
       <ConfirmDialog
+        open={confirmFixAll}
+        onOpenChange={setConfirmFixAll}
+        title={w.fixAllConfirmTitle}
+        description={fmt(w.fixAllConfirmDesc, {
+          count: recommendations.filter((r) => r.suggestedCode && r.filePath && !r.isApplied).length,
+        })}
+        confirmLabel={w.fixAllConfirm}
+        cancelLabel={w.cancel}
+        busy={fixingAll}
+        onConfirm={applyAllFixes}
+      />
+      <ConfirmDialog
         open={confirmDeleteDb}
         onOpenChange={setConfirmDeleteDb}
         title={w.confirmDeleteDbTitle}
@@ -2128,6 +2425,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
           projectId={project.id}
           savedScreens={designScreens}
           designPlan={props.designPlan}
+          targets={targets}
           onClose={() => setShowDesignCanvas(false)}
           onSaved={() => router.refresh()}
           onAiFinished={notifyChangedSteps}
@@ -2162,6 +2460,15 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             error: dict.studio.designError,
             retry: dict.studio.designRetry,
             confirmDiscard: dict.studio.confirmDiscard,
+            targetsLocked: dict.studio.targetsLocked,
+            startInteractive: dict.studio.startInteractive,
+            stopInteractive: dict.studio.stopInteractive,
+            noMockupForLink: dict.studio.noMockupForLink,
+            help: dict.studio.designHelp,
+            helpLabel: dict.a11y.help,
+            saveDone: dict.studio.designSaved,
+            generateDone: dict.studio.designGenerated,
+            planSaved: dict.studio.designPlanSaved,
           }}
         />
       )}
@@ -2179,6 +2486,16 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             title={designFullscreen.name}
             device={designFullscreen.device}
             scaleToFit={false}
+            allowInteractive
+            labels={{
+              start: dict.studio.startInteractive,
+              stop: dict.studio.stopInteractive,
+            }}
+            onNavigate={(href) => {
+              const target = screenForHref(href, designScreens, designPlan);
+              if (target) setDesignFullscreen(target);
+              else addToast("info", dict.studio.noMockupForLink);
+            }}
           />
         </FullscreenViewer>
       )}

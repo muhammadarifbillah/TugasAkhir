@@ -8,9 +8,11 @@ import { prisma } from "@/lib/prisma";
 import { requestIp, writeAudit } from "@/lib/audit";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
+import { recordAiUsage } from "@/lib/ai/usage";
 import {
   createScreen,
   hasVisibleContent,
+  mockupDevicesFor,
   parseDesignScreens,
   MAX_PAGES_PER_ROLE,
   MAX_SCREEN_HTML,
@@ -92,6 +94,15 @@ export async function POST(request: Request, { params }: RouteProps) {
   }
 
   const device = parsed.data.device ?? "desktop";
+  if (!mockupDevicesFor(project.targets).includes(device)) {
+    return NextResponse.json(
+      {
+        error: "TARGET_LOCKED",
+        message: "This viewport is not part of the project's declared targets. Change the targets at the needs step first.",
+      },
+      { status: 400 },
+    );
+  }
   const currentHtml =
     parsed.data.html ??
     (parsed.data.screenId ? storedScreenHtml(project.globalSpec, parsed.data.screenId) : null);
@@ -115,8 +126,9 @@ export async function POST(request: Request, { params }: RouteProps) {
 
   const baseRules = [
     "- Each screen is a COMPLETE, self-contained HTML document (doctype, <head> with inline <style>, <body> with visible content).",
-    "- Use inline CSS only. No external stylesheets, scripts, fonts, or images (CSS or inline SVG only).",
-    "- Do NOT include JavaScript.",
+    "- Use inline CSS only. No external stylesheets, fonts, or images (CSS or inline SVG only).",
+    "- Inline <script> is allowed ONLY for visual-only interactions (tabs, modals, toggles, fake form feedback). Never call fetch, XHR, WebSocket, storage, or external APIs.",
+    "- Link to other pages with <a href=\"/route\"> using the design plan's routes (or /kebab-case-page-name). The app turns those clicks into the matching mockup; never use javascript: URLs.",
     `- Target the ${device} layout.`,
     `- Project: ${project.name}. ${project.description ?? ""}`.trim(),
     project.uiPreferences ? `- Visual preferences: ${project.uiPreferences}` : "",
@@ -163,8 +175,10 @@ export async function POST(request: Request, { params }: RouteProps) {
 
     // Up to two content attempts: a retry recovers from an empty/fragment reply.
     let rawScreens: { name?: string; html: string }[] = [];
+    let promptTokens = 0;
+    let completionTokens = 0;
     for (let attempt = 0; attempt < 2 && rawScreens.length === 0; attempt++) {
-      const { text } = await generateText({
+      const { text, usage } = await generateText({
         model: resolved.model,
         system:
           attempt === 0
@@ -176,6 +190,8 @@ export async function POST(request: Request, { params }: RouteProps) {
         maxRetries: 3,
         abortSignal: AbortSignal.timeout(300_000),
       });
+      promptTokens += usage.inputTokens ?? 0;
+      completionTokens += usage.outputTokens ?? 0;
 
       if (isMulti) {
         rawScreens = parseDesignScreens(text).filter(
@@ -188,6 +204,16 @@ export async function POST(request: Request, { params }: RouteProps) {
         }
       }
     }
+
+    await recordAiUsage({
+      userId: session.user.id,
+      projectId: id,
+      source: "design",
+      providerCode: resolved.providerCode,
+      modelName: resolved.modelName,
+      promptTokens,
+      completionTokens,
+    });
 
     if (rawScreens.length === 0) {
       throw new EmptyModelOutputError();

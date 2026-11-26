@@ -42,6 +42,32 @@ const STATIC_MODELS: Record<string, ModelEntry[]> = {
   deepseek: [
     { id: "deepseek-flash", name: "DeepSeek Flash", maxTokens: 393216 },
   ],
+  groq: [
+    { id: "llama-3.3-70b-versatile", name: "Llama 3.3 70B Versatile", maxTokens: 32768 },
+    { id: "llama-3.1-8b-instant", name: "Llama 3.1 8B Instant", maxTokens: 8192 },
+    { id: "mixtral-8x7b-32768", name: "Mixtral 8x7B", maxTokens: 32768 },
+  ],
+  mistral: [
+    { id: "mistral-large-latest", name: "Mistral Large (latest)", maxTokens: null },
+    { id: "mistral-medium-latest", name: "Mistral Medium (latest)", maxTokens: null },
+    { id: "mistral-small-latest", name: "Mistral Small (latest)", maxTokens: null },
+    { id: "codestral-latest", name: "Codestral (latest)", maxTokens: null },
+  ],
+  xai: [
+    { id: "grok-2-latest", name: "Grok 2 (latest)", maxTokens: null },
+    { id: "grok-2-vision-latest", name: "Grok 2 Vision (latest)", maxTokens: null },
+    { id: "grok-beta", name: "Grok Beta", maxTokens: null },
+  ],
+  together: [
+    { id: "meta-llama/Llama-3.3-70B-Instruct-Turbo", name: "Llama 3.3 70B Turbo", maxTokens: null },
+    { id: "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo", name: "Llama 3.1 405B Turbo", maxTokens: null },
+    { id: "Qwen/Qwen2.5-72B-Instruct-Turbo", name: "Qwen 2.5 72B Turbo", maxTokens: null },
+    { id: "deepseek-ai/DeepSeek-V3", name: "DeepSeek V3", maxTokens: null },
+  ],
+  cerebras: [
+    { id: "llama-3.3-70b", name: "Llama 3.3 70B", maxTokens: 8192 },
+    { id: "llama3.1-8b", name: "Llama 3.1 8B", maxTokens: 8192 },
+  ],
   // Mirror of the router's own catalog; live fetch above replaces it when reachable.
   omniroute: [
     { id: "auto", name: "Auto (router pick)", maxTokens: null },
@@ -89,7 +115,7 @@ async function fetchOpenAIModels(apiKey: string, baseUrl?: string): Promise<Mode
   });
   if (!res.ok) throw new Error(`OpenAI API ${res.status}`);
   const data = await res.json();
-  const chatPrefixes = ["gpt-4", "gpt-3.5", "o1", "o3", "o4"];
+  const chatPrefixes = ["gpt-4", "gpt-5", "gpt-3.5", "o1", "o3", "o4", "o5"];
   const models: ModelEntry[] = (data.data ?? [])
     .filter((m: { id: string }) =>
       chatPrefixes.some((p) => m.id.startsWith(p)),
@@ -219,7 +245,12 @@ export async function POST(request: Request) {
         );
         break;
       default:
-        return NextResponse.json({ error: "Unknown provider" }, { status: 400 });
+        // Every other seeded provider is OpenAI-compatible and only needs its
+        // base URL. A provider without one is genuinely unknown.
+        if (!baseUrl) {
+          return NextResponse.json({ error: "Unknown provider" }, { status: 400 });
+        }
+        models = await fetchOpenAICompatibleModels(apiKey, baseUrl);
     }
     return NextResponse.json({ models });
   } catch (err) {

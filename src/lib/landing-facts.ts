@@ -6,7 +6,20 @@ import { SCORE_WEIGHTS } from "@/lib/scanner/score";
  * the copy cannot drift from the product. landing-facts.test.ts pins each value
  * to the code it describes (stages, seed, scanner, providers, locales).
  */
-export const AI_PROVIDERS = ["OpenAI", "Anthropic", "Gemini", "DeepSeek", "OpenRouter", "Ollama", "OmniRoute"] as const;
+export const AI_PROVIDERS = [
+  "OpenAI",
+  "Anthropic",
+  "Gemini",
+  "DeepSeek",
+  "OpenRouter",
+  "Ollama",
+  "OmniRoute",
+  "Groq",
+  "Mistral",
+  "xAI",
+  "Together",
+  "Cerebras",
+] as const;
 
 export { SCORE_WEIGHTS };
 

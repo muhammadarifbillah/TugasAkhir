@@ -117,6 +117,7 @@ model User {
   projects                   Project[]
   chats                      Chat[]
   auditLogs                  AuditLog[]
+  aiUsage                    AiUsage[]
 
   @@map("users")
 }
@@ -258,6 +259,7 @@ model Project {
   template          String? // 'e-commerce' | 'saas' | 'rest-api' | 'lms' | 'custom'
   scopeRequirements String?
   uiPreferences     String? // desired website visual look, colors, pages, references
+  targets           String[] @default(["web", "mobile"]) // mockup platforms the project needs
   badgePublic       Boolean       @default(false) // user opt-in for the public badge
   finalizedAt       DateTime? // user marked the project as final (unlocks DB provisioning)
   database          Json? // provisioned persistent database (encrypted connection)
@@ -471,6 +473,26 @@ model SecurityFinding {
   @@index([projectId])
   @@index([projectId, severity])
   @@map("security_findings")
+}
+
+/// Token usage for AI calls that are not already covered by a chat message
+/// (Design Studio, stack recommendation). Chat turns keep their usage in
+/// Message.promptMeta so the existing history stays meaningful.
+model AiUsage {
+  id               String   @id @default(cuid())
+  userId           String
+  projectId        String?
+  source           String // design | design-plan | stack
+  providerCode     String?
+  modelName        String?
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("ai_usage")
 }
 
 model AuditLog {

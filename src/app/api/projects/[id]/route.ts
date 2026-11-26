@@ -11,6 +11,7 @@ const bodySchema = z.object({
   badgePublic: z.boolean().optional(),
   name: z.string().min(1).max(120).optional(),
   scopeRequirements: z.string().max(4000).optional(),
+  targets: z.array(z.enum(["web", "mobile"])).min(1).max(2).optional(),
   outputLanguage: z
     .string()
     .refine((v) => OUTPUT_LANGUAGES.includes(v))
@@ -52,6 +53,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     data.scopeRequirements = parsed.data.scopeRequirements;
   }
   if (parsed.data.outputLanguage !== undefined) data.outputLanguage = parsed.data.outputLanguage;
+  if (parsed.data.targets !== undefined) data.targets = parsed.data.targets;
 
   const updated = await prisma.project.update({
     where: { id },
@@ -65,6 +67,12 @@ export async function PATCH(request: Request, { params }: RouteProps) {
 
   return NextResponse.json({
     ok: true,
-    project: { id: updated.id, badgePublic: updated.badgePublic, name: updated.name, outputLanguage: updated.outputLanguage },
+    project: {
+      id: updated.id,
+      badgePublic: updated.badgePublic,
+      name: updated.name,
+      outputLanguage: updated.outputLanguage,
+      targets: updated.targets,
+    },
   });
 }

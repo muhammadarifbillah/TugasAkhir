@@ -11,9 +11,13 @@ import {
   hasVisibleContent,
   normalizePlan,
   normalizeScreens,
+  mockupDevicesFor,
   parseDesignScreens,
   planPageKey,
+  screenForHref,
   uniqueScreensById,
+  type DesignPlan,
+  type DesignScreen,
 } from "./design";
 
 test("createScreen builds a valid screen", () => {
@@ -177,4 +181,36 @@ test("effectiveDesignPlan returns the plan unchanged without analysis roles", ()
   const plan = effectiveDesignPlan({ design: { uiPlan: { roles: [{ name: "A" }] } } });
   assert.equal(plan.roles.length, 1);
   assert.equal(plan.roles[0].name, "A");
+});
+
+test("mockupDevicesFor maps declared targets to unlocked viewports", () => {
+  assert.deepEqual(mockupDevicesFor(["web", "mobile"]), ["desktop", "tablet", "mobile"]);
+  assert.deepEqual(mockupDevicesFor(["web"]), ["desktop", "tablet"]);
+  assert.deepEqual(mockupDevicesFor(["mobile"]), ["mobile"]);
+  // Legacy projects (no targets) keep every viewport.
+  assert.deepEqual(mockupDevicesFor([]), ["desktop", "tablet", "mobile"]);
+});
+
+test("screenForHref resolves plan routes and screen names", () => {
+  const screens: DesignScreen[] = [
+    { id: "scr_home", name: "Landing", device: "desktop", html: "<html>home</html>", planKey: "role1.pg1" },
+    { id: "scr_login", name: "Login", device: "desktop", html: "<html>login</html>" },
+  ];
+  const plan: DesignPlan = {
+    version: 1,
+    roles: [
+      {
+        id: "role1",
+        name: "Guest",
+        pages: [{ id: "pg1", name: "Landing", route: "/" }],
+      },
+    ],
+  };
+
+  assert.equal(screenForHref("/", screens, plan)?.id, "scr_home");
+  assert.equal(screenForHref("/login", screens, plan)?.id, "scr_login");
+  assert.equal(screenForHref("https://example.test/login?x=1", screens, plan)?.id, "scr_login");
+  assert.equal(screenForHref("/missing", screens, plan), null);
+  assert.equal(screenForHref("#", screens, plan), null);
+  assert.equal(screenForHref("mailto:a@b.test", screens, plan), null);
 });

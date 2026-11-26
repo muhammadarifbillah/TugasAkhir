@@ -13,6 +13,11 @@ const PROVIDERS = [
   { code: "ollama", name: "Ollama (local)", baseUrl: "http://localhost:11434/v1", requiresKey: false, defaultModel: "llama3.2" },
   { code: "gemini", name: "Google Gemini", baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", requiresKey: true, defaultModel: "gemini-flash-latest" },
   { code: "omniroute", name: "OmniRoute", baseUrl: "https://router.boilingac.id/v1", requiresKey: true, defaultModel: "opencode-go/deepseek-v4.1-flash" },
+  { code: "groq", name: "Groq", baseUrl: "https://api.groq.com/openai/v1", requiresKey: true, defaultModel: "llama-3.3-70b-versatile" },
+  { code: "mistral", name: "Mistral AI", baseUrl: "https://api.mistral.ai/v1", requiresKey: true, defaultModel: "mistral-large-latest" },
+  { code: "xai", name: "xAI (Grok)", baseUrl: "https://api.x.ai/v1", requiresKey: true, defaultModel: "grok-2-latest" },
+  { code: "together", name: "Together AI", baseUrl: "https://api.together.xyz/v1", requiresKey: true, defaultModel: "meta-llama/Llama-3.3-70B-Instruct-Turbo" },
+  { code: "cerebras", name: "Cerebras", baseUrl: "https://api.cerebras.ai/v1", requiresKey: true, defaultModel: "llama-3.3-70b" },
 ] as const;
 
 const STAGES = [

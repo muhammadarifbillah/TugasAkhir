@@ -7,6 +7,19 @@ import { NoModelConfiguredError } from "@/lib/ai/errors";
 /** Providers that can run without a credential. */
 const KEYLESS_PROVIDERS = new Set(["ollama"]);
 
+/** OpenAI-compatible endpoints for providers that only differ by base URL. */
+const COMPATIBLE_BASE_URLS: Record<string, string> = {
+  openrouter: "https://openrouter.ai/api/v1",
+  gemini: "https://generativelanguage.googleapis.com/v1beta/openai",
+  deepseek: "https://api.deepseek.com/v1",
+  omniroute: "https://router.boilingac.id/v1",
+  groq: "https://api.groq.com/openai/v1",
+  mistral: "https://api.mistral.ai/v1",
+  xai: "https://api.x.ai/v1",
+  together: "https://api.together.xyz/v1",
+  cerebras: "https://api.cerebras.ai/v1",
+};
+
 /**
  * Builds an AI SDK LanguageModel from the user's BYOK configuration.
  * - OpenAI + OpenRouter + Gemini use the OpenAI-compatible client.
@@ -38,37 +51,27 @@ export function buildModel(
         modelName,
       );
       break;
-    case "openrouter":
-      model = createOpenAI({
-        apiKey,
-        baseURL: baseUrl ?? "https://openrouter.ai/api/v1",
-        name: "openrouter",
-      }).chat(modelName);
-      break;
-    case "gemini":
-      model = createOpenAI({
-        apiKey,
-        baseURL:
-          baseUrl ??
-          "https://generativelanguage.googleapis.com/v1beta/openai",
-        name: "gemini",
-      }).chat(modelName);
-      break;
-    case "deepseek":
-      model = createOpenAI({
-        apiKey,
-        baseURL: baseUrl ?? "https://api.deepseek.com/v1",
-        name: "deepseek",
-      }).chat(modelName);
-      break;
-    case "omniroute":
-      model = createOpenAI({
-        apiKey,
-        baseURL: baseUrl ?? "https://router.boilingac.id/v1",
-        name: "omniroute",
-      }).chat(modelName);
-      break;
     case "openai":
+      model = createOpenAI({
+        apiKey,
+        baseURL: baseUrl ?? undefined,
+      }).chat(modelName);
+      break;
+    case "openrouter":
+    case "gemini":
+    case "deepseek":
+    case "omniroute":
+    case "groq":
+    case "mistral":
+    case "xai":
+    case "together":
+    case "cerebras":
+      model = createOpenAI({
+        apiKey,
+        baseURL: baseUrl ?? COMPATIBLE_BASE_URLS[providerCode],
+        name: providerCode,
+      }).chat(modelName);
+      break;
     default:
       model = createOpenAI({
         apiKey,

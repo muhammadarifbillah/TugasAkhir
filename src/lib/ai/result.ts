@@ -40,9 +40,26 @@ export const recommendationSchema = z.object({
   mitigation: z.string().optional(),
 });
 
+/** One recommended answer the user can pick or customise. */
+export const choiceOptionSchema = z.object({
+  label: z.string().min(1).max(120),
+  value: z.string().min(1).max(500).optional(),
+  description: z.string().max(240).optional(),
+  recommended: z.boolean().optional(),
+});
+
+/** A single clarifying question rendered as choices under the AI reply. */
+export const choicesSchema = z.object({
+  question: z.string().min(1).max(240),
+  options: z.array(choiceOptionSchema).min(2).max(4),
+});
+
+export type DesignChoice = z.infer<typeof choicesSchema>;
+
 export const stageResultSchema = z
   .object({
     summary: z.string().optional(),
+    choices: choicesSchema.optional(),
     recommendedStack: z.any().optional(),
     securityRequirements: z.array(z.string()).optional(),
     dataClassification: z.array(z.string()).optional(),

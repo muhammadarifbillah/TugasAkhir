@@ -114,6 +114,7 @@ export default async function StudioPage(props: StudioPageProps) {
           outputLanguage: project.outputLanguage,
           status: project.status,
           badgePublic: project.badgePublic,
+          targets: project.targets,
           finalizedAt: project.finalizedAt ? project.finalizedAt.toISOString() : null,
           database: (() => {
             const db = project.database as Record<string, unknown> | null;
@@ -158,6 +159,7 @@ export default async function StudioPage(props: StudioPageProps) {
             id: m.id,
             role: m.role,
             content: m.content,
+            promptMeta: m.promptMeta,
             createdAt: m.createdAt.toISOString(),
           })) ?? []
         }

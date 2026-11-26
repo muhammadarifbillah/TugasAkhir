@@ -4,7 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Loader2, Play, ShieldAlert, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { HelpTip } from "@/components/ui/help-tip";
 import { InlineAlert } from "@/components/ui/inline-alert";
+import { useToast } from "@/components/ui/toast";
 import { csrfFetch } from "@/lib/csrf-client";
 import { fmt } from "@/lib/format";
 import { scoreBadgeVariant } from "@/lib/project-stats";
@@ -24,6 +26,10 @@ export interface SecurityScanLabels {
   showingOf: string;
   showMore: string;
   fixWithAi: string;
+  fixAllWithAi: string;
+  help: string;
+  helpLabel: string;
+  scanDone: string;
   openLocation: string;
   dismiss: string;
   /** Maps a raw severity ("high") to its localised label. */
@@ -55,6 +61,7 @@ export function SecurityScanPanel({
   labels,
   onOpenFile,
   onFixWithAi,
+  onFixAllWithAi,
   onScanComplete,
 }: {
   projectId: string;
@@ -62,6 +69,7 @@ export function SecurityScanPanel({
   labels: SecurityScanLabels;
   onOpenFile?: (file: string, line: number | null) => void;
   onFixWithAi?: (finding: ScanFinding) => void;
+  onFixAllWithAi?: (findings: ScanFinding[]) => void;
   /** Called after a successful scan so the server-derived score can refresh. */
   onScanComplete?: () => void;
 }) {
@@ -73,6 +81,7 @@ export function SecurityScanPanel({
   const [severity, setSeverity] = useState("all");
   const [tool, setTool] = useState("all");
   const [limit, setLimit] = useState(PAGE_SIZE);
+  const { addToast } = useToast();
 
   useEffect(() => {
     let cancelled = false;
@@ -118,6 +127,7 @@ export function SecurityScanPanel({
       setFindings(data.findings ?? []);
       setScan({ toolsRun: data.toolsRun, toolsSkipped: data.toolsSkipped });
       setLimit(PAGE_SIZE);
+      addToast("success", fmt(labels.scanDone, { count: data.findings?.length ?? 0 }));
       onScanComplete?.();
     } catch {
       setError(labels.failed);
@@ -150,6 +160,7 @@ export function SecurityScanPanel({
         <span className="flex items-center gap-1.5 text-xs font-medium">
           <ShieldAlert className="size-3.5 text-primary" />
           {labels.title}
+          <HelpTip text={labels.help} label={labels.helpLabel} />
         </span>
         {score != null && (
           <Badge variant={scoreBadgeVariant(score)} className="tabular-nums">
@@ -162,6 +173,18 @@ export function SecurityScanPanel({
         {loading ? <Loader2 className="size-3.5 animate-spin" /> : <Play className="size-3.5" />}
         {loading ? labels.running : labels.run}
       </Button>
+
+      {onFixAllWithAi && findings.length > 0 && (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="mt-1 w-full"
+          disabled={!hasCode}
+          onClick={() => onFixAllWithAi(findings)}
+        >
+          <Wand2 className="size-3.5" /> {labels.fixAllWithAi}
+        </Button>
+      )}
 
       {!hasCode && <p className="mt-2 text-[11px] text-muted-foreground">{labels.needCode}</p>}
       {error && (

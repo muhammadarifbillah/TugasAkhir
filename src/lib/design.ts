@@ -60,6 +60,67 @@ export function planPageKey(roleId: string, pageId: string): string {
   return `${roleId}.${pageId}`;
 }
 
+/**
+ * Mockup viewports unlocked by the project's declared targets. An empty or
+ * unknown list unlocks everything so projects created before targets existed
+ * keep working.
+ */
+export function mockupDevicesFor(targets: readonly string[]): DesignScreen["device"][] {
+  const web = targets.includes("web");
+  const mobile = targets.includes("mobile");
+  if (!web && !mobile) return ["desktop", "tablet", "mobile"];
+  const devices: DesignScreen["device"][] = [];
+  if (web) devices.push("desktop", "tablet");
+  if (mobile) devices.push("mobile");
+  return devices;
+}
+
+/** Normalizes a mockup link to a comparable path, or null when it is not a page. */
+function mockupPath(href: string): string | null {
+  const raw = href.trim();
+  if (!raw || raw === "#" || raw.startsWith("#")) return null;
+  if (/^(mailto:|tel:|javascript:)/i.test(raw)) return null;
+  try {
+    const url = new URL(raw, "https://mockup.local");
+    return url.pathname.replace(/\/+$/, "") || "/";
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Finds the saved screen a clicked mockup link points at: first by the design
+ * plan's route, then by the screen's own name (slug or exact). Returns null for
+ * links that have no mockup, which the viewer reports instead of navigating.
+ */
+export function screenForHref(
+  href: string,
+  screens: DesignScreen[],
+  plan: DesignPlan,
+): DesignScreen | null {
+  const path = mockupPath(href);
+  if (!path) return null;
+
+  for (const role of plan.roles) {
+    for (const page of role.pages) {
+      if (!page.route) continue;
+      if (mockupPath(page.route) !== path) continue;
+      const key = planPageKey(role.id, page.id);
+      const match = screens.find((s) => s.planKey === key);
+      if (match) return match;
+    }
+  }
+
+  const segment = path.split("/").filter(Boolean).pop()?.toLowerCase();
+  if (!segment) return null;
+  return (
+    screens.find((s) => {
+      const name = s.name.trim().toLowerCase();
+      return name === segment || name.replace(/\s+/g, "-") === segment;
+    }) ?? null
+  );
+}
+
 /** True when an HTML document has visible content (text or media), not just an empty shell. */
 export function hasVisibleContent(html: string): boolean {
   const visible = html

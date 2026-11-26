@@ -7,6 +7,7 @@ import { validateCsrfRequest } from "@/lib/validate-csrf";
 import { prisma } from "@/lib/prisma";
 import { resolveUserModel } from "@/lib/ai/resolve-model";
 import { classifyProviderError, EmptyModelOutputError } from "@/lib/ai/errors";
+import { recordAiUsage } from "@/lib/ai/usage";
 import { extractJson } from "@/lib/ai/result";
 import { effectiveDesignPlan, normalizePlan, type DesignPlan } from "@/lib/design";
 import type { Prisma } from "@/generated/prisma/client";
@@ -114,7 +115,7 @@ export async function POST(request: Request, { params }: RouteProps) {
 
   try {
     const resolved = await resolveUserModel(session.user.id);
-    const { text } = await generateText({
+    const { text, usage } = await generateText({
       model: resolved.model,
       system,
       prompt,
@@ -122,6 +123,15 @@ export async function POST(request: Request, { params }: RouteProps) {
       maxOutputTokens: resolved.maxTokens ?? 8192,
       maxRetries: 3,
       abortSignal: AbortSignal.timeout(120_000),
+    });
+    await recordAiUsage({
+      userId: session.user.id,
+      projectId: id,
+      source: "design-plan",
+      providerCode: resolved.providerCode,
+      modelName: resolved.modelName,
+      promptTokens: usage.inputTokens,
+      completionTokens: usage.outputTokens,
     });
 
     const extracted = extractJson(text);

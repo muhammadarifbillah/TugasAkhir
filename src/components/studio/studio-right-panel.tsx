@@ -1,7 +1,7 @@
 "use client";
 
 import { m } from "motion/react";
-import { CheckCircle2, Clock, ShieldCheck, ShieldQuestion, X } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, ShieldCheck, ShieldQuestion, X } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,8 +45,11 @@ export interface StudioRightPanelProps {
   onDismissError: () => void;
   onToggleApplied: (rec: RecommendationRow) => void;
   onAutoFix: (rec: RecommendationRow) => void;
+  onFixAll: () => void;
+  fixingAll: boolean;
   onOpenFile: (file: string, line?: number | null) => void;
   onFixWithAi: (finding: ScanFinding) => void;
+  onFixAllWithAi: (findings: ScanFinding[]) => void;
   onScanComplete: () => void;
   onClose: () => void;
 }
@@ -172,6 +175,9 @@ function ScoreSection({ dict, lang, scoreInfo }: StudioRightPanelProps) {
 function FindingsSection(props: StudioRightPanelProps) {
   const { dict, stage, recommendations, isCodeStage } = props;
   const w = dict.workspace;
+  const fixable = recommendations.filter(
+    (r) => r.suggestedCode && r.filePath && !r.isApplied,
+  ).length;
   return (
     <>
       {stage.code === "testing" && (
@@ -180,6 +186,7 @@ function FindingsSection(props: StudioRightPanelProps) {
           hasCode={props.hasCode}
           onOpenFile={(f, line) => props.onOpenFile(f, line)}
           onFixWithAi={props.onFixWithAi}
+          onFixAllWithAi={props.onFixAllWithAi}
           onScanComplete={props.onScanComplete}
           labels={{
             title: dict.studio.scanTitle,
@@ -195,6 +202,10 @@ function FindingsSection(props: StudioRightPanelProps) {
             showingOf: w.showingOf,
             showMore: w.showMore,
             fixWithAi: w.fixWithAi,
+            fixAllWithAi: w.fixAllWithAi,
+            help: dict.studio.scanHelp,
+            helpLabel: dict.a11y.help,
+            scanDone: dict.studio.scanDone,
             openLocation: w.openLocation,
             dismiss: w.dismiss,
             severityLabel: (s) => levelLabel(s, dict),
@@ -210,11 +221,25 @@ function FindingsSection(props: StudioRightPanelProps) {
         </p>
       ) : (
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+          <div className="flex items-center justify-between gap-2 text-xs font-semibold text-muted-foreground">
             <span>{dict.studio.recommendations}</span>
-            <span className="tabular-nums">
-              {recommendations.filter((r) => r.isApplied).length}/{recommendations.length} {w.applied}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="tabular-nums">
+                {recommendations.filter((r) => r.isApplied).length}/{recommendations.length} {w.applied}
+              </span>
+              {fixable > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-6 px-2 text-[11px]"
+                  disabled={props.fixingAll}
+                  onClick={props.onFixAll}
+                >
+                  {props.fixingAll && <Loader2 className="size-3 animate-spin" />}
+                  {fmt(w.fixAll, { count: fixable })}
+                </Button>
+              )}
+            </div>
           </div>
           <RecommendationList
             recommendations={recommendations}
