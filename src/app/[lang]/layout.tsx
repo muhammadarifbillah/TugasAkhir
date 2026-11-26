@@ -43,12 +43,12 @@ export function generateStaticParams() {
 
 const META: Record<string, { title: string; description: string }> = {
   en: {
-    title: "Saksi — AI code ships only with a witness",
+    title: "FUSE — AI code ships only with a witness",
     description:
       "An AI website studio with five server-enforced gates. Every gate is mapped to ISO/IEC 27001:2022, with NIST SP 800-218 as a supplement.",
   },
   id: {
-    title: "Saksi — Kode AI lolos hanya bila ada saksinya",
+    title: "FUSE — Kode AI lolos hanya bila ada saksinya",
     description:
       "Studio website berbasis AI dengan lima gerbang yang dijaga server. Setiap gerbang dipetakan ke ISO/IEC 27001:2022, dengan NIST SP 800-218 sebagai pelengkap.",
   },
@@ -108,6 +108,7 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
                 <div id="main-content" className="flex shrink-0 grow flex-col">
                   {children}
                   <SiteFooter
+                    name={dict.app.name}
                     label={`${dict.app.name} — ${dict.app.tagline} ${dict.app.frameworkNote}`}
                   />
                 </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
 import { auth, signOut } from "@/auth";
+import { FuseLockup } from "@/components/brand/fuse-lockup";
 import { writeAudit } from "@/lib/audit";
 import { AccessibilityToggle } from "@/components/accessibility-toggle";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -20,10 +20,7 @@ export async function Header({ lang }: { lang: Locale }) {
       <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between gap-2 px-4 sm:gap-4">
         <div className="flex items-center gap-4 sm:gap-6">
           <Link href={`/${lang}`} className="flex items-center gap-2 font-semibold">
-            <span className="flex size-7 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-sm">
-              <ShieldCheck className="size-4" />
-            </span>
-            <span className="text-sm">{dict.app.name}</span>
+            <FuseLockup label={dict.app.name} className="h-6 w-auto text-foreground" />
           </Link>
 
           <nav className="hidden items-center gap-1 text-sm md:flex">

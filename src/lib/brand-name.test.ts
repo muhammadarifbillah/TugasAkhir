@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import manifest from "@/app/manifest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 // Built from pieces so this file never counts as an occurrence of the old name.
 const OLD = ["shield", "forge"].join("");
@@ -24,10 +26,24 @@ function strings(v: unknown, path = ""): Array<[string, string]> {
 
 const DICTS = { en, id } as Record<string, Record<string, unknown>>;
 
+const MARK_TOP =
+  "M 0,26.8 A 26.8,26.8 0 0 1 26.8,0 L 102.1,0 A 2.5,2.5 0 0 1 104.6,2.5 L 104.6,12.6 A 19.2,19.2 0 0 1 85.4,31.8 L 17,31.8 A 21,21 0 0 0 0,40.47 Z";
+const MARK_BOTTOM =
+  "M 26.8,39 L 80.3,39 A 2.5,2.5 0 0 1 82.8,41.5 L 82.8,51.6 A 16.7,16.7 0 0 1 66.1,68.3 L 40.2,68.3 A 10.9,10.9 0 0 0 29.3,79.2 L 29.3,81.6 A 18.4,18.4 0 0 1 10.9,100 L 2.5,100 A 2.5,2.5 0 0 1 0,97.5 L 0,65.8 A 26.8,26.8 0 0 1 26.8,39 Z";
+
 describe("brand name", () => {
-  it('app.name is "Saksi" in en and id', () => {
-    expect(en.app.name).toBe("Saksi");
-    expect(id.app.name).toBe("Saksi");
+  it('app.name is "FUSE" in en and id', () => {
+    expect(en.app.name).toBe("FUSE");
+    expect(id.app.name).toBe("FUSE");
+  });
+
+  it("no dictionary string still names the product Saksi", () => {
+    const hits = Object.entries(DICTS).flatMap(([lang, d]) =>
+      strings(d)
+        .filter(([, s]) => /\bSaksi\b/.test(s))
+        .map(([p]) => `${lang}:${p}`),
+    );
+    expect(hits).toEqual([]);
   });
 
   it("app.tagline uses the witness tagline in en and id", () => {
@@ -59,8 +75,8 @@ describe("brand name", () => {
 
   it("app, landing, dashboard and auth copy has no compliance or forbidden phrases", () => {
     const hits = Object.entries(DICTS).flatMap(([lang, d]) =>
-      (["app", "landing", "dashboard", "auth"] as const).flatMap((ns) =>
-        strings(d[ns], ns)
+      (["app", "landing", "dashboard", "auth", "categories"] as const).flatMap((ns) =>
+        strings(d[ns] ?? {}, ns)
           .filter(([, s]) => FORBIDDEN.test(s))
           .map(([p, s]) => `${lang}:${p}: ${s}`),
       ),
@@ -76,17 +92,55 @@ describe("brand name", () => {
 
   it("manifest uses the new name and short_name", () => {
     const m = manifest();
-    expect(m.short_name).toBe("Saksi");
-    expect(m.name?.startsWith("Saksi")).toBe(true);
+    expect(m.short_name).toBe("FUSE");
+    expect(m.name?.startsWith("FUSE")).toBe(true);
+    expect(m.theme_color).toBe("#0A1931");
   });
 
   it("layout metadata titles, OG wordmark and footer template use the new name", () => {
     const layout = read("src/app/[lang]/layout.tsx");
-    expect(layout.split('title: "Saksi — ').length - 1).toBe(2);
+    expect(layout.split('title: "FUSE — ').length - 1).toBe(2);
     expect(layout).toContain("label={`${dict.app.name} — ${dict.app.tagline} ${dict.app.frameworkNote}`}");
+    expect(layout).toContain("name={dict.app.name}");
     const og = read("src/app/opengraph-image.tsx");
-    expect(og).toContain(">Saksi</div>");
-    expect(og).toContain('alt = "Saksi');
+    expect(og).toContain(">FUSE</div>");
+    expect(og).toContain('alt = "FUSE');
+  });
+
+  it("FuseLockup renders an accessible two-part gradient mark and the USE wordmark", async () => {
+    const { FuseLockup } = await import("@/components/brand/fuse-lockup");
+    const html = renderToStaticMarkup(createElement(FuseLockup, { label: "FUSE" }));
+    expect(html).toContain('role="img"');
+    expect(html).toContain('aria-label="FUSE"');
+    expect(html.match(/class="fuse-mark"/g)).toHaveLength(2);
+    expect(html).toContain(`d="${MARK_TOP}"`);
+    expect(html).toContain(`d="${MARK_BOTTOM}"`);
+    const words = html.match(/<path[^>]*class="fuse-word"[^>]*>/g) ?? [];
+    expect(words).toHaveLength(1);
+    expect(words[0]).toContain('fill="currentColor"');
+    expect(html).toContain("#04A2FB");
+    expect(html).toContain("#8448FC");
+    const ids = [...html.matchAll(/<linearGradient[^>]*id="([^"]+)"/g)].map((m) => m[1]);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+    expect(html).not.toContain("<rect");
+    expect(html).not.toContain("<text");
+  });
+
+  it("header and footer render the lockup; header drops the shield icon", () => {
+    const header = read("src/components/header.tsx");
+    expect(header).toContain("<FuseLockup");
+    expect(header).toContain('from "@/components/brand/fuse-lockup"');
+    expect(header).not.toContain("ShieldCheck");
+    expect(read("src/components/site-footer.tsx")).toContain("<FuseLockup");
+    expect(read("src/app/globals.css")).toMatch(/\.dark \.fuse-mark \{[^}]*fill: currentColor/);
+  });
+
+  it("icon.svg is the FUSE mark", () => {
+    const icon = read("src/app/icon.svg");
+    expect(icon).toContain("#04A2FB");
+    expect(icon).toContain("#8448FC");
+    expect(icon).not.toContain("#7c6cf6");
   });
 
   it("product outputs use the new name: CSV, ZIP, default repo, badge, commit messages, document headers", () => {
