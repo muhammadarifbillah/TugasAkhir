@@ -1223,5 +1223,169 @@
     "groupActions": "Aksi",
     "groupSteps": "Sub-langkah",
     "shortcutsHint": "Alt+1–5 pindah stage · Ctrl/⌘+K perintah"
+  },
+  "categories": {
+    "galleryLabel": "Ilustrasi template — bukan situs klien",
+    "artLabel": "Ilustrasi halaman {page} untuk template {category}",
+    "shelves": {
+      "sell": "Jualan online",
+      "learn": "Belajar & komunitas",
+      "business": "Bisnis & layanan",
+      "tech": "Teknis"
+    },
+    "items": {
+      "marketplace": {
+        "name": "Marketplace",
+        "desc": "Banyak penjual membuka toko di satu situs. Pembeli menelusuri produk, memberi ulasan, dan membayar di satu keranjang.",
+        "pages": {
+          "home": "Beranda",
+          "sellerStore": "Toko penjual",
+          "cartCheckout": "Keranjang & checkout"
+        },
+        "features": {
+          "multiSeller": "Banyak penjual",
+          "reviews": "Ulasan pembeli",
+          "payments": "Pembayaran"
+        },
+        "checks": {
+          "orderAccess": "Diperiksa apakah pengguna bisa membuka pesanan milik orang lain.",
+          "paymentWebhook": "Diperiksa apakah webhook pembayaran divalidasi sebelum pesanan ditandai lunas.",
+          "reviewXss": "Diperiksa apakah teks ulasan bisa menyisipkan skrip (XSS)."
+        }
+      },
+      "ecommerce": {
+        "name": "Toko online",
+        "desc": "Satu toko dengan katalog, detail produk, dan checkout. Cocok untuk usaha yang menjual produknya sendiri.",
+        "pages": {
+          "catalog": "Katalog",
+          "product": "Detail produk",
+          "checkout": "Checkout"
+        },
+        "features": {
+          "catalogSearch": "Pencarian katalog",
+          "cart": "Keranjang belanja",
+          "orders": "Riwayat pesanan"
+        },
+        "checks": {
+          "clientPrice": "Diperiksa apakah harga bisa diubah dari sisi klien.",
+          "checkoutCsrf": "Diperiksa apakah checkout terlindung dari CSRF.",
+          "buyerData": "Dipetakan data pembeli mana yang sensitif dan siapa yang boleh melihatnya."
+        }
+      },
+      "lms": {
+        "name": "Kursus online",
+        "desc": "Katalog kursus, ruang belajar berisi video, dan kuis. Pengajar mengelola materi, peserta mengikuti dari mana saja.",
+        "pages": {
+          "courses": "Katalog kursus",
+          "classroom": "Ruang belajar",
+          "quiz": "Kuis"
+        },
+        "features": {
+          "courses": "Katalog kursus",
+          "video": "Materi video",
+          "quizzes": "Kuis dan nilai"
+        },
+        "checks": {
+          "paidContent": "Diperiksa apakah materi berbayar bisa dibuka tanpa akses.",
+          "quizIntegrity": "Diperiksa apakah nilai kuis bisa diubah dari sisi klien.",
+          "fileUpload": "Diperiksa jenis dan ukuran berkas yang boleh diunggah."
+        }
+      },
+      "saas": {
+        "name": "Dashboard SaaS",
+        "desc": "Aplikasi berlangganan dengan ringkasan, tim, dan tagihan. Tiap organisasi hanya melihat datanya sendiri.",
+        "pages": {
+          "overview": "Ringkasan",
+          "team": "Tim & peran",
+          "billing": "Tagihan"
+        },
+        "features": {
+          "tenants": "Banyak organisasi",
+          "roles": "Peran pengguna",
+          "billing": "Tagihan langganan"
+        },
+        "checks": {
+          "tenantIsolation": "Diperiksa apakah data satu tenant bisa terbaca oleh tenant lain.",
+          "roleAccess": "Diperiksa apakah tiap peran hanya bisa memakai fitur yang diizinkan.",
+          "secretsInCode": "Diperiksa apakah kunci rahasia tertulis langsung di kode."
+        }
+      },
+      "clinic": {
+        "name": "Booking klinik",
+        "desc": "Pasien melihat jadwal dokter dan membuat janji temu. Klinik menyimpan riwayat kunjungan di satu tempat.",
+        "pages": {
+          "doctors": "Jadwal dokter",
+          "booking": "Formulir janji",
+          "history": "Riwayat pasien"
+        },
+        "features": {
+          "schedule": "Jadwal dokter",
+          "appointments": "Janji temu",
+          "records": "Riwayat pasien"
+        },
+        "checks": {
+          "healthData": "Dipetakan data kesehatan mana yang sensitif dan cara menyimpannya.",
+          "recordAuth": "Diperiksa apakah riwayat pasien hanya terbuka bagi yang berhak.",
+          "formRateLimit": "Diperiksa apakah formulir janji dibatasi agar tidak dibanjiri kiriman."
+        }
+      },
+      "company": {
+        "name": "Company profile",
+        "desc": "Profil perusahaan, daftar layanan, dan formulir kontak. Template bawaan untuk proyek tanpa kategori khusus.",
+        "pages": {
+          "home": "Beranda",
+          "services": "Layanan",
+          "contact": "Kontak"
+        },
+        "features": {
+          "profile": "Profil perusahaan",
+          "services": "Daftar layanan",
+          "contactForm": "Formulir kontak"
+        },
+        "checks": {
+          "contactSpam": "Diperiksa apakah formulir kontak bisa dipakai untuk spam.",
+          "securityHeaders": "Diperiksa header keamanan HTTP sebelum situs diserahkan.",
+          "outdatedDeps": "Diperiksa apakah ada dependensi usang dengan celah yang diketahui."
+        }
+      },
+      "news": {
+        "name": "Portal berita",
+        "desc": "Beranda berita, halaman artikel, dan panel editor. Redaksi menulis, menyunting, dan menerbitkan dari satu tempat.",
+        "pages": {
+          "home": "Beranda",
+          "article": "Artikel",
+          "editor": "Panel editor"
+        },
+        "features": {
+          "articles": "Artikel dan kategori",
+          "editorRoles": "Peran redaksi",
+          "media": "Galeri media"
+        },
+        "checks": {
+          "contentXss": "Diperiksa apakah isi artikel bisa menyisipkan skrip (XSS).",
+          "editorRole": "Diperiksa apakah hanya editor yang bisa menerbitkan artikel.",
+          "imageUpload": "Diperiksa jenis dan ukuran gambar yang boleh diunggah."
+        }
+      },
+      "api": {
+        "name": "Dokumentasi REST API",
+        "desc": "Referensi endpoint, contoh kode, dan pengelolaan kunci API. Pengembang lain bisa mulai memakai API dengan cepat.",
+        "pages": {
+          "reference": "Referensi endpoint",
+          "examples": "Contoh kode",
+          "keys": "Kunci API"
+        },
+        "features": {
+          "endpoints": "Referensi endpoint",
+          "apiKeys": "Kunci API",
+          "rateLimits": "Batas permintaan"
+        },
+        "checks": {
+          "tokenAuth": "Diperiksa cara token autentikasi dibuat, dikirim, dan dicabut.",
+          "rateLimit": "Dipetakan batas permintaan per kunci untuk mencegah penyalahgunaan.",
+          "inputValidation": "Diperiksa apakah setiap input endpoint divalidasi di server."
+        }
+      }
+    }
   }
 }

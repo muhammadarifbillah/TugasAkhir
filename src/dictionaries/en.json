@@ -1223,5 +1223,169 @@
     "groupActions": "Actions",
     "groupSteps": "Sub-steps",
     "shortcutsHint": "Alt+1–5 switch stage · Ctrl/⌘+K commands"
+  },
+  "categories": {
+    "galleryLabel": "Template illustration — not a client site",
+    "artLabel": "Illustration of the {page} page for the {category} template",
+    "shelves": {
+      "sell": "Selling online",
+      "learn": "Learning & community",
+      "business": "Business & services",
+      "tech": "Technical"
+    },
+    "items": {
+      "marketplace": {
+        "name": "Marketplace",
+        "desc": "Many sellers open stores on one site. Buyers browse products, leave reviews and pay in a single cart.",
+        "pages": {
+          "home": "Home",
+          "sellerStore": "Seller store",
+          "cartCheckout": "Cart & checkout"
+        },
+        "features": {
+          "multiSeller": "Many sellers",
+          "reviews": "Buyer reviews",
+          "payments": "Payments"
+        },
+        "checks": {
+          "orderAccess": "Checks whether a user can open someone else's orders.",
+          "paymentWebhook": "Checks whether the payment webhook is validated before an order is marked paid.",
+          "reviewXss": "Checks whether review text can inject scripts (XSS)."
+        }
+      },
+      "ecommerce": {
+        "name": "Online store",
+        "desc": "One store with a catalog, product pages and checkout. Suits a business selling its own products.",
+        "pages": {
+          "catalog": "Catalog",
+          "product": "Product detail",
+          "checkout": "Checkout"
+        },
+        "features": {
+          "catalogSearch": "Catalog search",
+          "cart": "Shopping cart",
+          "orders": "Order history"
+        },
+        "checks": {
+          "clientPrice": "Checks whether prices can be changed from the client.",
+          "checkoutCsrf": "Checks whether checkout is protected against CSRF.",
+          "buyerData": "Maps which buyer data is sensitive and who may see it."
+        }
+      },
+      "lms": {
+        "name": "Online course",
+        "desc": "A course catalog, a classroom with video and quizzes. Teachers manage material, students follow from anywhere.",
+        "pages": {
+          "courses": "Course catalog",
+          "classroom": "Classroom",
+          "quiz": "Quiz"
+        },
+        "features": {
+          "courses": "Course catalog",
+          "video": "Video lessons",
+          "quizzes": "Quizzes and grades"
+        },
+        "checks": {
+          "paidContent": "Checks whether paid material can be opened without access.",
+          "quizIntegrity": "Checks whether quiz scores can be changed from the client.",
+          "fileUpload": "Checks which file types and sizes may be uploaded."
+        }
+      },
+      "saas": {
+        "name": "SaaS dashboard",
+        "desc": "A subscription app with an overview, team and billing. Each organisation sees only its own data.",
+        "pages": {
+          "overview": "Overview",
+          "team": "Team & roles",
+          "billing": "Billing"
+        },
+        "features": {
+          "tenants": "Many organisations",
+          "roles": "User roles",
+          "billing": "Subscription billing"
+        },
+        "checks": {
+          "tenantIsolation": "Checks whether one tenant's data can be read by another tenant.",
+          "roleAccess": "Checks whether each role can only use the features it is allowed.",
+          "secretsInCode": "Checks whether secret keys are written directly in the code."
+        }
+      },
+      "clinic": {
+        "name": "Clinic booking",
+        "desc": "Patients see doctor schedules and book appointments. The clinic keeps visit history in one place.",
+        "pages": {
+          "doctors": "Doctor schedule",
+          "booking": "Appointment form",
+          "history": "Patient history"
+        },
+        "features": {
+          "schedule": "Doctor schedule",
+          "appointments": "Appointments",
+          "records": "Patient history"
+        },
+        "checks": {
+          "healthData": "Maps which health data is sensitive and how it is stored.",
+          "recordAuth": "Checks whether patient history opens only for those entitled to it.",
+          "formRateLimit": "Checks whether the appointment form is rate limited against floods."
+        }
+      },
+      "company": {
+        "name": "Company profile",
+        "desc": "A company profile, a list of services and a contact form. The default template for projects without a specific category.",
+        "pages": {
+          "home": "Home",
+          "services": "Services",
+          "contact": "Contact"
+        },
+        "features": {
+          "profile": "Company profile",
+          "services": "Service list",
+          "contactForm": "Contact form"
+        },
+        "checks": {
+          "contactSpam": "Checks whether the contact form can be used for spam.",
+          "securityHeaders": "Checks HTTP security headers before the site is handed over.",
+          "outdatedDeps": "Checks for outdated dependencies with known vulnerabilities."
+        }
+      },
+      "news": {
+        "name": "News portal",
+        "desc": "A news front page, article pages and an editor panel. The newsroom writes, edits and publishes from one place.",
+        "pages": {
+          "home": "Home",
+          "article": "Article",
+          "editor": "Editor panel"
+        },
+        "features": {
+          "articles": "Articles and sections",
+          "editorRoles": "Newsroom roles",
+          "media": "Media gallery"
+        },
+        "checks": {
+          "contentXss": "Checks whether article content can inject scripts (XSS).",
+          "editorRole": "Checks whether only editors can publish articles.",
+          "imageUpload": "Checks which image types and sizes may be uploaded."
+        }
+      },
+      "api": {
+        "name": "REST API docs",
+        "desc": "Endpoint reference, code examples and API key management. Other developers can start using the API quickly.",
+        "pages": {
+          "reference": "Endpoint reference",
+          "examples": "Code examples",
+          "keys": "API keys"
+        },
+        "features": {
+          "endpoints": "Endpoint reference",
+          "apiKeys": "API keys",
+          "rateLimits": "Rate limits"
+        },
+        "checks": {
+          "tokenAuth": "Checks how auth tokens are issued, sent and revoked.",
+          "rateLimit": "Maps per-key request limits to prevent abuse.",
+          "inputValidation": "Checks whether every endpoint input is validated on the server."
+        }
+      }
+    }
   }
 }
