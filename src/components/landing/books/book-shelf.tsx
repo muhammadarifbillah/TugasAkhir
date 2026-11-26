@@ -255,7 +255,7 @@ function ShelfBook({ book, copy, onOpen }: { book: ResultBook; copy: Copy; onOpe
   );
 }
 
-const BOARD = "h-3 rounded-sm bg-[var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)]";
+const BOARD = "h-3 rounded-sm [background:var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)]";
 
 function Shelf({ shelf, title, lede, copy, onOpen }: { shelf: ShelfId; title: string; lede: string; copy: Copy; onOpen: (id: BookId, el: HTMLElement) => void }) {
   return (
@@ -313,7 +313,7 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                 e.preventDefault();
                 trigger.current?.focus();
               }}
-              className="fixed inset-0 z-50 overflow-y-auto bg-[var(--fuse-card-bg)] p-5 pt-16 [perspective:1600px] focus:outline-none md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[90vh] md:w-[min(56rem,94vw)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[2rem] md:p-8 md:pt-16"
+              className="fixed inset-0 z-50 overflow-y-auto [background:var(--fuse-card-bg)] p-5 pt-16 [perspective:1600px] focus:outline-none md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[90vh] md:w-[min(56rem,94vw)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[2rem] md:p-8 md:pt-16"
             >
               <DialogPrimitive.Close
                 aria-label={copy.close}

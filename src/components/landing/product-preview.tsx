@@ -35,7 +35,7 @@ export function ProductPreview({ shots, figureLabels }: { shots: PreviewShot[]; 
         whileInView={{ scale: 1, opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, ease: EASE }}
-        className="rounded-[28px] bg-[var(--fuse-card-bg)] p-2.5 shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)]"
+        className="rounded-[28px] [background:var(--fuse-card-bg)] p-2.5 shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)]"
       >
         <div className="relative aspect-[1440/842] overflow-hidden rounded-[18px] bg-[var(--clay-bg)]">
           <Image src={main.src} fill alt={main.alt} sizes="(min-width: 1024px) 64rem, 100vw" className="object-cover object-top" />
