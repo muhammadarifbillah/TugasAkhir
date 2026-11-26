@@ -469,6 +469,19 @@
       "checkCodes": "Dipetakan ke NIST SSDF {nist} · ISO/IEC 27001 {iso}",
       "scanned": "Kode yang dihasilkan dipindai Semgrep & Trivy.",
       "start": "Mulai dari template ini"
+    },
+    "shelf": {
+      "pill": "Rak template",
+      "title": "Mulai dari rak, bukan dari halaman kosong.",
+      "lede": "Delapan jenis website, masing-masing tiga halaman contoh. Buka sampulnya untuk melihat isi dan yang diperiksa.",
+      "tabsLabel": "Tampilan rak",
+      "tabShelves": "Rak",
+      "tabAll": "Semua",
+      "searchLabel": "Cari template",
+      "searchPlaceholder": "Cari: toko, kursus, klinik…",
+      "count": "{n} template ditemukan",
+      "empty": "Tidak ada template yang cocok dengan \"{q}\".",
+      "pagesCount": "3 halaman"
     }
   },
   "nav": {

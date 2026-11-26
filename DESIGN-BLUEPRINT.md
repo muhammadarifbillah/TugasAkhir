@@ -653,6 +653,11 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | M6 | Facts numbers | First in view | count-up | kept |
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
 | M8 | Architecture node | Click/focus | glow outline + highlighted connectors, note crossfade | same |
+| M9 | Hero gallery wall | Hover/focus (all widths); pointer under `LANDING_MOTION_QUERY` | panel lifts 12 px; curved CSS 3D wall (rotateY ≤ 21°), wall tilts ≤ 3° with the pointer | flat row, lift off, no tilt |
+| M10 | Category viewer | Open / page change (all widths) | scale + fade in 0.32 s; page crossfade + 40 px slide | crossfade only |
+| M11 | Template shelf cover | Hover/focus (all widths) | cover rises 8 px and tilts 2° | none |
+
+Gallery interactions (M9 lift, M10, M11) run at every width inside their own MotionConfig skipAnimations={false}; the M9 tilt is the only parallax and stays behind LANDING_MOTION_QUERY.
 
 Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, whole-section fade-ups (only the H2 heading enters, see M2) and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
 

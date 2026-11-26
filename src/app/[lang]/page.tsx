@@ -11,6 +11,7 @@ import { GateLinkProvider } from "@/components/landing/gate-link";
 import { Glossary } from "@/components/landing/glossary";
 import { GalleryProvider } from "@/components/landing/gallery/gallery-provider";
 import { HeroWall } from "@/components/landing/gallery/hero-wall";
+import { TemplateShelf } from "@/components/landing/gallery/template-shelf";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { primaryCta } from "@/components/landing/primary-cta";
@@ -92,6 +93,10 @@ export default async function HomePage({ params }: HomePageProps) {
             </section>
 
             <StandardsStrip label={l.stripLabel} items={l.stripItems} />
+
+            <ClaySection id="rak" pill={l.shelf.pill} title={l.shelf.title} lede={l.shelf.lede}>
+              <TemplateShelf copy={l.shelf} />
+            </ClaySection>
           </GalleryProvider>
 
           <ClaySection id="masalah" pill={l.pills.problem} title={l.problemTitle} band>

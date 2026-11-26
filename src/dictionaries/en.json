@@ -469,6 +469,19 @@
       "checkCodes": "Mapped to NIST SSDF {nist} · ISO/IEC 27001 {iso}",
       "scanned": "Generated code is scanned by Semgrep & Trivy.",
       "start": "Start from this template"
+    },
+    "shelf": {
+      "pill": "Template shelf",
+      "title": "Start from a shelf, not a blank page.",
+      "lede": "Eight kinds of website, three sample pages each. Open a cover to see what is inside and what gets checked.",
+      "tabsLabel": "Shelf view",
+      "tabShelves": "Shelves",
+      "tabAll": "All",
+      "searchLabel": "Search templates",
+      "searchPlaceholder": "Search: shop, course, clinic…",
+      "count": "Templates found: {n}",
+      "empty": "No template matches \"{q}\".",
+      "pagesCount": "3 pages"
     }
   },
   "nav": {

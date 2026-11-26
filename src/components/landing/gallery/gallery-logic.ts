@@ -1,4 +1,5 @@
-import type { CategoryId } from "@/lib/site-categories";
+import type { Dictionary } from "@/lib/i18n";
+import type { CategoryId, ShelfId, SiteCategory } from "@/lib/site-categories";
 
 export type PageIndex = 0 | 1 | 2;
 export interface ViewerState {
@@ -51,4 +52,27 @@ export function pointerTilt(clientX: number, left: number, width: number): numbe
   if (width <= 0) return 0;
   const t = Math.min(1, Math.max(-1, ((clientX - left) / width) * 2 - 1));
   return noNegZero(Math.round(t * 1000) / 1000);
+}
+
+export const SHELF_ORDER: readonly ShelfId[] = ["sell", "learn", "business", "tech"];
+
+/** Categories grouped by shelf in SHELF_ORDER; empty shelves are dropped, input order kept. */
+export function groupByShelf(cats: readonly SiteCategory[]): { shelf: ShelfId; items: SiteCategory[] }[] {
+  return SHELF_ORDER.map((shelf) => ({ shelf, items: cats.filter((c) => c.shelf === shelf) })).filter((g) => g.items.length > 0);
+}
+
+const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+type SearchItem = { name: string; desc: string; pages: Record<string, string>; features: Record<string, string> };
+
+/** Every query token must appear in the category's name, description, page names or feature names. */
+export function searchCategories(cats: readonly SiteCategory[], query: string, labels: Dictionary["categories"]): SiteCategory[] {
+  const tokens = fold(query.trim()).split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return [...cats];
+  return cats.filter((c) => {
+    const item = labels.items[c.id] as unknown as SearchItem;
+    const text = fold(
+      [item.name, item.desc, ...c.pages.map((p) => item.pages[p.id]), ...c.features.map((f) => item.features[f])].join(" "),
+    );
+    return tokens.every((t) => text.includes(t));
+  });
 }
