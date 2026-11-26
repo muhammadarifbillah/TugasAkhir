@@ -103,10 +103,8 @@ describe("hero tape", () => {
     for (const phrase of FORBIDDEN) expect(text).not.toContain(phrase);
   });
 
-  it("landing page renders the tape hero, not the shield", () => {
+  it("landing page no longer renders the tape hero or the shield", () => {
     const page = read("src/app/[lang]/page.tsx");
-    for (const s of ["HeroShield", "heroWordmark", "hero-wordmark", "heroStandards"]) expect(page).not.toContain(s);
-    for (const s of ["<HeroTape", "fmt(l.heroSub", "fmt(l.heroLede", "dict.app.name", 'href="#bukti"', "l.ctaSample"])
-      expect(page).toContain(s);
+    for (const s of ["HeroShield", "heroWordmark", "hero-wordmark", "heroStandards", "<HeroTape"]) expect(page).not.toContain(s);
   });
 });
