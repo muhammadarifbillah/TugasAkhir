@@ -1,7 +1,9 @@
 # PEDOMAN WAWANCARA
 
-## Penelitian: Pengembangan Aplikasi ShieldForge
+## Penelitian: Pengembangan Aplikasi Saksi
 ### AI-Powered Secure SDLC Website Generator
+
+> Catatan: produk ini sebelumnya bernama ShieldForge; nama diganti menjadi Saksi pada 2026-11-26. Judul skripsi tidak berubah.
 
 ---
 
@@ -11,9 +13,9 @@
 
 ---
 
-## TENTANG APLIKASI SHIELDFORGE
+## TENTANG APLIKASI SAKSI
 
-**ShieldForge** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
+**Saksi** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
 
 - **5 Tahapan Berurutan:**
   1. **Analysis & Requirements** — Penentuan scope, rekomendasi stack teknologi, identifikasi requirement keamanan & privasi, klasifikasi data

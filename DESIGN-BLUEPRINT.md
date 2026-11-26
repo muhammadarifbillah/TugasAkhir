@@ -1,4 +1,4 @@
-# ShieldForge Design Blueprint
+# Saksi Design Blueprint (sebelumnya ShieldForge)
 
 > Versi: 1.0 | Terakhir diperbarui: September 2026
 > Tools: Next.js 16, Tailwind CSS v4, komponen UI lokal (Radix primitives), Archivo + Geist Mono (self-hosted)
@@ -268,7 +268,7 @@ Status: M4 done (PRD 2026-11-26 landing-dashboard-3d, bab 12): sticky toolbar, f
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                                                         │
-│              🛡️ ShieldForge                              │
+│              🛡️ Saksi                                    │
 │                                                         │
 │  ┌─────────────────────────────────────────────────┐   │
 │  │ Sign In                                          │   │
