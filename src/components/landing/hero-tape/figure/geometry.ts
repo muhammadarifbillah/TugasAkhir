@@ -28,6 +28,8 @@ import {
   REEL_X,
   REEL_Y,
   ROWS_Z,
+  STAMP_H,
+  STAMP_SIZE,
   STAMP_Y,
   STAMP_Z,
   TAPE_T,
@@ -86,7 +88,8 @@ export const HEAD_SEAMS = HEADS_Y.map((y) =>
 // Printed text runs along -y on the tape's front face (x = TAPE_X + INK).
 const FACE = TAPE_X + INK;
 export const LINE_AT = ROWS_Z.map((z) => sideMatrix([FACE, LINES_Y + LINE_LEN / 2 - 6], z + 3.5, P, "right"));
-export const STAMP_AT = sideMatrix([FACE, STAMP_Y], STAMP_Z + 3, P, "right");
+// Baseline sits so the cap height (~0.7 em) is centred in the plate.
+export const STAMP_AT = sideMatrix([FACE, STAMP_Y], STAMP_Z + (STAMP_H - 0.7 * STAMP_SIZE) / 2, P, "right");
 export const DIGIT_AT = DRUMS_Y.map((y) => sideMatrix([DRUM_X[1], y], TOP + 6, P, "right"));
 
 /** The window the tape is seen through, from guide to guide. */

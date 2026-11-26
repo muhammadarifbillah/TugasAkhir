@@ -19,7 +19,7 @@ function walk(dir: string, ext: RegExp, out: string[] = []): string[] {
     if (entry.isDirectory()) {
       if (path === "src/generated") continue;
       walk(path, ext, out);
-    } else if (ext.test(entry.name) && !entry.name.endsWith(".test.ts")) {
+    } else if (ext.test(entry.name) && !entry.name.endsWith(".test.ts") && !entry.name.endsWith(".test.tsx")) {
       out.push(path);
     }
   }
@@ -76,6 +76,13 @@ describe("landing information architecture", () => {
         return text.includes("landing/hero-shield") || text.includes("HeroShield");
       });
     expect(users).toEqual([]);
+  });
+
+  it("guard card titles are h4 under the guard heading", () => {
+    const about = read(ABOUT);
+    expect(about).toMatch(/<h3[^>]*>\{guardTitle\}<\/h3>/);
+    expect(about).toMatch(/<h4[^>]*>\{c\.title\}<\/h4>/);
+    expect(about).not.toMatch(/<h3[^>]*>\{c\.title\}/);
   });
 });
 

@@ -3,14 +3,15 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { translateAlong } from "@/components/iso/iso-kit";
+import { axisVector, iso, translateAlong } from "@/components/iso/iso-kit";
 import { contrastRatio } from "@/lib/contrast";
 import { HeroTape } from "../hero-tape";
 import { GATE4_STAMP, HERO_FINDINGS, POSTER_POSE, poseOf, type Pose } from "../model";
 import { HeroTapeFigure } from "./art";
 import { frameAttributes, frameOf, tapeLines } from "./frame";
+import { PATHS, TAPE_WINDOW } from "./geometry";
 import { PAINT_ORDER, PARTS } from "./parts";
-import { P } from "./view";
+import { INK, P, ROWS_Z, STAMP_H, STAMP_LEN, STAMP_SIZE, STAMP_Y, STAMP_Z, TAPE_X, TAPE_Z0 } from "./view";
 
 const ROOT = process.cwd();
 const DIR = join(ROOT, "src/components/landing/hero-tape/figure");
@@ -185,5 +186,75 @@ describe("hero tape figure", () => {
     };
     expect(contrastRatio(hiIn(".iso.hero-tape-figure {"), "#0b0d1a")).toBeGreaterThanOrEqual(3);
     expect(contrastRatio(hiIn("html:not(.dark) .iso.hero-tape-figure {"), "#eef0fb")).toBeGreaterThanOrEqual(3);
+  });
+});
+
+type Flat = [number, number];
+
+/** Polygons of an M/L/Z path; any other command fails the test with the part id. */
+function polygonsOf(d: string, id: string): Flat[][] {
+  const tokens = d.match(/[A-Za-z]|-?\d*\.?\d+(?:e-?\d+)?/g) ?? [];
+  const polys: Flat[][] = [];
+  for (let i = 0; i < tokens.length; ) {
+    const cmd = tokens[i++]!;
+    if (cmd === "Z" || cmd === "z") continue;
+    if (cmd !== "M" && cmd !== "L") throw new Error(`${id}: unsupported path command "${cmd}"`);
+    const point: Flat = [Number(tokens[i++]), Number(tokens[i++])];
+    if (cmd === "M") polys.push([point]);
+    else polys[polys.length - 1]!.push(point);
+  }
+  return polys;
+}
+
+/** Ray casting, even-odd across all subpaths. */
+function inside([x, y]: Flat, polys: Flat[][]): boolean {
+  let hit = false;
+  for (const poly of polys)
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const [xi, yi] = poly[i]!;
+      const [xj, yj] = poly[j]!;
+      if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit;
+    }
+  return hit;
+}
+
+describe("gate 4 stamp", () => {
+  it("stamp text is at least 12 px on screen", () => {
+    expect(STAMP_SIZE * Math.hypot(...axisVector(P, [0, 0, 1]))).toBeGreaterThanOrEqual(12);
+  });
+
+  it("stamp plate fits its text and sits in the tape margin", () => {
+    expect(STAMP_LEN).toBeGreaterThanOrEqual(GATE4_STAMP.length * 0.62 * STAMP_SIZE + 8);
+    expect(STAMP_H).toBeGreaterThanOrEqual(STAMP_SIZE + 4);
+    expect(STAMP_Z).toBeGreaterThanOrEqual(TAPE_Z0);
+    expect(STAMP_Z + STAMP_H).toBeLessThanOrEqual(ROWS_Z[2]);
+  });
+
+  it("stamp stays whole and unoccluded from 70% to 100% and on the poster", () => {
+    const window = polygonsOf(TAPE_WINDOW, "tape-window");
+    const firstRider = PAINT_ORDER.findIndex((id) => PARTS.find((p) => p.id === id)?.moves);
+    const front = PAINT_ORDER.filter((id, i) => i > firstRider && !PARTS.find((p) => p.id === id)?.moves && id !== "stamp-mark");
+    expect(front.length).toBeGreaterThan(0);
+    const covers = front.map((id) => ({ id, polys: polygonsOf(PATHS[id]!.fill, id) }));
+    const tapeXs = [...Array.from({ length: 31 }, (_, i) => poseOf(0.7 + i / 100).tapeX), POSTER_POSE.tapeX];
+    const y0 = STAMP_Y - STAMP_LEN / 2 + 1;
+    const y1 = STAMP_Y + STAMP_LEN / 2 - 1;
+    const z0 = STAMP_Z + 1;
+    const z1 = STAMP_Z + STAMP_H - 1;
+    const misses: string[] = [];
+    for (const tapeX of tapeXs)
+      for (let a = 0; a < 12; a++)
+        for (let b = 0; b < 3; b++) {
+          const y = y0 + ((y1 - y0) * a) / 11 - tapeX;
+          const z = z0 + ((z1 - z0) * b) / 2;
+          const at = iso([TAPE_X + INK, y, z], P);
+          if (!inside(at, window)) misses.push(`tapeX ${tapeX}: (${y}, ${z}) outside the window`);
+          for (const c of covers) if (inside(at, c.polys)) misses.push(`tapeX ${tapeX}: (${y}, ${z}) under ${c.id}`);
+        }
+    expect(misses).toEqual([]);
+  });
+
+  it("poster does not grow", () => {
+    expect(Buffer.byteLength(render(POSTER_POSE))).toBeLessThanOrEqual(39872);
   });
 });

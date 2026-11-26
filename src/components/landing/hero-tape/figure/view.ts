@@ -28,11 +28,11 @@ export const LINES_Y = 410;
 /** Bottom z of finding rows 1..3. */
 export const ROWS_Z = [84, 69, 54] as const;
 export const ROW_H = 14;
-export const STAMP_Y = 270;
-export const STAMP_LEN = 96;
-export const STAMP_Z = 39;
-export const STAMP_H = 12;
-export const STAMP_SIZE = 9;
+export const STAMP_Y = 500;
+export const STAMP_LEN = 130;
+export const STAMP_Z = 36;
+export const STAMP_H = 17;
+export const STAMP_SIZE = 13;
 
 /** Heads 1..5 (y centres), standing behind the tape. */
 export const HEADS_Y = [225, 175, 125, 70, 15] as const;

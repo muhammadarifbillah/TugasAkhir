@@ -62,7 +62,7 @@ export function AboutSection({
                 <span className="flex size-11 items-center justify-center rounded-2xl bg-[var(--clay-tint)] text-primary shadow-[inset_0_1px_0_var(--clay-hl)]">
                   <Icon className="size-5" aria-hidden="true" />
                 </span>
-                <h3 className="mt-5 text-lg font-semibold">{c.title}</h3>
+                <h4 className="mt-5 text-lg font-semibold">{c.title}</h4>
                 <ul className="mt-3 space-y-2">
                   {c.bullets.map((b) => (
                     <li key={b} className="flex gap-2 text-sm text-muted-foreground">
