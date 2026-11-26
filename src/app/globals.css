@@ -243,6 +243,11 @@ body {
   display: none;
 }
 
+/* FUSE mark: brand gradient in light, mono (currentColor) in dark. */
+.dark .fuse-mark {
+  fill: currentColor;
+}
+
 /* Soft elevated card used by panels/dialogs on top of the flat background */
 .card-elevated {
   box-shadow:

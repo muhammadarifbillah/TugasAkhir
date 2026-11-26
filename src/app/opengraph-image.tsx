@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Saksi: every stage is checked before any code ships";
+export const alt = "FUSE: every stage is checked before any code ships";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -25,13 +25,13 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          background: "radial-gradient(900px 500px at 50% -10%, rgba(124,58,237,0.45), #0b0d1a 70%)",
-          color: "#eef0ff",
+          background: "radial-gradient(900px 500px at 50% -10%, rgba(74,127,167,0.45), #0A1931 70%)",
+          color: "#F6FAFD",
           fontFamily: "sans-serif",
         }}
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 30, fontWeight: 700, color: "#b9a6ff" }}>Saksi</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: "#B3CFE5" }}>FUSE</div>
           <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.05, marginTop: 20, maxWidth: 980, letterSpacing: -1.5 }}>
             Every stage is checked before any code ships.
           </div>
@@ -44,7 +44,7 @@ export default function OpengraphImage() {
                 <svg width="30" height="30" viewBox="0 0 24 24">
                   <path d={g.shape} fill="none" stroke={g.color} strokeWidth="2" strokeLinejoin="round" />
                 </svg>
-                <div style={{ fontSize: 24, color: "#a6abd6" }}>{`${g.c}°C`}</div>
+                <div style={{ fontSize: 24, color: "#B3CFE5" }}>{`${g.c}°C`}</div>
               </div>
               <div style={{ height: 14, background: g.color, borderRadius: 999, marginTop: 14, boxShadow: "0 0 18px " + g.color }} />
               <div style={{ fontSize: 24, marginTop: 12 }}>{g.name}</div>
@@ -53,7 +53,7 @@ export default function OpengraphImage() {
           ))}
         </div>
 
-        <div style={{ fontSize: 22, color: "#a6abd6", borderTop: "1px solid #2a2f57", paddingTop: 18, display: "flex" }}>
+        <div style={{ fontSize: 22, color: "#B3CFE5", borderTop: "1px solid #1A3D63", paddingTop: 18, display: "flex" }}>
           Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A
         </div>
       </div>

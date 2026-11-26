@@ -43,7 +43,7 @@
     "back": "Back to settings"
   },
   "app": {
-    "name": "Saksi",
+    "name": "FUSE",
     "tagline": "AI code ships only with a witness. Every gate is mapped to ISO/IEC 27001:2022.",
     "frameworkNote": "NIST SP 800-218 (SSDF) is the supplement; this is a concept mapping, not a certification.",
     "offline": "You are offline. Some features may not work."
@@ -138,7 +138,7 @@
     "previewTitle": "This is the studio.",
     "previewShots": [
       {
-        "alt": "Saksi studio with sub-steps, the AI workspace and the security panel",
+        "alt": "FUSE studio with sub-steps, the AI workspace and the security panel",
         "caption": "Studio workspace"
       },
       {
@@ -182,7 +182,7 @@
         "a": "OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, and Ollama for local models."
       },
       {
-        "q": "Does Saksi give me an ISO 27001 certificate?",
+        "q": "Does FUSE give me an ISO 27001 certificate?",
         "a": "No. It maps each stage to ISO 27001:2022 Annex A controls and produces reports that support an audit."
       },
       {
@@ -307,7 +307,7 @@
         "note": "Hands over auditable results. (ZIP, manual book, ISO report, traceability matrix; push and pull requests with a security.yml workflow.) The repository stays yours."
       }
     ],
-    "archPlatformTitle": "Saksi platform security",
+    "archPlatformTitle": "FUSE platform security",
     "archPlatform": [
       "Keys and tokens encrypted with AES-256-GCM",
       "Content Security Policy with a per-request nonce",
@@ -324,7 +324,7 @@
     "resultsDeliverables": "Results",
     "limitsTitle": "Limits",
     "limits": [
-      "Not an ISO 27001 or NIST certification; Saksi maps controls and prepares evidence",
+      "Not an ISO 27001 or NIST certification; FUSE maps controls and prepares evidence",
       "Scanners find known patterns; human review is still needed",
       "AI output quality depends on the model you choose",
       "Docker is required to run apps and scans"
@@ -565,7 +565,7 @@
     "errorAccessDenied": "Sign-in was denied or your session expired.",
     "errorOAuth": "GitHub sign-in failed. Try again.",
     "registerTitle": "Create an account",
-    "registerSubtitle": "Get started with Saksi in minutes.",
+    "registerSubtitle": "Get started with FUSE in minutes.",
     "noAccount": "Don't have an account?",
     "createAccount": "Sign up",
     "emailLabel": "Email",
@@ -1019,7 +1019,7 @@
     "mergeRevision": "Merge revision",
     "cancelRevision": "Cancel revision",
     "badge": "Project status badge",
-    "badgeHint": "Paste this badge into your README to show the Saksi security pipeline.",
+    "badgeHint": "Paste this badge into your README to show the FUSE security pipeline.",
     "badgeCopied": "Badge copied!",
     "copy": "Copy",
     "ok": "OK",
