@@ -70,6 +70,7 @@ describe("section heading entrance", () => {
   });
 
   it("section heading SSR is visible without JavaScript", () => {
+    // eslint-disable-next-line react/no-children-prop -- ClaySection types children as a required prop
     const html = renderToStaticMarkup(createElement(ClaySection, { id: "x", pill: "p", title: "T", children: "c" }));
     const at = html.indexOf("<h2");
     expect(at).toBeGreaterThan(-1);

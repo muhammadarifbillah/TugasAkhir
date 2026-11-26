@@ -113,27 +113,26 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. It follows the theme toggle, with Dark Clay as the default (`defaultTheme="dark"` app-wide): `html.dark:has(.landing)` gives Dark Clay and `html:not(.dark):has(.landing)` gives Light Clay (lavender paper, same layout and accents), each swapping the tokens for the whole document (header and footer included); other pages are unaffected, and high contrast overrides both. The five gates keep the steel temper colours (dark variants on Dark Clay, deepened light variants on Light Clay so they stay ≥ 4.5:1) and hallmark shapes (◇ ○ △ □ ⬡). The hero is fully server-rendered and visible without JavaScript: H1, sub-headline and lede come first and are the LCP element, then the Pita Pindai stage (aria-hidden) and an HTML findings table that carries the same information; there is no route `loading.tsx` above the landing. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
 
 ```
-Hero        H1 · sub-headline (ISO/IEC 27001:2022 first) · lede · [Start a free project] [See a sample report → #bukti] · Pita Pindai stage (aria-hidden) · findings table (example scan: 2 medium + 1 low = 91, gate 4 stamp A.8.29 · PW.8.1)
-Strip       standards & tools as text chips (not logos)
-#dijaga      5 clay cards "what it guards" around the shield emblem
+Hero        #mulai-hero · H1 · sub-headline (ISO/IEC 27001:2022 first) · lede · [Start a free project → /register] [See a sample report → #bukti] · Pita Pindai stage (aria-hidden, server poster; desktop: pinned scroll timeline) · findings table
+Strip       ISO/IEC 27001:2022 Annex A · NIST SSDF SP 800-218 (complement) · Semgrep · Trivy (text chips)
 #masalah     cited Veracode figure (45% of tests) + 3 problems
-#tentang     AI vs gates · facts card (count-up) · studio screenshot
-#gerbang     5 temper coupons (auto carousel, desktop) · all 26 sub-steps in <details>
+#tentang     AI vs gates · the five guarded areas (clay cards) · facts card (count-up) · studio screenshot
+#gerbang     5 temper coupons (auto carousel with pause, desktop) · all 26 sub-steps in <details>
 #pengguna    3 audience tiles
 #pratinjau   3 real studio screenshots as clay cards
-#cara-kerja  6 steps with a live vignette (scan example = real scoring function)
+#cara-kerja  6 steps with a live vignette (scan example = real scoring function; prompt shown in full, no typing)
 #arsitektur  6 clay nodes with neon connectors + platform security
-#bukti       facts · score formula · gate → NIST/ISO table · CSV of 26 sub-steps
+#bukti       facts · score formula · gate NIST/ISO table · CSV of 26 sub-steps
 #hasil       deliverables | limits
 #pelajari    9 glossary cards · 7 FAQ
-Closing      clay CTA panel with violet glow
+#mulai       clay CTA panel with violet glow
 ```
 
 **Spesifikasi:**
 - Container `max-w-7xl px-4`; sections `py-24 md:py-32`, centred pill label + H2 + lede (`components/landing/clay-section.tsx`), alternate sections on `--clay-bg-2`.
 - Type: Archivo width axis, `.font-wide` for H1/H2/figures; Geist Mono only for real codes.
 - Surfaces (`globals.css`): `.clay-card` (24px radius, gradient, outer + inner double shadow, faint 1px edge), `.clay-btn` (violet gradient pill, glow, press squash), `.clay-btn-ghost`, `.clay-chip`, `.clay-pill`, `.coupon` (stage-tinted clay, glow ring when selected). No backdrop blur; glow is `box-shadow` only; high contrast drops shadows for 2px borders. Text pairs pinned in `src/lib/contrast.test.ts`.
-- Components: `hero-tape`, `standards-strip`, `guard-grid`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`.
+- Components: `hero-tape`, `standards-strip`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`. `hero-shield.tsx` is kept as history until M5 and is not rendered.
 - OG image (`src/app/opengraph-image.tsx`): navy with violet glow, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
 - Hero tape (PRD 2026-11-26 landing-dashboard-3d, bab 10 and 13): `components/landing/hero-tape/model.ts` holds the example findings, the running score (`computeSecurityScore`), the finding codes (`enrichFinding`), the gate 4 stamp (`GATE_MAPPING`) and `poseOf(progress)`, a pure function of scroll progress (0/25/50/75/100% = PRD table); `POSTER_POSE` is the 50% pose with the stamp shown. Tokens `--tape-paper` (dark #ede6d3, light #f6f1e3), `--tape-ink`, `--finding-medium`, `--finding-low`, `--brake`, `--odometer-bg` are pinned in `src/lib/contrast.test.ts`. The figure (M2b) and the scroll timeline (M2c) follow. The figure (`components/landing/hero-tape/figure/`) is a server-rendered isometric SVG of 58 parts drawn with the anatomy kit (`components/iso/`), aria-hidden, at most 40 kB, posed by `frameOf(pose)`; its geometry is checked with `scripts/hero-tape/audit.ts` (kit audit) and the kit's `lines.mjs`.
 
@@ -646,16 +645,16 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 
 | # | Element | Trigger | Motion | Reduced motion |
 |---|---|---|---|---|
-| M1 | Hero shield + wordmark | Load | shield fades in and rises 24 px (600 ms); wordmark fades in | fade only |
-| M2 | Hero shield idle | While visible | slow float y −6 px over 6 s (CSS `.hero-float`), paused offscreen; the only continuous effect | off |
+| M1 | Hero Pita Pindai | Scroll (desktop gate) | stage + caption pinned in #main for 1 600 px, scrub 0.6; pose = poseOf(progress): heads light, brake clamps, odometer 100 → 096 → 092 → 091, stamp prints; scrolling back reverses | server poster (pose 50% + stamp), no motion |
+| M2 | Section headings (H2) | First time 80% in view (desktop gate) | fade + rise 16 px, 0.4 s, power2.out, once | none (heading always visible; nothing is hidden without JavaScript) |
 | M3 | Gate coupons | In view | the selected coupon's bottom edge fills over 4.5 s (CSS, `onAnimationEnd` advances); selected coupon glows in its stage colour; panel crossfade; pauses on hover, focus, offscreen, hidden tab, button | crossfade, still rotating, pause button |
 | M4 | Clay cards / buttons | Hover, focus / press | cards lift 4 px with a deeper shadow; buttons squash (`translateY(1px) scale(.98)`) | shadow/colour only |
-| M5 | How-it-works vignette | Tab change | typing, staggered rows, score 0→91, diff flash, ticks | final state |
+| M5 | How-it-works vignette | Tab change | staggered rows, score 0→91, diff flash, ticks; the prompt is shown in full (no typing caret) | final state |
 | M6 | Facts numbers | First in view | count-up | kept |
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
 | M8 | Architecture node | Click/focus | glow outline + highlighted connectors, note crossfade | same |
 
-Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, section fade-ups and the looping hero demo. Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
+Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, section fade-ups and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
 
 **Landing scroll (GSAP + Lenis)** (PRD `docs/prd/2026-11-26-landing-dashboard-3d`, bab 24 a–c; replaces the earlier "no smooth-scroll library, no GSAP" rule):
 - **Landing only (a).** `LandingMotion` loads `gsap`, `gsap/ScrollTrigger` and `lenis` with dynamic `import()` only when `LANDING_MOTION_QUERY` in `motion.ts` matches: `(min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`. Otherwise the modules are not downloaded (0 B), not merely disabled. Dashboard, studio, settings and auth pages never import them and keep native scroll.

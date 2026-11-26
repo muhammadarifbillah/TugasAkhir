@@ -34,8 +34,8 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
     if (!shouldLoadLandingMotion(window.matchMedia.bind(window))) return;
     let cancelled = false;
     let cleanup: (() => void) | undefined;
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("lenis"), import("./hero-tape/hero-tape-live")])
-      .then(([g, st, l, hero]) => {
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("lenis"), import("./hero-tape/hero-tape-live"), import("./section-entrance")])
+      .then(([g, st, l, hero, entrance]) => {
         const main = document.getElementById("main");
         const content = document.getElementById("main-content");
         if (cancelled || !main || !content) return;
@@ -43,7 +43,7 @@ export function LandingMotion({ children }: { children: React.ReactNode }) {
           { gsap: g.gsap, ScrollTrigger: st.ScrollTrigger, Lenis: l.default },
           main,
           content,
-          [hero.heroTapeScene],
+          [hero.heroTapeScene, entrance.entranceScene],
         );
       })
       // A chunk that fails to load leaves the poster in place and native scrolling working.

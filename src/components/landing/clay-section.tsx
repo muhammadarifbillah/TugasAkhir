@@ -25,7 +25,7 @@ export function ClaySection({
       <div className="mx-auto w-full max-w-7xl px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="clay-pill">{pill}</span>
-          <h2 id={`${id}-title`} className="font-wide mt-5 text-balance text-3xl md:text-[2.75rem]">
+          <h2 id={`${id}-title`} data-entrance="" className="font-wide mt-5 text-balance text-3xl md:text-[2.75rem]">
             {title}
           </h2>
           {lede && <p className="mx-auto mt-5 max-w-[60ch] leading-relaxed text-muted-foreground">{lede}</p>}
