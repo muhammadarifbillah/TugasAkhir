@@ -654,7 +654,7 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
 | M8 | Architecture node | Click/focus | glow outline + highlighted connectors, note crossfade | same |
 
-Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, section fade-ups and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
+Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, whole-section fade-ups (only the H2 heading enters, see M2) and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
 
 **Landing scroll (GSAP + Lenis)** (PRD `docs/prd/2026-11-26-landing-dashboard-3d`, bab 24 a–c; replaces the earlier "no smooth-scroll library, no GSAP" rule):
 - **Landing only (a).** `LandingMotion` loads `gsap`, `gsap/ScrollTrigger` and `lenis` with dynamic `import()` only when `LANDING_MOTION_QUERY` in `motion.ts` matches: `(min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`. Otherwise the modules are not downloaded (0 B), not merely disabled. Dashboard, studio, settings and auth pages never import them and keep native scroll.
