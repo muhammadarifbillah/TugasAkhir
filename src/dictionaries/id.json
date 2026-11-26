@@ -482,6 +482,18 @@
       "count": "{n} template ditemukan",
       "empty": "Tidak ada template yang cocok dengan \"{q}\".",
       "pagesCount": "3 halaman"
+    },
+    "loop": {
+      "title": "Satu putaran, lima gerbang.",
+      "lede": "Gerbang berikutnya baru terbuka setelah yang sebelumnya lulus. Revisi tidak melompati apa pun: proyek kembali ke Analisis.",
+      "hint": "Pilih gerbang untuk melihat kontrol dan sub-langkahnya.",
+      "total": "{count} sub-langkah di lima gerbang",
+      "stationLabel": "Gerbang {n}: {title}",
+      "substeps": "{count} sub-langkah",
+      "substepsTitle": "Sub-langkah",
+      "returnLabel": "Revisi → pull request → mulai lagi dari Analisis",
+      "returnNote": "Pull request dibuka bila proyek sudah dipush ke GitHub. Revisi tersedia untuk proyek yang sudah selesai.",
+      "download": "Unduh matriks {count} sub-langkah (CSV)"
     }
   },
   "nav": {

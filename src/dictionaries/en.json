@@ -482,6 +482,18 @@
       "count": "Templates found: {n}",
       "empty": "No template matches \"{q}\".",
       "pagesCount": "3 pages"
+    },
+    "loop": {
+      "title": "One loop, five gates.",
+      "lede": "The next gate opens only after the previous one passes. A revision skips nothing: the project goes back to Analysis.",
+      "hint": "Pick a gate to see its controls and sub-steps.",
+      "total": "{count} sub-steps across five gates",
+      "stationLabel": "Gate {n}: {title}",
+      "substeps": "{count} sub-steps",
+      "substepsTitle": "Sub-steps",
+      "returnLabel": "Revision → pull request → back to Analysis",
+      "returnNote": "A pull request opens when the project has been pushed to GitHub. Revisions are for finished projects.",
+      "download": "Download the {count} sub-step matrix (CSV)"
     }
   },
   "nav": {
