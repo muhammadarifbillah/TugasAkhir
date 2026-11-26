@@ -1,0 +1,1869 @@
+﻿## Bagian A
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r5[39m
+
+ [31mΓ¥»[39m src/components/landing/gallery/category-viewer.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[33m 923[2mms[22m[39m
+   [33m[2mΓ£ô[22m[39m category viewer[2m > [22mViewerBody shows the category, its three pages and the current page [33m 453[2mms[22m[39m
+   [32mΓ£ô[39m category viewer[2m > [22mViewerBody lists three checks whose NIST and ISO codes exist in stages.ts[32m 130[2mms[22m[39m
+   [32mΓ£ô[39m category viewer[2m > [22mViewerBody has the spec table and the template CTA[32m 45[2mms[22m[39m
+   [32mΓ£ô[39m category viewer[2m > [22mgallery copy and rendered viewer avoid certification claims[32m 110[2mms[22m[39m
+   [32mΓ£ô[39m category viewer[2m > [22mCategoryViewer uses the Radix dialog, returns focus, handles arrows and blocks Lenis[32m 1[2mms[22m[39m
+[31m   [31m├ù[31m category viewer[2m > [22mthe viewer surface is opaque and the overlay is dark[39m[32m 29[2mms[22m[39m
+[31m     ΓåÆ expected 'fixed inset-0 z-50 overflow-y-auto bgΓÇª' to contain 'bg-card'[39m
+[31m   [31m├ù[31m category viewer[2m > [22mno component paints a gradient token as a background colour[39m[32m 151[2mms[22m[39m
+[31m     ΓåÆ expected [ ΓÇª(2) ] to deeply equal [][39m
+   [32mΓ£ô[39m category viewer[2m > [22mlanding.gallery keys match in id and en and keep placeholders[32m 2[2mms[22m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m Failed Tests 2 [49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/category-viewer.test.ts[2m > [22mcategory viewer[2m > 
+[22mthe viewer surface is opaque and the overlay is dark
+[31m[1mAssertionError[22m: expected 'fixed inset-0 z-50 overflow-y-auto bgΓÇª' to contain 'bg-card'[39m
+
+Expected: [32m"bg-card"[39m
+Received: [31m"fixed inset-0 z-50 overflow-y-auto bg-[var(--fuse-card-bg)] 
+shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] focus:outline-none lg:inset-auto lg:left-1/2 lg:top-1/2 
+lg:max-h-[88vh] lg:w-[min(72rem,94vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[2rem]"[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/category-viewer.test.ts:[2m159:21[22m[39m
+    [90m157| [39m    }[33m;[39m
+    [90m158| [39m    [35mconst[39m content [33m=[39m 
+[34mclassOf[39m([32m"DialogPrimitive.Content"[39m)[33m;[39m
+    [90m159| [39m    [34mexpect[39m(content)[33m.[39m[34mtoContain[39m([32m"bg-card"[39m)[33m;[39m
+    [90m   | [39m                    [31m^[39m
+    [90m160| [39m    
+[34mexpect[39m(content)[33m.[39m[34mtoContain[39m([32m"bg-[image:var(--fuse-card-bg)]"[39m)[33m;[39m
+    [90m161| [39m    for (const s of ["bg-[var(", "bg-transparent", "opacity-"]) expectΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/category-viewer.test.ts[2m > [22mcategory viewer[2m > 
+[22mno component paints a gradient token as a background colour
+[31m[1mAssertionError[22m: expected [ ΓÇª(2) ] to deeply equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "src/components/landing/gallery/category-viewer.tsx",[39m
+[31m+   "src/components/landing/gallery/template-shelf.tsx",[39m
+[31m+ ][39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/category-viewer.test.ts:[2m178:18[22m[39m
+    [90m176| [39m      return s.includes("bg-[var(--fuse-card-bg)]") || s.includes("bg-ΓÇª
+    [90m177| [39m    })[33m;[39m
+    [90m178| [39m    [34mexpect[39m(hits)[33m.[39m[34mtoEqual[39m([])[33m;[39m
+    [90m   | [39m                 [31m^[39m
+    [90m179| [39m  })[33m;[39m
+    [90m180| [39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/2]ΓÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m6 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 03:55:03
+[2m   Duration [22m 3.66s[2m (transform 273ms, setup 0ms, collect 1.61s, tests 923ms, environment 0ms, prepare 338ms)[22m
+
+
+## Bagian B
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r5[39m
+
+ [31mΓ¥»[39m src/components/landing/gallery/gallery-logic.test.ts [2m([22m[2m6 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 31[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mviewerReducer opens a category on page 1 and close resets[32m 5[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mnext and prev wrap around the three pages with a direction[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mgoto sets the direction and is a no-op for the same page or a closed viewer[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mkeyToAction maps the arrow keys only[32m 1[2mms[22m[39m
+[31m   [31m├ù[31m gallery logic[2m > [22mwallPose builds a coverflow panorama with a prominent centre[39m[32m 20[2mms[22m[39m
+[31m     ΓåÆ expected [ 21, 15, 9, 3, -3, -9, -15, -21 ] to deeply equal [ 39, 24, 12, 3, -3, -12, -24, -39 ][39m
+   [32mΓ£ô[39m gallery logic[2m > [22mpointerTilt is clamped to -1..1 and safe for zero width[32m 1[2mms[22m[39m
+ [31mΓ¥»[39m src/components/landing/gallery/hero-wall.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 208[2mms[22m[39m
+   [32mΓ£ô[39m hero wall[2m > [22mHeroWall renders eight labelled category panels as buttons[32m 56[2mms[22m[39m
+   [32mΓ£ô[39m hero wall[2m > [22meach panel carries its wallPose as CSS variables[32m 33[2mms[22m[39m
+[31m   [31m├ù[31m hero wall[2m > [22mHeroWall panels are portrait frames with three stacked pages[39m[32m 45[2mms[22m[39m
+[31m     ΓåÆ expected undefined to be 8 // Object.is equality[39m
+[31m   [31m├ù[31m hero wall[2m > [22meach panel carries its coverflow pose[39m[32m 44[2mms[22m[39m
+[31m     ΓåÆ expected '<div><div role="group" aria-label="GaΓÇª' to contain '--s:undefined'[39m
+[31m   [31m├ù[31m hero wall[2m > [22mwall and carousel sizes follow the panorama spec[39m[32m 17[2mms[22m[39m
+[31m     ΓåÆ expected '"use client";\n\nimport { useEffect, ΓÇª' to contain 'lg:pointer-fine:w-[clamp(8.5rem,14vw,ΓÇª'[39m
+[31m   [31m├ù[31m hero wall[2m > [22mthe carousel centre grows with a scroll-driven animation only when motion is allowed[39m[32m 4[2mms[22m[39m
+[31m     ΓåÆ expected '@import "tailwindcss";\n@import "tw-aΓÇª' to contain '@keyframes gallery-focus'[39m
+   [32mΓ£ô[39m hero wall[2m > [22mHeroWall is a snap carousel on small screens and a 3D wall behind lg:pointer-fine[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m hero wall[2m > [22mGalleryProvider re-enables interaction motion and throws outside[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m hero wall[2m > [22mpage.tsx renders the gallery hero and no longer the tape[32m 2[2mms[22m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m Failed Tests 5 [49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/gallery-logic.test.ts[2m > [22mgallery logic[2m > 
+[22mwallPose builds a coverflow panorama with a prominent centre
+[31m[1mAssertionError[22m: expected [ 21, 15, 9, 3, -3, -9, -15, -21 ] to deeply equal [ 39, 24, 12, 3, -3, -12, 
+-24, -39 ][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  [[22m
+[32m-   39,[39m
+[32m-   24,[39m
+[32m-   12,[39m
+[31m+   21,[39m
+[31m+   15,[39m
+[31m+   9,[39m
+[2m    3,[22m
+[2m    -3,[22m
+[32m-   -12,[39m
+[32m-   -24,[39m
+[32m-   -39,[39m
+[31m+   -9,[39m
+[31m+   -15,[39m
+[31m+   -21,[39m
+[2m  ][22m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/gallery-logic.test.ts:[2m48:41[22m[39m
+    [90m 46| [39m    [35mconst[39m n [33m=[39m [34m8[39m[33m;[39m
+    [90m 47| [39m    [35mconst[39m poses [33m=[39m [33mArray[39m[33m.[39m[35mfrom[39m({ length[33m:[39m 
+n }[33m,[39m (_[33m,[39m i) [33m=>[39m [34mwallPose[39m(i[33m,[39m n))[33m;[39m
+    [90m 48| [39m    expect(poses.map((p) => p.rotateY)).toEqual([39, 24, 12, 3, -3, -1ΓÇª
+    [90m   | [39m                                        [31m^[39m
+    [90m 49| [39m    expect(poses.map((p) => p.z)).toEqual([-216, -108, -36, 0, 0, -36,ΓÇª
+    [90m 50| [39m    expect(poses.map((p) => p.scale)).toEqual([1, 1, 1, 1.06, 1.06, 1,ΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/hero-wall.test.ts[2m > [22mhero wall[2m > [22mHeroWall 
+panels are portrait frames with three stacked pages
+[31m[1mAssertionError[22m: expected undefined to be 8 // Object.is equality[39m
+
+[32m- Expected:[39m 
+8
+
+[31m+ Received:[39m 
+undefined
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/hero-wall.test.ts:[2m60:50[22m[39m
+    [90m 58| [39m    [35mconst[39m out [33m=[39m [34mhtml[39m()[33m;[39m
+    [90m 59| [39m    [34mexpect[39m(out[33m.[39m[34mmatch[39m([36m/data-gallery-panel/g[39m)[33m?.[39mlengt
+h)[33m.[39m[34mtoBe[39m([34m8[39m)[33m;[39m
+    [90m 60| [39m    [34mexpect[39m(out[33m.[39m[34mmatch[39m([36m/data-panel-art/g[39m)[33m?.[39mlength)[
+33m.[39m[34mtoBe[39m([34m8[39m)[33m;[39m
+    [90m   | [39m                                                 [31m^[39m
+    [90m 61| [39m    [34mexpect[39m(out[33m.[39m[34mmatch[39m([36m/data-panel-page/g[39m)[33m?.[39mlength)
+[33m.[39m[34mtoBe[39m([34m24[39m)[33m;[39m
+    [90m 62| [39m    [34mexpect[39m(out[33m.[39m[34mmatch[39m([36m/data-panel-reflection/g[39m)[33m?.[39mle
+ngth)[33m.[39m[34mtoBe[39m([34m8[39m)[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/hero-wall.test.ts[2m > [22mhero wall[2m > [22meach panel 
+carries its coverflow pose
+[31m[1mAssertionError[22m: expected '<div><div role="group" aria-label="GaΓÇª' to contain '--s:undefined'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- --s:undefined[39m
+[31m+ <div><div role="group" aria-label="Galeri template, 8 kategori" class="transition-transform duration-700 
+[transform-style:preserve-3d] lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"><ul 
+class="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[16vw] pb-4 lg:pointer-fine:justify-center 
+lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:[perspective:1400px]"><li 
+style="--ry:21deg;--tz:49px" class="w-[68vw] max-w-[300px] shrink-0 snap-center 
+lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button type="button" 
+data-gallery-panel="" aria-label="Buka pratinjau Marketplace" class="block w-full rounded-[1.25rem] text-left 
+transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" class="font-narrow mb-2 block truncate text-center 
+text-xs uppercase tracking-wider text-foreground">Marketplace</span><span class="block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Beranda untuk template Marketplace" viewBox="0 0 320 200" width="100%" class="block h-auto 
+w-full"><defs><linearGradient id="_R_28l_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(24 72% 
+52%)"></stop><stop offset="1" stop-color="hsl(59 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Marketplace</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(24 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" height="69" rx="6" 
+fill="url(#_R_28l_-hero)"></rect><rect x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" 
+opacity="0.95"></rect><rect x="20" y="77.25" width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" 
+opacity="0.7"></rect><rect x="20" y="99" width="44" height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(24 80% 92%)"></rect><rect x="13" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="13" y="172.95" 
+width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="111.33333333333333" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(24 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" 
+y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect 
+x="214.66666666666666" y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect 
+x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(24 80% 92%)"></rect><rect 
+x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" class="mt-2 hidden h-12 
+opacity-25 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Beranda untuk template Marketplace" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_gl_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(24 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(59 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Marketplace</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(24 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" height="69" rx="6" fill="url(#_R_gl_-hero)"></rect><rect 
+x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" opacity="0.95"></rect><rect x="20" y="77.25" 
+width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" opacity="0.7"></rect><rect x="20" y="99" width="44" 
+height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="11" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(24 80% 
+92%)"></rect><rect x="13" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="13" y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g><g><rect x="111.33333333333333" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(24 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" width="58.39999999999999" height="4" rx="2" 
+fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" y="172.95" width="34.06666666666666" height="4" 
+rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="214.66666666666666" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" 
+rx="3" fill="hsl(24 80% 92%)"></rect><rect x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" 
+height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:15deg;--tz:25px" 
+class="w-[68vw] max-w-[300px] shrink-0 snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] 
+lg:pointer-fine:max-w-none lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button 
+type="button" data-gallery-panel="" aria-label="Buka pratinjau Toko online" class="block w-full rounded-[1.25rem] 
+text-left transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 
+focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none 
+motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" 
+class="font-narrow mb-2 block truncate text-center text-xs uppercase tracking-wider text-foreground">Toko 
+online</span><span class="block overflow-hidden rounded-[1.25rem] border border-border 
+shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Katalog untuk template Toko online" 
+viewBox="0 0 320 200" width="100%" class="block h-auto w-full"><defs><linearGradient id="_R_295_-hero" x1="0" y1="0" 
+x2="1" y2="1"><stop offset="0" stop-color="hsl(340 72% 52%)"></stop><stop offset="1" stop-color="hsl(15 72% 
+62%)"></stop></linearGradient></defs><rect width="320" height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" 
+width="64" height="200" rx="8" fill="#F1F5F9"></rect><g><rect x="10" y="57" width="36" height="4" rx="2" 
+fill="#0A1931" opacity="0.3"></rect></g><rect x="6" y="68" width="52" height="10" rx="3" fill="hsl(340 72% 
+52%)"></rect><g><rect x="10" y="85" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect 
+x="10" y="99" width="26" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect x="10" y="113" width="36" 
+height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g></g><g><rect x="64" y="0" width="256" height="24" 
+fill="#FFFFFF"></rect><line x1="64" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text 
+x="74" y="15.5" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Toko 
+online</text><rect x="190" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(340 72% 
+52%)"></rect></g><text x="72" y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931" opacity="0.8">Katalog</text><g><g><rect x="72" y="48" width="76" height="144" rx="5" 
+fill="#F1F5F9"></rect><rect x="75" y="51" width="70" height="76.2" rx="3" fill="hsl(340 80% 92%)"></rect><rect x="77" 
+y="132.2" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="77" y="139.2" 
+width="26.599999999999998" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="154" y="48" 
+width="76" height="144" rx="5" fill="#F1F5F9"></rect><rect x="157" y="51" width="70" height="76.2" rx="3" 
+fill="hsl(340 72% 52%)"></rect><rect x="159" y="132.2" width="45.6" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="159" y="139.2" width="26.599999999999998" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g><g><rect x="236" y="48" width="76" height="144" rx="5" fill="#F1F5F9"></rect><rect x="239" 
+y="51" width="70" height="76.2" rx="3" fill="hsl(340 80% 92%)"></rect><rect x="241" y="132.2" width="45.6" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="241" y="139.2" width="26.599999999999998" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" class="mt-2 hidden h-12 
+opacity-25 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Katalog untuk template Toko online" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_h5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(340 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(15 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="64" height="200" rx="8" 
+fill="#F1F5F9"></rect><g><rect x="10" y="57" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><rect x="6" y="68" width="52" height="10" rx="3" fill="hsl(340 72% 52%)"></rect><g><rect 
+x="10" y="85" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect x="10" y="99" width="26" 
+height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect x="10" y="113" width="36" height="4" rx="2" 
+fill="#0A1931" opacity="0.3"></rect></g></g><g><rect x="64" y="0" width="256" height="24" fill="#FFFFFF"></rect><line 
+x1="64" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="74" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Toko online</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(340 72% 52%)"></rect></g><text x="72" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Katalog</text><g><g><rect x="72" y="48" width="76" height="144" rx="5" fill="#F1F5F9"></rect><rect 
+x="75" y="51" width="70" height="76.2" rx="3" fill="hsl(340 80% 92%)"></rect><rect x="77" y="132.2" width="45.6" 
+height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="77" y="139.2" width="26.599999999999998" height="4" 
+rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="154" y="48" width="76" height="144" rx="5" 
+fill="#F1F5F9"></rect><rect x="157" y="51" width="70" height="76.2" rx="3" fill="hsl(340 72% 52%)"></rect><rect 
+x="159" y="132.2" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="159" y="139.2" 
+width="26.599999999999998" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="236" y="48" 
+width="76" height="144" rx="5" fill="#F1F5F9"></rect><rect x="239" y="51" width="70" height="76.2" rx="3" 
+fill="hsl(340 80% 92%)"></rect><rect x="241" y="132.2" width="45.6" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="241" y="139.2" width="26.599999999999998" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:9deg;--tz:9px" class="w-[68vw] max-w-[300px] shrink-0 
+snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button type="button" 
+data-gallery-panel="" aria-label="Buka pratinjau Kursus online" class="block w-full rounded-[1.25rem] text-left 
+transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" class="font-narrow mb-2 block truncate text-center 
+text-xs uppercase tracking-wider text-foreground">Kursus online</span><span class="block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Katalog kursus untuk template Kursus online" viewBox="0 0 320 200" width="100%" class="block h-auto 
+w-full"><defs><linearGradient id="_R_29l_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(265 72% 
+52%)"></stop><stop offset="1" stop-color="hsl(300 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Kursus online</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(265 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Katalog kursus</text><g><rect x="8" y="48" width="304" height="69" rx="6" 
+fill="url(#_R_29l_-hero)"></rect><rect x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" 
+opacity="0.95"></rect><rect x="20" y="77.25" width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" 
+opacity="0.7"></rect><rect x="20" y="99" width="44" height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 80% 92%)"></rect><rect x="13" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="13" y="172.95" 
+width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="111.33333333333333" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" 
+y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect 
+x="214.66666666666666" y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect 
+x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 80% 92%)"></rect><rect 
+x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" class="mt-2 hidden h-12 
+opacity-25 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Katalog kursus untuk template Kursus online" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_hl_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(265 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(300 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Kursus online</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(265 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Katalog kursus</text><g><rect x="8" y="48" width="304" height="69" rx="6" 
+fill="url(#_R_hl_-hero)"></rect><rect x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" 
+opacity="0.95"></rect><rect x="20" y="77.25" width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" 
+opacity="0.7"></rect><rect x="20" y="99" width="44" height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 80% 92%)"></rect><rect x="13" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="13" y="172.95" 
+width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="111.33333333333333" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" 
+y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect 
+x="214.66666666666666" y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect 
+x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(265 80% 92%)"></rect><rect 
+x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:3deg;--tz:1px" class="w-[68vw] 
+max-w-[300px] shrink-0 snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button type="button" 
+data-gallery-panel="" aria-label="Buka pratinjau Dashboard SaaS" class="block w-full rounded-[1.25rem] text-left 
+transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" class="font-narrow mb-2 block truncate text-center 
+text-xs uppercase tracking-wider text-foreground">Dashboard SaaS</span><span class="block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Ringkasan untuk template Dashboard SaaS" viewBox="0 0 320 200" width="100%" class="block h-auto 
+w-full"><defs><linearGradient id="_R_2a5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(205 72% 
+52%)"></stop><stop offset="1" stop-color="hsl(240 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="64" height="200" rx="8" 
+fill="#F1F5F9"></rect><text x="8" y="18" font-size="7" textLength="48" lengthAdjust="spacingAndGlyphs" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Dashboard SaaS</text><g><rect 
+x="10" y="33" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><rect x="6" y="44" width="52" 
+height="10" rx="3" fill="hsl(205 72% 52%)"></rect><g><rect x="10" y="61" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="75" width="26" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="89" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g></g><text x="72" y="17" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931" opacity="0.8">Ringkasan</text><g><rect x="72" y="24" width="240" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="78" y="78.3" width="27.428571428571427" height="20.7" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.4"></rect><rect x="111.42857142857143" y="44.49" width="27.428571428571427" height="54.51" rx="2" 
+fill="hsl(205 72% 52%)" opacity="0.5"></rect><rect x="144.85714285714286" y="58.980000000000004" 
+width="27.428571428571427" height="40.019999999999996" rx="2" fill="hsl(205 72% 52%)" opacity="0.6"></rect><rect 
+x="178.28571428571428" y="73.47" width="27.428571428571427" height="25.53" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.7"></rect><rect x="211.71428571428572" y="39.66000000000001" width="27.428571428571427" 
+height="59.33999999999999" rx="2" fill="hsl(205 72% 52%)" opacity="0.8"></rect><rect x="245.14285714285717" 
+y="54.150000000000006" width="27.428571428571427" height="44.849999999999994" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.9"></rect><rect x="278.57142857142856" y="68.64" width="27.428571428571427" height="30.359999999999996" 
+rx="2" fill="hsl(205 72% 52%)" opacity="1"></rect></g><g><g><rect x="72" y="111" width="76" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="75" y="114" width="70" height="41.550000000000004" rx="3" fill="hsl(205 80% 
+92%)"></rect><rect x="77" y="160.55" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="77" 
+y="167.55" width="26.599999999999998" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="154" 
+y="111" width="76" height="81" rx="5" fill="#F1F5F9"></rect><rect x="157" y="114" width="70" 
+height="41.550000000000004" rx="3" fill="hsl(205 72% 52%)"></rect><rect x="159" y="160.55" width="45.6" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="159" y="167.55" width="26.599999999999998" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g><g><rect x="236" y="111" width="76" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="239" y="114" width="70" height="41.550000000000004" rx="3" fill="hsl(205 80% 
+92%)"></rect><rect x="241" y="160.55" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="241" 
+y="167.55" width="26.599999999999998" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" class="mt-2 hidden h-12 opacity-25 
+[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden rounded-[1.25rem] 
+border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Ringkasan untuk 
+template Dashboard SaaS" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_i5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(205 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(240 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="64" height="200" rx="8" 
+fill="#F1F5F9"></rect><text x="8" y="18" font-size="7" textLength="48" lengthAdjust="spacingAndGlyphs" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Dashboard SaaS</text><g><rect 
+x="10" y="33" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><rect x="6" y="44" width="52" 
+height="10" rx="3" fill="hsl(205 72% 52%)"></rect><g><rect x="10" y="61" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="75" width="26" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="89" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g></g><text x="72" y="17" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931" opacity="0.8">Ringkasan</text><g><rect x="72" y="24" width="240" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="78" y="78.3" width="27.428571428571427" height="20.7" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.4"></rect><rect x="111.42857142857143" y="44.49" width="27.428571428571427" height="54.51" rx="2" 
+fill="hsl(205 72% 52%)" opacity="0.5"></rect><rect x="144.85714285714286" y="58.980000000000004" 
+width="27.428571428571427" height="40.019999999999996" rx="2" fill="hsl(205 72% 52%)" opacity="0.6"></rect><rect 
+x="178.28571428571428" y="73.47" width="27.428571428571427" height="25.53" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.7"></rect><rect x="211.71428571428572" y="39.66000000000001" width="27.428571428571427" 
+height="59.33999999999999" rx="2" fill="hsl(205 72% 52%)" opacity="0.8"></rect><rect x="245.14285714285717" 
+y="54.150000000000006" width="27.428571428571427" height="44.849999999999994" rx="2" fill="hsl(205 72% 52%)" 
+opacity="0.9"></rect><rect x="278.57142857142856" y="68.64" width="27.428571428571427" height="30.359999999999996" 
+rx="2" fill="hsl(205 72% 52%)" opacity="1"></rect></g><g><g><rect x="72" y="111" width="76" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="75" y="114" width="70" height="41.550000000000004" rx="3" fill="hsl(205 80% 
+92%)"></rect><rect x="77" y="160.55" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="77" 
+y="167.55" width="26.599999999999998" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="154" 
+y="111" width="76" height="81" rx="5" fill="#F1F5F9"></rect><rect x="157" y="114" width="70" 
+height="41.550000000000004" rx="3" fill="hsl(205 72% 52%)"></rect><rect x="159" y="160.55" width="45.6" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="159" y="167.55" width="26.599999999999998" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g><g><rect x="236" y="111" width="76" height="81" rx="5" 
+fill="#F1F5F9"></rect><rect x="239" y="114" width="70" height="41.550000000000004" rx="3" fill="hsl(205 80% 
+92%)"></rect><rect x="241" y="160.55" width="45.6" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="241" 
+y="167.55" width="26.599999999999998" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:-3deg;--tz:1px" class="w-[68vw] max-w-[300px] shrink-0 
+snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button type="button" 
+data-gallery-panel="" aria-label="Buka pratinjau Booking klinik" class="block w-full rounded-[1.25rem] text-left 
+transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" class="font-narrow mb-2 block truncate text-center 
+text-xs uppercase tracking-wider text-foreground">Booking klinik</span><span class="block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Jadwal dokter untuk template Booking klinik" viewBox="0 0 320 200" width="100%" class="block h-auto 
+w-full"><defs><linearGradient id="_R_2al_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(160 72% 
+52%)"></stop><stop offset="1" stop-color="hsl(195 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Booking klinik</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(160 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Jadwal dokter</text><g><rect x="8" y="48" width="57.6" height="20.333333333333332" rx="3" fill="hsl(160 
+72% 52%)"></rect><rect x="69.6" y="48" width="57.6" height="20.333333333333332" rx="3" fill="hsl(160 80% 
+92%)"></rect><rect x="131.2" y="48" width="57.6" height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect 
+x="192.8" y="48" width="57.6" height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="254.4" y="48" 
+width="57.6" height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="8" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 72% 52%)"></rect><rect x="69.6" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="131.2" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="192.8" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="254.4" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="8" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 72% 52%)"></rect><rect x="69.6" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="131.2" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="192.8" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="254.4" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect></g><g><g><rect x="8" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(160 80% 92%)"></rect><rect x="13" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="13" y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g><g><rect x="111.33333333333333" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(160 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" width="58.39999999999999" height="4" rx="2" 
+fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" y="172.95" width="34.06666666666666" height="4" 
+rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="214.66666666666666" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" 
+rx="3" fill="hsl(160 80% 92%)"></rect><rect x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" 
+height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" 
+class="mt-2 hidden h-12 opacity-25 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block 
+overflow-hidden rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" 
+aria-label="Ilustrasi halaman Jadwal dokter untuk template Booking klinik" viewBox="0 0 320 200" width="100%" 
+class="block h-auto w-full -scale-y-100"><defs><linearGradient id="_R_il_-hero" x1="0" y1="0" x2="1" y2="1"><stop 
+offset="0" stop-color="hsl(160 72% 52%)"></stop><stop offset="1" stop-color="hsl(195 72% 
+62%)"></stop></linearGradient></defs><rect width="320" height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" 
+width="320" height="24" fill="#FFFFFF"></rect><line x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" 
+stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931">Booking klinik</text><rect x="190" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect 
+x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="270" y="6" width="40" 
+height="12" rx="6" fill="hsl(160 72% 52%)"></rect></g><text x="8" y="41" font-size="9" font-family="ui-sans-serif, 
+system-ui, sans-serif" font-weight="700" fill="#0A1931" opacity="0.8">Jadwal dokter</text><g><rect x="8" y="48" 
+width="57.6" height="20.333333333333332" rx="3" fill="hsl(160 72% 52%)"></rect><rect x="69.6" y="48" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="131.2" y="48" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="192.8" y="48" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="254.4" y="48" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="8" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 72% 52%)"></rect><rect x="69.6" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="131.2" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="192.8" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="254.4" y="72.33333333333333" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="8" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 72% 52%)"></rect><rect x="69.6" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="131.2" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect><rect x="192.8" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="hsl(160 80% 92%)"></rect><rect x="254.4" y="96.66666666666666" width="57.6" 
+height="20.333333333333332" rx="3" fill="#F1F5F9"></rect></g><g><g><rect x="8" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(160 80% 92%)"></rect><rect x="13" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="13" y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g><g><rect x="111.33333333333333" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(160 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" width="58.39999999999999" height="4" rx="2" 
+fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" y="172.95" width="34.06666666666666" height="4" 
+rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="214.66666666666666" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" 
+rx="3" fill="hsl(160 80% 92%)"></rect><rect x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" 
+height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:-9deg;--tz:9px" 
+class="w-[68vw] max-w-[300px] shrink-0 snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] 
+lg:pointer-fine:max-w-none lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button 
+type="button" data-gallery-panel="" aria-label="Buka pratinjau Company profile" class="block w-full rounded-[1.25rem] 
+text-left transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 
+focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none 
+motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" 
+class="font-narrow mb-2 block truncate text-center text-xs uppercase tracking-wider text-foreground">Company 
+profile</span><span class="block overflow-hidden rounded-[1.25rem] border border-border 
+shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Beranda untuk template Company 
+profile" viewBox="0 0 320 200" width="100%" class="block h-auto w-full"><defs><linearGradient id="_R_2b5_-hero" x1="0" 
+y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(45 72% 52%)"></stop><stop offset="1" stop-color="hsl(80 72% 
+62%)"></stop></linearGradient></defs><rect width="320" height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" 
+width="320" height="24" fill="#FFFFFF"></rect><line x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" 
+stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931">Company profile</text><rect x="190" y="10" width="18" height="4" rx="2" 
+fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect 
+x="270" y="6" width="40" height="12" rx="6" fill="hsl(45 72% 52%)"></rect></g><text x="8" y="41" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" height="69" rx="6" 
+fill="url(#_R_2b5_-hero)"></rect><rect x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" 
+opacity="0.95"></rect><rect x="20" y="77.25" width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" 
+opacity="0.7"></rect><rect x="20" y="99" width="44" height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="11" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(45 80% 92%)"></rect><rect x="13" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="13" y="172.95" 
+width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="111.33333333333333" 
+y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" 
+width="91.33333333333333" height="34.95" rx="3" fill="hsl(45 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" 
+width="58.39999999999999" height="4" rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" 
+y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect 
+x="214.66666666666666" y="123" width="97.33333333333333" height="69" rx="5" fill="#F1F5F9"></rect><rect 
+x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(45 80% 92%)"></rect><rect 
+x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" height="4" rx="2" 
+fill="#0A1931" opacity="0.2"></rect></g></g></svg></span></button><div aria-hidden="true" class="mt-2 hidden h-12 
+opacity-25 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Beranda untuk template Company profile" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_j5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(45 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(80 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Company profile</text><rect 
+x="190" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" 
+height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(45 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" height="69" rx="6" fill="url(#_R_j5_-hero)"></rect><rect 
+x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" opacity="0.95"></rect><rect x="20" y="77.25" 
+width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" opacity="0.7"></rect><rect x="20" y="99" width="44" 
+height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><rect x="8" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="11" y="126" width="91.33333333333333" height="34.95" rx="3" fill="hsl(45 80% 
+92%)"></rect><rect x="13" y="165.95" width="58.39999999999999" height="4" rx="2" fill="#0A1931" 
+opacity="0.5"></rect><rect x="13" y="172.95" width="34.06666666666666" height="4" rx="2" fill="#0A1931" 
+opacity="0.2"></rect></g><g><rect x="111.33333333333333" y="123" width="97.33333333333333" height="69" rx="5" 
+fill="#F1F5F9"></rect><rect x="114.33333333333333" y="126" width="91.33333333333333" height="34.95" rx="3" 
+fill="hsl(45 72% 52%)"></rect><rect x="116.33333333333333" y="165.95" width="58.39999999999999" height="4" rx="2" 
+fill="#0A1931" opacity="0.5"></rect><rect x="116.33333333333333" y="172.95" width="34.06666666666666" height="4" 
+rx="2" fill="#0A1931" opacity="0.2"></rect></g><g><rect x="214.66666666666666" y="123" width="97.33333333333333" 
+height="69" rx="5" fill="#F1F5F9"></rect><rect x="217.66666666666666" y="126" width="91.33333333333333" height="34.95" 
+rx="3" fill="hsl(45 80% 92%)"></rect><rect x="219.66666666666666" y="165.95" width="58.39999999999999" height="4" 
+rx="2" fill="#0A1931" opacity="0.5"></rect><rect x="219.66666666666666" y="172.95" width="34.06666666666666" 
+height="4" rx="2" fill="#0A1931" opacity="0.2"></rect></g></g></svg></div></li><li style="--ry:-15deg;--tz:25px" 
+class="w-[68vw] max-w-[300px] shrink-0 snap-center lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] 
+lg:pointer-fine:max-w-none lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button 
+type="button" data-gallery-panel="" aria-label="Buka pratinjau Portal berita" class="block w-full rounded-[1.25rem] 
+text-left transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 
+focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none 
+motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" 
+class="font-narrow mb-2 block truncate text-center text-xs uppercase tracking-wider text-foreground">Portal 
+berita</span><span class="block overflow-hidden rounded-[1.25rem] border border-border 
+shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Beranda untuk template Portal berita" 
+viewBox="0 0 320 200" width="100%" class="block h-auto w-full"><defs><linearGradient id="_R_2bl_-hero" x1="0" y1="0" 
+x2="1" y2="1"><stop offset="0" stop-color="hsl(0 72% 52%)"></stop><stop offset="1" stop-color="hsl(35 72% 
+62%)"></stop></linearGradient></defs><rect width="320" height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" 
+width="320" height="24" fill="#FFFFFF"></rect><line x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" 
+stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931">Portal berita</text><rect x="190" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect 
+x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="270" y="6" width="40" 
+height="12" rx="6" fill="hsl(0 72% 52%)"></rect></g><text x="8" y="41" font-size="9" font-family="ui-sans-serif, 
+system-ui, sans-serif" font-weight="700" fill="#0A1931" opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" 
+height="69" rx="6" fill="url(#_R_2bl_-hero)"></rect><rect x="20" y="65.25" width="152" height="7" rx="3.5" 
+fill="#FFFFFF" opacity="0.95"></rect><rect x="20" y="77.25" width="103.36000000000001" height="4" rx="2" 
+fill="#FFFFFF" opacity="0.7"></rect><rect x="20" y="99" width="44" height="11" rx="5.5" 
+fill="#FFFFFF"></rect></g><g><g><circle cx="13" cy="128" r="4" fill="hsl(0 72% 52%)"></circle><rect x="22" y="126" 
+width="228" height="4" rx="2" fill="#0A1931" opacity="0.6"></rect></g><g><circle cx="13" cy="142" r="4" fill="hsl(0 
+80% 92%)"></circle><rect x="22" y="140" width="167.20000000000002" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="13" cy="156" r="4" fill="hsl(0 80% 92%)"></circle><rect x="22" y="154" 
+width="228" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="13" cy="170" r="4" fill="hsl(0 
+80% 92%)"></circle><rect x="22" y="168" width="167.20000000000002" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="13" cy="184" r="4" fill="hsl(0 80% 92%)"></circle><rect x="22" y="182" 
+width="228" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g></g></svg></span></button><div 
+aria-hidden="true" class="mt-2 hidden h-12 opacity-25 
+[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden rounded-[1.25rem] 
+border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Beranda untuk 
+template Portal berita" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_jl_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(0 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(35 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="320" height="24" fill="#FFFFFF"></rect><line 
+x1="0" x2="320" y1="24" y2="24" stroke="#0A1931" stroke-opacity="0.08"></line><text x="10" y="15.5" font-size="9" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Portal berita</text><rect x="190" 
+y="10" width="18" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="216" y="10" width="18" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect><rect x="242" y="10" width="18" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect><rect x="270" y="6" width="40" height="12" rx="6" fill="hsl(0 72% 52%)"></rect></g><text x="8" 
+y="41" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931" 
+opacity="0.8">Beranda</text><g><rect x="8" y="48" width="304" height="69" rx="6" fill="url(#_R_jl_-hero)"></rect><rect 
+x="20" y="65.25" width="152" height="7" rx="3.5" fill="#FFFFFF" opacity="0.95"></rect><rect x="20" y="77.25" 
+width="103.36000000000001" height="4" rx="2" fill="#FFFFFF" opacity="0.7"></rect><rect x="20" y="99" width="44" 
+height="11" rx="5.5" fill="#FFFFFF"></rect></g><g><g><circle cx="13" cy="128" r="4" fill="hsl(0 72% 
+52%)"></circle><rect x="22" y="126" width="228" height="4" rx="2" fill="#0A1931" opacity="0.6"></rect></g><g><circle 
+cx="13" cy="142" r="4" fill="hsl(0 80% 92%)"></circle><rect x="22" y="140" width="167.20000000000002" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="13" cy="156" r="4" fill="hsl(0 80% 92%)"></circle><rect 
+x="22" y="154" width="228" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="13" cy="170" r="4" 
+fill="hsl(0 80% 92%)"></circle><rect x="22" y="168" width="167.20000000000002" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="13" cy="184" r="4" fill="hsl(0 80% 92%)"></circle><rect x="22" y="182" 
+width="228" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g></g></svg></div></li><li 
+style="--ry:-21deg;--tz:49px" class="w-[68vw] max-w-[300px] shrink-0 snap-center 
+lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"><button type="button" 
+data-gallery-panel="" aria-label="Buka pratinjau Dokumentasi REST API" class="block w-full rounded-[1.25rem] text-left 
+transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"><span aria-hidden="true" class="font-narrow mb-2 block truncate text-center 
+text-xs uppercase tracking-wider text-foreground">Dokumentasi REST API</span><span class="block overflow-hidden 
+rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman 
+Referensi endpoint untuk template Dokumentasi REST API" viewBox="0 0 320 200" width="100%" class="block h-auto 
+w-full"><defs><linearGradient id="_R_2c5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(130 72% 
+52%)"></stop><stop offset="1" stop-color="hsl(165 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="64" height="200" rx="8" 
+fill="#F1F5F9"></rect><text x="8" y="18" font-size="7" textLength="48" lengthAdjust="spacingAndGlyphs" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Dokumentasi REST 
+API</text><g><rect x="10" y="33" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><rect x="6" 
+y="44" width="52" height="10" rx="3" fill="hsl(130 72% 52%)"></rect><g><rect x="10" y="61" width="36" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect x="10" y="75" width="26" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="89" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g></g><text x="72" y="17" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931" opacity="0.8">Referensi endpoint</text><g><g><circle cx="77" cy="29" r="4" 
+fill="hsl(130 72% 52%)"></circle><rect x="86" y="27" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.6"></rect></g><g><circle cx="77" cy="43" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="41" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="77" cy="57" r="4" fill="hsl(130 
+80% 92%)"></circle><rect x="86" y="55" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="77" cy="71" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="69" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="77" cy="85" r="4" fill="hsl(130 
+80% 92%)"></circle><rect x="86" y="83" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="77" cy="99" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="97" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g></g><g><rect x="72" y="111" width="240" 
+height="81" rx="6" fill="#0F172A"></rect><g><rect x="80" y="118" width="18" height="4" rx="2" fill="hsl(130 72% 
+52%)"></rect><rect x="102" y="118" width="36" height="4" rx="2" fill="#FDE68A" opacity="0.8"></rect></g><g><rect 
+x="88" y="127" width="18" height="4" rx="2" fill="#F9A8D4"></rect><rect x="110" y="127" width="72" height="4" rx="2" 
+fill="#86EFAC" opacity="0.8"></rect></g><g><rect x="96" y="136" width="18" height="4" rx="2" 
+fill="#FDE68A"></rect><rect x="118" y="136" width="48" height="4" rx="2" fill="#C4B5FD" 
+opacity="0.8"></rect></g><g><rect x="80" y="145" width="18" height="4" rx="2" fill="#86EFAC"></rect><rect x="102" 
+y="145" width="84" height="4" rx="2" fill="#7DD3FC" opacity="0.8"></rect></g><g><rect x="88" y="154" width="18" 
+height="4" rx="2" fill="#C4B5FD"></rect><rect x="110" y="154" width="60" height="4" rx="2" fill="#F9A8D4" 
+opacity="0.8"></rect></g><g><rect x="96" y="163" width="18" height="4" rx="2" fill="#7DD3FC"></rect><rect x="118" 
+y="163" width="36" height="4" rx="2" fill="#FDE68A" opacity="0.8"></rect></g><g><rect x="80" y="172" width="18" 
+height="4" rx="2" fill="#F9A8D4"></rect><rect x="102" y="172" width="72" height="4" rx="2" fill="#86EFAC" 
+opacity="0.8"></rect></g><g><rect x="88" y="181" width="18" height="4" rx="2" fill="#FDE68A"></rect><rect x="110" 
+y="181" width="48" height="4" rx="2" fill="#C4B5FD" opacity="0.8"></rect></g></g></svg></span></button><div 
+aria-hidden="true" class="mt-2 hidden h-12 opacity-25 
+[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block overflow-hidden rounded-[1.25rem] 
+border border-border shadow-[var(--fuse-shadow-soft)]"><svg role="img" aria-label="Ilustrasi halaman Referensi 
+endpoint untuk template Dokumentasi REST API" viewBox="0 0 320 200" width="100%" class="block h-auto w-full 
+-scale-y-100"><defs><linearGradient id="_R_k5_-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(130 
+72% 52%)"></stop><stop offset="1" stop-color="hsl(165 72% 62%)"></stop></linearGradient></defs><rect width="320" 
+height="200" rx="8" fill="#FFFFFF"></rect><g><rect x="0" y="0" width="64" height="200" rx="8" 
+fill="#F1F5F9"></rect><text x="8" y="18" font-size="7" textLength="48" lengthAdjust="spacingAndGlyphs" 
+font-family="ui-sans-serif, system-ui, sans-serif" font-weight="700" fill="#0A1931">Dokumentasi REST 
+API</text><g><rect x="10" y="33" width="36" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><rect x="6" 
+y="44" width="52" height="10" rx="3" fill="hsl(130 72% 52%)"></rect><g><rect x="10" y="61" width="36" height="4" 
+rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><rect x="10" y="75" width="26" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><rect x="10" y="89" width="36" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g></g><text x="72" y="17" font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" 
+font-weight="700" fill="#0A1931" opacity="0.8">Referensi endpoint</text><g><g><circle cx="77" cy="29" r="4" 
+fill="hsl(130 72% 52%)"></circle><rect x="86" y="27" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.6"></rect></g><g><circle cx="77" cy="43" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="41" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="77" cy="57" r="4" fill="hsl(130 
+80% 92%)"></circle><rect x="86" y="55" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="77" cy="71" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="69" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g><g><circle cx="77" cy="85" r="4" fill="hsl(130 
+80% 92%)"></circle><rect x="86" y="83" width="180" height="4" rx="2" fill="#0A1931" 
+opacity="0.3"></rect></g><g><circle cx="77" cy="99" r="4" fill="hsl(130 80% 92%)"></circle><rect x="86" y="97" 
+width="132" height="4" rx="2" fill="#0A1931" opacity="0.3"></rect></g></g><g><rect x="72" y="111" width="240" 
+height="81" rx="6" fill="#0F172A"></rect><g><rect x="80" y="118" width="18" height="4" rx="2" fill="hsl(130 72% 
+52%)"></rect><rect x="102" y="118" width="36" height="4" rx="2" fill="#FDE68A" opacity="0.8"></rect></g><g><rect 
+x="88" y="127" width="18" height="4" rx="2" fill="#F9A8D4"></rect><rect x="110" y="127" width="72" height="4" rx="2" 
+fill="#86EFAC" opacity="0.8"></rect></g><g><rect x="96" y="136" width="18" height="4" rx="2" 
+fill="#FDE68A"></rect><rect x="118" y="136" width="48" height="4" rx="2" fill="#C4B5FD" 
+opacity="0.8"></rect></g><g><rect x="80" y="145" width="18" height="4" rx="2" fill="#86EFAC"></rect><rect x="102" 
+y="145" width="84" height="4" rx="2" fill="#7DD3FC" opacity="0.8"></rect></g><g><rect x="88" y="154" width="18" 
+height="4" rx="2" fill="#C4B5FD"></rect><rect x="110" y="154" width="60" height="4" rx="2" fill="#F9A8D4" 
+opacity="0.8"></rect></g><g><rect x="96" y="163" width="18" height="4" rx="2" fill="#7DD3FC"></rect><rect x="118" 
+y="163" width="36" height="4" rx="2" fill="#FDE68A" opacity="0.8"></rect></g><g><rect x="80" y="172" width="18" 
+height="4" rx="2" fill="#F9A8D4"></rect><rect x="102" y="172" width="72" height="4" rx="2" fill="#86EFAC" 
+opacity="0.8"></rect></g><g><rect x="88" y="181" width="18" height="4" rx="2" fill="#FDE68A"></rect><rect x="110" 
+y="181" width="48" height="4" rx="2" fill="#C4B5FD" opacity="0.8"></rect></g></g></svg></div></li></ul></div><p 
+class="mt-4 text-center text-sm text-muted-foreground">Klik panel untuk melihat isinya.</p><p class="mt-1 text-center 
+text-xs text-muted-foreground">Ilustrasi template ΓÇö bukan situs klien</p></div>[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/hero-wall.test.ts:[2m81:19[22m[39m
+    [90m 79| [39m      [34mexpect[39m(out)[33m.[39m[34mtoContain[39m([32m`--ry:[39m[36m${[39mp[33m.[39mro
+tateY[36m}[39m[32mdeg`[39m)[33m;[39m
+    [90m 80| [39m      [34mexpect[39m(out)[33m.[39m[34mtoContain[39m([32m`--tz:[39m[36m${[39mp[33m.[39mz
+[36m}[39m[32mpx`[39m)[33m;[39m
+    [90m 81| [39m      [34mexpect[39m(out)[33m.[39m[34mtoContain[39m([32m`--s:[39m[36m${[39mp[33m.[39msca
+le[36m}[39m[32m`[39m)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m 82| [39m    }
+    [90m 83| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/hero-wall.test.ts[2m > [22mhero wall[2m > [22mwall and 
+carousel sizes follow the panorama spec
+[31m[1mAssertionError[22m: expected '"use client";\n\nimport { useEffect, ΓÇª' to contain 
+'lg:pointer-fine:w-[clamp(8.5rem,14vw,ΓÇª'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- lg:pointer-fine:w-[clamp(8.5rem,14vw,15rem)][39m
+[31m+ "use client";[39m
+[31m+[39m
+[31m+ import { useEffect, useRef } from "react";[39m
+[31m+ import { SiteArt } from "@/components/site-art/site-art";[39m
+[31m+ import { fmt } from "@/lib/format";[39m
+[31m+ import { SITE_CATEGORIES } from "@/lib/site-categories";[39m
+[31m+ import { LANDING_MOTION_QUERY } from "../motion";[39m
+[31m+ import { pointerTilt, wallPose } from "./gallery-logic";[39m
+[31m+ import { useGallery } from "./gallery-provider";[39m
+[31m+[39m
+[31m+ const FRAME = "overflow-hidden rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]";[39m
+[31m+[39m
+[31m+ /** Hero gallery: snap carousel on touch/small screens, curved CSS 3D wall on desktop pointers. */[39m
+[31m+ export function HeroWall() {[39m
+[31m+   const { open, labels, copy } = useGallery();[39m
+[31m+   const wallRef = useRef<HTMLDivElement>(null);[39m
+[31m+[39m
+[31m+   // Parallax only where the landing motion gate allows it; a CSS variable, no timers.[39m
+[31m+   useEffect(() => {[39m
+[31m+     const el = wallRef.current;[39m
+[31m+     if (!el || !window.matchMedia(LANDING_MOTION_QUERY).matches) return;[39m
+[31m+     const move = (e: PointerEvent) => {[39m
+[31m+       const rect = el.getBoundingClientRect();[39m
+[31m+       el.style.setProperty("--tilt", String(pointerTilt(e.clientX, rect.left, rect.width)));[39m
+[31m+     };[39m
+[31m+     const leave = () => el.style.setProperty("--tilt", "0");[39m
+[31m+     el.addEventListener("pointermove", move);[39m
+[31m+     el.addEventListener("pointerleave", leave);[39m
+[31m+     return () => {[39m
+[31m+       el.removeEventListener("pointermove", move);[39m
+[31m+       el.removeEventListener("pointerleave", leave);[39m
+[31m+     };[39m
+[31m+   }, []);[39m
+[31m+[39m
+[31m+   return ([39m
+[31m+     <div>[39m
+[31m+       <div[39m
+[31m+         ref={wallRef}[39m
+[31m+         role="group"[39m
+[31m+         aria-label={copy.wallLabel}[39m
+[31m+         className="transition-transform duration-700 [transform-style:preserve-3d] 
+lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"[39m
+[31m+       >[39m
+[31m+         <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[16vw] pb-4 
+lg:pointer-fine:justify-center lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 
+lg:pointer-fine:[perspective:1400px]">[39m
+[31m+           {SITE_CATEGORIES.map((c, i) => {[39m
+[31m+             const pose = wallPose(i, SITE_CATEGORIES.length);[39m
+[31m+             const name = (labels.items[c.id] as { name: string }).name;[39m
+[31m+             return ([39m
+[31m+               <li[39m
+[31m+                 key={c.id}[39m
+[31m+                 style={{ "--ry": `${pose.rotateY}deg`, "--tz": `${pose.z}px` } as React.CSSProperties}[39m
+[31m+                 className="w-[68vw] max-w-[300px] shrink-0 snap-center 
+lg:pointer-fine:w-[clamp(7.5rem,10.5vw,10.5rem)] lg:pointer-fine:max-w-none 
+lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))]"[39m
+[31m+               >[39m
+[31m+                 <button[39m
+[31m+                   type="button"[39m
+[31m+                   data-gallery-panel=""[39m
+[31m+                   aria-label={fmt(copy.openPanel, { category: name })}[39m
+[31m+                   onClick={(e) => open(c.id, e.currentTarget)}[39m
+[31m+                   className="block w-full rounded-[1.25rem] text-left transition-transform duration-300 
+hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 
+focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 
+motion-reduce:focus-visible:translate-y-0"[39m
+[31m+                 >[39m
+[31m+                   <span aria-hidden="true" className="font-narrow mb-2 block truncate text-center text-xs 
+uppercase tracking-wider text-foreground">[39m
+[31m+                     {name}[39m
+[31m+                   </span>[39m
+[31m+                   <span className={`block ${FRAME}`}>[39m
+[31m+                     <SiteArt category={c} pageIndex={0} labels={labels} className="block h-auto w-full" />[39m
+[31m+                   </span>[39m
+[31m+                 </button>[39m
+[31m+                 <div[39m
+[31m+                   aria-hidden="true"[39m
+[31m+                   className={`mt-2 hidden h-12 opacity-25 
+[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent_70%)] lg:block ${FRAME}`}[39m
+[31m+                 >[39m
+[31m+                   <SiteArt category={c} pageIndex={0} labels={labels} className="block h-auto w-full 
+-scale-y-100" />[39m
+[31m+                 </div>[39m
+[31m+               </li>[39m
+[31m+             );[39m
+[31m+           })}[39m
+[31m+         </ul>[39m
+[31m+       </div>[39m
+[31m+       <p className="mt-4 text-center text-sm text-muted-foreground">{copy.hint}</p>[39m
+[31m+       <p className="mt-1 text-center text-xs text-muted-foreground">{labels.galleryLabel}</p>[39m
+[31m+     </div>[39m
+[31m+   );[39m
+[31m+ }[39m
+[31m+[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/hero-wall.test.ts:[2m101:19[22m[39m
+    [90m 99| [39m      [32m"pointerTilt"[39m[33m,[39m
+    [90m100| [39m    ])
+    [90m101| [39m      [34mexpect[39m(src)[33m.[39m[34mtoContain[39m(s)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m102| [39m    for (const s of ["setInterval", "requestAnimationFrame", "backdropΓÇª
+    [90m103| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/5]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/hero-wall.test.ts[2m > [22mhero wall[2m > [22mthe 
+carousel centre grows with a scroll-driven animation only when motion is allowed
+[31m[1mAssertionError[22m: expected '@import "tailwindcss";\n@import "tw-aΓÇª' to contain '@keyframes 
+gallery-focus'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- @keyframes gallery-focus[39m
+[31m+ @import "tailwindcss";[39m
+[31m+ @import "tw-animate-css";[39m
+[31m+[39m
+[31m+ @custom-variant dark (&:is(.dark *));[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Short viewports (e.g. a 1080p laptop at 150% scaling leaves only ~585px of[39m
+[31m+  * usable height). The `short:` variant lets dense chrome collapse so the[39m
+[31m+  * workspace fits without hunting through a long scroll.[39m
+[31m+  */[39m
+[31m+ @custom-variant short (@media (max-height: 700px));[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Brand palette: "tempered report" ΓÇö flat surfaces and thin rules, in the cool[39m
+[31m+  * grey of a compliance document rather than a tinted SaaS violet. Light is the[39m
+[31m+  * default because the product is shown on projectors and printed; dark is the[39m
+[31m+  * long-session studio mode. All text pairings tested >= 4.5:1.[39m
+[31m+  */[39m
+[31m+ :root {[39m
+[31m+   color-scheme: light;[39m
+[31m+[39m
+[31m+   --background: #f4f6f8;[39m
+[31m+   --foreground: #15191e;[39m
+[31m+   --card: #ffffff;[39m
+[31m+   --card-foreground: #15191e;[39m
+[31m+   --popover: #ffffff;[39m
+[31m+   --popover-foreground: #15191e;[39m
+[31m+[39m
+[31m+   --primary: #2f5e9e;[39m
+[31m+   --primary-foreground: #ffffff;[39m
+[31m+   --secondary: #e9edf1;[39m
+[31m+   --secondary-foreground: #15191e;[39m
+[31m+   --muted: #e9edf1;[39m
+[31m+   --muted-foreground: #5b6470;[39m
+[31m+   --accent: #e3e8ee;[39m
+[31m+   --accent-foreground: #15191e;[39m
+[31m+[39m
+[31m+   --destructive: oklch(0.577 0.245 27.325);[39m
+[31m+   --destructive-foreground: #ffffff;[39m
+[31m+   --success: oklch(0.596 0.145 163.225);[39m
+[31m+   --success-foreground: #ffffff;[39m
+[31m+   --warning: oklch(0.769 0.16 70.08);[39m
+[31m+   --danger: oklch(0.637 0.237 25.331);[39m
+[31m+   /* Informational / low severity: never green, so "low" never reads as "safe". */[39m
+[31m+   --info: oklch(0.58 0.14 240);[39m
+[31m+[39m
+[31m+   /*[39m
+[31m+    * Forge ramp: the five Secure SDLC stages, straw -> bronze -> violet -> blue[39m
+[31m+    * -> grey, as steel changes colour while it is tempered. Kept apart from the[39m
+[31m+    * status colours above so a stage never reads as a warning.[39m
+[31m+    */[39m
+[31m+   --stage-1: #8a6812;[39m
+[31m+   --stage-2: #9f622d;[39m
+[31m+   --stage-3: #6e4a93;[39m
+[31m+   --stage-4: #2f5e9e;[39m
+[31m+   --stage-5: #5e6f80;[39m
+[31m+[39m
+[31m+   /* Motion tokens: short, decelerating, never blocking input. */[39m
+[31m+   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);[39m
+[31m+   --dur-fast: 120ms;[39m
+[31m+   --dur-base: 200ms;[39m
+[31m+   --dur-slow: 300ms;[39m
+[31m+[39m
+[31m+   --border: #d5dbe2;[39m
+[31m+   --input: #8a94a0;[39m
+[31m+   --ring: #2f5e9e;[39m
+[31m+[39m
+[31m+   --radius: 0.5rem;[39m
+[31m+[39m
+[31m+   --shadow-color: 215 25% 20%;[39m
+[31m+[39m
+[31m+   /* FUSE "Colors Ideas" palette primitives; app surfaces do not read these. */[39m
+[31m+   --fuse-ink: #0A1931;[39m
+[31m+   --fuse-deep: #1A3D63;[39m
+[31m+   --fuse-steel: #4A7FA7;[39m
+[31m+   --fuse-mist: #B3CFE5;[39m
+[31m+   --fuse-snow: #F6FAFD;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ .dark {[39m
+[31m+   color-scheme: dark;[39m
+[31m+[39m
+[31m+   --background: #1e2227;[39m
+[31m+   --foreground: #e7eaee;[39m
+[31m+   --card: #272c33;[39m
+[31m+   --card-foreground: #e7eaee;[39m
+[31m+   --popover: #272c33;[39m
+[31m+   --popover-foreground: #e7eaee;[39m
+[31m+[39m
+[31m+   --primary: #7fa6dc;[39m
+[31m+   --primary-foreground: #1e2227;[39m
+[31m+   --secondary: #2f353d;[39m
+[31m+   --secondary-foreground: #e7eaee;[39m
+[31m+   --muted: #2f353d;[39m
+[31m+   --muted-foreground: #a3acb7;[39m
+[31m+   --accent: #323942;[39m
+[31m+   --accent-foreground: #e7eaee;[39m
+[31m+[39m
+[31m+   --destructive: oklch(0.704 0.191 22.216);[39m
+[31m+   --destructive-foreground: #1e2227;[39m
+[31m+   --success: oklch(0.7 0.16 162.48);[39m
+[31m+   --success-foreground: #1e2227;[39m
+[31m+   --warning: oklch(0.82 0.14 75);[39m
+[31m+   --danger: oklch(0.704 0.191 22.216);[39m
+[31m+   --info: oklch(0.74 0.12 235);[39m
+[31m+[39m
+[31m+   /* Lifted for dark surfaces; still >= 4.5:1 on --card. */[39m
+[31m+   --stage-1: #d9b45e;[39m
+[31m+   --stage-2: #d08a4e;[39m
+[31m+   --stage-3: #b394db;[39m
+[31m+   --stage-4: #86ace0;[39m
+[31m+   --stage-5: #9cadbd;[39m
+[31m+[39m
+[31m+   --border: #3a414a;[39m
+[31m+   --input: #6b7683;[39m
+[31m+   --ring: #7fa6dc;[39m
+[31m+[39m
+[31m+   --shadow-color: 215 30% 4%;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ @theme inline {[39m
+[31m+   --color-background: var(--background);[39m
+[31m+   --color-foreground: var(--foreground);[39m
+[31m+   --color-card: var(--card);[39m
+[31m+   --color-card-foreground: var(--card-foreground);[39m
+[31m+   --color-popover: var(--popover);[39m
+[31m+   --color-popover-foreground: var(--popover-foreground);[39m
+[31m+   --color-primary: var(--primary);[39m
+[31m+   --color-primary-foreground: var(--primary-foreground);[39m
+[31m+   --color-secondary: var(--secondary);[39m
+[31m+   --color-secondary-foreground: var(--secondary-foreground);[39m
+[31m+   --color-muted: var(--muted);[39m
+[31m+   --color-muted-foreground: var(--muted-foreground);[39m
+[31m+   --color-accent: var(--accent);[39m
+[31m+   --color-accent-foreground: var(--accent-foreground);[39m
+[31m+   --color-destructive: var(--destructive);[39m
+[31m+   --color-destructive-foreground: var(--destructive-foreground);[39m
+[31m+   --color-success: var(--success);[39m
+[31m+   --color-success-foreground: var(--success-foreground);[39m
+[31m+   --color-warning: var(--warning);[39m
+[31m+   --color-danger: var(--danger);[39m
+[31m+   --color-info: var(--info);[39m
+[31m+   --color-stage-1: var(--stage-1);[39m
+[31m+   --color-stage-2: var(--stage-2);[39m
+[31m+   --color-stage-3: var(--stage-3);[39m
+[31m+   --color-stage-4: var(--stage-4);[39m
+[31m+   --color-stage-5: var(--stage-5);[39m
+[31m+   --color-border: var(--border);[39m
+[31m+   --color-input: var(--input);[39m
+[31m+   --color-ring: var(--ring);[39m
+[31m+   --color-fuse-ink: var(--fuse-ink);[39m
+[31m+   --color-fuse-deep: var(--fuse-deep);[39m
+[31m+   --color-fuse-steel: var(--fuse-steel);[39m
+[31m+   --color-fuse-mist: var(--fuse-mist);[39m
+[31m+   --color-fuse-snow: var(--fuse-snow);[39m
+[31m+   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;[39m
+[31m+   --font-mono: var(--font-geist-mono), ui-monospace, monospace;[39m
+[31m+   --radius-sm: calc(var(--radius) - 4px);[39m
+[31m+   --radius-md: calc(var(--radius) - 2px);[39m
+[31m+   --radius-lg: var(--radius);[39m
+[31m+   --radius-xl: calc(var(--radius) + 4px);[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Tailwind ships no default border colour, so give every border the theme's[39m
+[31m+  * hairline. It lives in `base` (not unlayered) so `border-*` utilities can[39m
+[31m+  * still override it ΓÇö an unlayered rule silently beat every one of them. */[39m
+[31m+ @layer base {[39m
+[31m+   * {[39m
+[31m+     border-color: var(--border);[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ html {[39m
+[31m+   -webkit-tap-highlight-color: transparent;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ body {[39m
+[31m+   background-color: var(--background);[39m
+[31m+   color: var(--foreground);[39m
+[31m+   font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;[39m
+[31m+   transition: background-color 0.2s ease, color 0.2s ease;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Display voice: Archivo's expanded width, stamped-plate weight. Used for page[39m
+[31m+  * headings only ΓÇö body copy stays at the normal width so long text stays[39m
+[31m+  * readable.[39m
+[31m+  */[39m
+[31m+ .display-type {[39m
+[31m+   font-stretch: 125%;[39m
+[31m+   font-weight: 800;[39m
+[31m+   letter-spacing: -0.022em;[39m
+[31m+   line-height: 1.04;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Signature hairline: the five stage colours as a single 1px rule. */[39m
+[31m+ .stage-ramp {[39m
+[31m+   background-image: linear-gradient([39m
+[31m+     90deg,[39m
+[31m+     var(--stage-1) 0 20%,[39m
+[31m+     var(--stage-2) 20% 40%,[39m
+[31m+     var(--stage-3) 40% 60%,[39m
+[31m+     var(--stage-4) 60% 80%,[39m
+[31m+     var(--stage-5) 80% 100%[39m
+[31m+   );[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ ::selection {[39m
+[31m+   background: color-mix(in oklab, var(--primary) 30%, transparent);[39m
+[31m+   color: var(--foreground);[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Thin, unobtrusive scrollbars for the dense developer UI */[39m
+[31m+ * {[39m
+[31m+   scrollbar-width: thin;[39m
+[31m+   scrollbar-color: color-mix(in oklab, var(--muted-foreground) 45%, transparent) transparent;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ ::-webkit-scrollbar {[39m
+[31m+   width: 10px;[39m
+[31m+   height: 10px;[39m
+[31m+ }[39m
+[31m+ ::-webkit-scrollbar-track {[39m
+[31m+   background: transparent;[39m
+[31m+ }[39m
+[31m+ ::-webkit-scrollbar-thumb {[39m
+[31m+   background: color-mix(in oklab, var(--muted-foreground) 40%, transparent);[39m
+[31m+   border-radius: 9999px;[39m
+[31m+   border: 2px solid transparent;[39m
+[31m+   background-clip: content-box;[39m
+[31m+ }[39m
+[31m+ ::-webkit-scrollbar-thumb:hover {[39m
+[31m+   background: color-mix(in oklab, var(--muted-foreground) 65%, transparent);[39m
+[31m+   background-clip: content-box;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Hide scrollbar completely for horizontal scroll areas */[39m
+[31m+ .scrollbar-none {[39m
+[31m+   scrollbar-width: none;[39m
+[31m+   -ms-overflow-style: none;[39m
+[31m+ }[39m
+[31m+ .scrollbar-none::-webkit-scrollbar {[39m
+[31m+   display: none;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* FUSE mark: brand gradient in light, mono (currentColor) in dark. */[39m
+[31m+ .dark .fuse-mark {[39m
+[31m+   fill: currentColor;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Soft elevated card used by panels/dialogs on top of the flat background */[39m
+[31m+ .card-elevated {[39m
+[31m+   box-shadow:[39m
+[31m+     0 1px 2px hsl(var(--shadow-color) / 0.08),[39m
+[31m+     0 12px 28px -22px hsl(var(--shadow-color) / 0.35);[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Respect the OS high-contrast preference with stronger borders/text. */[39m
+[31m+ @media (prefers-contrast: more) {[39m
+[31m+   :root {[39m
+[31m+     --border: oklch(0.6 0.02 286);[39m
+[31m+     --muted-foreground: oklch(0.38 0.02 286);[39m
+[31m+   }[39m
+[31m+   .dark {[39m
+[31m+     --border: oklch(1 0 0 / 32%);[39m
+[31m+     --muted-foreground: oklch(0.85 0.01 286);[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /* Manual accessibility preferences (header toggle). */[39m
+[31m+ html[data-fontsize="sm"] {[39m
+[31m+   font-size: 14px;[39m
+[31m+ }[39m
+[31m+ html[data-fontsize="lg"] {[39m
+[31m+   font-size: 18px;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ html[data-contrast="high"] {[39m
+[31m+   --border: oklch(0.55 0.02 286);[39m
+[31m+   --muted-foreground: oklch(0.35 0.02 286);[39m
+[31m+ }[39m
+[31m+ html[data-contrast="high"].dark {[39m
+[31m+   --border: oklch(1 0 0 / 34%);[39m
+[31m+   --muted-foreground: oklch(0.88 0.01 286);[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Landing "Clay" in the FUSE palette (ink, deep, steel, mist, snow). It follows[39m
+[31m+  * the theme toggle: dark under .dark, light otherwise. When the page contains[39m
+[31m+  * .landing or .dashboard-surface the whole document (header, footer included)[39m
+[31m+  * takes these tokens. No backdrop[39m
+[31m+  * blur; glow is box-shadow only; every clay edge keeps a faint border so it[39m
+[31m+  * reads on a projector. Contrast pairs are pinned in src/lib/contrast.test.ts.[39m
+[31m+  */[39m
+[31m+ html.dark:has(.landing),[39m
+[31m+ html.dark:has(.dashboard-surface) {[39m
+[31m+   color-scheme: dark;[39m
+[31m+   --background: #0A1931;[39m
+[31m+   --foreground: #F6FAFD;[39m
+[31m+   --card: #1A3D63;[39m
+[31m+   --card-foreground: #F6FAFD;[39m
+[31m+   --popover: #1A3D63;[39m
+[31m+   --popover-foreground: #F6FAFD;[39m
+[31m+   --primary: #B3CFE5;[39m
+[31m+   --primary-foreground: #0A1931;[39m
+[31m+   --secondary: #1A3D63;[39m
+[31m+   --secondary-foreground: #F6FAFD;[39m
+[31m+   --muted: #1A3D63;[39m
+[31m+   --muted-foreground: #B3CFE5;[39m
+[31m+   --accent: #1A3D63;[39m
+[31m+   --accent-foreground: #F6FAFD;[39m
+[31m+   --destructive: #FCA5A5;[39m
+[31m+   --destructive-foreground: #0A1931;[39m
+[31m+   --success: #6EE7B7;[39m
+[31m+   --success-foreground: #0A1931;[39m
+[31m+   --warning: #FCD34D;[39m
+[31m+   --danger: #FCA5A5;[39m
+[31m+   --info: #93C5FD;[39m
+[31m+   --stage-1: #E8C877;[39m
+[31m+   --stage-2: #E3A574;[39m
+[31m+   --stage-3: #C4A9EA;[39m
+[31m+   --stage-4: #A9C6EC;[39m
+[31m+   --stage-5: #B4C3D1;[39m
+[31m+   --border: #2A5580;[39m
+[31m+   --input: #8FB4D3;[39m
+[31m+   --ring: #B3CFE5;[39m
+[31m+   --shadow-color: 215 70% 4%;[39m
+[31m+   --tape-paper: #ede6d3;[39m
+[31m+   --fuse-accent-text: #8FB4D3;[39m
+[31m+   --fuse-btn-bg: #B3CFE5;[39m
+[31m+   --fuse-btn-fg: #0A1931;[39m
+[31m+   --fuse-bg: linear-gradient(160deg, #0A1931 0%, #1A3D63 100%);[39m
+[31m+   --fuse-card-bg: linear-gradient(160deg, #1A3D63 0%, #12284A 100%);[39m
+[31m+   --fuse-sheen: inset 0 1px 0 rgb(255 255 255 / 0.14);[39m
+[31m+   --fuse-shadow-soft: 0 18px 40px -24px rgb(2 8 20 / 0.7), 0 2px 6px rgb(2 8 20 / 0.35);[39m
+[31m+   --fuse-glow: rgb(74 127 167 / 0.45);[39m
+[31m+ }[39m
+[31m+ html:not(.dark):has(.landing),[39m
+[31m+ html:not(.dark):has(.dashboard-surface) {[39m
+[31m+   color-scheme: light;[39m
+[31m+   --background: #F6FAFD;[39m
+[31m+   --foreground: #0A1931;[39m
+[31m+   --card: #FFFFFF;[39m
+[31m+   --card-foreground: #0A1931;[39m
+[31m+   --popover: #FFFFFF;[39m
+[31m+   --popover-foreground: #0A1931;[39m
+[31m+   --primary: #1A3D63;[39m
+[31m+   --primary-foreground: #F6FAFD;[39m
+[31m+   --secondary: #E8F1F9;[39m
+[31m+   --secondary-foreground: #0A1931;[39m
+[31m+   --muted: #E8F1F9;[39m
+[31m+   --muted-foreground: #1A3D63;[39m
+[31m+   --accent: #E8F1F9;[39m
+[31m+   --accent-foreground: #0A1931;[39m
+[31m+   --destructive: #B91C1C;[39m
+[31m+   --destructive-foreground: #FFFFFF;[39m
+[31m+   --success: #047857;[39m
+[31m+   --success-foreground: #FFFFFF;[39m
+[31m+   --warning: #92400E;[39m
+[31m+   --danger: #B91C1C;[39m
+[31m+   --info: #1D4ED8;[39m
+[31m+   --stage-1: #765a0e;[39m
+[31m+   --stage-2: #87522a;[39m
+[31m+   --stage-3: #6e4a93;[39m
+[31m+   --stage-4: #2f5e9e;[39m
+[31m+   --stage-5: #4f5f70;[39m
+[31m+   --border: #B3CFE5;[39m
+[31m+   --input: #4A7FA7;[39m
+[31m+   --ring: #4A7FA7;[39m
+[31m+   --shadow-color: 211 59% 25%;[39m
+[31m+   --tape-paper: #f6f1e3;[39m
+[31m+   --fuse-accent-text: #1A3D63;[39m
+[31m+   --fuse-btn-bg: #1A3D63;[39m
+[31m+   --fuse-btn-fg: #F6FAFD;[39m
+[31m+   --fuse-bg: linear-gradient(180deg, #F6FAFD 0%, #E8F1F9 100%);[39m
+[31m+   --fuse-card-bg: linear-gradient(180deg, #FFFFFF 0%, #F6FAFD 100%);[39m
+[31m+   --fuse-sheen: inset 0 1px 0 rgb(255 255 255 / 0.9);[39m
+[31m+   --fuse-shadow-soft: 0 18px 40px -26px rgb(26 61 99 / 0.35), 0 2px 6px rgb(26 61 99 / 0.08);[39m
+[31m+   --fuse-glow: rgb(74 127 167 / 0.25);[39m
+[31m+ }[39m
+[31m+ /* High contrast (OS or header toggle) must win over the FUSE tokens above. */[39m
+[31m+ @media (prefers-contrast: more) {[39m
+[31m+   html.dark:has(.landing),[39m
+[31m+   html.dark:has(.dashboard-surface) {[39m
+[31m+     --muted-foreground: #DCE9F5;[39m
+[31m+     --border: #6E9CC2;[39m
+[31m+   }[39m
+[31m+   html:not(.dark):has(.landing),[39m
+[31m+   html:not(.dark):has(.dashboard-surface) {[39m
+[31m+     --muted-foreground: #0A1931;[39m
+[31m+     --border: #4A7FA7;[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+ html.dark[data-contrast="high"]:has(.landing),[39m
+[31m+ html.dark[data-contrast="high"]:has(.dashboard-surface) {[39m
+[31m+   --muted-foreground: #DCE9F5;[39m
+[31m+   --border: #6E9CC2;[39m
+[31m+ }[39m
+[31m+ html:not(.dark)[data-contrast="high"]:has(.landing),[39m
+[31m+ html:not(.dark)[data-contrast="high"]:has(.dashboard-surface) {[39m
+[31m+   --muted-foreground: #0A1931;[39m
+[31m+   --border: #4A7FA7;[39m
+[31m+ }[39m
+[31m+ .landing {[39m
+[31m+   --tape-ink: #222222;[39m
+[31m+   --finding-medium: #f7c6c6;[39m
+[31m+   --finding-low: #f5d9a8;[39m
+[31m+   --brake: #e5484d;[39m
+[31m+   --odometer-bg: #0f1226;[39m
+[31m+   --clay-bg: #0A1931;[39m
+[31m+   --clay-bg-2: #0F2240;[39m
+[31m+   --clay-surface: #12284A;[39m
+[31m+   --clay-surface-hi: #1A3D63;[39m
+[31m+   --clay-edge: rgba(179, 207, 229, 0.10);[39m
+[31m+   --clay-glow: rgba(74, 127, 167, 0.5);[39m
+[31m+   --clay-hl: rgba(255, 255, 255, 0.1);[39m
+[31m+   --clay-tint: rgba(74, 127, 167, 0.18);[39m
+[31m+   --clay-info: #93C5FD;[39m
+[31m+   --clay-info-tint: rgba(147, 197, 253, 0.14);[39m
+[31m+   --clay-danger: #FCA5A5;[39m
+[31m+   --clay-danger-tint: rgba(252, 165, 165, 0.14);[39m
+[31m+   --clay-line: #8FB4D3;[39m
+[31m+   --clay-line-soft: rgba(143, 180, 211, 0.25);[39m
+[31m+   --clay-figure-from: #FFFFFF;[39m
+[31m+   --clay-figure-to: #B3CFE5;[39m
+[31m+   --clay-plate-1: #1A3D63;[39m
+[31m+   --clay-plate-2: #12284A;[39m
+[31m+   --clay-plate-3: #0A1931;[39m
+[31m+   --clay-shield-edge: #0A1931;[39m
+[31m+   --clay-halo-1: rgba(74, 127, 167, 0.45);[39m
+[31m+   --clay-halo-2: rgba(179, 207, 229, 0.10);[39m
+[31m+   --clay-drop: #050D1C;[39m
+[31m+   --clay-drop-opacity: 0.7;[39m
+[31m+   --clay-ghost-bg: rgba(26, 61, 99, 0.6);[39m
+[31m+   --clay-ghost-bg-hover: rgba(36, 78, 122, 0.7);[39m
+[31m+   --clay-shadow:[39m
+[31m+     12px 14px 28px rgba(0, 0, 0, 0.55),[39m
+[31m+     -8px -8px 22px rgba(179, 207, 229, 0.05),[39m
+[31m+     inset 2px 2px 4px rgba(255, 255, 255, 0.07),[39m
+[31m+     inset -4px -6px 12px rgba(0, 0, 0, 0.35);[39m
+[31m+   --clay-shadow-hover:[39m
+[31m+     16px 20px 36px rgba(0, 0, 0, 0.6),[39m
+[31m+     -8px -8px 22px rgba(179, 207, 229, 0.07),[39m
+[31m+     inset 2px 2px 4px rgba(255, 255, 255, 0.09),[39m
+[31m+     inset -4px -6px 12px rgba(0, 0, 0, 0.35),[39m
+[31m+     0 0 0 1px rgba(179, 207, 229, 0.35);[39m
+[31m+   --clay-page:[39m
+[31m+     radial-gradient(60rem 40rem at 50% -10rem, rgba(74, 127, 167, 0.28), transparent 70%),[39m
+[31m+     radial-gradient(40rem 30rem at 100% 30%, rgba(179, 207, 229, 0.08), transparent 70%);[39m
+[31m+   background: var(--clay-page), var(--clay-bg);[39m
+[31m+ }[39m
+[31m+ html:not(.dark) .landing {[39m
+[31m+   --clay-bg: #F6FAFD;[39m
+[31m+   --clay-bg-2: #E8F1F9;[39m
+[31m+   --clay-surface: #EEF5FB;[39m
+[31m+   --clay-surface-hi: #FFFFFF;[39m
+[31m+   --clay-edge: rgba(26, 61, 99, 0.12);[39m
+[31m+   --clay-glow: rgba(74, 127, 167, 0.35);[39m
+[31m+   --clay-hl: rgba(255, 255, 255, 0.9);[39m
+[31m+   --clay-tint: rgba(74, 127, 167, 0.12);[39m
+[31m+   --clay-info: #1D4ED8;[39m
+[31m+   --clay-info-tint: rgba(29, 78, 216, 0.10);[39m
+[31m+   --clay-danger: #B91C1C;[39m
+[31m+   --clay-danger-tint: rgba(185, 28, 28, 0.10);[39m
+[31m+   --clay-line: #1A3D63;[39m
+[31m+   --clay-line-soft: rgba(26, 61, 99, 0.25);[39m
+[31m+   --clay-figure-from: #0A1931;[39m
+[31m+   --clay-figure-to: #1A3D63;[39m
+[31m+   --clay-plate-1: #FFFFFF;[39m
+[31m+   --clay-plate-2: #DCE8F3;[39m
+[31m+   --clay-plate-3: #B3CFE5;[39m
+[31m+   --clay-shield-edge: #1A3D63;[39m
+[31m+   --clay-halo-1: rgba(74, 127, 167, 0.18);[39m
+[31m+   --clay-halo-2: rgba(179, 207, 229, 0.20);[39m
+[31m+   --clay-drop: #1A3D63;[39m
+[31m+   --clay-drop-opacity: 0.28;[39m
+[31m+   --clay-ghost-bg: rgba(255, 255, 255, 0.8);[39m
+[31m+   --clay-ghost-bg-hover: #FFFFFF;[39m
+[31m+   --clay-shadow:[39m
+[31m+     10px 12px 24px rgba(26, 61, 99, 0.16),[39m
+[31m+     -8px -8px 18px rgba(255, 255, 255, 0.85),[39m
+[31m+     inset 2px 2px 4px rgba(255, 255, 255, 0.9),[39m
+[31m+     inset -4px -6px 10px rgba(26, 61, 99, 0.08);[39m
+[31m+   --clay-shadow-hover:[39m
+[31m+     14px 18px 32px rgba(26, 61, 99, 0.22),[39m
+[31m+     -8px -8px 18px rgba(255, 255, 255, 0.9),[39m
+[31m+     inset 2px 2px 4px rgba(255, 255, 255, 0.9),[39m
+[31m+     inset -4px -6px 10px rgba(26, 61, 99, 0.08),[39m
+[31m+     0 0 0 1px rgba(74, 127, 167, 0.35);[39m
+[31m+   --clay-page:[39m
+[31m+     radial-gradient(60rem 40rem at 50% -10rem, rgba(74, 127, 167, 0.16), transparent 70%),[39m
+[31m+     radial-gradient(40rem 30rem at 100% 30%, rgba(179, 207, 229, 0.10), transparent 70%);[39m
+[31m+ }.font-wide {[39m
+[31m+   font-stretch: 125%;[39m
+[31m+   font-weight: 800;[39m
+[31m+   letter-spacing: -0.022em;[39m
+[31m+   line-height: 1.04;[39m
+[31m+ }[39m
+[31m+ .font-narrow {[39m
+[31m+   font-stretch: 75%;[39m
+[31m+   font-weight: 600;[39m
+[31m+   letter-spacing: 0.01em;[39m
+[31m+ }[39m
+[31m+ .clay-card {[39m
+[31m+   border-radius: 1.5rem;[39m
+[31m+   border: 1px solid var(--clay-edge);[39m
+[31m+   background: linear-gradient(145deg, var(--clay-surface-hi), var(--clay-surface));[39m
+[31m+   box-shadow: var(--clay-shadow);[39m
+[31m+   transition:[39m
+[31m+     box-shadow 200ms var(--ease-out),[39m
+[31m+     transform 200ms var(--ease-out);[39m
+[31m+ }[39m
+[31m+ .clay-hover:hover,[39m
+[31m+ .clay-hover:focus-within {[39m
+[31m+   box-shadow: var(--clay-shadow-hover);[39m
+[31m+   transform: translateY(-4px);[39m
+[31m+ }[39m
+[31m+ .clay-chip {[39m
+[31m+   border-radius: 999px;[39m
+[31m+   border: 1px solid var(--clay-edge);[39m
+[31m+   background: var(--clay-surface-hi);[39m
+[31m+   box-shadow: inset 0 1px 0 var(--clay-hl);[39m
+[31m+ }[39m
+[31m+ /* Section label pill: real text that names the section's content. */[39m
+[31m+ .clay-pill {[39m
+[31m+   display: inline-flex;[39m
+[31m+   align-items: center;[39m
+[31m+   gap: 0.4rem;[39m
+[31m+   border-radius: 999px;[39m
+[31m+   border: 1px solid rgba(143, 180, 211, 0.3);[39m
+[31m+   background: rgba(74, 127, 167, 0.12);[39m
+[31m+   padding: 0.25rem 0.85rem;[39m
+[31m+   font-size: 0.8125rem;[39m
+[31m+   color: var(--primary);[39m
+[31m+ }[39m
+[31m+ .clay-btn {[39m
+[31m+   display: inline-flex;[39m
+[31m+   min-height: 2.75rem;[39m
+[31m+   align-items: center;[39m
+[31m+   justify-content: center;[39m
+[31m+   gap: 0.5rem;[39m
+[31m+   border-radius: 999px;[39m
+[31m+   padding: 0 1.5rem;[39m
+[31m+   font-weight: 600;[39m
+[31m+   color: var(--fuse-btn-fg);[39m
+[31m+   background: var(--fuse-btn-bg);[39m
+[31m+   box-shadow:[39m
+[31m+     0 10px 26px var(--clay-glow),[39m
+[31m+     inset 0 2px 0 rgba(255, 255, 255, 0.3),[39m
+[31m+     inset 0 -3px 6px rgba(0, 0, 0, 0.25);[39m
+[31m+   transition:[39m
+[31m+     transform 150ms var(--ease-out),[39m
+[31m+     box-shadow 150ms var(--ease-out);[39m
+[31m+ }[39m
+[31m+ .clay-btn:hover {[39m
+[31m+   box-shadow:[39m
+[31m+     0 14px 34px var(--clay-glow),[39m
+[31m+     inset 0 2px 0 rgba(255, 255, 255, 0.35),[39m
+[31m+     inset 0 -3px 6px rgba(0, 0, 0, 0.25);[39m
+[31m+ }[39m
+[31m+ .clay-btn:active {[39m
+[31m+   transform: translateY(1px) scale(0.98);[39m
+[31m+   box-shadow:[39m
+[31m+     0 4px 14px var(--clay-glow),[39m
+[31m+     inset 0 2px 0 rgba(255, 255, 255, 0.2),[39m
+[31m+     inset 0 -1px 3px rgba(0, 0, 0, 0.3);[39m
+[31m+ }[39m
+[31m+ .clay-btn-ghost {[39m
+[31m+   display: inline-flex;[39m
+[31m+   min-height: 2.75rem;[39m
+[31m+   align-items: center;[39m
+[31m+   justify-content: center;[39m
+[31m+   border-radius: 999px;[39m
+[31m+   padding: 0 1.5rem;[39m
+[31m+   font-weight: 600;[39m
+[31m+   color: var(--foreground);[39m
+[31m+   border: 1px solid rgba(143, 180, 211, 0.35);[39m
+[31m+   background: var(--clay-ghost-bg);[39m
+[31m+   box-shadow: inset 0 1px 0 var(--clay-hl);[39m
+[31m+   transition: background-color 150ms var(--ease-out);[39m
+[31m+ }[39m
+[31m+ .clay-btn-ghost:hover {[39m
+[31m+   background: var(--clay-ghost-bg-hover);[39m
+[31m+ }[39m
+[31m+ .clay-btn:focus-visible,[39m
+[31m+ .clay-btn-ghost:focus-visible {[39m
+[31m+   outline: 2px solid var(--ring);[39m
+[31m+   outline-offset: 3px;[39m
+[31m+ }[39m
+[31m+ .ledger-row {[39m
+[31m+   display: flex;[39m
+[31m+   align-items: baseline;[39m
+[31m+   gap: 0.5rem;[39m
+[31m+ }[39m
+[31m+ .ledger-row::after {[39m
+[31m+   content: "";[39m
+[31m+   order: 1;[39m
+[31m+   flex: 1;[39m
+[31m+   min-width: 1.5rem;[39m
+[31m+   border-bottom: 1px dotted var(--border);[39m
+[31m+   transform: translateY(-0.3em);[39m
+[31m+ }[39m
+[31m+ .ledger-row > dt {[39m
+[31m+   order: 0;[39m
+[31m+ }[39m
+[31m+ .ledger-row > dd {[39m
+[31m+   order: 2;[39m
+[31m+   font-variant-numeric: tabular-nums;[39m
+[31m+ }[39m
+[31m+ .faq-item::details-content {[39m
+[31m+   transition:[39m
+[31m+     height 250ms var(--ease-out),[39m
+[31m+     content-visibility 250ms allow-discrete;[39m
+[31m+   height: 0;[39m
+[31m+   overflow: clip;[39m
+[31m+ }[39m
+[31m+ .faq-item[open]::details-content {[39m
+[31m+   height: auto;[39m
+[31m+ }[39m
+[31m+ .landing {[39m
+[31m+   interpolate-size: allow-keywords;[39m
+[31m+ }[39m
+[31m+ /* Landing motion is desktop-only: below lg everything renders in its final state. */[39m
+[31m+ @media (max-width: 1023.98px) {[39m
+[31m+   .landing .faq-item::details-content {[39m
+[31m+     transition: none;[39m
+[31m+   }[39m
+[31m+   .landing .clay-hover:hover,[39m
+[31m+   .landing .clay-hover:focus-within {[39m
+[31m+     transform: none;[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+ @media (prefers-contrast: more) {[39m
+[31m+   .landing .clay-card {[39m
+[31m+     box-shadow: none;[39m
+[31m+     border: 2px solid var(--border);[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+ html[data-contrast="high"] .landing .clay-card {[39m
+[31m+   box-shadow: none;[39m
+[31m+   border: 2px solid var(--border);[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Route view transitions (React <ViewTransition>, see PageTransition).[39m
+[31m+  * nav-forward / nav-back slide 60px to signal direction; page-fade covers[39m
+[31m+  * untyped navigations. Anchored chrome (header, studio top bar) never moves.[39m
+[31m+  */[39m
+[31m+ ::view-transition {[39m
+[31m+   pointer-events: none;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ ::view-transition-old(.nav-forward) {[39m
+[31m+   --slide-offset: -60px;[39m
+[31m+   animation:[39m
+[31m+     150ms ease-in both vt-fade reverse,[39m
+[31m+     400ms var(--ease-out) both vt-slide reverse;[39m
+[31m+ }[39m
+[31m+ ::view-transition-new(.nav-forward) {[39m
+[31m+   --slide-offset: 60px;[39m
+[31m+   animation:[39m
+[31m+     210ms ease-out 150ms both vt-fade,[39m
+[31m+     400ms var(--ease-out) both vt-slide;[39m
+[31m+ }[39m
+[31m+ ::view-transition-old(.nav-back) {[39m
+[31m+   --slide-offset: 60px;[39m
+[31m+   animation:[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m10 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 03:56:01
+[2m   Duration [22m 2.65s[2m (transform 251ms, setup 0ms, collect 1.50s, tests 240ms, environment 1ms, prepare 501ms)[22m
+
+[31m+     150ms ease-in both vt-fade reverse,[39m
+[31m+     400ms var(--ease-out) both vt-slide reverse;[39m
+[31m+ }[39m
+[31m+ ::view-transition-new(.nav-back) {[39m
+[31m+   --slide-offset: -60px;[39m
+[31m+   animation:[39m
+[31m+     210ms ease-out 150ms both vt-fade,[39m
+[31m+     400ms var(--ease-out) both vt-slide;[39m
+[31m+ }[39m
+[31m+ ::view-transition-old(.page-fade) {[39m
+[31m+   animation: 120ms ease-in both vt-fade reverse;[39m
+[31m+ }[39m
+[31m+ ::view-transition-new(.page-fade) {[39m
+[31m+   animation: 180ms ease-out 60ms both vt-fade;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ ::view-transition-group(site-header),[39m
+[31m+ ::view-transition-group(studio-topbar) {[39m
+[31m+   animation: none;[39m
+[31m+   z-index: 100;[39m
+[31m+ }[39m
+[31m+ ::view-transition-old(site-header),[39m
+[31m+ ::view-transition-old(studio-topbar) {[39m
+[31m+   display: none;[39m
+[31m+ }[39m
+[31m+ ::view-transition-new(site-header),[39m
+[31m+ ::view-transition-new(studio-topbar) {[39m
+[31m+   animation: none;[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ @keyframes vt-fade {[39m
+[31m+   from {[39m
+[31m+     opacity: 0;[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+ @keyframes vt-slide {[39m
+[31m+   from {[39m
+[31m+     translate: var(--slide-offset);[39m
+[31m+   }[39m
+[31m+   to {[39m
+[31m+     translate: 0;[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+[31m+ /*[39m
+[31m+  * Reduced motion = reduce, not remove. Windows turns this on whenever[39m
+[31m+  * "Animation effects" is off, so wiping every animation made the UI look[39m
+[31m+  * unfinished. Movement (slide, zoom, bounce, scroll-linked travel) goes;[39m
+[31m+  * fades and colour changes stay, which WCAG 2.3.3 allows.[39m
+[31m+  */[39m
+[31m+ @media (prefers-reduced-motion: reduce) {[39m
+[31m+   html,[39m
+[31m+   * {[39m
+[31m+     scroll-behavior: auto !important;[39m
+[31m+   }[39m
+[31m+   /* tw-animate enter/exit keep their fade but lose translate, zoom and spin. */[39m
+[31m+   [class*="animate-in"],[39m
+[31m+   [class*="animate-out"] {[39m
+[31m+     --tw-enter-translate-x: 0 !important;[39m
+[31m+     --tw-enter-translate-y: 0 !important;[39m
+[31m+     --tw-enter-scale: 1 !important;[39m
+[31m+     --tw-enter-rotate: 0 !important;[39m
+[31m+     --tw-exit-translate-x: 0 !important;[39m
+[31m+     --tw-exit-translate-y: 0 !important;[39m
+[31m+     --tw-exit-scale: 1 !important;[39m
+[31m+     --tw-exit-rotate: 0 !important;[39m
+[31m+   }[39m
+[31m+   .animate-bounce,[39m
+[31m+   .animate-ping {[39m
+[31m+     animation: none !important;[39m
+[31m+   }[39m
+[31m+   .clay-hover:hover,[39m
+[31m+   .clay-hover:focus-within {[39m
+[31m+     transform: none !important;[39m
+[31m+   }[39m
+[31m+   /* Route changes crossfade instead of sliding; shared elements jump, not fly. */[39m
+[31m+   ::view-transition-group(*) {[39m
+[31m+     animation: none !important;[39m
+[31m+   }[39m
+[31m+   ::view-transition-old(.nav-forward),[39m
+[31m+   ::view-transition-old(.nav-back) {[39m
+[31m+     animation: 120ms ease-in both vt-fade reverse !important;[39m
+[31m+   }[39m
+[31m+   ::view-transition-new(.nav-forward),[39m
+[31m+   ::view-transition-new(.nav-back) {[39m
+[31m+     animation: 180ms ease-out 60ms both vt-fade !important;[39m
+[31m+   }[39m
+[31m+ }[39m
+[31m+[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/hero-wall.test.ts:[2m108:19[22m[39m
+    [90m106| [39m    [35mconst[39m css [33m=[39m [34mread[39m([32m"src/app/globals.css"[39m)[33m;[39m
+    [90m107| [39m    for (const s of ["@keyframes gallery-focus", "animation-timeline: ΓÇª
+    [90m108| [39m      [34mexpect[39m(css)[33m.[39m[34mtoContain[39m(s)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m109| [39m    [35mconst[39m at [33m=[39m css[33m.[39m[34mindexOf[39m([32m"@keyframes 
+gallery-focus"[39m)[33m;[39m
+    [90m110| [39m    const block = css.slice(at, css.indexOf(".gallery-carousel-item", ΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[5/5]ΓÄ»[22m[39m
+
+
+## Bagian C
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90mC:/Users/Arif/Downloads/TugasAkhir-mandor-fuse-v2-r5[39m
+
+ [31mΓ¥»[39m src/components/landing/gallery/gallery-logic.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 32[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mviewerReducer opens a category on page 1 and close resets[32m 4[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mnext and prev wrap around the three pages with a direction[32m 2[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mgoto sets the direction and is a no-op for the same page or a closed viewer[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mkeyToAction maps the arrow keys only[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mwallPose builds a coverflow panorama with a prominent centre[32m 6[2mms[22m[39m
+[31m   [31m├ù[31m gallery logic[2m > [22mfilterByShelf keeps one shelf or everything[39m[32m 12[2mms[22m[39m
+[31m     ΓåÆ (0 , filterByShelf) is not a function[39m
+   [32mΓ£ô[39m gallery logic[2m > [22mpointerTilt is clamped to -1..1 and safe for zero width[32m 1[2mms[22m[39m
+ [31mΓ¥»[39m src/components/landing/gallery/template-shelf.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 98[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mgroupByShelf follows SHELF_ORDER and drops empty shelves[32m 3[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22msearchCategories filters by name, pages and features in each language[32m 7[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mTemplateShelf renders four shelves of covers that open the viewer[32m 37[2mms[22m[39m
+[31m   [31m├ù[31m template shelf[2m > [22mTemplateShelf shows upright books on embossed planks with a see-all link per shelf[39m[32m 34[2mms[22m[39m
+[31m     ΓåÆ data-book=: expected +0 to be 8 // Object.is equality[39m
+[31m   [31m├ù[31m template shelf[2m > [22mshelf source lays shelves side by side and paints planks opaquely[39m[32m 11[2mms[22m[39m
+[31m     ΓåÆ expected '"use client";\n\nimport { useId, useSΓÇª' to contain 'lg:grid-cols-2'[39m
+[31m   [31m├ù[31m template shelf[2m > [22mnew shelf keys exist in id and en with placeholders[39m[32m 2[2mms[22m[39m
+[31m     ΓåÆ seeAll: expected 'undefined' to be 'string' // Object.is equality[39m
+   [32mΓ£ô[39m template shelf[2m > [22mshelf source is client-filtered, motion-safe and blur-free[32m 1[2mms[22m[39m
+   [32mΓ£ô[39m template shelf[2m > [22mlanding.shelf keys match in id and en[32m 1[2mms[22m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m[1m[41m Failed Tests 4 [49m[22m[31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/gallery-logic.test.ts[2m > [22mgallery logic[2m > 
+[22mfilterByShelf keeps one shelf or everything
+[31m[1mTypeError[22m: (0 , filterByShelf) is not a function[39m
+[36m [2mΓ¥»[22m src/components/landing/gallery/gallery-logic.test.ts:[2m69:17[22m[39m
+    [90m 67| [39m  [34mit[39m([32m"filterByShelf keeps one shelf or everything"[39m[33m,[39m () [33m=>[39m {
+    [90m 68| [39m    [35mconst[39m before [33m=[39m [33mSITE_CATEGORIES[39m[33m.[39m[34mmap[39m((c) 
+[33m=>[39m c[33m.[39mid)[33m;[39m
+    [90m 69| [39m    [35mconst[39m all [33m=[39m [34mfilterByShelf[39m([33mSITE_CATEGORIES[39m[33m,[39m 
+[35mnull[39m)[33m;[39m
+    [90m   | [39m                [31m^[39m
+    [90m 70| [39m    [34mexpect[39m(all[33m.[39m[34mmap[39m((c) [33m=>[39m 
+c[33m.[39mid))[33m.[39m[34mtoEqual[39m(before)[33m;[39m
+    [90m 71| [39m    [34mexpect[39m(all)[33m.[39m[34mtoHaveLength[39m([34m8[39m)[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mTemplateShelf shows upright books on embossed planks with a see-all link per shelf
+[31m[1mAssertionError[22m: data-book=: expected +0 to be 8 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 8[39m
+[31m+ 0[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m134:120[22m[39m
+    [90m132| [39m    [34mexpect[39m(html[33m.[39m[34mmatch[39m([36m/<h3/g[39m)[33m?.[39mlength)[33m.[39m
+[34mtoBe[39m([34m4[39m)[33m;[39m
+    [90m133| [39m    expect(html.match(/<button[^>]*data-shelf-cover/g)?.length).toBe(8ΓÇª
+    [90m134| [39m    for (const attr of ["data-book=", "data-book-spine", "data-book-tiΓÇª
+    [90m   | [39m                                                                                                    
+                   [31m^[39m
+    [90m135| [39m    [34mexpect[39m(html[33m.[39m[34mmatch[39m([36m/data-shelf-plank/g[39m)[33m?.[39mlength
+)[33m.[39m[34mtoBe[39m([34m4[39m)[33m;[39m
+    [90m136| [39m    const seeAll = [...html.matchAll(/<button[^>]*data-see-all[^>]*>([ΓÇª
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mshelf source lays shelves side by side and paints planks opaquely
+[31m[1mAssertionError[22m: expected '"use client";\n\nimport { useId, useSΓÇª' to contain 'lg:grid-cols-2'[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- lg:grid-cols-2[39m
+[31m+ "use client";[39m
+[31m+[39m
+[31m+ import { useId, useState } from "react";[39m
+[31m+ import { CategoryIcon } from "@/components/site-art/category-icon";[39m
+[31m+ import { SiteArt } from "@/components/site-art/site-art";[39m
+[31m+ import { fmt } from "@/lib/format";[39m
+[31m+ import type { Dictionary } from "@/lib/i18n";[39m
+[31m+ import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";[39m
+[31m+ import { groupByShelf, searchCategories } from "./gallery-logic";[39m
+[31m+ import { useGallery } from "./gallery-provider";[39m
+[31m+[39m
+[31m+ type Copy = Dictionary["landing"]["shelf"];[39m
+[31m+[39m
+[31m+ const TAB =[39m
+[31m+   "min-h-11 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-none 
+focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:text-background";[39m
+[31m+ const ROW = "flex snap-x gap-4 overflow-x-auto px-1 pb-2 pt-4 lg:flex-wrap lg:overflow-visible";[39m
+[31m+[39m
+[31m+ /** Template shelf: covers grouped per shelf (or all in a grid), filtered client-side; each cover opens the 
+viewer. */[39m
+[31m+ export function TemplateShelf({ copy }: { copy: Copy }) {[39m
+[31m+   const gallery = useGallery();[39m
+[31m+   const [view, setView] = useState<"shelves" | "all">("shelves");[39m
+[31m+   const [query, setQuery] = useState("");[39m
+[31m+   const searchId = useId();[39m
+[31m+   const results = searchCategories(SITE_CATEGORIES, query, gallery.labels);[39m
+[31m+[39m
+[31m+   const cover = (c: SiteCategory, wide = false) => {[39m
+[31m+     const name = (gallery.labels.items[c.id] as { name: string }).name;[39m
+[31m+     return ([39m
+[31m+       <li key={c.id} className={wide ? "" : "w-40 shrink-0 snap-start sm:w-44"}>[39m
+[31m+         <button[39m
+[31m+           type="button"[39m
+[31m+           data-shelf-cover=""[39m
+[31m+           aria-label={fmt(gallery.copy.openPanel, { category: name })}[39m
+[31m+           onClick={(e) => gallery.open(c.id, e.currentTarget)}[39m
+[31m+           className="clay-card flex aspect-[3/4] w-full flex-col gap-2 rounded-[1.25rem] p-3 text-left 
+transition-transform duration-300 hover:-translate-y-2 hover:-rotate-2 focus-visible:-translate-y-2 
+focus-visible:-rotate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring 
+motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:rotate-0 
+motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:rotate-0"[39m
+[31m+         >[39m
+[31m+           <CategoryIcon id={c.id} className="size-6 text-[var(--fuse-accent-text)]" />[39m
+[31m+           <span className="font-narrow text-sm uppercase tracking-wider text-foreground">{name}</span>[39m
+[31m+           <span className="mt-auto block overflow-hidden rounded-xl border border-border">[39m
+[31m+             <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-full" />[39m
+[31m+           </span>[39m
+[31m+           <span className="text-xs text-muted-foreground">{copy.pagesCount}</span>[39m
+[31m+         </button>[39m
+[31m+       </li>[39m
+[31m+     );[39m
+[31m+   };[39m
+[31m+[39m
+[31m+   return ([39m
+[31m+     <div>[39m
+[31m+       <div className="flex flex-wrap items-center gap-4">[39m
+[31m+         <div role="group" aria-label={copy.tabsLabel} className="flex gap-1 rounded-full border border-border 
+p-1">[39m
+[31m+           <button type="button" aria-pressed={view === "shelves"} onClick={() => setView("shelves")} 
+className={TAB}>[39m
+[31m+             {copy.tabShelves}[39m
+[31m+           </button>[39m
+[31m+           <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} 
+className={TAB}>[39m
+[31m+             {copy.tabAll}[39m
+[31m+           </button>[39m
+[31m+         </div>[39m
+[31m+         <label htmlFor={searchId} className="sr-only">[39m
+[31m+           {copy.searchLabel}[39m
+[31m+         </label>[39m
+[31m+         <input[39m
+[31m+           type="search"[39m
+[31m+           id={searchId}[39m
+[31m+           value={query}[39m
+[31m+           onChange={(e) => setQuery(e.target.value)}[39m
+[31m+           placeholder={copy.searchPlaceholder}[39m
+[31m+           className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-transparent px-5 text-sm 
+text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 
+focus-visible:ring-ring"[39m
+[31m+         />[39m
+[31m+         <p aria-live="polite" className="text-sm text-muted-foreground">[39m
+[31m+           {fmt(copy.count, { n: results.length })}[39m
+[31m+         </p>[39m
+[31m+       </div>[39m
+[31m+[39m
+[31m+       {results.length === 0 ? ([39m
+[31m+         <p className="mt-10 text-center text-muted-foreground">{fmt(copy.empty, { q: query.trim() })}</p>[39m
+[31m+       ) : view === "shelves" ? ([39m
+[31m+         groupByShelf(results).map((g) => ([39m
+[31m+           <section key={g.shelf} className="mt-10">[39m
+[31m+             <h3 className="font-wide text-lg">{gallery.labels.shelves[g.shelf]}</h3>[39m
+[31m+             <ul className={ROW}>{g.items.map((c) => cover(c))}</ul>[39m
+[31m+             <div aria-hidden="true" className="h-3 rounded-full bg-card bg-[image:var(--fuse-card-bg)] 
+shadow-[0_10px_18px_-8px_rgb(0_0_0/0.45)]" />[39m
+[31m+           </section>[39m
+[31m+         ))[39m
+[31m+       ) : ([39m
+[31m+         <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{results.map((c) => cover(c, 
+true))}</ul>[39m
+[31m+       )}[39m
+[31m+     </div>[39m
+[31m+   );[39m
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (15)[39m
+[2m   Start at [22m 03:58:08
+[2m   Duration [22m 2.64s[2m (transform 310ms, setup 0ms, collect 1.72s, tests 131ms, environment 1ms, prepare 454ms)[22m
+
+[31m+ }[39m
+[31m+[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m147:135[22m[39m
+    [90m145| [39m  it("shelf source lays shelves side by side and paints planks opaquelΓÇª
+    [90m146| [39m    const src = read("src/components/landing/gallery/template-shelf.tsΓÇª
+    [90m147| [39m    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "filterByShelf"ΓÇª
+    [90m   | [39m                                                                                                    
+                                  [31m^[39m
+    [90m148| [39m    for (const s of ["bg-[var(--fuse-card-bg)]", "backdrop", "setInterΓÇª
+    [90m149| [39m  })[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[3/4]ΓÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/landing/gallery/template-shelf.test.ts[2m > [22mtemplate shelf[2m > 
+[22mnew shelf keys exist in id and en with placeholders
+[31m[1mAssertionError[22m: seeAll: expected 'undefined' to be 'string' // Object.is equality[39m
+
+Expected: [32m"string"[39m
+Received: [31m"undefined"[39m
+
+[36m [2mΓ¥»[22m src/components/landing/gallery/template-shelf.test.ts:[2m155:100[22m[39m
+    [90m153| [39m    [35mconst[39m en [33m=[39m [33mDICTS[39m[33m.[39men[33m.[39mlanding[33m.[39mshelf 
+[35mas[39m [33mRecord[39m[33m<[39mstring[33m,[39m string[33m>[39m[33m;[39m
+    [90m154| [39m    [35mfor[39m ([35mconst[39m s [35mof[39m [id[33m,[39m en]) {
+    [90m155| [39m      for (const k of ["seeAll", "seeAllShelf", "shelfOnly", "allShelvΓÇª
+    [90m   | [39m                                                                                                   
+[31m^[39m
+    [90m156| [39m      
+[34mexpect[39m(s[33m.[39mseeAllShelf)[33m.[39m[34mtoContain[39m([32m"{shelf}"[39m)[33m;[39m
+    [90m157| [39m      
+[34mexpect[39m(s[33m.[39mshelfOnly)[33m.[39m[34mtoContain[39m([32m"{shelf}"[39m)[33m;[39m
+
+[31m[2mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[4/4]ΓÄ»[22m[39m
+

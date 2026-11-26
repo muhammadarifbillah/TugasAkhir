@@ -192,7 +192,11 @@
       "searchPlaceholder": "Cari: toko, kursus, klinik…",
       "count": "{n} template ditemukan",
       "empty": "Tidak ada template yang cocok dengan \"{q}\".",
-      "pagesCount": "3 halaman"
+      "pagesCount": "3 halaman",
+      "seeAll": "Lihat semua",
+      "seeAllShelf": "Lihat semua template di rak {shelf}",
+      "shelfOnly": "Rak: {shelf}",
+      "allShelves": "Tampilkan semua rak"
     },
     "loop": {
       "title": "Satu putaran, lima gerbang.",

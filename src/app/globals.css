@@ -753,3 +753,14 @@ html[data-contrast="high"] .landing .clay-card {
     animation: 180ms ease-out 60ms both vt-fade !important;
   }
 }
+
+/* Mobile hero carousel: the centred panel grows as it scrolls into view (scroll-driven, no JS). */
+@keyframes gallery-focus {
+  0%, 100% { scale: 0.9; }
+  50% { scale: 1; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (not ((min-width: 1024px) and (pointer: fine))) {
+    .gallery-carousel-item { animation: gallery-focus linear both; animation-timeline: view(inline); }
+  }
+}

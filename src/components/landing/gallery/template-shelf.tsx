@@ -1,45 +1,61 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useId, useState } from "react";
 import { CategoryIcon } from "@/components/site-art/category-icon";
 import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
-import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";
-import { groupByShelf, searchCategories } from "./gallery-logic";
+import { SITE_CATEGORIES, type ShelfId, type SiteCategory } from "@/lib/site-categories";
+import { filterByShelf, groupByShelf, searchCategories } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
 
 type Copy = Dictionary["landing"]["shelf"];
 
 const TAB =
   "min-h-11 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:text-background";
-const ROW = "flex snap-x gap-4 overflow-x-auto px-1 pb-2 pt-4 lg:flex-wrap lg:overflow-visible";
+const ROW = "flex snap-x items-end gap-5 overflow-x-auto px-2 pt-4 lg:flex-wrap lg:overflow-visible";
 
-/** Template shelf: covers grouped per shelf (or all in a grid), filtered client-side; each cover opens the viewer. */
+/** Template shelf: books grouped per shelf (or all in a grid), filtered client-side; each book opens the viewer. */
 export function TemplateShelf({ copy }: { copy: Copy }) {
   const gallery = useGallery();
   const [view, setView] = useState<"shelves" | "all">("shelves");
+  const [shelf, setShelf] = useState<ShelfId | null>(null);
   const [query, setQuery] = useState("");
   const searchId = useId();
   const results = searchCategories(SITE_CATEGORIES, query, gallery.labels);
 
-  const cover = (c: SiteCategory, wide = false) => {
+  const book = (c: SiteCategory, wide = false) => {
     const name = (gallery.labels.items[c.id] as { name: string }).name;
     return (
-      <li key={c.id} className={wide ? "" : "w-40 shrink-0 snap-start sm:w-44"}>
+      <li key={c.id} className={wide ? "" : "shrink-0 snap-start"}>
         <button
           type="button"
           data-shelf-cover=""
           aria-label={fmt(gallery.copy.openPanel, { category: name })}
           onClick={(e) => gallery.open(c.id, e.currentTarget)}
-          className="clay-card flex aspect-[3/4] w-full flex-col gap-2 rounded-[1.25rem] p-3 text-left transition-transform duration-300 hover:-translate-y-2 hover:-rotate-2 focus-visible:-translate-y-2 focus-visible:-rotate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:rotate-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:rotate-0"
+          className="flex w-full flex-col rounded-md text-left transition-transform duration-300 hover:-translate-y-2 hover:-rotate-2 focus-visible:-translate-y-2 focus-visible:-rotate-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:rotate-0 motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:rotate-0"
         >
-          <CategoryIcon id={c.id} className="size-6 text-[var(--fuse-accent-text)]" />
-          <span className="font-narrow text-sm uppercase tracking-wider text-foreground">{name}</span>
-          <span className="mt-auto block overflow-hidden rounded-xl border border-border">
-            <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-full" />
+          <span
+            data-book=""
+            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[7.5rem] sm:w-[8.5rem]"}`}
+          >
+            <span
+              className="absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-3 overflow-hidden rounded-l-sm rounded-r-md bg-card pl-4 pr-2 pt-4"
+              style={{ backgroundImage: `linear-gradient(160deg, hsl(${c.hue} 55% 32%), hsl(${c.hue} 60% 20%))` }}
+            >
+              <CategoryIcon id={c.id} className="size-6 text-white" />
+              <span className="flex aspect-square w-full items-center overflow-hidden rounded-sm border-2 border-white bg-white">
+                <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-[160%] max-w-none -translate-x-[18.75%]" />
+              </span>
+            </span>
+            <span data-book-spine="" className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(0_0_0/0.5),rgb(0_0_0/0.2))]" />
+            <span className="absolute inset-y-1 right-0 w-1 rounded-r-sm bg-[#F3EBD8]" />
           </span>
-          <span className="text-xs text-muted-foreground">{copy.pagesCount}</span>
+          <span data-book-title="" className="mt-3 block text-sm font-medium text-foreground">
+            {name}
+          </span>
+          <span className="block text-xs text-muted-foreground">{copy.pagesCount}</span>
         </button>
       </li>
     );
@@ -49,7 +65,15 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
     <div>
       <div className="flex flex-wrap items-center gap-4">
         <div role="group" aria-label={copy.tabsLabel} className="flex gap-1 rounded-full border border-border p-1">
-          <button type="button" aria-pressed={view === "shelves"} onClick={() => setView("shelves")} className={TAB}>
+          <button
+            type="button"
+            aria-pressed={view === "shelves"}
+            onClick={() => {
+              setView("shelves");
+              setShelf(null);
+            }}
+            className={TAB}
+          >
             {copy.tabShelves}
           </button>
           <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} className={TAB}>
@@ -75,15 +99,55 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
       {results.length === 0 ? (
         <p className="mt-10 text-center text-muted-foreground">{fmt(copy.empty, { q: query.trim() })}</p>
       ) : view === "shelves" ? (
-        groupByShelf(results).map((g) => (
-          <section key={g.shelf} className="mt-10">
-            <h3 className="font-wide text-lg">{gallery.labels.shelves[g.shelf]}</h3>
-            <ul className={ROW}>{g.items.map((c) => cover(c))}</ul>
-            <div aria-hidden="true" className="h-3 rounded-full bg-[var(--fuse-card-bg)] shadow-[0_10px_18px_-8px_rgb(0_0_0/0.45)]" />
-          </section>
-        ))
+        <div className="mt-10 grid gap-x-10 gap-y-12 lg:grid-cols-2">
+          {groupByShelf(results).map((g) => {
+            const name = gallery.labels.shelves[g.shelf];
+            return (
+              <section key={g.shelf} data-shelf="">
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="font-wide text-lg">{name}</h3>
+                  <button
+                    type="button"
+                    data-see-all=""
+                    aria-label={fmt(copy.seeAllShelf, { shelf: name })}
+                    onClick={() => {
+                      setView("all");
+                      setShelf(g.shelf);
+                    }}
+                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[var(--fuse-accent-text)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {copy.seeAll}
+                    <ArrowRight aria-hidden="true" className="size-4" />
+                  </button>
+                </div>
+                <ul className={ROW}>{g.items.map((c) => book(c))}</ul>
+                <div
+                  aria-hidden="true"
+                  data-shelf-plank=""
+                  className="h-3.5 rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(255_255_255/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.18)]"
+                />
+              </section>
+            );
+          })}
+        </div>
       ) : (
-        <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{results.map((c) => cover(c, true))}</ul>
+        <>
+          {shelf && (
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <p className="text-sm text-foreground">{fmt(copy.shelfOnly, { shelf: gallery.labels.shelves[shelf] })}</p>
+              <button
+                type="button"
+                onClick={() => setShelf(null)}
+                className="min-h-11 rounded-full border border-border px-4 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {copy.allShelves}
+              </button>
+            </div>
+          )}
+          <ul className="mt-10 grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
+            {filterByShelf(results, shelf).map((c) => book(c, true))}
+          </ul>
+        </>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -143,6 +143,39 @@ describe("category viewer", () => {
     for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "onOpenChange", "keyToAction", "data-lenis-prevent", "AnimatePresence"])
       expect(src).toContain(s);
     for (const s of ["backdrop", "<motion.", "setInterval"]) expect(src).not.toContain(s);
+  });
+
+  it("the viewer surface is opaque and the overlay is dark", () => {
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    const classOf = (tag: string) => {
+      // Content's props hold arrow functions ("=>"), so take the first className after the tag instead of stopping at ">".
+      const at = src.indexOf(`<${tag}`);
+      expect(at, tag).toBeGreaterThanOrEqual(0);
+      const m = /className="([^"]*)"/.exec(src.slice(at));
+      expect(m, tag).not.toBeNull();
+      return m![1];
+    };
+    const content = classOf("DialogPrimitive.Content");
+    expect(content).toContain("bg-card");
+    expect(content).toContain("bg-[image:var(--fuse-card-bg)]");
+    for (const s of ["bg-[var(", "bg-transparent", "opacity-"]) expect(content).not.toContain(s);
+    const bgTokens = content.split(/\s+/).filter((t) => /(^|:)bg-/.test(t));
+    for (const t of bgTokens) expect(t, t).not.toMatch(/\/(0?\.\d+|\d{1,2})\b/);
+    expect(classOf("DialogPrimitive.Overlay")).toContain("bg-[#0A1931]/85");
+  });
+
+  it("no component paints a gradient token as a background colour", () => {
+    const walk = (dir: string): string[] =>
+      readdirSync(join(ROOT, dir), { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? walk(`${dir}/${e.name}`) : e.name.endsWith(".tsx") ? [`${dir}/${e.name}`] : [],
+      );
+    const files = walk("src");
+    expect(files.length).toBeGreaterThan(0);
+    const hits = files.filter((f) => {
+      const s = read(f);
+      return s.includes("bg-[var(--fuse-card-bg)]") || s.includes("bg-[var(--fuse-bg)]");
+    });
+    expect(hits).toEqual([]);
   });
 
   it("landing.gallery keys match in id and en and keep placeholders", () => {

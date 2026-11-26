@@ -54,6 +54,64 @@ describe("hero wall", () => {
     }
   });
 
+  it("HeroWall panels are portrait frames with three stacked pages", () => {
+    const out = html();
+    expect(out.match(/data-gallery-panel/g)?.length).toBe(8);
+    expect(out.match(/data-panel-art/g)?.length).toBe(8);
+    expect(out.match(/data-panel-page/g)?.length).toBe(24);
+    expect(out.match(/data-panel-reflection/g)?.length).toBe(8);
+    for (const attr of ["data-panel-art", "data-panel-reflection"]) {
+      const tags = [...out.matchAll(new RegExp(`<[a-z]+[^>]*${attr}[^>]*>`, "g"))].map((m) => m[0]);
+      expect(tags).toHaveLength(8);
+      for (const t of tags) expect(t, attr).toContain('aria-hidden="true"');
+    }
+    const panels = [...out.matchAll(/<button[^>]*data-gallery-panel[^>]*>/g)].map((m) => m[0]);
+    panels.forEach((tag, i) => {
+      const name = names[SITE_CATEGORIES[i].id].name;
+      expect(tag).toContain(`aria-label="${escape(fmt(copy.openPanel, { category: name }))}"`);
+    });
+  });
+
+  it("each panel carries its coverflow pose", () => {
+    const out = html();
+    for (const i of [0, 3, 7]) {
+      const p = wallPose(i, 8);
+      expect(out).toContain(`--ry:${p.rotateY}deg`);
+      expect(out).toContain(`--tz:${p.z}px`);
+      expect(out).toContain(`--s:${p.scale}`);
+    }
+  });
+
+  it("wall and carousel sizes follow the panorama spec", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    for (const s of [
+      "lg:pointer-fine:w-[clamp(8.5rem,14vw,15rem)]",
+      "lg:pointer-fine:aspect-[2/3]",
+      "aspect-[3/4]",
+      "w-[80vw]",
+      "gallery-carousel-item",
+      "scale(var(--s))",
+      "[perspective:1200px]",
+      "motion-safe:",
+      "snap-x",
+      "snap-mandatory",
+      "LANDING_MOTION_QUERY",
+      "pointerTilt",
+    ])
+      expect(src).toContain(s);
+    for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
+  });
+
+  it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {
+    const css = read("src/app/globals.css");
+    for (const s of ["@keyframes gallery-focus", "animation-timeline: view(inline)", "@supports (animation-timeline: view())", "prefers-reduced-motion: no-preference"])
+      expect(css).toContain(s);
+    const at = css.indexOf("@keyframes gallery-focus");
+    const block = css.slice(at, css.indexOf(".gallery-carousel-item", at) + 200);
+    expect(block).toContain("gallery-focus linear both");
+    expect(block).not.toContain("infinite");
+  });
+
   it("HeroWall is a snap carousel on small screens and a 3D wall behind lg:pointer-fine", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
     for (const s of ["snap-x", "snap-mandatory", "lg:pointer-fine:", "motion-safe:", "motion-reduce:", "LANDING_MOTION_QUERY", "pointerTilt", "wallPose", "aria-hidden"])

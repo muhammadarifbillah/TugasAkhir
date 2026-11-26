@@ -192,7 +192,11 @@
       "searchPlaceholder": "Search: shop, course, clinic…",
       "count": "Templates found: {n}",
       "empty": "No template matches \"{q}\".",
-      "pagesCount": "3 pages"
+      "pagesCount": "3 pages",
+      "seeAll": "See all",
+      "seeAllShelf": "See every template on the {shelf} shelf",
+      "shelfOnly": "Shelf: {shelf}",
+      "allShelves": "Show all shelves"
     },
     "loop": {
       "title": "One loop, five gates.",

@@ -178,7 +178,7 @@ export function CategoryViewer({
     >
       {category && (
         <DialogPrimitive.Portal>
-          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[rgb(5_13_28/0.82)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[#0A1931]/85 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
           <DialogPrimitive.Content
             data-lenis-prevent=""
             onKeyDown={(e) => {
@@ -192,7 +192,7 @@ export function CategoryViewer({
               e.preventDefault();
               onClosed();
             }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-[var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] focus:outline-none lg:inset-auto lg:left-1/2 lg:top-1/2 lg:max-h-[88vh] lg:w-[min(72rem,94vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[2rem]"
+            className="fixed inset-0 z-50 overflow-y-auto bg-card bg-[image:var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] focus:outline-none lg:inset-auto lg:left-1/2 lg:top-1/2 lg:max-h-[88vh] lg:w-[min(72rem,94vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[2rem]"
           >
             <m.div
               initial={{ opacity: 0, scale: 0.94, y: 12 }}

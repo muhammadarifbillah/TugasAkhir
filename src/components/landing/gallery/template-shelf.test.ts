@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
 import { GalleryProvider } from "./gallery-provider";
-import { groupByShelf, searchCategories } from "./gallery-logic";
+import { SHELF_ORDER, groupByShelf, searchCategories } from "./gallery-logic";
 import { TemplateShelf } from "./template-shelf";
 
 type Json = Record<string, unknown>;
@@ -115,6 +115,50 @@ describe("template shelf", () => {
     expect(html).toMatch(new RegExp(`<button[^>]*aria-pressed="true"[^>]*>${escape(copy.tabShelves)}</button>`));
     expect(html).toMatch(new RegExp(`<button[^>]*aria-pressed="false"[^>]*>${escape(copy.tabAll)}</button>`));
     expect(html).toContain(escape(fmt(copy.count, { n: 8 })));
+  });
+
+  it("TemplateShelf shows upright books on embossed planks with a see-all link per shelf", () => {
+    const d = DICTS.id;
+    const gallery = d.landing.gallery as ProviderProps["copy"];
+    const copy = d.landing.shelf as ShelfCopy & Record<"seeAll" | "seeAllShelf", string>;
+    const labels = labelsOf("id");
+    const html = renderToStaticMarkup(
+      createElement(
+        GalleryProvider,
+        { lang: "id", appName: d.app.name, labels, copy: gallery } as ProviderProps,
+        createElement(TemplateShelf, { copy }),
+      ),
+    );
+    expect(html.match(/<h3/g)?.length).toBe(4);
+    expect(html.match(/<button[^>]*data-shelf-cover/g)?.length).toBe(8);
+    for (const attr of ["data-book=", "data-book-spine", "data-book-title"]) expect(html.split(attr).length - 1, attr).toBe(8);
+    expect(html.match(/data-shelf-plank/g)?.length).toBe(4);
+    const seeAll = [...html.matchAll(/<button[^>]*data-see-all[^>]*>([\s\S]*?)<\/button>/g)];
+    expect(seeAll).toHaveLength(4);
+    const want = SHELF_ORDER.map((s) => labels.shelves[s]).map((shelf) => `aria-label="${escape(fmt(copy.seeAllShelf, { shelf }))}"`);
+    seeAll.forEach((m, i) => {
+      expect(m[0]).toContain(want[i]);
+      expect(m[1]).toContain(escape(copy.seeAll));
+    });
+  });
+
+  it("shelf source lays shelves side by side and paints planks opaquely", () => {
+    const src = read("src/components/landing/gallery/template-shelf.tsx");
+    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "filterByShelf", "data-shelf-plank", "bg-card", "motion-reduce:"]) expect(src).toContain(s);
+    for (const s of ["bg-[var(--fuse-card-bg)]", "backdrop", "setInterval"]) expect(src).not.toContain(s);
+  });
+
+  it("new shelf keys exist in id and en with placeholders", () => {
+    const id = DICTS.id.landing.shelf as Record<string, string>;
+    const en = DICTS.en.landing.shelf as Record<string, string>;
+    for (const s of [id, en]) {
+      for (const k of ["seeAll", "seeAllShelf", "shelfOnly", "allShelves"]) expect(typeof s[k], k).toBe("string");
+      expect(s.seeAllShelf).toContain("{shelf}");
+      expect(s.shelfOnly).toContain("{shelf}");
+    }
+    expect(Object.keys(id).sort()).toEqual(Object.keys(en).sort());
+    const text = [id, en].flatMap((s) => ["seeAll", "seeAllShelf", "shelfOnly", "allShelves"].map((k) => s[k] ?? "")).join("\n").toLowerCase();
+    for (const p of FORBIDDEN) expect(text).not.toContain(p);
   });
 
   it("shelf source is client-filtered, motion-safe and blur-free", () => {
