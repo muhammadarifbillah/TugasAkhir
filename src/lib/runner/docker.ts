@@ -203,7 +203,7 @@ export interface SdlcContainerInfo {
 }
 
 /**
- * Lists ShieldForge run containers by label so the in-memory session registry
+ * Lists Saksi run containers by label so the in-memory session registry
  * can be rebuilt after a process restart (otherwise runs look "lost").
  */
 export async function listSdlcContainers(): Promise<SdlcContainerInfo[]> {

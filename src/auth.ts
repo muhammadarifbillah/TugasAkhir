@@ -8,6 +8,7 @@ import { encryptSecret } from "@/lib/crypto";
 import { writeAudit } from "@/lib/audit";
 import type { NextAuthConfig } from "next-auth";
 
+// Legacy dev-account email: changing it orphans the existing dev user's projects.
 const DEV_EMAIL = "dev@shieldforge.local";
 
 /** True when real GitHub OAuth credentials are configured in .env. */

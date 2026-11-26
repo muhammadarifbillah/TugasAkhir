@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "ShieldForge: every stage is checked before any code ships";
+export const alt = "Saksi: every stage is checked before any code ships";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 30, fontWeight: 700, color: "#b9a6ff" }}>ShieldForge</div>
+          <div style={{ fontSize: 30, fontWeight: 700, color: "#b9a6ff" }}>Saksi</div>
           <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.05, marginTop: 20, maxWidth: 980, letterSpacing: -1.5 }}>
             Every stage is checked before any code ships.
           </div>

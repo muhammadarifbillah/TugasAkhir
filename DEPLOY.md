@@ -1,6 +1,6 @@
-# Deploy ShieldForge (Proxmox + Docker)
+# Deploy Saksi (Proxmox + Docker)
 
-Panduan men-deploy ShieldForge secara publik memakai Docker Compose: **Caddy
+Panduan men-deploy Saksi secara publik memakai Docker Compose: **Caddy
 (HTTPS) + Next.js app + PostgreSQL**. Hanya Caddy yang terekspos (port 80/443);
 app dan database tetap di jaringan internal.
 
@@ -41,8 +41,10 @@ sudo usermod -aG docker "$USER" && newgrp docker
 ## 3. Ambil kode
 
 ```bash
-git clone <url-repo-shieldforge> shieldforge && cd shieldforge
+git clone <url-repo> shieldforge && cd shieldforge
 ```
+
+Direktori clone sengaja tetap `shieldforge`: Docker Compose memakai nama direktori sebagai awalan volume (`shieldforge_shieldforge-db`), sehingga clone ke direktori lain membuat volume Postgres baru yang kosong.
 
 ## 4. Konfigurasi `.env`
 
@@ -54,8 +56,8 @@ Isi nilai produksi:
 
 | Variabel | Nilai |
 |---|---|
-| `DOMAIN` | domain publik, mis. `shieldforge.example.com` |
-| `AUTH_URL` / `NEXTAUTH_URL` | `https://shieldforge.example.com` |
+| `DOMAIN` | domain publik, mis. `saksi.example.com` |
+| `AUTH_URL` / `NEXTAUTH_URL` | `https://saksi.example.com` |
 | `POSTGRES_PASSWORD` | kata sandi kuat (untuk container `db`) |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `ENCRYPTION_MASTER_KEY` | `openssl rand -hex 32` |
@@ -76,10 +78,10 @@ Isi nilai produksi:
 ```bash
 # Di VM, arahkan tunnel ke app internal:
 cloudflared tunnel login
-cloudflared tunnel create shieldforge
+cloudflared tunnel create saksi
 # Konfigurasi CNAME domain → <tunnel-id>.cfargotunnel.com, lalu:
-cloudflared tunnel route dns shieldforge shieldforge.example.com
-cloudflared tunnel run --url http://localhost:3000 shieldforge
+cloudflared tunnel route dns saksi saksi.example.com
+cloudflared tunnel run --url http://localhost:3000 saksi
 ```
 
 Dengan jalur ini Caddy bisa dilewati (Cloudflare menangani TLS di edge); jalankan

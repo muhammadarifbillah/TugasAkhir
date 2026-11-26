@@ -1,4 +1,4 @@
-# Caddyfile — automatic HTTPS reverse proxy for ShieldForge.
+# Caddyfile — automatic HTTPS reverse proxy for Saksi.
 # Set DOMAIN in the environment (see docker-compose.prod.yml / .env).
 {$DOMAIN} {
 	encode gzip

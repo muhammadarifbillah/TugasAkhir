@@ -2,7 +2,7 @@ import { GraduationCap, Presentation, Store } from "lucide-react";
 
 const ICONS = [GraduationCap, Store, Presentation];
 
-/** Who ShieldForge is for: three clay tiles. */
+/** Who Saksi is for: three clay tiles. */
 export function AudienceTiles({ items }: { items: { title: string; desc: string }[] }) {
   return (
     <ul className="grid gap-6 md:grid-cols-3">

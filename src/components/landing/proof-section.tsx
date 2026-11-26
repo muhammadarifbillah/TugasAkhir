@@ -41,7 +41,7 @@ export function ProofSection({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "shieldforge-matriks-nist-iso.csv";
+    a.download = "saksi-matriks-nist-iso.csv";
     a.click();
     URL.revokeObjectURL(url);
   };

@@ -28,9 +28,9 @@
     "back": "Kembali ke pengaturan"
   },
   "app": {
-    "name": "ShieldForge",
-    "tagline": "Generator website aman bertenaga AI",
-    "frameworkNote": "NIST SP 800-218 engine · ISO 27001:2022 crosswalk (concept).",
+    "name": "Saksi",
+    "tagline": "Kode AI lolos hanya bila ada saksinya. Setiap gerbang dipetakan ke ISO/IEC 27001:2022.",
+    "frameworkNote": "NIST SP 800-218 (SSDF) sebagai pelengkap; ini pemetaan konsep, bukan sertifikasi.",
     "offline": "Anda sedang offline. Beberapa fitur mungkin tidak berfungsi."
   },
   "landing": {
@@ -123,7 +123,7 @@
     "previewTitle": "Ini studionya, bukan ilustrasi.",
     "previewShots": [
       {
-        "alt": "Studio ShieldForge dengan sub-langkah, ruang kerja AI, dan panel keamanan",
+        "alt": "Studio Saksi dengan sub-langkah, ruang kerja AI, dan panel keamanan",
         "caption": "Ruang kerja studio"
       },
       {
@@ -131,8 +131,8 @@
         "caption": "Skor keamanan terverifikasi"
       },
       {
-        "alt": "Panel kepatuhan yang memetakan task NIST SSDF ke kontrol ISO 27001",
-        "caption": "Panel kepatuhan NIST → ISO"
+        "alt": "Panel pemetaan yang menghubungkan task NIST SSDF ke kontrol ISO/IEC 27001:2022",
+        "caption": "Panel pemetaan NIST → ISO"
       }
     ],
     "deliverables": [
@@ -167,8 +167,8 @@
         "a": "OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, dan Ollama untuk model lokal."
       },
       {
-        "q": "Apakah ShieldForge memberi sertifikat ISO 27001?",
-        "a": "Tidak. ShieldForge memetakan tiap tahap ke kontrol ISO 27001:2022 Lampiran A dan membuat laporan pendukung audit."
+        "q": "Apakah Saksi memberi sertifikat ISO 27001?",
+        "a": "Tidak. Saksi memetakan tiap tahap ke kontrol ISO 27001:2022 Lampiran A dan membuat laporan pendukung audit."
       },
       {
         "q": "Apakah wajib memakai GitHub?",
@@ -243,13 +243,13 @@
       "Tanpa artefak per tahap, sulit menunjukkan kontrol mana yang dipenuhi dan kapan."
     ],
     "aboutTitle": "Apa itu {name}?",
-    "aboutLede": "ShieldForge adalah studio pembuat website berbasis AI yang bekerja seperti lini produksi dengan pos pemeriksaan. AI menyusun kebutuhan, desain, kode, dan dokumen; ShieldForge memastikan setiap tahap memenuhi syaratnya sebelum tahap berikutnya dibuka, lalu memeriksa hasilnya dengan pemindai keamanan sungguhan.",
+    "aboutLede": "{name} adalah studio pembuat website berbasis AI yang bekerja seperti lini produksi dengan pos pemeriksaan. AI menyusun kebutuhan, desain, kode, dan dokumen; {name} memastikan setiap tahap memenuhi syaratnya sebelum tahap berikutnya dibuka, lalu memeriksa hasilnya dengan pemindai keamanan sungguhan.",
     "aboutAiTitle": "Dikerjakan AI",
     "aboutAi": [
       "Menyusun kebutuhan keamanan dan klasifikasi data",
       "Membuat desain UI, arsitektur, diagram, dan skema database",
       "Menulis kode untuk berbagai stack",
-      "Menulis manual book dan laporan kepatuhan"
+      "Menulis manual book dan laporan pemetaan ISO/IEC 27001:2022"
     ],
     "aboutGateTitle": "Dijaga gerbang",
     "aboutGate": [
@@ -292,7 +292,7 @@
         "note": "Menyerahkan hasil yang bisa diaudit. (ZIP, manual book, laporan ISO, matriks ketertelusuran; push dan pull request dengan workflow security.yml.) Repositori tetap milik Anda."
       }
     ],
-    "archPlatformTitle": "Keamanan platform ShieldForge",
+    "archPlatformTitle": "Keamanan platform Saksi",
     "archPlatform": [
       "Kunci dan token terenkripsi AES-256-GCM",
       "Content Security Policy dengan nonce per permintaan",
@@ -309,7 +309,7 @@
     "resultsDeliverables": "Hasil",
     "limitsTitle": "Batasan",
     "limits": [
-      "Bukan sertifikasi ISO 27001 atau NIST; ShieldForge memetakan kontrol dan menyiapkan bukti",
+      "Bukan sertifikasi ISO 27001 atau NIST; Saksi memetakan kontrol dan menyiapkan bukti",
       "Pemindai menemukan pola yang dikenal; tinjauan manusia tetap diperlukan",
       "Kualitas hasil AI bergantung pada model yang Anda pilih",
       "Docker dibutuhkan untuk menjalankan aplikasi dan pemindaian"
@@ -456,7 +456,7 @@
   },
   "dashboard": {
     "title": "Dasbor Proyek",
-    "subtitle": "Buat, kelola, dan pantau kepatuhan keamanan untuk website buatan AI Anda.",
+    "subtitle": "Buat dan kelola website buatan AI Anda, lengkap dengan bukti keamanan tiap gerbang.",
     "newProject": "Proyek Baru",
     "all": "Semua Proyek",
     "inProgress": "Berjalan",
@@ -550,7 +550,7 @@
     "errorAccessDenied": "Akses ditolak atau sesi berakhir.",
     "errorOAuth": "Gagal masuk dengan GitHub. Coba lagi.",
     "registerTitle": "Buat akun baru",
-    "registerSubtitle": "Mulai dengan ShieldForge dalam hitungan menit.",
+    "registerSubtitle": "Mulai dengan Saksi dalam hitungan menit.",
     "noAccount": "Belum punya akun?",
     "createAccount": "Daftar",
     "emailLabel": "Email",
@@ -971,7 +971,7 @@
     "mergeRevision": "Gabungkan revisi",
     "cancelRevision": "Batalkan revisi",
     "badge": "Lencana status proyek",
-    "badgeHint": "Tempelkan lencana ini ke README Anda untuk menampilkan pipa kepatuhan ShieldForge.",
+    "badgeHint": "Tempelkan lencana ini ke README Anda untuk menampilkan pipeline keamanan Saksi.",
     "badgeCopied": "Lencana tersalin!",
     "copy": "Salin",
     "ok": "OK",

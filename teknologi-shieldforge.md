@@ -1,4 +1,6 @@
-# ShieldForge
+# Saksi
+
+> Catatan: produk ini sebelumnya bernama ShieldForge; nama diganti menjadi Saksi pada 2026-11-26. Judul skripsi tidak berubah.
 
 ## AI-Powered Secure SDLC Generator
 
@@ -10,7 +12,7 @@ Tugas Akhir - Sistem Informasi
 
 ## 1. Ringkasan Proyek
 
-ShieldForge adalah aplikasi web yang membantu pengembang website membangun aplikasi web yang aman melalui panduan terstruktur 5 tahap Secure Software Development Lifecycle (Secure SDLC). Aplikasi ini menggunakan AI (Artificial Intelligence) untuk menganalisis kebutuhan proyek, memberikan rekomendasi arsitektur, menghasilkan source code yang aman, melakukan security testing, serta menyediakan deliverables yang siap deploy.
+Saksi adalah aplikasi web yang membantu pengembang website membangun aplikasi web yang aman melalui panduan terstruktur 5 tahap Secure Software Development Lifecycle (Secure SDLC). Aplikasi ini menggunakan AI (Artificial Intelligence) untuk menganalisis kebutuhan proyek, memberikan rekomendasi arsitektur, menghasilkan source code yang aman, melakukan security testing, serta menyediakan deliverables yang siap deploy.
 
 Pendekatan keamanan aplikasi ini berbasis pada dua standar internasional: NIST SP 800-218 (Secure Software Development Framework / SSDF v1.1) dan ISO/IEC 27001:2022 Annex A. Seluruh 42 task SSDF dipetakan ke kontrol Annex A; 29 di antaranya dihubungkan langsung ke lima tahap pengembangan.
 
@@ -93,7 +95,7 @@ Fitur pembeda: traceability requirement keamanan dari tahap analisis hingga kode
 
 ## 3. Arsitektur Sistem
 
-ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. Berikut alur data utama:
+Saksi dibangun dengan arsitektur monolith menggunakan Next.js App Router. Berikut alur data utama:
 
 1. **Login** - NextAuth.js memvalidasi kredensial (GitHub OAuth / Email / Dev Account) dan membuat session JWT pada httpOnly cookie.
 2. **Buat Proyek** - User mengisi nama, template, bahasa output. Sistem membuat 5 ProjectStage (satu per tahap SDLC) dan merekomendasikan stack teknologi via AI.
@@ -190,15 +192,15 @@ ShieldForge dibangun dengan arsitektur monolith menggunakan Next.js App Router. 
 
 ### 4.7 Runner Docker & Hosting
 
-- Fitur Run dan Scan mengeksekusi container di host yang menjalankan ShieldForge.
+- Fitur Run dan Scan mengeksekusi container di host yang menjalankan Saksi.
 - **Hosting**: butuh server dengan Docker daemon (VPS/VM). Pada platform serverless (mis. Vercel), fitur ini tidak tersedia; atur `RUNNER_MODE=disabled`.
-- User akhir tidak perlu Docker; hanya server ShieldForge.
+- User akhir tidak perlu Docker; hanya server Saksi.
 
 ---
 
 ## 5. Mapping ke Standar Keamanan
 
-ShieldForge mengimplementasikan **42 task** NIST SP 800-218 SSDF v1.1 yang di-crosswalk ke ISO/IEC 27001:2022 Annex A. Sebagian contoh pemetaan:
+Saksi mengimplementasikan **42 task** NIST SP 800-218 SSDF v1.1 yang di-crosswalk ke ISO/IEC 27001:2022 Annex A. Sebagian contoh pemetaan:
 
 | Task Code | Judul | Tahap SDLC | ISO 27001:2022 |
 |---|---|---|---|
@@ -259,7 +261,7 @@ ShieldForge mengimplementasikan **42 task** NIST SP 800-218 SSDF v1.1 yang di-cr
 
 ## 8. Kesimpulan
 
-ShieldForge berhasil direalisasikan dengan memanfaatkan teknologi modern pada ekosistem JavaScript/TypeScript. Aplikasi ini mengintegrasikan AI ke dalam alur kerja Secure SDLC yang terstruktur, dengan pendekatan keamanan berbasis NIST SP 800-218 dan ISO/IEC 27001:2022.
+Saksi berhasil direalisasikan dengan memanfaatkan teknologi modern pada ekosistem JavaScript/TypeScript. Aplikasi ini mengintegrasikan AI ke dalam alur kerja Secure SDLC yang terstruktur, dengan pendekatan keamanan berbasis NIST SP 800-218 dan ISO/IEC 27001:2022.
 
 Fitur utama yang telah diimplementasikan meliputi:
 

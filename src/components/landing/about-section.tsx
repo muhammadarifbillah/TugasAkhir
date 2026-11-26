@@ -5,7 +5,7 @@ import { CountUp } from "@/components/landing/count-up";
 const GUARD_ICONS = [Database, Waypoints, FileCode2, ScanSearch, PackageCheck];
 
 /**
- * "What is ShieldForge": the AI's work beside what the gates guard, the five
+ * "What is Saksi": the AI's work beside what the gates guard, the five
  * guarded areas, then a facts card (real numbers from landing-facts) next to a
  * real studio screenshot.
  */

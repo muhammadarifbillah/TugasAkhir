@@ -109,7 +109,7 @@ export default async function HomePage({ params }: HomePageProps) {
             />
           </ClaySection>
 
-          <ClaySection id="tentang" pill={l.pills.about} title={fmt(l.aboutTitle, { name: dict.app.name })} lede={l.aboutLede}>
+          <ClaySection id="tentang" pill={l.pills.about} title={fmt(l.aboutTitle, { name: dict.app.name })} lede={fmt(l.aboutLede, { name: dict.app.name })}>
             <AboutSection
               aiTitle={l.aboutAiTitle}
               ai={l.aboutAi}

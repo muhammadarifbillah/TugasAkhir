@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       const commit = await octokit.rest.git.createCommit({
         owner,
         repo,
-        message: `feat: release ${nextVersion} via ShieldForge`,
+        message: `feat: release ${nextVersion} via Saksi`,
         tree: tree.data.sha,
         parents: [baseSha],
       });
