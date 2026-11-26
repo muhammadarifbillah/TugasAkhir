@@ -44,7 +44,13 @@ sudo usermod -aG docker "$USER" && newgrp docker
 git clone <url-repo> shieldforge && cd shieldforge
 ```
 
-Direktori clone sengaja tetap `shieldforge`: Docker Compose memakai nama direktori sebagai awalan volume (`shieldforge_shieldforge-db`), sehingga clone ke direktori lain membuat volume Postgres baru yang kosong.
+Direktori clone sengaja tetap `shieldforge`: Docker Compose memakai nama direktori sebagai awalan volume, sehingga clone ke direktori lain membuat volume Postgres baru yang kosong. Nama volume bergantung pada berkas Compose yang dipakai: `shieldforge_db-data` untuk `docker-compose.prod.yml` (produksi), `shieldforge_shieldforge-db` untuk `docker-compose.yml` (lokal).
+
+Bila volume lama dan baru sudah terlanjur berbeda nama, salin isinya **sebelum** start:
+
+```bash
+docker run --rm -v <volume-lama>:/from -v <volume-baru>:/to alpine cp -a /from/. /to/
+```
 
 ## 4. Konfigurasi `.env`
 
