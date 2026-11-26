@@ -644,9 +644,9 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 | M4 | Clay cards / buttons | Hover, focus / press | cards lift 4 px with a deeper shadow; buttons squash (`translateY(1px) scale(.98)`) | shadow/colour only |
 | M6 | Facts numbers | First in view | count-up | kept |
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
-| M9 | Hero gallery wall | Hover/focus (all widths); pointer under `LANDING_MOTION_QUERY` | panel lifts 12 px; curved CSS 3D wall (rotateY ≤ 21°), wall tilts ≤ 3° with the pointer | flat row, lift off, no tilt |
+| M9 | Hero gallery wall | Hover/focus (all widths); pointer under `LANDING_MOTION_QUERY` | portrait panels on a coverflow panorama (rotateY up to 39°, edges pushed back to −216 px, centre pair scaled 1.06); panel art scrolls up on hover; wall tilts ≤ 3° with the pointer; mobile carousel centre panel grows via scroll-driven `animation-timeline: view(inline)` | flat row, no tilt, no scroll-driven scale |
 | M10 | Category viewer | Open / page change (all widths) | scale + fade in 0.32 s; page crossfade + 40 px slide | crossfade only |
-| M11 | Template shelf cover | Hover/focus (all widths) | cover rises 8 px and tilts 2° | none |
+| M11 | Template shelf book | Hover/focus (all widths) | upright 2:3 book on an embossed plank rises 8 px and tilts 2° | none |
 | M12 | Gate loop | First in view (`LANDING_MOTION_QUERY` only) | centre line draws (pathLength, 1.4 s, once); one light dot travels the loop once (SMIL animateMotion, 4.5 s, no repeat) | static final path, no dot |
 | M13 | Result book | Click (all widths) | cover swings open (rotateY −165°, 0.7 s) to a two-page spread; hover pulls the book 8 px out of the shelf | spread crossfades in, no rotation |
 | M14 | Studio preview | First in view | bezel zooms 0.96 → 1 once | opacity only |

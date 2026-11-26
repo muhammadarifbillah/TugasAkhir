@@ -65,6 +65,11 @@ export function groupByShelf(cats: readonly SiteCategory[]): { shelf: ShelfId; i
   return SHELF_ORDER.map((shelf) => ({ shelf, items: cats.filter((c) => c.shelf === shelf) })).filter((g) => g.items.length > 0);
 }
 
+/** One shelf's categories (input order), or a copy of all when `shelf` is null. */
+export function filterByShelf(cats: readonly SiteCategory[], shelf: ShelfId | null): SiteCategory[] {
+  return shelf === null ? [...cats] : cats.filter((c) => c.shelf === shelf);
+}
+
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 type SearchItem = { name: string; desc: string; pages: Record<string, string>; features: Record<string, string> };
 
