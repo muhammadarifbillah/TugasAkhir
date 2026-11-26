@@ -494,6 +494,95 @@
       "returnLabel": "Revision → pull request → back to Analysis",
       "returnNote": "A pull request opens when the project has been pushed to GitHub. Revisions are for finished projects.",
       "download": "Download the {count} sub-step matrix (CSV)"
+    },
+    "books": {
+      "title": "What one project gives you.",
+      "lede": "Two shelves: what you can download or use outside FUSE, and what you use inside the studio. Open a book to see what is inside and what it needs.",
+      "shelfHome": "Take home",
+      "shelfHomeLede": "Files and links that stay yours outside FUSE.",
+      "shelfStudio": "Used in the studio",
+      "shelfStudioLede": "Tools that work inside the studio while the project runs.",
+      "studioBadge": "Available in the studio",
+      "open": "Open the {title} book",
+      "close": "Close the book",
+      "contents": "Contents",
+      "format": "Format",
+      "when": "When you get it",
+      "stage": "Source stage",
+      "items": {
+        "sourceZip": {
+          "title": "Source code",
+          "contents": "Every project file the AI wrote, ready to open in your editor.",
+          "format": "ZIP",
+          "when": "Once the Development stage has produced code."
+        },
+        "github": {
+          "title": "GitHub repository",
+          "contents": "Code is pushed to your repository; later revisions arrive as pull requests.",
+          "format": "Git repository + pull request",
+          "when": "After you connect GitHub. Revision pull requests only for finished projects that were pushed."
+        },
+        "manual": {
+          "title": "Manual book",
+          "contents": "Project overview, file structure, how to run it, security notes and deployment steps.",
+          "format": "PDF or Markdown",
+          "when": "After all five stages are complete."
+        },
+        "iso": {
+          "title": "ISO/IEC 27001 report",
+          "contents": "Each stage mapped to Annex A controls with its evidence, to support an audit. Not a certificate.",
+          "format": "PDF or Markdown",
+          "when": "After all five stages are complete."
+        },
+        "traceability": {
+          "title": "Traceability matrix",
+          "contents": "Security requirements linked to the recommendations and NIST controls that cover them.",
+          "format": "Markdown",
+          "when": "After all five stages are complete; also viewable in the studio."
+        },
+        "badge": {
+          "title": "Security badge",
+          "contents": "A public badge with the score and completed stages for your README or site.",
+          "format": "Badge link (Markdown)",
+          "when": "Optional: you switch it on, and only for finished projects."
+        },
+        "scanReport": {
+          "title": "Security scan report",
+          "contents": "Semgrep & Trivy findings by severity and the project's security score.",
+          "format": "Studio panel",
+          "when": "Once the Development stage has produced code; the scanners run in containers, so the host needs Docker."
+        },
+        "mockup": {
+          "title": "Clickable design mockup",
+          "contents": "Clickable sample screens for web and mobile, following the project's target.",
+          "format": "Interactive preview in the studio",
+          "when": "Created in the Design stage."
+        },
+        "threatModel": {
+          "title": "Threat model & architecture",
+          "contents": "A STRIDE threat table with likelihood, impact and mitigation, plus architecture diagrams.",
+          "format": "Table + Mermaid diagrams in the studio",
+          "when": "Created in the Design stage; shown in the studio only."
+        },
+        "runPreview": {
+          "title": "Running app preview",
+          "contents": "The AI-built app runs so you can try it, with live logs.",
+          "format": "Running app + logs in the studio",
+          "when": "Needs code and Docker on the FUSE host."
+        },
+        "database": {
+          "title": "Managed database",
+          "contents": "A persistent database for your app, managed from the studio.",
+          "format": "Studio service",
+          "when": "After the project is finalised; runs on the Docker runner."
+        },
+        "snapshots": {
+          "title": "Version history",
+          "contents": "Project snapshots you can restore when a change goes wrong.",
+          "format": "Snapshot list in the studio",
+          "when": "Throughout the project; restore any time from the studio."
+        }
+      }
     }
   },
   "nav": {

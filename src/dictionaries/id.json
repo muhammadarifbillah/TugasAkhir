@@ -494,6 +494,95 @@
       "returnLabel": "Revisi → pull request → mulai lagi dari Analisis",
       "returnNote": "Pull request dibuka bila proyek sudah dipush ke GitHub. Revisi tersedia untuk proyek yang sudah selesai.",
       "download": "Unduh matriks {count} sub-langkah (CSV)"
+    },
+    "books": {
+      "title": "Yang Anda dapatkan dari satu proyek.",
+      "lede": "Dua rak: yang bisa diunduh atau dipakai di luar FUSE, dan yang Anda pakai di dalam studio. Buka bukunya untuk melihat isi dan syaratnya.",
+      "shelfHome": "Dibawa pulang",
+      "shelfHomeLede": "Berkas dan tautan yang tetap milik Anda di luar FUSE.",
+      "shelfStudio": "Dipakai di studio",
+      "shelfStudioLede": "Alat yang bekerja di dalam studio selama proyek berjalan.",
+      "studioBadge": "Tersedia di studio",
+      "open": "Buka buku {title}",
+      "close": "Tutup buku",
+      "contents": "Isi",
+      "format": "Format",
+      "when": "Kapan tersedia",
+      "stage": "Tahap asal",
+      "items": {
+        "sourceZip": {
+          "title": "Kode sumber",
+          "contents": "Semua berkas proyek yang ditulis AI, siap dibuka di editor Anda.",
+          "format": "ZIP",
+          "when": "Setelah tahap Pengembangan menghasilkan kode."
+        },
+        "github": {
+          "title": "Repo GitHub",
+          "contents": "Kode didorong ke repo Anda; revisi berikutnya datang sebagai pull request.",
+          "format": "Repo Git + pull request",
+          "when": "Setelah GitHub disambungkan. Pull request revisi hanya untuk proyek selesai yang sudah dipush."
+        },
+        "manual": {
+          "title": "Manual book",
+          "contents": "Ringkasan proyek, struktur berkas, cara menjalankan, catatan keamanan, dan langkah deployment.",
+          "format": "PDF atau Markdown",
+          "when": "Setelah kelima tahap selesai."
+        },
+        "iso": {
+          "title": "Laporan ISO/IEC 27001",
+          "contents": "Pemetaan tiap tahap ke kontrol Annex A beserta buktinya, untuk mendukung audit. Bukan sertifikat.",
+          "format": "PDF atau Markdown",
+          "when": "Setelah kelima tahap selesai."
+        },
+        "traceability": {
+          "title": "Matriks ketertelusuran",
+          "contents": "Kebutuhan keamanan dihubungkan ke rekomendasi dan kontrol NIST yang menutupnya.",
+          "format": "Markdown",
+          "when": "Setelah kelima tahap selesai; tampilannya juga ada di studio."
+        },
+        "badge": {
+          "title": "Lencana keamanan",
+          "contents": "Lencana publik dengan skor dan jumlah tahap selesai untuk README atau situs Anda.",
+          "format": "Tautan lencana (Markdown)",
+          "when": "Opsional: Anda yang menyalakannya, dan hanya untuk proyek selesai."
+        },
+        "scanReport": {
+          "title": "Laporan pindai keamanan",
+          "contents": "Temuan Semgrep & Trivy per tingkat keparahan dan skor keamanan proyek.",
+          "format": "Panel di studio",
+          "when": "Setelah ada kode dari tahap Pengembangan; pemindai berjalan di kontainer, jadi host butuh Docker."
+        },
+        "mockup": {
+          "title": "Mockup desain klik-able",
+          "contents": "Layar contoh yang bisa diklik, untuk web dan mobile sesuai target proyek.",
+          "format": "Pratinjau interaktif di studio",
+          "when": "Dibuat di tahap Desain."
+        },
+        "threatModel": {
+          "title": "Threat model & arsitektur",
+          "contents": "Tabel ancaman STRIDE dengan kemungkinan, dampak, dan mitigasi, ditambah diagram arsitektur.",
+          "format": "Tabel + diagram Mermaid di studio",
+          "when": "Dibuat di tahap Desain; hanya tampil di studio."
+        },
+        "runPreview": {
+          "title": "Pratinjau aplikasi berjalan",
+          "contents": "Aplikasi hasil AI dijalankan agar bisa Anda coba langsung, lengkap dengan log.",
+          "format": "Aplikasi berjalan + log di studio",
+          "when": "Butuh kode dan Docker di host FUSE."
+        },
+        "database": {
+          "title": "Database terkelola",
+          "contents": "Database tetap untuk aplikasi Anda, dikelola dari studio.",
+          "format": "Layanan di studio",
+          "when": "Setelah proyek difinalisasi; berjalan di runner Docker."
+        },
+        "snapshots": {
+          "title": "Riwayat versi",
+          "contents": "Snapshot proyek yang bisa dipulihkan bila perubahan tidak sesuai harapan.",
+          "format": "Daftar snapshot di studio",
+          "when": "Selama proyek berjalan; pulihkan kapan saja dari studio."
+        }
+      }
     }
   },
   "nav": {
