@@ -110,31 +110,26 @@ Bayangan memakai utilitas `shadow` bawaan Tailwind 4 dan kelas `.card-elevated` 
 
 ### 2.1 Landing Page
 
-Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. It follows the theme toggle, with Dark Clay as the default (`defaultTheme="dark"` app-wide): `html.dark:has(.landing)` gives Dark Clay and `html:not(.dark):has(.landing)` gives Light Clay (lavender paper, same layout and accents), each swapping the tokens for the whole document (header and footer included); other pages are unaffected, and high contrast overrides both. The five gates keep the steel temper colours (dark variants on Dark Clay, deepened light variants on Light Clay so they stay ≥ 4.5:1) and hallmark shapes (◇ ○ △ □ ⬡). The hero is fully server-rendered and visible without JavaScript: H1, sub-headline and lede come first and are the LCP element, then the Pita Pindai stage (aria-hidden) and an HTML findings table that carries the same information; there is no route `loading.tsx` above the landing. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
+Concept "Dark Clay" (PRD `docs/prd/2026-11-25-landing-claymorphism-prd.md`): claymorphism on a deep navy base with violet neon, after two cyber-security references. It follows the theme toggle, with Dark Clay as the default (`defaultTheme="dark"` app-wide): `html.dark:has(.landing)` gives Dark Clay and `html:not(.dark):has(.landing)` gives Light Clay (lavender paper, same layout and accents), each swapping the tokens for the whole document (header and footer included); other pages are unaffected, and high contrast overrides both. The five gates keep the steel temper colours (dark variants on Dark Clay, deepened light variants on Light Clay so they stay ≥ 4.5:1) and hallmark shapes (◇ ○ △ □ ⬡). The hero is fully server-rendered and visible without JavaScript: the gallery H1 and sub-headline come first and are the LCP element, then the curved gallery wall of the eight categories; there is no route `loading.tsx` above the landing. Every number and standard code is derived from code (`src/lib/landing-facts.ts`: `gateFacts()`, `GATE_MAPPING` = original seed crosswalk, `SCORE_WEIGHTS`) and pinned by tests. No testimonials, customer logos, awards or blog; the reference sections are replaced by real equivalents and the page states its limits.
 
 ```
-Hero        #mulai-hero · H1 · sub-headline (ISO/IEC 27001:2022 first) · lede · [Start a free project → /register] [See a sample report → #bukti] · Pita Pindai stage (aria-hidden, server poster; desktop: pinned scroll timeline) · findings table
-Strip       ISO/IEC 27001:2022 Annex A · NIST SSDF SP 800-218 (complement) · Semgrep · Trivy (text chips)
+#mulai-hero  gallery H1 · sub-headline · [Start a free project → /register] [Templates → #rak] · curved gallery wall (8 categories, opens the category viewer)
+Strip       ISO/IEC 27001:2022 Annex A · NIST SSDF SP 800-218 (complement) · Semgrep · Trivy (text chips) · 4 facts (count-up)
+#rak         template shelf (shelves / all tabs, search)
 #masalah     cited Veracode figure (45% of tests) + 3 problems
-#tentang     AI vs gates · the five guarded areas (clay cards) · facts card (count-up) · studio screenshot
-#gerbang     5 temper coupons (auto carousel with pause, desktop) · all 26 sub-steps in <details>
-#pengguna    3 audience tiles
-#pratinjau   3 real studio screenshots as clay cards
-#cara-kerja  6 steps with a live vignette (scan example = real scoring function; prompt shown in full, no typing)
-#arsitektur  6 clay nodes with neon connectors + platform security
-#bukti       facts · score formula · gate NIST/ISO table · CSV of 26 sub-steps
-#hasil       deliverables | limits
-#pelajari    9 glossary cards · 7 FAQ
-#mulai       clay CTA panel with violet glow
+#gerbang     gate loop: 5 stations left to right, revision lane back to Analysis · detail panel (NIST/ISO, artefact, sub-steps) · CSV of 26 sub-steps
+#pratinjau   studio screenshot in a raised bezel + 2 label cards
+#hasil       two book shelves: "Take home" (6) and "Used in the studio" (6), each book opens into a spread
+#batasan     limits · 5 FAQ (ISO certificate question open)
+#mulai       clay CTA panel with edge glow
 ```
 
 **Spesifikasi:**
 - Container `max-w-7xl px-4`; sections `py-24 md:py-32`, centred pill label + H2 + lede (`components/landing/clay-section.tsx`), alternate sections on `--clay-bg-2`.
 - Type: Archivo width axis, `.font-wide` for H1/H2/figures; Geist Mono only for real codes.
-- Surfaces (`globals.css`): `.clay-card` (24px radius, gradient, outer + inner double shadow, faint 1px edge), `.clay-btn` (violet gradient pill, glow, press squash), `.clay-btn-ghost`, `.clay-chip`, `.clay-pill`, `.coupon` (stage-tinted clay, glow ring when selected). No backdrop blur; glow is `box-shadow` only; high contrast drops shadows for 2px borders. Text pairs pinned in `src/lib/contrast.test.ts`.
-- Components: `hero-tape`, `standards-strip`, `problem-section`, `about-section`, `gate-coupons`, `substeps-disclosure`, `gate-link`, `audience-tiles`, `product-preview`, `how-it-works`, `architecture-flow`, `proof-section`, `deliverables`, `glossary`, `faq`. `hero-shield.tsx` is kept as history until M5 and is not rendered.
+- Surfaces (`globals.css`): `.clay-card` (24px radius, gradient, outer + inner double shadow, faint 1px edge), `.clay-btn` (violet gradient pill, glow, press squash), `.clay-btn-ghost`, `.clay-chip`, `.clay-pill`. No backdrop blur; glow is `box-shadow` only; high contrast drops shadows for 2px borders. Text pairs pinned in `src/lib/contrast.test.ts`.
+- Components: `gallery/*` (hero wall, category viewer, template shelf), `standards-strip`, `problem-section`, `loop/gate-loop`, `product-preview`, `books/book-shelf`, `faq`. Result books list only what the code delivers: each book in `books/book-list.ts` names the source file and a literal that proves it, pinned by `books.test.ts`.
 - OG image (`src/app/opengraph-image.tsx`): navy with violet glow, the five temper colours with hallmarks and temperatures, "Mapped to NIST SP 800-218 v1.1 and ISO/IEC 27001:2022 Annex A".
-- Hero tape (PRD 2026-11-26 landing-dashboard-3d, bab 10 and 13): `components/landing/hero-tape/model.ts` holds the example findings, the running score (`computeSecurityScore`), the finding codes (`enrichFinding`), the gate 4 stamp (`GATE_MAPPING`) and `poseOf(progress)`, a pure function of scroll progress (0/25/50/75/100% = PRD table); `POSTER_POSE` is the 50% pose with the stamp shown. Tokens `--tape-paper` (dark #ede6d3, light #f6f1e3), `--tape-ink`, `--finding-medium`, `--finding-low`, `--brake`, `--odometer-bg` are pinned in `src/lib/contrast.test.ts`. The figure (M2b) and the scroll timeline (M2c) follow. The figure (`components/landing/hero-tape/figure/`) is a server-rendered isometric SVG of 58 parts drawn with the anatomy kit (`components/iso/`), aria-hidden, at most 40 kB, posed by `frameOf(pose)`; its geometry is checked with `scripts/hero-tape/audit.ts` (kit audit) and the kit's `lines.mjs`.
 
 ### 2.2 Dashboard
 
@@ -645,19 +640,18 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 
 | # | Element | Trigger | Motion | Reduced motion |
 |---|---|---|---|---|
-| M1 | Hero Pita Pindai | Scroll (desktop gate) | stage + caption pinned in #main for 1 600 px, scrub 0.6; pose = poseOf(progress): heads light, brake clamps, odometer 100 → 096 → 092 → 091, stamp prints; scrolling back reverses | server poster (pose 50% + stamp), no motion |
 | M2 | Section headings (H2) | First time 80% in view (desktop gate) | fade + rise 16 px, 0.4 s, power2.out, once | none (heading always visible; nothing is hidden without JavaScript) |
-| M3 | Gate coupons | In view | the selected coupon's bottom edge fills over 4.5 s (CSS, `onAnimationEnd` advances); selected coupon glows in its stage colour; panel crossfade; pauses on hover, focus, offscreen, hidden tab, button | crossfade, still rotating, pause button |
 | M4 | Clay cards / buttons | Hover, focus / press | cards lift 4 px with a deeper shadow; buttons squash (`translateY(1px) scale(.98)`) | shadow/colour only |
-| M5 | How-it-works vignette | Tab change | staggered rows, score 0→91, diff flash, ticks; the prompt is shown in full (no typing caret) | final state |
 | M6 | Facts numbers | First in view | count-up | kept |
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
-| M8 | Architecture node | Click/focus | glow outline + highlighted connectors, note crossfade | same |
 | M9 | Hero gallery wall | Hover/focus (all widths); pointer under `LANDING_MOTION_QUERY` | panel lifts 12 px; curved CSS 3D wall (rotateY ≤ 21°), wall tilts ≤ 3° with the pointer | flat row, lift off, no tilt |
 | M10 | Category viewer | Open / page change (all widths) | scale + fade in 0.32 s; page crossfade + 40 px slide | crossfade only |
 | M11 | Template shelf cover | Hover/focus (all widths) | cover rises 8 px and tilts 2° | none |
+| M12 | Gate loop | First in view (`LANDING_MOTION_QUERY` only) | centre line draws (pathLength, 1.4 s, once); one light dot travels the loop once (SMIL animateMotion, 4.5 s, no repeat) | static final path, no dot |
+| M13 | Result book | Click (all widths) | cover swings open (rotateY −165°, 0.7 s) to a two-page spread; hover pulls the book 8 px out of the shelf | spread crossfades in, no rotation |
+| M14 | Studio preview | First in view | bezel zooms 0.96 → 1 once | opacity only |
 
-Gallery interactions (M9 lift, M10, M11) run at every width inside their own MotionConfig skipAnimations={false}; the M9 tilt is the only parallax and stays behind LANDING_MOTION_QUERY.
+Gallery interactions (M9 lift, M10, M11), the gate loop panel and the result books (M13) run at every width inside their own MotionConfig skipAnimations={false}; the M9 tilt is the only parallax and stays behind LANDING_MOTION_QUERY.
 
 Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, whole-section fade-ups (only the H2 heading enters, see M2) and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
 
@@ -665,8 +659,8 @@ Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift
 - **Landing only (a).** `LandingMotion` loads `gsap`, `gsap/ScrollTrigger` and `lenis` with dynamic `import()` only when `LANDING_MOTION_QUERY` in `motion.ts` matches: `(min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`. Otherwise the modules are not downloaded (0 B), not merely disabled. Dashboard, studio, settings and auth pages never import them and keep native scroll.
 - **Scroller is `#main`.** Lenis wraps `#main` with `#main-content` as content; `#main` is `position: relative` so `sr-only` text cannot make `window` scroll. `landing-scroll-init.ts` sets `autoRaf: false`, `anchors: true`, drives Lenis from `gsap.ticker`, calls `lagSmoothing(0)` and `ScrollTrigger.defaults({ scroller: main })`. Unmount (route change, StrictMode) kills every ScrollTrigger and destroys Lenis.
 - **Desktop only (b).** Below 1024 px or with a coarse pointer there is no ScrollTrigger and no `.pin-spacer`.
-- **Reduced motion (c): reduce, not remove.** The hero shows a static pose (50% or final); fades and colour changes may stay; no information disappears (findings table, odometer 91, stamp); no automatic loop.
-- **Limits.** One pin (hero, M2) of at most 1 600 px scroll, no snap, no automatic `scrollTo`, anchors jump directly.
+- **Reduced motion (c): reduce, not remove.** Modules are not loaded; fades and colour changes may stay; no information disappears; no automatic loop.
+- **Limits.** No pins (GSAP only runs the M2 heading entrance), no snap, no automatic `scrollTo`, anchors jump directly.
 - **Licences.** GSAP: "Standard no-charge" licence (not MIT). Lenis: MIT. Anatomy kit (`components/iso/`): MIT.
 
 Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fast: 120ms`, `--dur-base: 200ms`, `--dur-slow: 300ms`. In-app interactions stay within 120–300 ms and never block input.
@@ -693,9 +687,9 @@ Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fas
 **Rules**
 - Animate only `transform`, `opacity` and colour.
 - Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
-- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the temper rail (colour only) and the gates carousel (crossfade, with a pause button). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
+- `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the temper rail (colour only), the gate loop detail panel and the result book spread (crossfades). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
 - No glassmorphism (`backdrop-blur`). GSAP and Lenis are allowed on the landing page only, under "Landing scroll (GSAP + Lenis)".
-- `prefers-contrast: more` / high-contrast toggle: landing coupon texture removed and borders at full strength.
+- `prefers-contrast: more` / high-contrast toggle: landing card shadows removed and borders at full strength.
 
 ### 7.2 Hover States
 

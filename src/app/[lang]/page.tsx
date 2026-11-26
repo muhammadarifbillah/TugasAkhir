@@ -1,30 +1,23 @@
 import Link from "next/link";
+import { Info } from "lucide-react";
 import { auth } from "@/auth";
-import { AboutSection } from "@/components/landing/about-section";
-import { ArchitectureFlow } from "@/components/landing/architecture-flow";
-import { AudienceTiles } from "@/components/landing/audience-tiles";
+import { BookShelf } from "@/components/landing/books/book-shelf";
+import type { StageCode } from "@/components/landing/books/book-list";
 import { ClaySection } from "@/components/landing/clay-section";
-import { Deliverables } from "@/components/landing/deliverables";
 import { Faq } from "@/components/landing/faq";
-import { GateCoupons } from "@/components/landing/gate-coupons";
-import { GateLinkProvider } from "@/components/landing/gate-link";
-import { Glossary } from "@/components/landing/glossary";
 import { GalleryProvider } from "@/components/landing/gallery/gallery-provider";
 import { HeroWall } from "@/components/landing/gallery/hero-wall";
 import { TemplateShelf } from "@/components/landing/gallery/template-shelf";
-import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingMotion } from "@/components/landing/landing-motion";
+import { GateLoop } from "@/components/landing/loop/gate-loop";
 import { primaryCta } from "@/components/landing/primary-cta";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { ProductPreview, type PreviewShot } from "@/components/landing/product-preview";
-import { ProofSection } from "@/components/landing/proof-section";
 import { StandardsStrip } from "@/components/landing/standards-strip";
-import { SubStepsDisclosure } from "@/components/landing/substeps-disclosure";
 import { PageTransition } from "@/components/page-transition";
 import { fmt } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n";
-import { GATE_MAPPING, LANDING_FACTS, SCORE_WEIGHTS, TEMPER, gateFacts } from "@/lib/landing-facts";
-import { computeSecurityScore } from "@/lib/scanner/score";
+import { GATE_MAPPING, LANDING_FACTS, gateFacts } from "@/lib/landing-facts";
 
 // Real screenshots of the studio (public/landing), captured from a demo project.
 const SHOT_FILES = [
@@ -33,8 +26,7 @@ const SHOT_FILES = [
   { src: "/landing/compliance-panel.jpg", width: 360, height: 460 },
 ] as const;
 
-// Worked example for the score formula, computed by the real scoring function.
-const EXAMPLE_FINDINGS = [{ severity: "medium" }, { severity: "medium" }, { severity: "low" }] as const;
+const STAGE_CODES: StageCode[] = ["analysis", "design", "development", "testing", "handover"];
 
 interface HomePageProps {
   params: Promise<{ lang: string }>;
@@ -47,19 +39,19 @@ export default async function HomePage({ params }: HomePageProps) {
   const session = await auth();
   const cta = primaryCta(lang, Boolean(session?.user));
 
-  const facts = gateFacts();
-  const stageDict = dict.stages as unknown as Record<string, { steps: Record<string, { label: string }> }>;
+  const stageDict = dict.stages as unknown as Record<string, { name: string; steps: Record<string, { label: string }> }>;
   const stepLabel = (code: string, id: string) => stageDict[code]?.steps?.[id]?.label ?? id;
-  const gates = facts.map((g, i) => ({
-    ...g,
+  const loopGates = gateFacts().map((g, i) => ({
+    code: g.code,
     title: l.steps[i].title,
     why: l.steps[i].why,
     artifact: l.steps[i].artifact,
-    temper: TEMPER[i],
-    mapping: GATE_MAPPING[i],
-    colourName: l.rail.colours[TEMPER[i].colour],
+    nist: [GATE_MAPPING[i].nist],
+    iso: [...GATE_MAPPING[i].iso],
+    steps: g.steps.map((s) => ({ label: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
   }));
-  const scanScore = computeSecurityScore([...EXAMPLE_FINDINGS]);
+  const matrix = loopGates.flatMap((g) => g.steps.map((s) => ({ gate: g.title, subStep: s.label, nist: s.nist, iso: s.iso })));
+  const stageNames = Object.fromEntries(STAGE_CODES.map((c) => [c, stageDict[c]?.name ?? c])) as Record<StageCode, string>;
   const shots = SHOT_FILES.map((f, i) => ({ ...f, ...l.previewShots[i] })) as PreviewShot[];
   const factList = [
     { label: l.statStages, value: LANDING_FACTS.stages },
@@ -92,7 +84,7 @@ export default async function HomePage({ params }: HomePageProps) {
               </div>
             </section>
 
-            <StandardsStrip label={l.stripLabel} items={l.stripItems} />
+            <StandardsStrip label={l.stripLabel} items={l.stripItems} facts={factList} />
 
             <ClaySection id="rak" pill={l.shelf.pill} title={l.shelf.title} lede={l.shelf.lede}>
               <TemplateShelf copy={l.shelf} />
@@ -112,127 +104,39 @@ export default async function HomePage({ params }: HomePageProps) {
             />
           </ClaySection>
 
-          <ClaySection id="tentang" pill={l.pills.about} title={fmt(l.aboutTitle, { name: dict.app.name })} lede={fmt(l.aboutLede, { name: dict.app.name })}>
-            <AboutSection
-              aiTitle={l.aboutAiTitle}
-              ai={l.aboutAi}
-              gateTitle={l.aboutGateTitle}
-              gate={l.aboutGate}
-              guardTitle={fmt(l.guardTitle, { name: dict.app.name })}
-              guardLede={l.guardLede}
-              guardCards={l.guardCards}
-              factsTitle={l.factsTitle}
-              facts={factList}
-              shot={shots[0]}
-            />
+          <ClaySection id="gerbang" pill={l.pills.gates} title={l.loop.title} lede={l.loop.lede}>
+            <GateLoop gates={loopGates} labels={{ ...l.loop, nist: l.mapNist, iso: l.mapIso, artifact: l.mapArtifact }} matrix={matrix} />
           </ClaySection>
 
-          <GateLinkProvider>
-            <ClaySection id="gerbang" pill={l.pills.gates} title={l.gatesTitle} lede={l.gatesLede} band>
-              <GateCoupons
-                gates={gates.map((g) => ({
-                  title: g.title,
-                  why: g.why,
-                  artifact: g.artifact,
-                  celsius: fmt(l.gatesCelsius, { n: g.temper.celsius }),
-                  colourName: g.colourName,
-                  nist: [g.mapping.nist],
-                  iso: g.mapping.iso,
-                }))}
-                labels={{
-                  tabs: l.gatesTabs,
-                  prev: l.gatesPrev,
-                  next: l.gatesNext,
-                  pause: l.demoPause,
-                  play: l.demoPlay,
-                  artifact: l.gatesArtifact,
-                  nist: l.mapNist,
-                  iso: l.mapIso,
-                }}
-              />
-              <SubStepsDisclosure
-                summary={fmt(l.gatesSubSteps, { count: LANDING_FACTS.subSteps })}
-                gates={gates.map((g) => ({
-                  title: g.title,
-                  count: fmt(l.gatesSubStepsCount, { count: g.steps.length }),
-                  steps: g.steps.map((s) => ({ label: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
-                }))}
-                labels={{ subStep: l.gatesSubStepCol, nist: l.mapNist, iso: l.mapIso }}
-              />
-            </ClaySection>
-
-            <ClaySection id="pengguna" pill={l.pills.audience} title={l.audienceTitle}>
-              <AudienceTiles items={l.audience} />
-            </ClaySection>
-
-            <ClaySection id="pratinjau" pill={l.pills.studio} title={l.previewTitle} band>
-              <ProductPreview shots={shots} figureLabels={[1, 2, 3].map((n) => fmt(l.figure, { n }))} />
-            </ClaySection>
-
-            <ClaySection id="cara-kerja" pill={l.pills.how} title={l.howTitle} lede={l.howLede}>
-              <HowItWorks
-                label={l.howTitle}
-                steps={l.how}
-                copy={{
-                  prompt: l.howPrompt,
-                  plan: l.howPlan,
-                  planTitle: l.howPlanTitle,
-                  approve: l.howApprove,
-                  verified: l.howVerified,
-                  finding: l.howFinding,
-                  fixed: l.howFixed,
-                  exports: l.deliverables.map((d) => d.title),
-                  scanScore,
-                  scanExample: fmt(l.howScanExample, {
-                    medium: 2,
-                    low: 1,
-                    wm: SCORE_WEIGHTS.medium,
-                    wl: SCORE_WEIGHTS.low,
-                    score: scanScore,
-                  }),
-                }}
-              />
-            </ClaySection>
-
-            <ClaySection id="arsitektur" pill={l.pills.arch} title={l.archTitle} band>
-              <ArchitectureFlow nodes={l.archNodes} lede={l.archLede} platformTitle={l.archPlatformTitle} platform={l.archPlatform} />
-            </ClaySection>
-
-            <ClaySection id="bukti" pill={l.pills.proof} title={l.proofTitle}>
-              <ProofSection
-                facts={[...factList, { label: l.statLanguages, value: LANDING_FACTS.languages }]}
-                formulaTitle={l.proofFormulaTitle}
-                formula={l.proofFormula}
-                rows={gates.map((g) => ({ title: g.title, nist: [g.mapping.nist], iso: g.mapping.iso, artifact: g.artifact }))}
-                matrix={gates.flatMap((g) =>
-                  g.steps.map((s) => ({ gate: g.title, subStep: stepLabel(g.code, s.id), nist: s.nist, iso: s.iso })),
-                )}
-                labels={{
-                  stage: l.mapStage,
-                  nist: l.mapNist,
-                  iso: l.mapIso,
-                  artifact: l.mapArtifact,
-                  download: l.proofDownload,
-                }}
-              />
-            </ClaySection>
-          </GateLinkProvider>
-
-          <ClaySection id="hasil" pill={l.pills.results} title={l.resultsTitle} band>
-            <Deliverables resultsTitle={l.resultsDeliverables} items={l.deliverables} limitsTitle={l.limitsTitle} limits={l.limits} />
+          <ClaySection id="pratinjau" pill={l.pills.studio} title={l.previewTitle} band>
+            <ProductPreview shots={shots} figureLabels={[1, 2, 3].map((n) => fmt(l.figure, { n }))} />
           </ClaySection>
 
-          <ClaySection id="pelajari" pill={l.pills.learn} title={l.learnTitle}>
-            <Glossary items={l.glossary} />
+          <ClaySection id="hasil" pill={l.pills.results} title={l.books.title} lede={l.books.lede}>
+            <BookShelf copy={l.books} stageNames={stageNames} />
+          </ClaySection>
+
+          <ClaySection id="batasan" pill={l.pills.limits} title={l.limitsSectionTitle} band>
+            <div className="clay-card mx-auto max-w-3xl p-7">
+              <h3 className="text-lg font-semibold">{l.limitsTitle}</h3>
+              <ul className="mt-3 divide-y divide-[var(--border)]">
+                {l.limits.map((item) => (
+                  <li key={item} className="flex items-start gap-3 py-3">
+                    <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <span className="leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <h3 className="font-wide mt-20 text-center text-2xl md:text-3xl">{l.faqHeading}</h3>
             <div className="mt-8">
-              <Faq items={l.faq} />
+              <Faq items={l.faq} defaultOpen={0} />
             </div>
           </ClaySection>
 
-          {/* Start: a clay panel with a violet edge glow instead of a contact form. */}
+          {/* Start: a clay panel with an edge glow instead of a contact form. */}
           <section id="mulai" aria-labelledby="mulai-title" className="px-4 pb-28 pt-8">
-            <div className="clay-card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] px-6 py-16 text-center shadow-[var(--clay-shadow),0_0_70px_rgba(139,92,246,0.35)] md:px-12">
+            <div className="clay-card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] px-6 py-16 text-center shadow-[var(--clay-shadow),0_0_70px_var(--fuse-glow)] md:px-12">
               <span className="clay-pill">{l.pills.start}</span>
               <h2 id="mulai-title" className="font-wide mt-5 text-balance text-3xl md:text-5xl">
                 {l.closingTitle}

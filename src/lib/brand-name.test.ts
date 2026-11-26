@@ -84,12 +84,6 @@ describe("brand name", () => {
     expect(hits).toEqual([]);
   });
 
-  it("aboutLede uses {name} and the landing page fills it with fmt", () => {
-    expect(en.landing.aboutLede).toContain("{name}");
-    expect(id.landing.aboutLede).toContain("{name}");
-    expect(read("src/app/[lang]/page.tsx")).toContain("fmt(l.aboutLede, { name: dict.app.name })");
-  });
-
   it("manifest uses the new name and short_name", () => {
     const m = manifest();
     expect(m.short_name).toBe("FUSE");
@@ -144,7 +138,7 @@ describe("brand name", () => {
   });
 
   it("product outputs use the new name: CSV, ZIP, default repo, badge, commit messages, document headers", () => {
-    expect(read("src/components/landing/proof-section.tsx")).toContain('"saksi-matriks-nist-iso.csv"');
+    expect(read("src/components/landing/loop/gate-loop.tsx")).toContain('"saksi-matriks-nist-iso.csv"');
     const panel = read("src/components/studio/deliverables-panel.tsx");
     expect(panel).toContain('"saksi-website"');
     expect(panel).toContain("saksi-${projectId}.zip");

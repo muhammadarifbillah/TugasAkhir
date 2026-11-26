@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -70,9 +70,8 @@ describe("hero wall", () => {
 
   it("page.tsx renders the gallery hero and no longer the tape", () => {
     const page = read("src/app/[lang]/page.tsx");
-    for (const s of ["HeroTape", 'hero-tape/hero-tape"']) expect(page).not.toContain(s);
+    expect(page).not.toContain("HeroTape");
     for (const s of ["<GalleryProvider", "<HeroWall", "l.gallery.headline", "l.gallery.sub", 'href="#rak"']) expect(page).toContain(s);
     expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(2);
-    expect(existsSync(join(ROOT, "src/components/landing/hero-tape/hero-tape.tsx"))).toBe(true);
   });
 });
