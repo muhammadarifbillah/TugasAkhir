@@ -353,3 +353,7 @@ AssertionError: expected 'import Link from "next/link";\nimport…' not to conta
    Start at  02:44:35
    Duration  2.50s (transform 621ms, setup 0ms, collect 868ms, tests 212ms, environment 1ms, prepare 823ms)
 
+
+## Bagian C
+'vitest' is not recognized as an internal or external command,
+operable program or batch file.
