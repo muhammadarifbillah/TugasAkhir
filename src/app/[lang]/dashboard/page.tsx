@@ -48,6 +48,7 @@ export default async function DashboardPage({ params }: DashboardProps) {
     stageProgress: getStageProgress(p),
     revisionCount: p.revisions.length,
     updatedAt: p.updatedAt.toISOString(),
+    template: p.template,
   }));
 
   return (

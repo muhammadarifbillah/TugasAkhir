@@ -535,6 +535,8 @@
     "searchHint": "Cari proyek (tekan /)",
     "emptyTitle": "Belum ada proyek",
     "emptyLede": "Buat proyek dan bawa melewati gerbang. Temuan dan skor muncul di sini setelah pemindaian.",
+    "cardTemplate": "Template {category}",
+    "statsTitle": "Ringkasan proyek",
     "templateEcommerceDesc": "Toko online dengan katalog produk, keranjang, checkout, dan manajemen pesanan.",
     "templateEcommerceReq": "Katalog produk publik, akun pelanggan, keranjang + checkout pembayaran, manajemen pesanan admin, riwayat pesanan, penanganan data pembayaran (kesadaran PCI), perlindungan CSRF dan injeksi.",
     "templateSaasDesc": "Dasbor SaaS multi-tenant dengan penagihan dan akses berbasis peran.",

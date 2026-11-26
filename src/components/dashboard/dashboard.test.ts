@@ -7,8 +7,10 @@ import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import { fmt } from "@/lib/format";
 import { scoreColorClass } from "@/lib/project-stats";
-import { scoreSourceText } from "@/lib/dashboard-view";
+import { dashboardStats, scoreSourceText } from "@/lib/dashboard-view";
+import type { Dictionary } from "@/lib/i18n";
 import { DashboardEmpty } from "./dashboard-empty";
+import { DashboardStats } from "./dashboard-stats";
 import { GateRail } from "./gate-rail";
 import { ScoreBlock } from "./score-block";
 
@@ -38,6 +40,8 @@ const NEW_KEYS = [
   "searchHint",
   "emptyTitle",
   "emptyLede",
+  "cardTemplate",
+  "statsTitle",
 ];
 const FORBIDDEN = /bersertifikat|patuh standar|100% aman|terjamin|diperkeras|certified|compliant|hardened|guaranteed/i;
 
@@ -97,19 +101,22 @@ describe("dashboard components", () => {
 
   const empty = () => renderToStaticMarkup(createElement(DashboardEmpty, { dict: en, lang: "en" }));
 
-  it("DashboardEmpty renders the poster svg inside an aria-hidden wrapper without data-hero-stage", () => {
+  const COLLAGE = /<div class="dashboard-collage"[^>]*>(?:[\s\S]*?<\/svg>){3}<\/div>/;
+
+  it("DashboardEmpty renders an aria-hidden collage of three SiteArt pages and no hero-tape hooks", () => {
     const html = empty();
-    const at = html.indexOf('class="dashboard-poster iso hero-tape-figure"');
+    const at = html.indexOf('class="dashboard-collage"');
     expect(at).toBeGreaterThan(-1);
     expect(html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1)).toContain('aria-hidden="true"');
-    expect(html.indexOf("<svg", at)).toBeGreaterThan(at);
-    for (const hook of ["data-hero-stage", "data-pose", "hero-tape-stage"]) expect(html).not.toContain(hook);
+    const collage = html.match(COLLAGE)?.[0] ?? "";
+    expect(collage.match(/<svg/g)).toHaveLength(3);
+    for (const hook of ["hero-tape", "dashboard-poster", "data-hero-stage", "data-pose", "iso-face"]) expect(html).not.toContain(hook);
   });
 
-  it("DashboardEmpty shows three steps and no digits outside the aria-hidden poster", () => {
+  it("DashboardEmpty shows three steps and no digits outside the aria-hidden collage", () => {
     const html = empty();
-    const stripped = html.replace(/<div class="dashboard-poster[^"]*"[^>]*>[\s\S]*?<\/svg><\/div>/, "");
-    expect(stripped).not.toContain("dashboard-poster");
+    const stripped = html.replace(COLLAGE, "");
+    expect(stripped).not.toContain("dashboard-collage");
     expect(textOf(stripped)).not.toMatch(/\d/);
     const ol = stripped.slice(stripped.indexOf("<ol"), stripped.indexOf("</ol>"));
     expect(ol.match(/<li/g)).toHaveLength(3);
@@ -135,8 +142,22 @@ describe("dashboard components", () => {
       "stageProgress",
       "revisionCount",
       "updatedAt",
+      "template",
     ])
       expect(iface).toMatch(new RegExp(`\\n\\s*${field}:`));
+    for (const s of ["<ProjectCard", "--card-index", "project-card-enter", "h-11 md:h-8", "grid gap-4 md:grid-cols-2 xl:grid-cols-3"])
+      expect(src, s).toContain(s);
+    const mdiv = src.slice(src.indexOf("<m.div"), src.indexOf(">", src.indexOf("transition={{ duration")));
+    expect(mdiv).toContain("layout");
+    expect(mdiv).toContain("exit={{ opacity: 0, scale: 0.97 }}");
+    expect(mdiv).not.toContain("initial={{");
+    expect(mdiv).not.toContain("animate={{");
+  });
+
+  it("dashboard page passes the project template to the cards", () => {
+    const src = read("src/app/[lang]/dashboard/page.tsx");
+    expect(src).toContain("template: p.template");
+    expect(src).toContain("dashboard-surface");
   });
 
   it("dashboard sources import no gsap, lenis or @/lib/stages and use no backdrop", () => {
@@ -155,17 +176,82 @@ describe("dashboard components", () => {
     ];
     for (const f of files) {
       const text = read(f);
-      for (const s of ['from "gsap', 'from "lenis', '"@/lib/stages"', "backdrop-"]) expect(text, `${f}: ${s}`).not.toContain(s);
+      for (const s of ['from "gsap', 'from "lenis', '"@/lib/stages"', "backdrop-", "hero-tape", "@/components/iso"])
+        expect(text, `${f}: ${s}`).not.toContain(s);
     }
-    for (const f of ["dashboard-empty.tsx", "dashboard-stats.tsx", "gate-rail.tsx", "score-block.tsx"])
+    expect(files).toContain(`${dashDir}/project-card.tsx`);
+    for (const f of ["dashboard-empty.tsx", "dashboard-stats.tsx", "gate-rail.tsx", "score-block.tsx", "project-card.tsx"])
       expect(read(`${dashDir}/${f}`), f).not.toContain('"use client"');
   });
 
-  it("dashboard.css hides figure text inside .dashboard-poster", () => {
+  it("dashboard.css animates cards only with hover and turns motion off for reduced motion", () => {
     const css = read("src/components/dashboard/dashboard.css");
-    const at = css.indexOf(".dashboard-poster .iso-face-text");
-    expect(at).toBeGreaterThan(-1);
-    expect(css.slice(at, css.indexOf("}", at))).toMatch(/visibility:\s*hidden/);
+    const block = (marker: string) => {
+      const at = css.indexOf(marker);
+      expect(at, marker).toBeGreaterThan(-1);
+      let depth = 0;
+      for (let i = css.indexOf("{", at); i < css.length; i++) {
+        if (css[i] === "{") depth++;
+        else if (css[i] === "}" && --depth === 0) return css.slice(at, i + 1);
+      }
+      return css.slice(at);
+    };
+    const hover = block("@media (hover: hover)");
+    expect(hover).toContain(".project-card-art");
+    expect(hover).toContain("translateY(-50%)");
+    const reduced = block("@media (prefers-reduced-motion: reduce)");
+    for (const s of [".project-card-art", ".project-card-enter", "animation: none", "transform: none"]) expect(reduced, s).toContain(s);
+    expect(css).not.toContain(".dashboard-poster");
+  });
+
+  const STATS_FIXTURE: { status: string; score: number | null; scoreSource: string | null }[] = [
+    { status: "in_progress", score: 80, scoreSource: "scanner" },
+    { status: "draft", score: 70, scoreSource: "ai" },
+    { status: "completed", score: 91, scoreSource: "scanner" },
+    { status: "in_revision", score: null, scoreSource: null },
+  ];
+  const stats = (cards: typeof STATS_FIXTURE) =>
+    renderToStaticMarkup(createElement(DashboardStats, { cards, dict: en as unknown as Dictionary }));
+  const statCard = (html: string, key: string) => {
+    const at = html.indexOf(`data-stat="${key}"`);
+    const next = html.indexOf("data-stat=", at + 1);
+    return html.slice(at, next === -1 ? undefined : next);
+  };
+
+  it("DashboardStats renders four SaaS stat cards with the dashboardStats numbers", () => {
+    const html = stats(STATS_FIXTURE);
+    const s = dashboardStats(STATS_FIXTURE);
+    expect([s.inProgress, s.completed, s.inRevision, s.avgScanScore]).toEqual([2, 1, 1, 86]);
+    const expected: [string, number][] = [
+      ["inProgress", 2],
+      ["completed", 1],
+      ["inRevision", 1],
+      ["avgScore", 86],
+    ];
+    for (const [key, n] of expected) expect(statCard(html, key), key).toMatch(new RegExp(`>${n}<`));
+    expect(html.match(/<span[^>]*class="[^"]*size-11 rounded-full[^"]*"[^>]*>/g)?.filter((t) => t.includes('aria-hidden="true"'))).toHaveLength(4);
+    expect(html).toMatch(new RegExp(`<h2[^>]*class="sr-only"[^>]*>${en.dashboard.statsTitle}</h2>`));
+    const none = statCard(stats(STATS_FIXTURE.map((c) => ({ ...c, scoreSource: null }))), "avgScore");
+    expect(none).toContain("—");
+    expect(none).toContain(en.dashboard.statNoScans);
+  });
+
+  it("compact GateRail drops its label row but keeps five segments; compact ScoreBlock keeps number, band and source without the box", () => {
+    const html = renderToStaticMarkup(
+      createElement(GateRail, { activeStage: "development", stageProgress: { completed: 2, total: 5 }, stageNames: NAMES, labels: RAIL_LABELS, compact: true }),
+    );
+    expect(html.match(/data-gate-segment/g)).toHaveLength(5);
+    expect(html).not.toContain(fmt(en.dashboard.gateActive, { n: 3 }));
+    expect(html).not.toContain("<p");
+    expect(html).toMatch(new RegExp(`<span class="sr-only">${en.dashboard.gatesLabel}</span>`));
+    const p = { score: 91, scoreSource: "scanner" as const, scannedAt: "2026-11-24T08:00:00.000Z", scoreStale: false };
+    const score = renderToStaticMarkup(createElement(ScoreBlock, { ...p, labels: en.dashboard, compact: true }));
+    expect(score).toContain(">91<");
+    expect(score).toContain(en.dashboard.scoreGood);
+    expect(score).toContain("text-xl");
+    expect(score).not.toContain("text-3xl");
+    expect(score).not.toContain("rounded-lg border");
+    expect(score).toContain(fmt(en.dashboard.scoreScanner, { date: "2026-11-24" }));
   });
 
   it("en and id dashboard namespaces have identical keys and no forbidden phrases in the new keys", () => {

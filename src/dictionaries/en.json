@@ -535,6 +535,8 @@
     "searchHint": "Search projects (press /)",
     "emptyTitle": "No projects yet",
     "emptyLede": "Create a project and take it through the gates. Findings and scores appear here after a scan.",
+    "cardTemplate": "{category} template",
+    "statsTitle": "Project summary",
     "templateEcommerceDesc": "An online store with product catalog, cart, checkout, and order management.",
     "templateEcommerceReq": "Public product catalog, customer accounts, cart + checkout with payment, admin order management, order history, payment data handling (PCI awareness), CSRF and injection protection.",
     "templateSaasDesc": "A multi-tenant SaaS dashboard with billing and role-based access.",
