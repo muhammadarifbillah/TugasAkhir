@@ -79,7 +79,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
           <section key={g.shelf} className="mt-10">
             <h3 className="font-wide text-lg">{gallery.labels.shelves[g.shelf]}</h3>
             <ul className={ROW}>{g.items.map((c) => cover(c))}</ul>
-            <div aria-hidden="true" className="h-3 rounded-full bg-[var(--fuse-card-bg)] shadow-[0_10px_18px_-8px_rgb(0_0_0/0.45)]" />
+            <div aria-hidden="true" className="h-3 rounded-full bg-card bg-[image:var(--fuse-card-bg)] shadow-[0_10px_18px_-8px_rgb(0_0_0/0.45)]" />
           </section>
         ))
       ) : (
