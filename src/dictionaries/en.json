@@ -448,7 +448,28 @@
       }
     ],
     "learnTitle": "Terms and answers.",
-    "faqHeading": "Frequently asked questions"
+    "faqHeading": "Frequently asked questions",
+    "gallery": {
+      "headline": "What website do you want to build?",
+      "sub": "Pick one. AI builds it, five security gates check it.",
+      "ctaShelf": "Browse the template shelf",
+      "wallLabel": "Template gallery, 8 categories",
+      "hint": "Click a panel to look inside.",
+      "openPanel": "Open the {category} preview",
+      "close": "Close",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {n} of {total}",
+      "pageHint": "Click the preview or press ← → to change the page.",
+      "thumbsLabel": "Template pages",
+      "specPages": "Pages",
+      "specFeatures": "Key features",
+      "specStack": "Example stack",
+      "checksTitle": "What {name} checks in the code",
+      "checkCodes": "Mapped to NIST SSDF {nist} · ISO/IEC 27001 {iso}",
+      "scanned": "Generated code is scanned by Semgrep & Trivy.",
+      "start": "Start from this template"
+    }
   },
   "nav": {
     "dashboard": "Dashboard",

@@ -448,7 +448,28 @@
       }
     ],
     "learnTitle": "Pelajari istilah dan jawabannya.",
-    "faqHeading": "Pertanyaan yang sering diajukan"
+    "faqHeading": "Pertanyaan yang sering diajukan",
+    "gallery": {
+      "headline": "Website apa yang mau Anda bangun?",
+      "sub": "Pilih satu. AI membangunnya, lima gerbang keamanan memeriksanya.",
+      "ctaShelf": "Lihat rak template",
+      "wallLabel": "Galeri template, 8 kategori",
+      "hint": "Klik panel untuk melihat isinya.",
+      "openPanel": "Buka pratinjau {category}",
+      "close": "Tutup",
+      "prevPage": "Halaman sebelumnya",
+      "nextPage": "Halaman berikutnya",
+      "pageOf": "Halaman {n} dari {total}",
+      "pageHint": "Klik pratinjau atau tekan ← → untuk ganti halaman.",
+      "thumbsLabel": "Halaman template",
+      "specPages": "Halaman",
+      "specFeatures": "Fitur kunci",
+      "specStack": "Contoh stack",
+      "checksTitle": "Yang diperiksa {name} di kode",
+      "checkCodes": "Dipetakan ke NIST SSDF {nist} · ISO/IEC 27001 {iso}",
+      "scanned": "Kode yang dihasilkan dipindai Semgrep & Trivy.",
+      "start": "Mulai dari template ini"
+    }
   },
   "nav": {
     "dashboard": "Dasbor",

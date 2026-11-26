@@ -20,7 +20,7 @@ const DICTS = {
 };
 const LANGS = ["id", "en"] as const;
 
-const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 const noop = () => {};
 
 const copyOf = (lang: "id" | "en") => (DICTS[lang].landing.gallery ?? {}) as Props["copy"];

@@ -1,0 +1,54 @@
+import type { CategoryId } from "@/lib/site-categories";
+
+export type PageIndex = 0 | 1 | 2;
+export interface ViewerState {
+  open: CategoryId | null;
+  page: PageIndex;
+  dir: 1 | -1;
+}
+export type ViewerAction =
+  | { type: "open"; id: CategoryId; page?: PageIndex }
+  | { type: "close" }
+  | { type: "next" }
+  | { type: "prev" }
+  | { type: "goto"; page: PageIndex };
+
+export const VIEWER_INITIAL: ViewerState = { open: null, page: 0, dir: 1 };
+
+export function viewerReducer(s: ViewerState, a: ViewerAction): ViewerState {
+  switch (a.type) {
+    case "open":
+      return { open: a.id, page: a.page ?? 0, dir: 1 };
+    case "close":
+      return VIEWER_INITIAL;
+  }
+  if (s.open === null) return s;
+  switch (a.type) {
+    case "next":
+      return { ...s, page: ((s.page + 1) % 3) as PageIndex, dir: 1 };
+    case "prev":
+      return { ...s, page: ((s.page + 2) % 3) as PageIndex, dir: -1 };
+    case "goto":
+      return a.page === s.page ? s : { ...s, page: a.page, dir: a.page > s.page ? 1 : -1 };
+  }
+}
+
+export function keyToAction(key: string): "next" | "prev" | null {
+  return key === "ArrowRight" ? "next" : key === "ArrowLeft" ? "prev" : null;
+}
+
+/** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */
+const noNegZero = (n: number) => n + 0;
+
+/** Concave wall: left panels turn right, edge panels sit closer to the viewer. */
+export function wallPose(i: number, n: number, step = 6): { rotateY: number; z: number } {
+  const offset = i - (n - 1) / 2;
+  return { rotateY: noNegZero(-offset * step), z: noNegZero(Math.round(offset * offset * 4)) };
+}
+
+/** Pointer position across `width` mapped to -1..1 (3 decimals). */
+export function pointerTilt(clientX: number, left: number, width: number): number {
+  if (width <= 0) return 0;
+  const t = Math.min(1, Math.max(-1, ((clientX - left) / width) * 2 - 1));
+  return noNegZero(Math.round(t * 1000) / 1000);
+}
