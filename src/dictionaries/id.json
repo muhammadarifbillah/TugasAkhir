@@ -17,6 +17,9 @@
     "stages": "Sesi tahap",
     "revisions": "Revisi",
     "noRevisions": "Belum ada revisi.",
+    "chatSessions": "Sesi obrolan",
+    "noChatSessions": "Belum ada sesi obrolan.",
+    "messageCount": "Pesan: {count}",
     "open": "Buka proyek"
   },
   "audit": {
@@ -689,6 +692,8 @@
     "targetsHint": "Hanya platform yang dipilih di sini yang bisa dibuat di Studio Desain. Kamu bisa mengubahnya kapan saja.",
     "targetsSaved": "Platform disimpan",
     "targetsLocked": "Terkunci: tampilan ini bukan bagian dari platform yang dipilih di langkah kebutuhan. Tambahkan di sana untuk membuatnya.",
+    "targetsMin": "Minimal satu platform harus tetap dipilih.",
+    "outsideTargets": "Di luar kebutuhan",
     "startInteractive": "Coba klik",
     "stopInteractive": "Berhenti klik",
     "noMockupForLink": "Belum ada mockup tersimpan untuk tautan itu.",
@@ -1184,6 +1189,7 @@
     "fixAllDone": "{count} perbaikan diterapkan",
     "fixAllFailed": "{count} perbaikan gagal",
     "fixAllPrompt": "Perbaiki {count} temuan keamanan ini dalam satu rencana. Tampilkan setiap patch dan jelaskan risikonya:\n{findings}",
+    "fixAllDraft": "Draf prompt siap di kotak chat. Tinjau lalu kirim.",
     "fixAllConfirmTitle": "Terapkan semua perbaikan yang disarankan?",
     "fixAllConfirmDesc": "Ini menulis {count} berkas dari saran AI. Tinjau perubahannya setelah itu.",
     "fixAllConfirm": "Terapkan semua",

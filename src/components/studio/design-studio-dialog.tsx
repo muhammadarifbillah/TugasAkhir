@@ -69,6 +69,7 @@ export interface DesignStudioLabels {
   stale: string;
   revise: string;
   targetsLocked: string;
+  outsideTargets: string;
   startInteractive: string;
   stopInteractive: string;
   noMockupForLink: string;
@@ -467,6 +468,12 @@ export function DesignStudioDialog({
     );
   };
 
+  /** Selecting a screen also switches the toolbar to its viewport when allowed. */
+  const selectScreen = (screen: DesignScreenType) => {
+    setSelectedId(screen.id);
+    if (allowedDevices.includes(screen.device)) setDevice(screen.device);
+  };
+
   return (
     <div role="dialog" aria-modal="true" aria-labelledby={headingId} className="fixed inset-0 z-[70] flex h-dvh flex-col bg-background">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
@@ -541,7 +548,7 @@ export function DesignStudioDialog({
               <Button
                 className="mt-2 w-full"
                 variant="outline"
-                disabled={loading || !refinePrompt.trim()}
+                disabled={loading || !refinePrompt.trim() || !allowedDevices.includes(selected.device)}
                 onClick={async () => {
                   await generate({ prompt: refinePrompt, base: selected });
                   setRefinePrompt("");
@@ -551,6 +558,11 @@ export function DesignStudioDialog({
                 {loading && busyKind === "refine" ? labels.refineBusy : labels.refine}
               </Button>
               <p className="mt-1.5 text-[11px] leading-snug text-muted-foreground">{labels.refineHint}</p>
+              {!allowedDevices.includes(selected.device) && (
+                <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+                  {labels.targetsLocked}
+                </p>
+              )}
             </div>
           )}
 
@@ -746,6 +758,9 @@ export function DesignStudioDialog({
                           <span className="truncate font-medium">{screen.name}</span>
                           {isDraft && <Badge variant="warning">{labels.draft}</Badge>}
                           {stale && <Badge variant="outline">{labels.revise}</Badge>}
+                          {!allowedDevices.includes(screen.device) && (
+                            <Badge variant="outline">{labels.outsideTargets}</Badge>
+                          )}
                         </span>
                         <div className="flex items-center gap-1">
                           {isDraft ? (
@@ -802,11 +817,11 @@ export function DesignStudioDialog({
                         role="button"
                         tabIndex={0}
                         aria-pressed={active}
-                        onClick={() => setSelectedId(screen.id)}
+                        onClick={() => selectScreen(screen)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
-                            setSelectedId(screen.id);
+                            selectScreen(screen);
                           }
                         }}
                         className={`block w-full cursor-pointer ${active ? "" : "opacity-90 hover:opacity-100"}`}

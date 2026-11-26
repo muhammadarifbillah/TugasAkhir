@@ -892,6 +892,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
     setInput(fmt(w.fixAllPrompt, { count: capped.length, findings: lines }));
     setChatMode("plan");
     focusComposer();
+    addToast("info", w.fixAllDraft);
   }
 
   const dirtyFiles = useMemo(
@@ -1052,7 +1053,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
       ? targets.filter((t) => t !== value)
       : [...targets, value];
     // At least one platform must stay selected: the mockup stage needs a target.
-    if (next.length === 0) return;
+    if (next.length === 0) {
+      addToast("info", dict.studio.targetsMin);
+      return;
+    }
     const previous = targets;
     setTargets(next);
     setSavingTargets(true);
@@ -2038,6 +2042,10 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                 {messages.map((msg, i) => {
                   const choices = msg.role === "assistant" ? messageChoices(msg) : null;
                   const showChoices = Boolean(choices) && i === messages.length - 1 && !loading;
+                  const prose = msg.role === "assistant" ? displayAssistantText(msg.content) : "";
+                  // A question-only reply can be pure JSON; the choices block shows
+                  // it, so don't dump the raw object above it.
+                  const proseIsJson = /^[{[][\s\S]*[}\]]$/.test(prose.trim());
                   return (
                     <m.div
                       key={i}
@@ -2053,7 +2061,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                       )}
                       {msg.role === "assistant" ? (
                         <div className="min-w-0 rounded-lg border bg-card px-3 py-2 text-sm [overflow-wrap:anywhere]">
-                          <Markdown source={displayAssistantText(msg.content)} />
+                          {!(showChoices && proseIsJson) && <Markdown source={prose} />}
                           {showChoices && choices && (
                             <div className="mt-2 border-t pt-2">
                               <p className="mb-1.5 text-xs font-semibold">{choices.question}</p>
@@ -2093,6 +2101,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                                             size="sm"
                                             variant={opt.recommended ? "default" : "outline"}
                                             className="h-7 text-[11px]"
+                                            aria-label={`${dict.studio.choicePick}: ${opt.label}`}
                                             onClick={() => {
                                               setChoiceCustom(null);
                                               void sendPrompt(opt.value ?? opt.label);
@@ -2105,6 +2114,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
                                             variant="ghost"
                                             className="h-7 text-[11px]"
                                             aria-expanded={customizing}
+                                            aria-label={`${dict.studio.choiceCustomize}: ${opt.label}`}
                                             onClick={() =>
                                               setChoiceCustom(
                                                 customizing
@@ -2461,6 +2471,7 @@ function StudioWorkspaceInner(props: StudioWorkspaceProps) {
             retry: dict.studio.designRetry,
             confirmDiscard: dict.studio.confirmDiscard,
             targetsLocked: dict.studio.targetsLocked,
+            outsideTargets: dict.studio.outsideTargets,
             startInteractive: dict.studio.startInteractive,
             stopInteractive: dict.studio.stopInteractive,
             noMockupForLink: dict.studio.noMockupForLink,

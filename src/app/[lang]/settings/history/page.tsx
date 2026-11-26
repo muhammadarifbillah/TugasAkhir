@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { getDictionary, type Locale } from "@/lib/i18n";
+import { fmt } from "@/lib/format";
 
 interface HistoryPageProps {
   params: Promise<{ lang: string }>;
@@ -34,6 +35,15 @@ export default async function HistoryPage({ params }: HistoryPageProps) {
           status: true,
           completedAt: true,
           stage: { select: { code: true, name: true } },
+          chats: {
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              createdAt: true,
+              _count: { select: { messages: true } },
+              messages: { orderBy: { createdAt: "desc" }, take: 1, select: { createdAt: true } },
+            },
+          },
         },
       },
       revisions: {
@@ -84,6 +94,13 @@ export default async function HistoryPage({ params }: HistoryPageProps) {
                     ? { variant: "default" as const, text: dict.dashboard.statusDraft }
                     : { variant: "muted" as const, text: dict.dashboard.statusInProgress };
             const done = project.projectStages.filter((s) => s.status === "completed").length;
+            const sessions = project.projectStages
+              .flatMap((stage) => stage.chats.map((chat) => ({ chat, stage })))
+              .sort(
+                (a, b) =>
+                  (b.chat.messages[0]?.createdAt ?? b.chat.createdAt).getTime() -
+                  (a.chat.messages[0]?.createdAt ?? a.chat.createdAt).getTime(),
+              );
             return (
               <Card key={project.id}>
                 <CardHeader>
@@ -142,6 +159,34 @@ export default async function HistoryPage({ params }: HistoryPageProps) {
                             <span className="min-w-0 truncate">{revision.revisionSummary}</span>
                             <span className="ms-auto shrink-0 text-muted-foreground">
                               {date(revision.createdAt)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="mb-1 text-xs font-medium text-muted-foreground">
+                      {dict.history.chatSessions}
+                    </p>
+                    {sessions.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">{dict.history.noChatSessions}</p>
+                    ) : (
+                      <ul className="space-y-1">
+                        {sessions.map(({ chat, stage }) => (
+                          <li key={chat.id} className="flex items-center gap-2 text-xs">
+                            <Link
+                              href={`/${lang}/studio/${project.id}/${stage.stage.code}`}
+                              className="truncate hover:underline"
+                            >
+                              {stage.stage.name}
+                            </Link>
+                            <span className="shrink-0 text-muted-foreground">
+                              {fmt(dict.history.messageCount, { count: chat._count.messages })}
+                            </span>
+                            <span className="ms-auto shrink-0 text-muted-foreground">
+                              {date(chat.messages[0]?.createdAt ?? chat.createdAt)}
                             </span>
                           </li>
                         ))}

@@ -17,6 +17,9 @@
     "stages": "Stage sessions",
     "revisions": "Revisions",
     "noRevisions": "No revisions yet.",
+    "chatSessions": "Chat sessions",
+    "noChatSessions": "No chat sessions yet.",
+    "messageCount": "Messages: {count}",
     "open": "Open project"
   },
   "audit": {
@@ -689,6 +692,8 @@
     "targetsHint": "Only the platforms picked here can be generated in the Design Studio. You can change this at any time.",
     "targetsSaved": "Platforms saved",
     "targetsLocked": "Locked: this viewport is not part of the platforms chosen at the needs step. Add it there to generate it.",
+    "targetsMin": "Keep at least one platform selected.",
+    "outsideTargets": "Outside needs",
     "startInteractive": "Try clicking",
     "stopInteractive": "Stop clicking",
     "noMockupForLink": "There is no saved mockup for that link yet.",
@@ -1184,6 +1189,7 @@
     "fixAllDone": "{count} fixes applied",
     "fixAllFailed": "{count} fixes failed",
     "fixAllPrompt": "Fix these {count} security findings in one plan. Show each patch and explain the risk:\n{findings}",
+    "fixAllDraft": "Draft prompt ready in the chat box. Review it, then send.",
     "fixAllConfirmTitle": "Apply all suggested fixes?",
     "fixAllConfirmDesc": "This writes {count} files from the AI suggestions. Review the changes afterwards.",
     "fixAllConfirm": "Apply all",

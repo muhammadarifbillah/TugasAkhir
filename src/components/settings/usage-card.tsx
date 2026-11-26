@@ -3,14 +3,11 @@
 import { useMemo, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { aggregateUsage, type UsageDay, type UsageGranularity } from "@/lib/usage-rollup";
 
-export interface UsageDay {
-  day: string;
-  prompt: number;
-  completion: number;
-}
+export type { UsageDay };
 
-type Granularity = "day" | "month" | "year";
+type Granularity = UsageGranularity;
 
 interface UsageLabels {
   title: string;
@@ -23,29 +20,6 @@ interface UsageLabels {
   period: string;
   empty: string;
   note: string;
-}
-
-/** Rolls daily totals up by day, month or year and sorts newest first. */
-export function aggregateUsage(
-  series: UsageDay[],
-  granularity: Granularity,
-): { period: string; prompt: number; completion: number }[] {
-  const buckets = new Map<string, { prompt: number; completion: number }>();
-  for (const row of series) {
-    const key =
-      granularity === "year"
-        ? row.day.slice(0, 4)
-        : granularity === "month"
-          ? row.day.slice(0, 7)
-          : row.day;
-    const slot = buckets.get(key) ?? { prompt: 0, completion: 0 };
-    slot.prompt += row.prompt;
-    slot.completion += row.completion;
-    buckets.set(key, slot);
-  }
-  return [...buckets.entries()]
-    .map(([period, value]) => ({ period, ...value }))
-    .sort((a, b) => b.period.localeCompare(a.period));
 }
 
 export function UsageCard({ series, labels }: { series: UsageDay[]; labels: UsageLabels }) {
