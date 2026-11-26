@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { decryptSecret } from "@/lib/crypto";
+import { fetchOpenAICompatibleModels } from "@/lib/ai/provider-models";
 import { prisma } from "@/lib/prisma";
 import { rateLimited } from "@/lib/rate-limit";
 import { validateCsrfRequest } from "@/lib/validate-csrf";
@@ -41,9 +42,18 @@ const STATIC_MODELS: Record<string, ModelEntry[]> = {
   deepseek: [
     { id: "deepseek-flash", name: "DeepSeek Flash", maxTokens: 393216 },
   ],
+  // Mirror of the router's own catalog; live fetch above replaces it when reachable.
   omniroute: [
-    { id: "opencode-go/deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", maxTokens: 32000 },
-    { id: "opencode-go/deepseek-v4-pro", name: "DeepSeek V4 Pro", maxTokens: 32000 },
+    { id: "auto", name: "Auto (router pick)", maxTokens: null },
+    { id: "cc/claude-opus-5-5", name: "Claude Opus 5.5", maxTokens: null },
+    { id: "cc/claude-sonnet-5-5", name: "Claude Sonnet 5.5", maxTokens: null },
+    { id: "cc/claude-haiku-5-5", name: "Claude Haiku 5.5", maxTokens: null },
+    { id: "claude/claude-opus-5-5", name: "Claude Opus 5.5 (Messages)", maxTokens: null },
+    { id: "claude/claude-sonnet-5-5", name: "Claude Sonnet 5.5 (Messages)", maxTokens: null },
+    { id: "claude/claude-haiku-5-5", name: "Claude Haiku 5.5 (Messages)", maxTokens: null },
+    { id: "no-think/cc/claude-haiku-5-5", name: "Claude Haiku 5.5 (no thinking)", maxTokens: null },
+    { id: "opencode-go/deepseek-v4.1-flash", name: "DeepSeek V4.1 Flash", maxTokens: null },
+    { id: "opencode-go/deepseek-v4-pro", name: "DeepSeek V4 Pro", maxTokens: null },
   ],
 };
 
@@ -90,22 +100,6 @@ async function fetchOpenAIModels(apiKey: string, baseUrl?: string): Promise<Mode
       maxTokens: null,
     }));
   return models;
-}
-
-async function fetchDeepSeekModels(apiKey: string, baseUrl?: string): Promise<ModelEntry[]> {
-  // DeepSeek is OpenAI-compatible; its /models list only contains deepseek-* ids,
-  // so the OpenAI chat-prefix filter would wrongly drop them all.
-  const res = await fetch(`${baseUrl ?? "https://api.deepseek.com/v1"}/models`, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-    signal: AbortSignal.timeout(10000),
-  });
-  if (!res.ok) throw new Error(`DeepSeek API ${res.status}`);
-  const data = await res.json();
-  return (data.data ?? []).map((m: { id: string }) => ({
-    id: m.id,
-    name: m.id,
-    maxTokens: null,
-  }));
 }
 
 async function fetchOpenRouterModels(apiKey: string): Promise<ModelEntry[]> {
@@ -216,10 +210,13 @@ export async function POST(request: Request) {
         models = await fetchOpenRouterModels(apiKey);
         break;
       case "deepseek":
-        models = await fetchDeepSeekModels(apiKey, baseUrl);
+        models = await fetchOpenAICompatibleModels(apiKey, baseUrl ?? "https://api.deepseek.com/v1");
         break;
       case "omniroute":
-        models = await fetchOpenAIModels(apiKey, baseUrl);
+        models = await fetchOpenAICompatibleModels(
+          apiKey,
+          baseUrl ?? "https://router.boilingac.id/v1",
+        );
         break;
       default:
         return NextResponse.json({ error: "Unknown provider" }, { status: 400 });
