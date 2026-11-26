@@ -49,12 +49,8 @@
     "offline": "Anda sedang offline. Beberapa fitur mungkin tidak berfungsi."
   },
   "landing": {
-    "headline": "Kode dari AI dibaca lima gerbang sebelum boleh dikirim.",
-    "heroSub": "{name} membangun website dengan AI, lalu menahan setiap rilis di kontrol pengembangan aman yang dipetakan ke ISO/IEC 27001:2022 Annex A.",
     "ctaPrimary": "Mulai proyek gratis",
-    "ctaSample": "Lihat contoh laporan",
     "ctaDashboard": "Buka dasbor",
-    "mapStage": "Tahap",
     "mapNist": "Praktik NIST SSDF",
     "mapIso": "Kontrol ISO 27001",
     "mapArtifact": "Artefak",
@@ -85,56 +81,11 @@
         "why": "Bukti dikemas menjadi laporan siap audit."
       }
     ],
-    "demoPause": "Jeda animasi",
-    "demoPlay": "Putar animasi",
     "problemTitle": "Kode buatan AI cepat jadi, tapi jarang diperiksa.",
     "statStages": "tahap Secure SDLC",
     "statNist": "task NIST SSDF",
     "statSubsteps": "syarat selesai sub-langkah",
     "statProviders": "penyedia AI (BYOK)",
-    "statLanguages": "bahasa antarmuka & keluaran",
-    "gatesLede": "Tahap berikutnya baru terbuka setelah semua sub-langkah tahap ini terpenuhi, dan server menolak jalan pintas.",
-    "gatesTabs": "Tahap Secure SDLC",
-    "gatesPrev": "Tahap sebelumnya",
-    "gatesNext": "Tahap berikutnya",
-    "gatesArtifact": "Artefak",
-    "howTitle": "Dari prompt ke rilis yang bisa diaudit",
-    "howLede": "Anda tetap memegang kendali di setiap langkah: AI mengusulkan, Anda menyetujui, pemindai memverifikasi.",
-    "how": [
-      {
-        "title": "Prompt",
-        "desc": "Jelaskan kebutuhan untuk tahap yang sedang aktif dengan bahasa sehari-hari."
-      },
-      {
-        "title": "Rencana",
-        "desc": "AI mengusulkan rencana berisi aksi konkret. Tidak ada yang berubah sebelum Anda menyetujuinya."
-      },
-      {
-        "title": "Bangun",
-        "desc": "Kode, diagram, dan dokumen dihasilkan lalu disimpan sebagai snapshot berversi."
-      },
-      {
-        "title": "Pindai",
-        "desc": "Semgrep dan Trivy memindai kode dan menghasilkan skor keamanan terverifikasi."
-      },
-      {
-        "title": "Perbaiki dengan AI",
-        "desc": "Temuan dibuka tepat di barisnya, lalu perbaikan diusulkan sebagai diff yang bisa ditinjau."
-      },
-      {
-        "title": "Ekspor",
-        "desc": "Unduh kode sumber, push ke GitHub, dan dapatkan manual book serta laporan ISO."
-      }
-    ],
-    "howPrompt": "Buat situs booking klinik dengan login pasien dan dasbor admin.",
-    "howPlan": [
-      "Tambahkan autentikasi dengan password ter-hash",
-      "Validasi setiap input formulir booking",
-      "Simpan rahasia di variabel lingkungan"
-    ],
-    "howVerified": "Terverifikasi pemindai",
-    "howFinding": "Query SQL disusun dari input pengguna",
-    "howFixed": "Query berparameter",
     "previewTitle": "Ini studionya, bukan ilustrasi.",
     "previewShots": [
       {
@@ -150,29 +101,11 @@
         "caption": "Panel pemetaan NIST → ISO"
       }
     ],
-    "deliverables": [
-      {
-        "title": "Kode sumber",
-        "desc": "Seluruh proyek dalam arsip ZIP."
-      },
-      {
-        "title": "Push & pull request GitHub",
-        "desc": "Push ke repositori baru atau yang sudah ada; revisi datang sebagai pull request."
-      },
-      {
-        "title": "Manual book",
-        "desc": "Deployment, konfigurasi, endpoint, dan halaman, dalam PDF."
-      },
-      {
-        "title": "Laporan ISO 27001",
-        "desc": "Crosswalk Lampiran A dan ringkasan NIST SSDF, dalam PDF atau Markdown."
-      },
-      {
-        "title": "Matriks ketertelusuran",
-        "desc": "Setiap kebutuhan terhubung ke task NIST, kontrol ISO, dan berkasnya."
-      }
-    ],
     "faq": [
+      {
+        "q": "Apakah FUSE memberi sertifikat ISO 27001?",
+        "a": "Tidak. FUSE memetakan tiap tahap ke kontrol ISO 27001:2022 Lampiran A dan membuat laporan pendukung audit."
+      },
       {
         "q": "Apakah kunci API saya aman?",
         "a": "Kunci disimpan terenkripsi AES-256-GCM dan tidak pernah dikirim ke browser."
@@ -182,71 +115,17 @@
         "a": "OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, dan Ollama untuk model lokal."
       },
       {
-        "q": "Apakah FUSE memberi sertifikat ISO 27001?",
-        "a": "Tidak. FUSE memetakan tiap tahap ke kontrol ISO 27001:2022 Lampiran A dan membuat laporan pendukung audit."
-      },
-      {
         "q": "Apakah wajib memakai GitHub?",
         "a": "Tidak. Kode bisa diunduh sebagai ZIP. GitHub opsional untuk push dan pull request."
       },
       {
         "q": "Bagaimana skor keamanan dihitung?",
         "a": "Dari pemindaian deterministik Semgrep dan Trivy. Skor yang hanya berasal dari AI ditandai berbeda."
-      },
-      {
-        "q": "Bahasa apa yang didukung?",
-        "a": "Antarmuka dan keluaran AI tersedia dalam Bahasa Indonesia dan Inggris."
-      },
-      {
-        "q": "Versi SSDF mana yang dipakai?",
-        "a": "NIST SP 800-218 versi 1.1 (Februari 2022). Draf versi 1.2 masih dalam konsultasi publik."
       }
     ],
     "closingTitle": "Mulai proyek pertama Anda",
     "closingLede": "Lima gerbang, satu ruang kerja terpandu, dan bukti yang bisa Anda tunjukkan.",
-    "howPlanTitle": "Rencana usulan",
-    "howApprove": "Setujui & bangun",
-    "heroLede": "{name} adalah platform tempat AI membangun website, dengan lima gerbang yang mengunci urutan: analisis, desain, kode, pemindaian nyata oleh Semgrep dan Trivy, lalu serah terima. Tiap gerbang dipetakan ke ISO/IEC 27001:2022 Annex A, dengan NIST SSDF sebagai pelengkap.",
-    "heroTape": {
-      "steps": [
-        "Tulis prompt; AI membangun websitenya.",
-        "AI menulis kodenya, gerbang 1–3 mencatat urutannya.",
-        "Semgrep dan Trivy menemukan {medium} medium dan {low} low.",
-        "Diperbaiki, lalu dipetakan ke kontrol ISO/IEC 27001:2022 (dan NIST SSDF).",
-        "Bawa pulang kodenya, beserta buktinya."
-      ],
-      "tableCaption": "Contoh hasil pindai di gerbang 4 (Semgrep + Trivy). Skor = 100 dikurangi bobot severity.",
-      "cols": {
-        "finding": "Temuan",
-        "tool": "Pemindai",
-        "severity": "Severity",
-        "penalty": "Penalti",
-        "score": "Skor",
-        "mapping": "Dipetakan ke"
-      },
-      "severity": {
-        "medium": "medium",
-        "low": "low"
-      },
-      "findings": [
-        "Injeksi SQL di kueri pencarian",
-        "HTML tanpa escape di komentar (XSS)",
-        "Paket usang dengan kerentanan yang diketahui"
-      ],
-      "start": "Skor awal",
-      "final": "Skor akhir",
-      "stamp": "Cap gerbang 4"
-    },
     "ctaGates": "Lihat lima gerbang",
-    "rail": {
-      "colours": {
-        "straw": "jerami",
-        "brown": "cokelat",
-        "purple": "ungu",
-        "blue": "biru tua",
-        "grey": "biru keabuan"
-      }
-    },
     "problemStatShow": "true",
     "problemStat": "Kode buatan AI memunculkan celah keamanan berisiko pada 45% pengujian.",
     "problemStatSource": "Veracode, 2025 GenAI Code Security Report (pembaruan Oktober 2025)",
@@ -257,115 +136,13 @@
       "Pemetaan ke standar biasanya dibuat setelah aplikasi jadi, saat setiap perubahan sudah mahal.",
       "Tanpa artefak per tahap, sulit menunjukkan kontrol mana yang dipenuhi dan kapan."
     ],
-    "aboutTitle": "Apa itu {name}?",
-    "aboutLede": "{name} adalah studio pembuat website berbasis AI yang bekerja seperti lini produksi dengan pos pemeriksaan. AI menyusun kebutuhan, desain, kode, dan dokumen; {name} memastikan setiap tahap memenuhi syaratnya sebelum tahap berikutnya dibuka, lalu memeriksa hasilnya dengan pemindai keamanan sungguhan.",
-    "aboutAiTitle": "Dikerjakan AI",
-    "aboutAi": [
-      "Menyusun kebutuhan keamanan dan klasifikasi data",
-      "Membuat desain UI, arsitektur, diagram, dan skema database",
-      "Menulis kode untuk berbagai stack",
-      "Menulis manual book dan laporan pemetaan ISO/IEC 27001:2022"
-    ],
-    "aboutGateTitle": "Dijaga gerbang",
-    "aboutGate": [
-      "Mengunci tahap sampai semua sub-langkahnya terpenuhi, diperiksa di server",
-      "Menjalankan Semgrep dan Trivy pada kode",
-      "Menghitung skor keamanan dari temuan, bukan perkiraan",
-      "Menelusuri setiap kebutuhan ke rekomendasi, berkas, dan standar"
-    ],
-    "gatesTitle": "Lima gerbang, diuji berurutan.",
-    "gatesCelsius": "{n} °C",
-    "gatesSubSteps": "Lihat {count} sub-langkah",
-    "gatesSubStepsCount": "{count} sub-langkah",
-    "gatesSubStepCol": "Sub-langkah",
-    "howScanExample": "{medium} temuan sedang + {low} rendah → 100 − ({medium}×{wm} + {low}×{wl}) = {score}",
-    "archTitle": "Apa yang terjadi di balik layar.",
-    "archLede": "Pilih bagian untuk membaca penjelasannya.",
-    "archNodes": [
-      {
-        "name": "Studio",
-        "note": "Tempat Anda bekerja dan semua proyek disimpan. (Next.js, PostgreSQL lewat Prisma.) Akses dibatasi per akun."
-      },
-      {
-        "name": "Penyedia AI",
-        "note": "Menulis isi tiap tahap dengan model pilihan Anda. (OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, Ollama; kunci disimpan terenkripsi AES-256-GCM.) Kualitas hasil bergantung pada model yang dipilih."
-      },
-      {
-        "name": "Gerbang tahap",
-        "note": "Memeriksa syarat sebelum tahap selesai. (Server menolak bila sub-langkah belum terpenuhi atau tahap sebelumnya belum selesai.) Syarat memeriksa kelengkapan hasil, bukan kebenaran setiap baris kode."
-      },
-      {
-        "name": "Sandbox Docker",
-        "note": "Menjalankan aplikasi Anda di kotak terisolasi. (Node/Next, Python, PHP, Go, statis; cap-drop ALL, no-new-privileges, port hanya ke 127.0.0.1, jaringan privat per run.) Mengurangi dampak kode berbahaya, bukan pengganti peninjauan."
-      },
-      {
-        "name": "Pemindai",
-        "note": "Memeriksa kode dan dependensi. (Semgrep untuk SAST; Trivy untuk kerentanan, rahasia, dan miskonfigurasi; audit dependensi.) Menemukan pola yang dikenal, bukan semua celah."
-      },
-      {
-        "name": "Ekspor & GitHub",
-        "note": "Menyerahkan hasil yang bisa diaudit. (ZIP, manual book, laporan ISO, matriks ketertelusuran; push dan pull request dengan workflow security.yml.) Repositori tetap milik Anda."
-      }
-    ],
-    "archPlatformTitle": "Keamanan platform FUSE",
-    "archPlatform": [
-      "Kunci dan token terenkripsi AES-256-GCM",
-      "Content Security Policy dengan nonce per permintaan",
-      "Perlindungan CSRF pada permintaan yang mengubah data",
-      "Pembatasan laju permintaan",
-      "Log audit aktivitas akun"
-    ],
-    "proofTitle": "Angka dan metode yang bisa Anda periksa sendiri.",
-    "proofFormulaTitle": "Cara skor dihitung",
-    "proofFormula": "Skor = 100 − (20 × kritis + 10 × tinggi + 4 × sedang + 1 × rendah), minimal 0. Hanya temuan Semgrep dan Trivy yang dihitung; skor yang berasal dari AI ditandai berbeda.",
-    "proofDownload": "Unduh matriks 26 sub-langkah (CSV)",
     "figure": "Gbr. {n}",
-    "resultsTitle": "Yang Anda bawa pulang, dan yang tidak dijanjikan.",
-    "resultsDeliverables": "Hasil",
     "limitsTitle": "Batasan",
     "limits": [
       "Bukan sertifikasi ISO 27001 atau NIST; FUSE memetakan kontrol dan menyiapkan bukti",
       "Pemindai menemukan pola yang dikenal; tinjauan manusia tetap diperlukan",
       "Kualitas hasil AI bergantung pada model yang Anda pilih",
       "Docker dibutuhkan untuk menjalankan aplikasi dan pemindaian"
-    ],
-    "glossary": [
-      {
-        "term": "Secure SDLC",
-        "definition": "Siklus pengembangan perangkat lunak yang memasukkan pemeriksaan keamanan di setiap tahap, bukan di akhir."
-      },
-      {
-        "term": "NIST SSDF (SP 800-218 v1.1)",
-        "definition": "Kumpulan praktik pengembangan aman dari NIST, dikelompokkan PO, PS, PW, dan RV; kode task-nya (mis. PW.5.1) menjadi syarat gerbang."
-      },
-      {
-        "term": "ISO/IEC 27001:2022 Lampiran A",
-        "definition": "Daftar kontrol keamanan informasi; tiap sub-langkah dipetakan ke kontrolnya (mis. A.8.28)."
-      },
-      {
-        "term": "SAST",
-        "definition": "Pemeriksaan kode sumber tanpa menjalankannya; dilakukan Semgrep."
-      },
-      {
-        "term": "SCA & secret scanning",
-        "definition": "Pemeriksaan dependensi yang rentan dan rahasia yang bocor; dilakukan Trivy."
-      },
-      {
-        "term": "STRIDE",
-        "definition": "Cara memodelkan ancaman: spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege."
-      },
-      {
-        "term": "OWASP Top 10",
-        "definition": "Daftar sepuluh risiko keamanan aplikasi web yang paling umum; ditinjau di gerbang Pengujian."
-      },
-      {
-        "term": "BYOK",
-        "definition": "Bring Your Own Key: memakai kunci API penyedia AI milik Anda sendiri."
-      },
-      {
-        "term": "Ketertelusuran",
-        "definition": "Setiap kebutuhan keamanan (REQ-SEC-…) dapat ditelusuri ke rekomendasi, berkas kode, task NIST, dan kontrol ISO."
-      }
     ],
     "stripLabel": "Dipetakan ke dan diperiksa dengan",
     "stripItems": [
@@ -376,78 +153,12 @@
     ],
     "pills": {
       "problem": "Masalahnya",
-      "about": "Tentang",
       "gates": "Alur kerja",
-      "audience": "Pengguna",
       "studio": "Studio",
-      "how": "Cara kerja",
-      "arch": "Di balik layar",
-      "proof": "Bukti",
       "results": "Hasil",
-      "learn": "Pelajari",
+      "limits": "Batasan & FAQ",
       "start": "Mulai"
     },
-    "guardTitle": "Yang dijaga {name} di setiap proyek.",
-    "guardLede": "Lima area keamanan diperiksa sebelum proyek boleh melangkah, dari kebutuhan sampai serah terima.",
-    "guardCards": [
-      {
-        "title": "Kebutuhan & data",
-        "bullets": [
-          "Ruang lingkup dan tujuan proyek",
-          "Kebutuhan keamanan dan privasi",
-          "Klasifikasi data yang diproses"
-        ]
-      },
-      {
-        "title": "Desain & ancaman",
-        "bullets": [
-          "Arsitektur dan alur data",
-          "Threat model STRIDE",
-          "Skema database dan alur autentikasi"
-        ]
-      },
-      {
-        "title": "Kode aman",
-        "bullets": [
-          "Autentikasi dan otorisasi",
-          "Anti-injeksi dan output encoding",
-          "Penanganan rahasia dan CSRF"
-        ]
-      },
-      {
-        "title": "Pemindaian & skor",
-        "bullets": [
-          "Semgrep untuk kode sumber",
-          "Trivy untuk dependensi dan rahasia",
-          "Skor keamanan deterministik"
-        ]
-      },
-      {
-        "title": "Serah terima",
-        "bullets": [
-          "Manual book dan laporan ISO",
-          "Checklist keamanan rilis",
-          "Ekspor ZIP atau push ke GitHub"
-        ]
-      }
-    ],
-    "factsTitle": "Dibangun di atas kerangka nyata",
-    "audienceTitle": "Dibuat untuk tiga kelompok pengguna.",
-    "audience": [
-      {
-        "title": "Mahasiswa & developer pemula",
-        "desc": "Belajar praktik pengembangan aman sambil membangun proyek nyata, tahap demi tahap."
-      },
-      {
-        "title": "Tim kecil & UMKM",
-        "desc": "Mendapatkan website beserta bukti keamanannya tanpa harus menjadi ahli keamanan."
-      },
-      {
-        "title": "Pengajar",
-        "desc": "Memperagakan Secure SDLC secara nyata, lengkap dengan pemetaan ke standar."
-      }
-    ],
-    "learnTitle": "Pelajari istilah dan jawabannya.",
     "faqHeading": "Pertanyaan yang sering diajukan",
     "gallery": {
       "headline": "Website apa yang mau Anda bangun?",
@@ -583,7 +294,8 @@
           "when": "Selama proyek berjalan; pulihkan kapan saja dari studio."
         }
       }
-    }
+    },
+    "limitsSectionTitle": "Yang tidak kami janjikan, dan pertanyaan yang sering muncul."
   },
   "nav": {
     "dashboard": "Dasbor",

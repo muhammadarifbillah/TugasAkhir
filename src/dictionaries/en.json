@@ -49,12 +49,8 @@
     "offline": "You are offline. Some features may not work."
   },
   "landing": {
-    "headline": "AI code is read by five gates before it ships.",
-    "heroSub": "{name} builds websites with AI, then holds every release at secure development controls mapped to ISO/IEC 27001:2022 Annex A.",
     "ctaPrimary": "Start a free project",
-    "ctaSample": "See a sample report",
     "ctaDashboard": "Open dashboard",
-    "mapStage": "Stage",
     "mapNist": "NIST SSDF practice",
     "mapIso": "ISO 27001 control",
     "mapArtifact": "Artefact",
@@ -85,56 +81,11 @@
         "why": "Evidence is packaged into audit-ready reports."
       }
     ],
-    "demoPause": "Pause animation",
-    "demoPlay": "Play animation",
     "problemTitle": "AI code ships fast, rarely checked.",
     "statStages": "Secure SDLC stages",
     "statNist": "NIST SSDF tasks",
     "statSubsteps": "sub-step completion criteria",
     "statProviders": "AI providers (BYOK)",
-    "statLanguages": "interface & output languages",
-    "gatesLede": "The next stage opens only when every sub-step of this one is met, and the server refuses shortcuts.",
-    "gatesTabs": "Secure SDLC stages",
-    "gatesPrev": "Previous stage",
-    "gatesNext": "Next stage",
-    "gatesArtifact": "Artefact",
-    "howTitle": "From prompt to auditable release",
-    "howLede": "You stay in control at every step: the AI proposes, you approve, and scanners verify.",
-    "how": [
-      {
-        "title": "Prompt",
-        "desc": "Describe what you need for the current stage, in plain language."
-      },
-      {
-        "title": "Plan",
-        "desc": "The AI proposes a plan of concrete actions. Nothing changes until you approve it."
-      },
-      {
-        "title": "Build",
-        "desc": "Code, diagrams and documents are generated and saved as versioned snapshots."
-      },
-      {
-        "title": "Scan",
-        "desc": "Semgrep and Trivy scan the code and produce a verified security score."
-      },
-      {
-        "title": "Fix with AI",
-        "desc": "Findings open at the exact line, and a fix is proposed as a reviewable diff."
-      },
-      {
-        "title": "Export",
-        "desc": "Download the source, push to GitHub, and get the manual book and ISO report."
-      }
-    ],
-    "howPrompt": "Build a clinic booking site with patient login and an admin dashboard.",
-    "howPlan": [
-      "Add authentication with hashed passwords",
-      "Validate every booking form input",
-      "Store secrets in environment variables"
-    ],
-    "howVerified": "Verified by scanner",
-    "howFinding": "SQL query built from user input",
-    "howFixed": "Parameterised query",
     "previewTitle": "This is the studio.",
     "previewShots": [
       {
@@ -150,29 +101,11 @@
         "caption": "NIST → ISO mapping panel"
       }
     ],
-    "deliverables": [
-      {
-        "title": "Source code",
-        "desc": "The full project as a ZIP archive."
-      },
-      {
-        "title": "GitHub push & pull request",
-        "desc": "Push to a new or existing repository; revisions arrive as pull requests."
-      },
-      {
-        "title": "Manual book",
-        "desc": "Deployment, configuration, endpoints and pages, as PDF."
-      },
-      {
-        "title": "ISO 27001 report",
-        "desc": "Annex A crosswalk and NIST SSDF summary, as PDF or Markdown."
-      },
-      {
-        "title": "Traceability matrix",
-        "desc": "Every requirement linked to its NIST task, ISO control and file."
-      }
-    ],
     "faq": [
+      {
+        "q": "Does FUSE give me an ISO 27001 certificate?",
+        "a": "No. It maps each stage to ISO 27001:2022 Annex A controls and produces reports that support an audit."
+      },
       {
         "q": "Are my API keys safe?",
         "a": "Keys are stored encrypted with AES-256-GCM and are never sent to the browser."
@@ -182,71 +115,17 @@
         "a": "OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, and Ollama for local models."
       },
       {
-        "q": "Does FUSE give me an ISO 27001 certificate?",
-        "a": "No. It maps each stage to ISO 27001:2022 Annex A controls and produces reports that support an audit."
-      },
-      {
         "q": "Do I need GitHub?",
         "a": "No. You can download the code as a ZIP. GitHub is optional, for pushes and pull requests."
       },
       {
         "q": "How is the security score calculated?",
         "a": "From deterministic Semgrep and Trivy scans. A score that only comes from the AI is labelled differently."
-      },
-      {
-        "q": "Which languages are supported?",
-        "a": "The interface and the AI output are available in English and Indonesian."
-      },
-      {
-        "q": "Which SSDF version is used?",
-        "a": "NIST SP 800-218 version 1.1 (February 2022). The version 1.2 draft is still in public consultation."
       }
     ],
     "closingTitle": "Start your first project",
     "closingLede": "Five gates, one guided workspace, and evidence you can show.",
-    "howPlanTitle": "Proposed plan",
-    "howApprove": "Approve & build",
-    "heroLede": "{name} is a platform where AI builds your website, with five gates that lock the order: analysis, design, code, real scans by Semgrep and Trivy, then handover. Every gate is mapped to ISO/IEC 27001:2022 Annex A, with NIST SSDF as a complement.",
-    "heroTape": {
-      "steps": [
-        "Write a prompt; AI builds the website.",
-        "AI writes the code; gates 1–3 record the order.",
-        "Semgrep and Trivy find {medium} medium and {low} low.",
-        "Fixed, then mapped to ISO/IEC 27001:2022 controls (and NIST SSDF).",
-        "Take the code home, with its evidence."
-      ],
-      "tableCaption": "Example scan at gate 4 (Semgrep + Trivy). Score = 100 minus the severity weights.",
-      "cols": {
-        "finding": "Finding",
-        "tool": "Scanner",
-        "severity": "Severity",
-        "penalty": "Penalty",
-        "score": "Score",
-        "mapping": "Mapped to"
-      },
-      "severity": {
-        "medium": "medium",
-        "low": "low"
-      },
-      "findings": [
-        "SQL injection in the search query",
-        "Unescaped HTML in a comment (XSS)",
-        "Outdated package with a known vulnerability"
-      ],
-      "start": "Starting score",
-      "final": "Final score",
-      "stamp": "Gate 4 stamp"
-    },
     "ctaGates": "See the five gates",
-    "rail": {
-      "colours": {
-        "straw": "straw",
-        "brown": "brown",
-        "purple": "purple",
-        "blue": "dark blue",
-        "grey": "grey-blue"
-      }
-    },
     "problemStatShow": "true",
     "problemStat": "AI-generated code introduced risky security flaws in 45% of tests.",
     "problemStatSource": "Veracode, 2025 GenAI Code Security Report (October 2025 update)",
@@ -257,115 +136,13 @@
       "Mapping to a standard usually happens after the app is built, when every change is already expensive.",
       "Without an artefact per stage it is hard to show which control was met, and when."
     ],
-    "aboutTitle": "What is {name}?",
-    "aboutLede": "{name} is an AI website studio that works like a production line with checkpoints. The AI drafts requirements, designs, code and documents; {name} makes sure each stage meets its criteria before the next one opens, then checks the result with real security scanners.",
-    "aboutAiTitle": "Done by the AI",
-    "aboutAi": [
-      "Drafts security requirements and data classification",
-      "Produces UI designs, architecture, diagrams and database schema",
-      "Writes code for several stacks",
-      "Writes the manual book and the ISO/IEC 27001:2022 mapping report"
-    ],
-    "aboutGateTitle": "Guarded by the gates",
-    "aboutGate": [
-      "Locks a stage until all its sub-steps are met, checked on the server",
-      "Runs Semgrep and Trivy on the code",
-      "Calculates the security score from findings, not estimates",
-      "Traces every requirement to its recommendation, file and standard"
-    ],
-    "gatesTitle": "Five gates, in order.",
-    "gatesCelsius": "{n} °C",
-    "gatesSubSteps": "Show {count} sub-steps",
-    "gatesSubStepsCount": "{count} sub-steps",
-    "gatesSubStepCol": "Sub-step",
-    "howScanExample": "{medium} medium + {low} low findings → 100 − ({medium}×{wm} + {low}×{wl}) = {score}",
-    "archTitle": "Under the hood.",
-    "archLede": "Choose a part to read how it works.",
-    "archNodes": [
-      {
-        "name": "Studio",
-        "note": "Where you work and where every project is stored. (Next.js, PostgreSQL via Prisma.) Access is scoped per account."
-      },
-      {
-        "name": "AI provider",
-        "note": "Writes each stage's content with the model you choose. (OpenAI, Anthropic, Gemini, DeepSeek, OpenRouter, Ollama; keys encrypted with AES-256-GCM.) Output quality depends on the chosen model."
-      },
-      {
-        "name": "Stage gate",
-        "note": "Checks the criteria before a stage completes. (The server refuses if sub-steps are unmet or an earlier stage is open.) Criteria check that results are complete, not that every line is correct."
-      },
-      {
-        "name": "Docker sandbox",
-        "note": "Runs your app in an isolated box. (Node/Next, Python, PHP, Go, static; cap-drop ALL, no-new-privileges, ports bound to 127.0.0.1, a private network per run.) It reduces the impact of bad code; it does not replace review."
-      },
-      {
-        "name": "Scanners",
-        "note": "Checks code and dependencies. (Semgrep for SAST; Trivy for vulnerabilities, secrets and misconfiguration; dependency audit.) It finds known patterns, not every flaw."
-      },
-      {
-        "name": "Export & GitHub",
-        "note": "Hands over auditable results. (ZIP, manual book, ISO report, traceability matrix; push and pull requests with a security.yml workflow.) The repository stays yours."
-      }
-    ],
-    "archPlatformTitle": "FUSE platform security",
-    "archPlatform": [
-      "Keys and tokens encrypted with AES-256-GCM",
-      "Content Security Policy with a per-request nonce",
-      "CSRF protection on state-changing requests",
-      "Request rate limiting",
-      "Account activity audit log"
-    ],
-    "proofTitle": "Numbers you can check.",
-    "proofFormulaTitle": "How the score is calculated",
-    "proofFormula": "Score = 100 − (20 × critical + 10 × high + 4 × medium + 1 × low), minimum 0. Only Semgrep and Trivy findings count; a score that comes from the AI is labelled differently.",
-    "proofDownload": "Download the 26 sub-step matrix (CSV)",
     "figure": "Fig. {n}",
-    "resultsTitle": "What you take home, and what we don't promise.",
-    "resultsDeliverables": "Results",
     "limitsTitle": "Limits",
     "limits": [
       "Not an ISO 27001 or NIST certification; FUSE maps controls and prepares evidence",
       "Scanners find known patterns; human review is still needed",
       "AI output quality depends on the model you choose",
       "Docker is required to run apps and scans"
-    ],
-    "glossary": [
-      {
-        "term": "Secure SDLC",
-        "definition": "A software development life cycle with security checks in every stage, not at the end."
-      },
-      {
-        "term": "NIST SSDF (SP 800-218 v1.1)",
-        "definition": "NIST's set of secure development practices, grouped PO, PS, PW and RV; its task codes (e.g. PW.5.1) become gate criteria."
-      },
-      {
-        "term": "ISO/IEC 27001:2022 Annex A",
-        "definition": "A list of information security controls; each sub-step is mapped to its controls (e.g. A.8.28)."
-      },
-      {
-        "term": "SAST",
-        "definition": "Analysing source code without running it; done by Semgrep."
-      },
-      {
-        "term": "SCA & secret scanning",
-        "definition": "Checking for vulnerable dependencies and leaked secrets; done by Trivy."
-      },
-      {
-        "term": "STRIDE",
-        "definition": "A way to model threats: spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege."
-      },
-      {
-        "term": "OWASP Top 10",
-        "definition": "The ten most common web application security risks; reviewed in the Testing gate."
-      },
-      {
-        "term": "BYOK",
-        "definition": "Bring Your Own Key: using your own AI provider API key."
-      },
-      {
-        "term": "Traceability",
-        "definition": "Every security requirement (REQ-SEC-…) can be traced to its recommendation, code file, NIST task and ISO control."
-      }
     ],
     "stripLabel": "Mapped to and checked with",
     "stripItems": [
@@ -376,78 +153,12 @@
     ],
     "pills": {
       "problem": "The problem",
-      "about": "About",
       "gates": "Workflow",
-      "audience": "Who it is for",
       "studio": "Studio",
-      "how": "How it works",
-      "arch": "Behind the scenes",
-      "proof": "Evidence",
       "results": "Results",
-      "learn": "Learn",
+      "limits": "Limits & FAQ",
       "start": "Start"
     },
-    "guardTitle": "What {name} guards in every project.",
-    "guardLede": "Five security areas are checked before a project may move on, from requirements to handover.",
-    "guardCards": [
-      {
-        "title": "Requirements & data",
-        "bullets": [
-          "Project scope and goals",
-          "Security and privacy requirements",
-          "Classification of the data handled"
-        ]
-      },
-      {
-        "title": "Design & threats",
-        "bullets": [
-          "Architecture and data flow",
-          "STRIDE threat model",
-          "Database schema and auth flow"
-        ]
-      },
-      {
-        "title": "Secure code",
-        "bullets": [
-          "Authentication and authorisation",
-          "Anti-injection and output encoding",
-          "Secret handling and CSRF"
-        ]
-      },
-      {
-        "title": "Scanning & score",
-        "bullets": [
-          "Semgrep for source code",
-          "Trivy for dependencies and secrets",
-          "Deterministic security score"
-        ]
-      },
-      {
-        "title": "Handover",
-        "bullets": [
-          "Manual book and ISO report",
-          "Release security checklist",
-          "ZIP export or GitHub push"
-        ]
-      }
-    ],
-    "factsTitle": "Built on a real framework",
-    "audienceTitle": "Built for three groups.",
-    "audience": [
-      {
-        "title": "Students & junior developers",
-        "desc": "Learn secure development practice while building a real project, stage by stage."
-      },
-      {
-        "title": "Small teams & SMEs",
-        "desc": "Get a website together with evidence of its security, without being a security expert."
-      },
-      {
-        "title": "Lecturers",
-        "desc": "Demonstrate Secure SDLC for real, complete with the mapping to standards."
-      }
-    ],
-    "learnTitle": "Terms and answers.",
     "faqHeading": "Frequently asked questions",
     "gallery": {
       "headline": "What website do you want to build?",
@@ -583,7 +294,8 @@
           "when": "Throughout the project; restore any time from the studio."
         }
       }
-    }
+    },
+    "limitsSectionTitle": "What we don't promise, and common questions."
   },
   "nav": {
     "dashboard": "Dashboard",

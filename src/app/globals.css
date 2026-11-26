@@ -587,57 +587,6 @@ html:not(.dark) .landing {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
 }
-/* Gate coupon: clay plate tinted by its stage colour (set --tint). */
-.coupon {
-  border-radius: 1.25rem;
-  border: 1px solid color-mix(in oklab, var(--tint) 30%, var(--clay-edge));
-  background: linear-gradient(
-    145deg,
-    color-mix(in oklab, var(--tint) 16%, var(--clay-surface-hi)),
-    color-mix(in oklab, var(--tint) 6%, var(--clay-surface))
-  );
-  box-shadow: var(--clay-shadow);
-  transition: box-shadow 200ms var(--ease-out);
-}
-.coupon[data-selected="true"] {
-  box-shadow:
-    var(--clay-shadow),
-    0 0 0 2px var(--tint),
-    0 0 28px color-mix(in oklab, var(--tint) 45%, transparent);
-}
-/* Pita Pindai hero: stage slot (figure arrives in M2b) and the findings table. */
-.hero-tape-stage {
-  width: 100%;
-  max-width: 760px;
-  margin-inline: auto;
-  aspect-ratio: 760 / 590;
-}
-.hero-tape-table [data-severity] .hero-tape-sev {
-  color: var(--tape-ink);
-  border-radius: 0.375rem;
-  padding: 0.125rem 0.5rem;
-}
-.hero-tape-table [data-severity="medium"] .hero-tape-sev {
-  background: var(--finding-medium);
-}
-.hero-tape-table [data-severity="low"] .hero-tape-sev {
-  background: var(--finding-low);
-}
-.hero-float {
-  animation: hero-float 6s ease-in-out infinite;
-}
-.hero-float[data-paused="true"] {
-  animation-play-state: paused;
-}
-@keyframes hero-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
 .ledger-row {
   display: flex;
   align-items: baseline;
@@ -658,21 +607,6 @@ html:not(.dark) .landing {
   order: 2;
   font-variant-numeric: tabular-nums;
 }
-.gate-progress {
-  transform-origin: left;
-  animation: gate-fill var(--gate-ms, 4500ms) linear both;
-}
-.gate-progress[data-paused="true"] {
-  animation-play-state: paused;
-}
-@keyframes gate-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
 .faq-item::details-content {
   transition:
     height 250ms var(--ease-out),
@@ -688,14 +622,8 @@ html:not(.dark) .landing {
 }
 /* Landing motion is desktop-only: below lg everything renders in its final state. */
 @media (max-width: 1023.98px) {
-  .landing .gate-progress {
-    display: none;
-  }
   .landing .faq-item::details-content {
     transition: none;
-  }
-  .landing .hero-float {
-    animation: none;
   }
   .landing .clay-hover:hover,
   .landing .clay-hover:focus-within {
@@ -703,14 +631,12 @@ html:not(.dark) .landing {
   }
 }
 @media (prefers-contrast: more) {
-  .landing .clay-card,
-  .landing .coupon {
+  .landing .clay-card {
     box-shadow: none;
     border: 2px solid var(--border);
   }
 }
-html[data-contrast="high"] .landing .clay-card,
-html[data-contrast="high"] .landing .coupon {
+html[data-contrast="high"] .landing .clay-card {
   box-shadow: none;
   border: 2px solid var(--border);
 }
@@ -807,8 +733,7 @@ html[data-contrast="high"] .landing .coupon {
     --tw-exit-rotate: 0 !important;
   }
   .animate-bounce,
-  .animate-ping,
-  .hero-float {
+  .animate-ping {
     animation: none !important;
   }
   .clay-hover:hover,
