@@ -1,12 +1,17 @@
 const W = 1440;
 const H = 360;
 
-/** Floating orbs: [cx, cy, r, kind]. */
+/** Floating orbs: [cx, cy, r, kind]; only in the outer 30 % on each side, clear of the centred caption. */
 const ORBS = [
-  [430, 250, 16, "warm"],
-  [740, 230, 18, "blue"],
-  [575, 312, 22, "glass"],
-  [1010, 290, 18, "glass"],
+  [250, 250, 16, "warm"],
+  [380, 300, 20, "glass"],
+  [1100, 235, 18, "blue"],
+  [1225, 300, 20, "glass"],
+] as const;
+
+/** Bright ripple lines on the teal sheen behind the grass: [x, y, w]. */
+const SHEEN_LINES = [
+  [120, 292, 260], [520, 304, 220], [860, 296, 300], [1180, 310, 180], [330, 326, 200], [980, 330, 240],
 ] as const;
 
 /** The blue burst sits on the water in the lower half, below the panels' bottom edges. */
@@ -55,7 +60,16 @@ export function HeroFloor({ className }: { className?: string }) {
           <stop offset="0.4" stopColor="#9ab4c8" stopOpacity="0.12" />
           <stop offset="1" stopColor="#9ab4c8" stopOpacity="0.3" />
         </radialGradient>
+        <linearGradient id="hero-sheen" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#0e2a3a" stopOpacity="0" />
+          <stop offset="1" stopColor="#0e2a3a" />
+        </linearGradient>
       </defs>
+      {/* Teal water in the lowest quarter so the black grass silhouette reads against it. */}
+      <rect y={H * 0.75} width={W} height={H * 0.25} fill="url(#hero-sheen)" opacity={0.6} />
+      {SHEEN_LINES.map(([x, y, w], i) => (
+        <rect key={`s${i}`} className="hero-glint" x={x} y={y} width={w} height={1} rx={0.5} fill="#7fd0ff" opacity={0.3} />
+      ))}
       <ellipse cx={W / 2} cy={BURST_Y} rx={240} ry={60} fill="url(#hero-burst)" />
       {[-60, -30, 0, 30, 60].map((a) => (
         <rect key={a} x={W / 2 - 1} y={BURST_Y - 50} width={2} height={100} fill="#7fd0ff" opacity={0.35} transform={`rotate(${a} ${W / 2} ${BURST_Y})`} />

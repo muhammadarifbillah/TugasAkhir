@@ -14,7 +14,8 @@ const BLADES = Array.from({ length: 160 }, (_, i) => {
 export function HeroGrass({ className }: { className?: string }) {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" focusable="false" data-hero-grass="" className={className}>
-      <path d={BLADES} fill="#000" />
+      {/* Body stays black; a faint lit edge separates the blades from the dark water. */}
+      <path d={BLADES} fill="#000" stroke="#16283a" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />
       <rect y={H - 6} width={W} height={6} fill="#000" />
     </svg>
   );

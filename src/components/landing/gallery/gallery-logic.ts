@@ -45,11 +45,14 @@ const noNegZero = (n: number) => n + 0;
 const WALL_DEPTH = 1200 / 187;
 const WALL_GAP = 6 / 187;
 
-/** Right-half pose at offset `a` (>= 0) from the centre, x not yet placed. */
-const sidePose = (a: number) => ({
+/**
+ * Right-half pose at offset `a` (>= 0) from the centre (`a0` is the centre-most offset), x not yet placed.
+ * z starts at 0: a panel behind the preserve-3d ul plane (z < 0) loses its hover and click to the ul.
+ */
+const sidePose = (a: number, a0: number) => ({
   rotateY: noNegZero(-Math.round(8 * a)),
-  z: Math.round((0.059 * a * a - 0.52) * 1000) / 1000,
-  scale: Math.round((0.7 + 0.025 * Math.max(0, a * a - 0.25)) * 100) / 100,
+  z: noNegZero(Math.round(0.059 * (a * a - a0 * a0) * 1000) / 1000),
+  scale: Math.round((0.65 + 0.023 * Math.max(0, a * a - 0.25)) * 100) / 100,
 });
 
 /**
@@ -61,12 +64,13 @@ export function wallPose(i: number, n: number): { x: number; rotateY: number; z:
   const o = i - (n - 1) / 2;
   const a = Math.abs(o);
   const D = WALL_DEPTH;
-  const centre = sidePose(0);
+  const a0 = n % 2 ? 0 : 0.5;
+  const centre = sidePose(0, a0);
   // Outer projected edge of the previous panel; an odd wall starts from the centre panel's right edge.
   let edge = n % 2 ? (0.5 * centre.scale * D) / (D - centre.z) : -WALL_GAP / 2;
   let x = 0;
   for (let k = n % 2 ? 1 : 0.5; k <= a; k++) {
-    const p = sidePose(k);
+    const p = sidePose(k, a0);
     const r = (p.rotateY * Math.PI) / 180;
     const half = 0.5 * p.scale;
     // Inner edge (u = -half) projects to edge + gap: solve X·D/(D-Z) for x.
@@ -74,7 +78,7 @@ export function wallPose(i: number, n: number): { x: number; rotateY: number; z:
     x = Math.round(x * 1000) / 1000;
     edge = ((x + half * Math.cos(r)) * D) / (D - (p.z - half * Math.sin(r)));
   }
-  const pose = sidePose(a);
+  const pose = sidePose(a, a0);
   return { x: noNegZero(Math.sign(o) * x), rotateY: noNegZero(Math.sign(o) * pose.rotateY), z: pose.z, scale: pose.scale };
 }
 

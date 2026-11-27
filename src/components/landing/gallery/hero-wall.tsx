@@ -35,10 +35,11 @@ export function HeroWall() {
       ref={wallRef}
       role="group"
       aria-label={copy.wallLabel}
-      className="transition-transform duration-700 [transform-style:preserve-3d] motion-reduce:transition-none lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"
+      className="transition-transform duration-700 [transform-style:preserve-3d] motion-reduce:transition-none lg:pointer-fine:pointer-events-none lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"
     >
-      {/* Desktop: every li sits in one grid cell at the centre and is placed by its pose; preserve-3d depth-sorts them. */}
-      <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-[19vw] pb-4 pt-6 lg:pointer-fine:grid lg:pointer-fine:justify-center lg:pointer-fine:justify-items-center lg:pointer-fine:gap-[6px] lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:pb-0 lg:pointer-fine:pt-6 lg:pointer-fine:[perspective:1200px] lg:pointer-fine:[transform-style:preserve-3d]">
+      {/* Desktop: every li sits in one grid cell at the centre and is placed by its pose; preserve-3d depth-sorts them.
+          The ul and group pass the pointer through so only the panel buttons hit-test (the mobile carousel keeps scrolling). */}
+      <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-[19vw] pb-4 pt-6 lg:pointer-fine:pointer-events-none lg:pointer-fine:grid lg:pointer-fine:justify-center lg:pointer-fine:justify-items-center lg:pointer-fine:gap-[6px] lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:pb-0 lg:pointer-fine:pt-6 lg:pointer-fine:[perspective:1200px] lg:pointer-fine:[transform-style:preserve-3d]">
         {SITE_CATEGORIES.map((c, i) => {
           const pose = wallPose(i, SITE_CATEGORIES.length);
           const name = (labels.items[c.id] as { name: string }).name;
@@ -62,9 +63,9 @@ export function HeroWall() {
                 data-gallery-panel=""
                 aria-label={fmt(copy.openPanel, { category: name })}
                 onClick={(e) => open(c.id, e.currentTarget)}
-                className="group block min-h-11 w-full rounded-[6px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000] hover:brightness-115 focus-visible:brightness-115 motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:hover:-translate-y-3.5 motion-safe:focus-visible:-translate-y-3.5 motion-reduce:transition-none"
+                className="group pointer-events-auto block min-h-11 w-full rounded-[6px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000] hover:brightness-115 focus-visible:brightness-115 motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:hover:-translate-y-3.5 motion-safe:focus-visible:-translate-y-3.5 motion-reduce:transition-none"
               >
-                <span aria-hidden="true" className="mb-2 block truncate text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] lg:text-[clamp(0.6rem,0.85vw,0.85rem)]">
+                <span aria-hidden="true" className="-mx-8 mb-2 block whitespace-nowrap text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] lg:text-[clamp(0.6rem,0.85vw,0.85rem)]">
                   {name}
                 </span>
                 <span
