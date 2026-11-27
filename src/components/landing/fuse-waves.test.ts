@@ -46,6 +46,10 @@ describe("FuseWaves", () => {
     const heroAt = src.indexOf('id="mulai-hero"');
     const heroTag = src.slice(src.lastIndexOf("<section", heroAt), src.indexOf(">", heroAt) + 1);
     expect(heroTag).toContain("isolate");
+    // the hint and gallery label under HeroWall must sit above the waves, not on the deep layer
+    const pb = heroTag.match(/(?<![\w:-])pb-(\d+)\b/);
+    expect(pb, "hero pb-*").not.toBeNull();
+    expect(Number(pb![1]), "hero pb-*").toBeGreaterThanOrEqual(28);
     const hero = sectionFrom(src, 'id="mulai-hero"');
     expect(hero.indexOf("<FuseWaves")).toBeGreaterThan(hero.indexOf("<h1"));
     expect(hero.indexOf("<h1")).toBeGreaterThan(-1);

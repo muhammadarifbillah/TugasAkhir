@@ -75,6 +75,54 @@ describe("palette guard", () => {
     for (const s of good) expect(findOffPalette(s), s).toEqual([]);
   });
 
+  it("palette helper flags named colours and Tailwind default shadow/ring colours", () => {
+    const bad = [
+      'fill="red"',
+      'stroke="black"',
+      "bg-[red]",
+      "text-[WhiteSmoke]",
+      "color: white",
+      "background: tomato;",
+      'style={{ color: "navy" }}',
+      'stop-color="gold"',
+      "shadow-sm",
+      'className="card shadow"',
+      "hover:shadow-md",
+      "shadow-lg",
+      "shadow-xl",
+      "shadow-2xl",
+      "shadow-black/40",
+      "ring-offset-white",
+      "ring-white",
+      "bg-white",
+      "bg-black",
+      "text-black",
+      "from-sky-500",
+      "via-indigo-400",
+      "to-rose-300",
+    ];
+    const good = [
+      'fill="none"',
+      'stroke="currentColor"',
+      "bg-[transparent]",
+      "color: inherit",
+      "background: transparent;",
+      "fill={accent}",
+      'fill="url(#company-hero)"',
+      "shadow-[var(--fuse-shadow-soft)]",
+      "shadow-[0_1px_3px_rgb(10_25_49/0.1)]",
+      "shadow-none",
+      "box-shadow: var(--clay-shadow);",
+      "--shadow-color: 217 66% 12%;",
+      "--clay-shadow-hover:",
+      "bg-[var(--fuse-snow)]",
+      "ring-ring",
+      "ring-offset-background",
+    ];
+    for (const s of bad) expect(findOffPalette(s).length, s).toBeGreaterThan(0);
+    for (const s of good) expect(findOffPalette(s), s).toEqual([]);
+  });
+
   it("scoped landing and dashboard sources use only the five palette colours", () => {
     const files = scopedFiles();
     expect(files.length).toBeGreaterThanOrEqual(30);
