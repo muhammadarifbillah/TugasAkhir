@@ -80,7 +80,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   </Link>
                 </div>
               </div>
-              <FuseWaves className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[40%] w-full" />
+              <FuseWaves className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-28 w-full" />
               <div className="mt-12">
                 <HeroWall />
               </div>
