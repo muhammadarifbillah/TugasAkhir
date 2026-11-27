@@ -79,8 +79,8 @@ export function ViewerBody({
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_8.5rem] lg:gap-8">
-        <div className="order-1">
-          <div className="relative grid place-items-center py-6">
+        <div className="order-1 min-w-0">
+          <div data-viewer-preview="" className="relative grid w-full max-w-full place-items-center py-6">
             <span
               data-viewer-circle=""
               aria-hidden="true"
@@ -114,7 +114,7 @@ export function ViewerBody({
             <button type="button" aria-label={copy.prevPage} onClick={onPrev} className={ARROW}>
               <ChevronLeft aria-hidden="true" className="size-5" />
             </button>
-            <p className="text-sm font-medium text-[#0A1931]">{fmt(copy.pageOf, { n: page + 1, total: 3 })}</p>
+            <p className="relative z-10 rounded-full bg-[#F6FAFD] px-3 text-sm font-medium text-[#0A1931]">{fmt(copy.pageOf, { n: page + 1, total: 3 })}</p>
             <button type="button" aria-label={copy.nextPage} onClick={onNext} className={ARROW}>
               <ChevronRight aria-hidden="true" className="size-5" />
             </button>
@@ -123,7 +123,7 @@ export function ViewerBody({
           <p className="mt-1 text-center text-xs text-[#1A3D63]">{labels.galleryLabel}</p>
         </div>
 
-        <div className="order-2 flex items-center gap-2 lg:order-3 lg:items-start">
+        <div className="order-2 flex min-w-0 items-center gap-2 lg:order-3 lg:items-start">
           <ul aria-label={copy.thumbsLabel} className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
             {PAGES.map((i) => (
               <li key={i} className="w-28 shrink-0 lg:w-full">
@@ -152,7 +152,7 @@ export function ViewerBody({
           </button>
         </div>
 
-        <div className="order-3 lg:order-2">
+        <div className="order-3 min-w-0 lg:order-2">
           <Title className="font-wide text-3xl text-[#0A1931] md:text-4xl">{item.name}</Title>
           <p data-viewer-byline="" className="mt-2 text-xs uppercase tracking-wide text-[#1A3D63]">
             {fmt(copy.byline, { name: appName, n: category.pages.length })}
