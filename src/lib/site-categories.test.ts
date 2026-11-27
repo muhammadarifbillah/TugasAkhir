@@ -1,12 +1,10 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
-import { contrastRatio } from "./contrast";
-import { PALETTE } from "./palette";
-import { BLOCK_KINDS, SITE_CATEGORIES, categoryForTemplate, type CategoryTone } from "./site-categories";
+import { SITE_CATEGORIES, categoryForTemplate } from "./site-categories";
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8");
 
@@ -22,50 +20,36 @@ function keys(tree: Tree, prefix = ""): string[] {
 }
 
 describe("site categories", () => {
-  it("site categories have a unique palette tone each", () => {
+  // R27: SiteArt is gone, so its illustration data (tone, page blocks, BLOCK_KINDS) went with it. The tone/block tests were
+  // removed; the page ids stay because the shelf search matches the page names (gallery-logic searchCategories).
+  it("SiteArt and its illustration data are gone; the data the viewer and shelf use stays", () => {
+    expect(existsSync(join(process.cwd(), "src/components/site-art/site-art.tsx"))).toBe(false);
     expect(SITE_CATEGORIES).toHaveLength(8);
     expect(new Set(SITE_CATEGORIES.map((c) => c.id)).size).toBe(8);
-    const expected: Record<string, CategoryTone> = {
-      marketplace: { field: "snow", accent: "steel", soft: "deep", hero: ["deep", "steel"] },
-      ecommerce: { field: "snow", accent: "deep", soft: "steel", hero: ["ink", "deep"] },
-      lms: { field: "mist", accent: "deep", soft: "steel", hero: ["deep", "ink"] },
-      saas: { field: "snow", accent: "deep", soft: "ink", hero: ["steel", "deep"] },
-      clinic: { field: "mist", accent: "ink", soft: "steel", hero: ["steel", "ink"] },
-      company: { field: "snow", accent: "ink", soft: "steel", hero: ["ink", "steel"] },
-      news: { field: "mist", accent: "ink", soft: "deep", hero: ["ink", "deep"] },
-      api: { field: "snow", accent: "steel", soft: "ink", hero: ["ink", "steel"] },
-    };
     for (const c of SITE_CATEGORIES) {
-      expect(c.tone, c.id).toEqual(expected[c.id]);
-      expect("hue" in c, c.id).toBe(false);
-      const t = c.tone;
-      expect(["snow", "mist"]).toContain(t.field);
-      expect(t.accent, c.id).not.toBe(t.soft);
-      expect(contrastRatio(PALETTE[t.accent], PALETTE[t.field]), c.id).toBeGreaterThanOrEqual(3);
-      expect(t.hero[0], c.id).not.toBe(t.hero[1]);
-      for (const h of t.hero) {
-        expect(["ink", "deep", "steel"]).toContain(h);
-        expect(contrastRatio(PALETTE.snow, PALETTE[h]), `${c.id} ${h}`).toBeGreaterThanOrEqual(3);
-      }
-    }
-    expect(new Set(SITE_CATEGORIES.map((c) => JSON.stringify(c.tone))).size).toBe(8);
-  });
-
-  it("every category has three pages with unique ids and non-empty block lists", () => {
-    for (const c of SITE_CATEGORIES) {
+      expect(Object.keys(c).sort(), c.id).toEqual(["checks", "features", "id", "pages", "shelf", "stack", "templates"]);
       expect(c.pages).toHaveLength(3);
       expect(new Set(c.pages.map((p) => p.id)).size).toBe(3);
-      for (const p of c.pages) {
-        expect(p.blocks.length).toBeGreaterThan(0);
-        for (const b of p.blocks) expect(BLOCK_KINDS).toContain(b);
-      }
+      for (const p of c.pages) expect(Object.keys(p), `${c.id}.${p.id}`).toEqual(["id"]);
+      expect(c.features).toHaveLength(3);
+      expect(c.stack.length).toBeGreaterThan(0);
     }
+    const src = read("src/lib/site-categories.ts");
+    for (const s of ["tone", "blocks", "BLOCK_KINDS", "CategoryTone", "./palette"]) expect(src, s).not.toContain(s);
   });
 
-  it("the 24 pages together use all twelve block kinds", () => {
-    const used = new Set(SITE_CATEGORIES.flatMap((c) => c.pages.flatMap((p) => p.blocks)));
-    expect(BLOCK_KINDS).toHaveLength(12);
-    expect([...used].sort()).toEqual([...BLOCK_KINDS].sort());
+  it("no source under src still references SiteArt or the illustration data", () => {
+    const hits: string[] = [];
+    const visit = (rel: string) => {
+      const abs = join(process.cwd(), rel);
+      if (statSync(abs).isDirectory()) for (const n of readdirSync(abs)) visit(`${rel}/${n}`);
+      else if (/\.(ts|tsx)$/.test(rel) && !/\.test\.ts$/.test(rel)) {
+        const text = readFileSync(abs, "utf8");
+        for (const s of ["SiteArt", "site-art/site-art", "BLOCK_KINDS", "CategoryTone"]) if (text.includes(s)) hits.push(`${rel}: ${s}`);
+      }
+    };
+    visit("src");
+    expect(hits).toEqual([]);
   });
 
   it("every security check names a NIST task and ISO control of its own stage in stages.ts", () => {
@@ -103,9 +87,8 @@ describe("site categories", () => {
         expect((v as string).trim(), `${lang}:${path}`).not.toBe("");
       };
       str("galleryLabel");
-      str("artLabel");
-      expect(at(cat, "artLabel")).toContain("{page}");
-      expect(at(cat, "artLabel")).toContain("{category}");
+      // R27: artLabel only labelled the SiteArt illustration.
+      expect(at(cat, "artLabel"), lang).toBeUndefined();
       for (const shelf of ["sell", "learn", "business", "tech"]) str(`shelves.${shelf}`);
       for (const c of SITE_CATEGORIES) {
         str(`items.${c.id}.name`);

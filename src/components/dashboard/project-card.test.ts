@@ -8,6 +8,7 @@ import type { ProjectCardData } from "@/components/project-list";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { categoryForTemplate } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { ProjectCard } from "./project-card";
 
 const BASE: ProjectCardData = {
@@ -42,6 +43,9 @@ const card = (overrides: Partial<ProjectCardData> = {}, extra: Record<string, un
 const count = (html: string, s: string) => html.split(s).length - 1;
 const categoryName = (t: string | null) =>
   (en.categories.items as Record<string, { name: string }>)[categoryForTemplate(t).id].name;
+const screenImgs = (html: string) =>
+  [...html.slice(html.indexOf('data-card-part="screen"'), html.indexOf('data-card-part="lip"')).matchAll(/<img[^>]*>/g)].map((m) => m[0]);
+const srcOf = (tag: string) => decodeURIComponent(/ src="([^"]*)"/.exec(tag)![1].replace(/&amp;/g, "&"));
 /** Opening tag of the first element carrying `marker`. */
 const tagWith = (html: string, marker: string) => {
   const at = html.indexOf(marker);
@@ -49,10 +53,11 @@ const tagWith = (html: string, marker: string) => {
 };
 
 describe("ProjectCard", () => {
-  it("maps project.template to the category illustration: e-commerce, lms, saas, rest-api, custom, null and unknown", () => {
+  it("maps project.template to the category screenshot: e-commerce, lms, saas, rest-api, custom, null and unknown", () => {
     for (const t of ["e-commerce", "lms", "saas", "rest-api", "custom", null, "zzz"]) {
       const html = card({ template: t });
       expect(html, String(t)).toContain('data-category="' + categoryForTemplate(t).id + '"');
+      expect(srcOf(screenImgs(html)[0]), String(t)).toContain(SITE_TEMPLATES[categoryForTemplate(t).id][0].pages[0].src);
       expect(html, String(t)).toContain(fmt(en.dashboard.cardTemplate, { category: categoryName(t) }));
     }
     for (const t of [null, "custom", "zzz"]) expect(categoryForTemplate(t).id).toBe("company");
@@ -71,7 +76,29 @@ describe("ProjectCard", () => {
     expect(open).not.toContain("<button");
   });
 
-  it("status chip and round category icon sit inside the bezel; the screen is aria-hidden with two SiteArt pages", () => {
+  it("the bezel screen is a 16:10 next/image of the first template's first page: empty alt, lazy, cover-top, no SiteArt", () => {
+    const html = card({ template: "lms" });
+    const imgs = screenImgs(html);
+    expect(imgs.length).toBeGreaterThanOrEqual(1);
+    const tpl = SITE_TEMPLATES.lms[0];
+    expect(srcOf(imgs[0])).toContain(tpl.pages[0].src);
+    for (const img of imgs) {
+      expect(img).toContain("/_next/image?url=");
+      expect(img).toContain('alt=""');
+      expect(img).toContain('loading="lazy"');
+      expect(img).toMatch(/sizes="[^"]+"/);
+      for (const k of ["object-cover", "object-top"]) expect(img).toContain(k);
+    }
+    const screen = html.slice(html.indexOf('data-card-part="screen"'), html.indexOf('data-card-part="lip"'));
+    expect(screen).toContain("aspect-[16/10]");
+    expect(screen).not.toMatch(/<svg[^>]*role="img"/);
+    const src = readFileSync(join(process.cwd(), "src/components/dashboard/project-card.tsx"), "utf8");
+    expect(src).not.toContain("SiteArt");
+    expect(src).not.toContain("site-art/site-art");
+    expect(src).toContain('from "next/image"');
+  });
+
+  it("status chip and round category icon sit inside the bezel; the screen is aria-hidden", () => {
     const statuses: [string, string][] = [
       ["completed", en.dashboard.statusCompleted],
       ["in_revision", en.dashboard.statusInRevision],
@@ -89,8 +116,7 @@ describe("ProjectCard", () => {
       // R13 §1.6: the round category button is 52px, like the reference's "webcam" (was size-11).
       expect(cat).toContain("size-[3.25rem]");
       expect(tagWith(bezel, 'data-card-part="screen"')).toContain('aria-hidden="true"');
-      const screen = bezel.slice(bezel.indexOf('data-card-part="screen"'), bezel.indexOf('data-card-part="status"'));
-      expect(screen.match(/<svg[^>]*role="img"/g)).toHaveLength(2);
+      expect(screenImgs(html).length).toBeGreaterThanOrEqual(1);
     }
   });
 
