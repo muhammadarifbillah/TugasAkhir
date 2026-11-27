@@ -213,7 +213,7 @@ export function ViewerBody({
         <div className="order-3 min-w-0 lg:order-2">
           <Title className="font-wide text-3xl text-[#0A1931] md:text-4xl">{item.name}</Title>
           <p data-viewer-byline="" className="mt-2 text-xs uppercase tracking-wide text-[#1A3D63]">
-            {fmt(copy.byline, { name: appName, n: category.pages.length })}
+            {fmt(copy.byline, { name: appName, n: templates.length })}
           </p>
           <div
             role="tablist"
