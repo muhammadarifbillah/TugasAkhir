@@ -3,11 +3,14 @@ const H = 360;
 
 /** Floating orbs: [cx, cy, r, kind]. */
 const ORBS = [
-  [420, 150, 16, "warm"],
-  [720, 96, 20, "blue"],
-  [560, 250, 22, "glass"],
-  [1010, 190, 18, "glass"],
+  [430, 250, 16, "warm"],
+  [740, 230, 18, "blue"],
+  [575, 312, 22, "glass"],
+  [1010, 290, 18, "glass"],
 ] as const;
+
+/** The blue burst sits on the water in the lower half, below the panels' bottom edges. */
+const BURST_Y = 215;
 
 const GLINTS = [
   [180, 120, 220], [930, 80, 160], [300, 230, 260], [1120, 260, 200], [640, 300, 180], [1260, 150, 120],
@@ -53,9 +56,9 @@ export function HeroFloor({ className }: { className?: string }) {
           <stop offset="1" stopColor="#9ab4c8" stopOpacity="0.3" />
         </radialGradient>
       </defs>
-      <ellipse cx={W / 2} cy={70} rx={260} ry={70} fill="url(#hero-burst)" />
+      <ellipse cx={W / 2} cy={BURST_Y} rx={240} ry={60} fill="url(#hero-burst)" />
       {[-60, -30, 0, 30, 60].map((a) => (
-        <rect key={a} x={W / 2 - 1} y={-30} width={2} height={120} fill="#7fd0ff" opacity={0.35} transform={`rotate(${a} ${W / 2} 70)`} />
+        <rect key={a} x={W / 2 - 1} y={BURST_Y - 50} width={2} height={100} fill="#7fd0ff" opacity={0.35} transform={`rotate(${a} ${W / 2} ${BURST_Y})`} />
       ))}
       {GLINTS.map(([x, y, w], i) => (
         <rect key={i} className="hero-glint" x={x} y={y} width={w} height={1.2} rx={0.6} fill="#cfe7ff" opacity={0.18} />

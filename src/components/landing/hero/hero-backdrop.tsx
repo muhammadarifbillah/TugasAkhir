@@ -17,13 +17,20 @@ const SPRAY: readonly (readonly [number, number, number, number])[] = [
   [130, 0, 95, 1], [0, 150, 5, 0.9], [150, 40, 110, 0.8], [70, 70, 50, 1.1], [180, 10, 120, 0.7], [110, 90, 70, 0.8],
 ];
 
-const spray = (mirror: boolean) => (
-  <g transform={mirror ? `translate(${W} 0) scale(-1 1)` : undefined} fill="#000">
+const leaves = (key: string) =>
+  SPRAY.map(([x, y, a, s], i) => <path key={`${key}${i}`} d={LEAF} transform={`translate(${x} ${y}) rotate(${a}) scale(${s})`} />);
+
+/** One side's foliage: a corner spray plus a larger spray hanging beside the moon, seen against its halo. */
+const side = (mirror: boolean) => (
+  <g data-hero-leaves={mirror ? "right" : "left"} transform={mirror ? `translate(${W} 0) scale(-1 1)` : undefined} fill="#000">
     <path d="M0 0 Q120 40 200 0 L200 0 L0 0 Z" />
-    {SPRAY.map(([x, y, a, s], i) => (
-      <path key={i} d={LEAF} transform={`translate(${x} ${y}) rotate(${a}) scale(${s})`} />
-    ))}
+    {leaves("c")}
     <path d="M0 0 Q60 60 150 70 M20 0 Q90 30 190 40" stroke="#000" strokeWidth={3} fill="none" />
+    <g transform="translate(380 -20) scale(1.2)">
+      <path d="M0 0 Q70 50 170 60 M40 0 Q100 20 200 18 M10 30 Q60 90 120 130" stroke="#000" strokeWidth={3} fill="none" />
+      {leaves("m")}
+      <g transform="translate(60 40) rotate(-12) scale(0.85)">{leaves("n")}</g>
+    </g>
   </g>
 );
 
@@ -64,15 +71,8 @@ export function HeroBackdrop({ className }: { className?: string }) {
         <circle cx={W / 2 + 10} cy={-10} r={30} fill="#7d8a99" opacity={0.2} />
         <circle cx={W / 2} cy={-40} r={150} fill="url(#hero-moon-shade)" />
       </g>
-      <g data-hero-leaves="">
-        {spray(false)}
-        {spray(true)}
-        <g transform={`translate(${W / 2 + 120} 0)`} fill="#000">
-          {SPRAY.slice(0, 6).map(([x, y, a, s], i) => (
-            <path key={i} d={LEAF} transform={`translate(${x * 0.6} ${y * 0.5}) rotate(${a}) scale(${s * 0.7})`} />
-          ))}
-        </g>
-      </g>
+      {side(false)}
+      {side(true)}
     </svg>
   );
 }

@@ -15,6 +15,10 @@ interface Box {
   h: number;
 }
 
+const r2 = (n: number) => Math.round(n * 100) / 100;
+/** Path template rounding every interpolated number to 2 decimals, so server and client print identical paths. */
+const pd = (s: TemplateStringsArray, ...v: number[]) => s.reduce((out, part, i) => out + r2(v[i - 1]) + part);
+
 /** A pine: stacked triangles, optional snow caps. */
 const pine = (x: number, base: number, h: number, fill: string, snow?: string) => {
   const w = h * 0.42;
@@ -22,13 +26,13 @@ const pine = (x: number, base: number, h: number, fill: string, snow?: string) =
     const top = base - h + t * h;
     const bottom = base - h * (0.35 - t * 0.35) - (i === 2 ? 0 : h * 0.15);
     const half = (w / 2) * (0.6 + t);
-    return `M${x} ${top} L${x + half} ${bottom} L${x - half} ${bottom} Z`;
+    return pd`M${x} ${top} L${x + half} ${bottom} L${x - half} ${bottom} Z`;
   });
   return (
     <g key={`${x}-${base}`}>
       <rect x={x - 1.2} y={base - h * 0.2} width={2.4} height={h * 0.2} fill={fill} />
       <path d={tiers.join(" ")} fill={fill} />
-      {snow && <path d={`M${x} ${base - h} L${x + w * 0.18} ${base - h * 0.78} L${x - w * 0.18} ${base - h * 0.78} Z`} fill={snow} />}
+      {snow && <path d={pd`M${x} ${base - h} L${x + w * 0.18} ${base - h * 0.78} L${x - w * 0.18} ${base - h * 0.78} Z`} fill={snow} />}
     </g>
   );
 };
@@ -51,11 +55,11 @@ const palm = (x: number, base: number, h: number, lean: number, fill: string) =>
     const r = (a * Math.PI) / 180;
     const ex = tx + Math.cos(r) * 26;
     const ey = ty + Math.sin(r) * 14 + 10;
-    return `M${tx} ${ty} Q${(tx + ex) / 2} ${ty - 8} ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+    return pd`M${tx} ${ty} Q${(tx + ex) / 2} ${ty - 8} ${ex} ${ey}`;
   });
   return (
     <g key={`${x}-${base}`} fill="none" stroke={fill} strokeLinecap="round">
-      <path d={`M${x} ${base} Q${x + lean * 0.2} ${base - h * 0.6} ${tx} ${ty}`} strokeWidth={3} />
+      <path d={pd`M${x} ${base} Q${x + lean * 0.2} ${base - h * 0.6} ${tx} ${ty}`} strokeWidth={3} />
       <path d={fronds.join(" ")} strokeWidth={4} />
     </g>
   );
@@ -64,14 +68,14 @@ const palm = (x: number, base: number, h: number, lean: number, fill: string) =>
 /** A flat-topped acacia. */
 const acacia = (x: number, base: number, s: number, fill: string) => (
   <g key={`${x}-${base}`} fill={fill}>
-    <path d={`M${x - 1.5} ${base} L${x - 1} ${base - 30 * s} L${x - 14 * s} ${base - 44 * s} L${x - 12 * s} ${base - 45 * s} L${x} ${base - 34 * s} L${x + 12 * s} ${base - 46 * s} L${x + 14 * s} ${base - 45 * s} L${x + 2} ${base - 30 * s} L${x + 1.5} ${base} Z`} />
+    <path d={pd`M${x - 1.5} ${base} L${x - 1} ${base - 30 * s} L${x - 14 * s} ${base - 44 * s} L${x - 12 * s} ${base - 45 * s} L${x} ${base - 34 * s} L${x + 12 * s} ${base - 46 * s} L${x + 14 * s} ${base - 45 * s} L${x + 2} ${base - 30 * s} L${x + 1.5} ${base} Z`} />
     <ellipse cx={x} cy={base - 48 * s} rx={38 * s} ry={7 * s} />
     <ellipse cx={x - 10 * s} cy={base - 52 * s} rx={20 * s} ry={5 * s} />
   </g>
 );
 
 const hills = (y: number, amp: number, fill: string, phase = 0) => {
-  const pts = Array.from({ length: 6 }, (_, i) => `Q${i * 40 + 20} ${y - amp * (((i + phase) % 2) ? 1 : -0.4)} ${(i + 1) * 40} ${y}`);
+  const pts = Array.from({ length: 6 }, (_, i) => pd`Q${i * 40 + 20} ${y - amp * (((i + phase) % 2) ? 1 : -0.4)} ${(i + 1) * 40} ${y}`);
   return <path d={`M0 ${H} L0 ${y} ${pts.join(" ")} L${W} ${H} Z`} fill={fill} />;
 };
 
@@ -230,7 +234,7 @@ function block(kind: BlockKind, b: Box, accent: string): ReactNode {
       return (
         <>
           <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={3} fill={INK} opacity={0.75} />
-          <path d={`M${b.x + b.w / 2 - 6} ${b.y + b.h / 2 - 8} l14 8 l-14 8 Z`} fill={WHITE} />
+          <path d={pd`M${b.x + b.w / 2 - 6} ${b.y + b.h / 2 - 8} l14 8 l-14 8 Z`} fill={WHITE} />
         </>
       );
     case "schedule":
