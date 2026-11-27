@@ -11,7 +11,7 @@
 @custom-variant short (@media (max-height: 700px));
 
 /*
- * Brand palette: "tempered report" â€” flat surfaces and thin rules, in the cool
+ * Brand palette: "tempered report" — flat surfaces and thin rules, in the cool
  * grey of a compliance document rather than a tinted SaaS violet. Light is the
  * default because the product is shown on projectors and printed; dark is the
  * long-session studio mode. All text pairings tested >= 4.5:1.
@@ -163,7 +163,7 @@
 
 /* Tailwind ships no default border colour, so give every border the theme's
  * hairline. It lives in `base` (not unlayered) so `border-*` utilities can
- * still override it â€” an unlayered rule silently beat every one of them. */
+ * still override it — an unlayered rule silently beat every one of them. */
 @layer base {
   * {
     border-color: var(--border);
@@ -183,7 +183,7 @@ body {
 
 /*
  * Display voice: Archivo's expanded width, stamped-plate weight. Used for page
- * headings only â€” body copy stays at the normal width so long text stays
+ * headings only — body copy stays at the normal width so long text stays
  * readable.
  */
 .display-type {

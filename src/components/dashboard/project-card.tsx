@@ -53,13 +53,13 @@ export function ProjectCard({
           </div>
         </div>
         {/* Straddles the bezel's top edge (half outside the frame) so it never covers the screen. */}
-        <span data-card-part="status" data-chip-edge="top" className="absolute left-4 top-0 z-10 -translate-y-1/2 rounded-md bg-card shadow-sm">
+        <span data-card-part="status" data-chip-edge="top" className="absolute left-4 top-0 z-10 -translate-y-1/2 rounded-md bg-card shadow-[0_1px_3px_rgb(10_25_49/0.1),0_1px_2px_-1px_rgb(10_25_49/0.1)]">
           <Badge variant={status.variant}>{status.text}</Badge>
         </span>
         <span
           data-card-part="category"
           aria-hidden="true"
-          className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full border bg-background text-foreground shadow-sm"
+          className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full border bg-background text-foreground shadow-[0_1px_3px_rgb(10_25_49/0.1),0_1px_2px_-1px_rgb(10_25_49/0.1)]"
         >
           <CategoryIcon id={category.id} className="size-5" />
         </span>

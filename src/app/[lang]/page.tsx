@@ -67,7 +67,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <LandingMotion>
           <GalleryProvider lang={lang} appName={dict.app.name} labels={dict.categories} copy={l.gallery}>
             {/* Hero: headline first (LCP), then the gallery wall of the eight categories. */}
-            <section id="mulai-hero" className="@container relative isolate overflow-hidden pb-16 pt-14 md:pt-20">
+            <section id="mulai-hero" className="@container relative isolate overflow-hidden pb-32 pt-14 md:pt-20">
               <div className="mx-auto max-w-4xl px-4 text-center">
                 <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.gallery.headline}</h1>
                 <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.gallery.sub}</p>

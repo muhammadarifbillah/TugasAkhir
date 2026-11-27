@@ -9,6 +9,24 @@ const RGB = new Set(
 
 const TW_HUES = "slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose";
 
+/** CSS named colours (none/currentColor/transparent/inherit are keywords, not colours, so they pass). */
+const NAMED = new Set(
+  (
+    "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue " +
+    "chartreuse chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey " +
+    "darkkhaki darkmagenta darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray " +
+    "darkslategrey darkturquoise darkviolet deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen " +
+    "fuchsia gainsboro ghostwhite gold goldenrod gray green greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender " +
+    "lavenderblush lawngreen lemonchiffon lightblue lightcoral lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey " +
+    "lightpink lightsalmon lightseagreen lightskyblue lightslategray lightslategrey lightsteelblue lightyellow lime limegreen linen " +
+    "magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple mediumseagreen mediumslateblue mediumspringgreen " +
+    "mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite navy oldlace olive olivedrab orange " +
+    "orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink plum powderblue purple " +
+    "rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue slateblue slategray " +
+    "slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen"
+  ).split(" "),
+);
+
 /** Each rule returns true when its match is off-palette. */
 const RULES: [RegExp, (m: RegExpMatchArray) => boolean][] = [
   [
@@ -36,8 +54,12 @@ const RULES: [RegExp, (m: RegExpMatchArray) => boolean][] = [
     ),
     () => true,
   ],
-  [/(?<![\w-])(?:[a-z0-9-]+:)*(?:bg|text|border|ring|fill|stroke|from|via|to|outline|decoration|divide)-(?:white|black)\b/gi, () => true],
+  [/(?<![\w-])(?:[a-z0-9-]+:)*(?:bg|text|border|ring|ring-offset|fill|stroke|from|via|to|outline|decoration|divide|shadow)-(?:white|black)\b/gi, () => true],
   [/(?:fill|stroke|stop-?color|color|background)\s*[=:]\s*\{?\s*["']?(?:white|black)\b/gi, () => true],
+  // Tailwind's default shadow scale is black alpha; arbitrary shadow-[…] with palette rgb is the allowed form.
+  [/(?<![\w-])(?:[a-z0-9-]+:)*shadow(?:-(?:2xs|xs|sm|md|lg|xl|2xl|inner))?(?![\w[/-])/gi, () => true],
+  [/(?<![\w-])(?:[a-z0-9-]+:)*[a-z-]+-\[([a-z]+)\]/gi, (m) => NAMED.has(m[1].toLowerCase())],
+  [/(?:fill|stroke|stop-?color|color|background)\s*[=:]\s*\{?\s*["']?([a-z]+)\b/gi, (m) => NAMED.has(m[1].toLowerCase())],
 ];
 
 /** Every colour in `text` outside the palette (hex, rgb, other colour functions, opaque color-mix, Tailwind colours, white/black). */
