@@ -1,0 +1,806 @@
+{
+  "api/dok-salju": {
+    "pages": [
+      {
+        "id": "intro",
+        "std": 49.4
+      },
+      {
+        "id": "quickstart",
+        "std": 84.9
+      },
+      {
+        "id": "endpoint",
+        "std": 85.3
+      },
+      {
+        "id": "schema",
+        "std": 63.8
+      },
+      {
+        "id": "code",
+        "std": 86.7
+      },
+      {
+        "id": "auth",
+        "std": 48.7
+      }
+    ],
+    "mobile": {
+      "id": "intro",
+      "std": 48.8
+    }
+  },
+  "api/referensi-jernih": {
+    "pages": [
+      {
+        "id": "intro",
+        "std": 50.0
+      },
+      {
+        "id": "quickstart",
+        "std": 84.3
+      },
+      {
+        "id": "endpoint",
+        "std": 84.6
+      },
+      {
+        "id": "schema",
+        "std": 63.9
+      },
+      {
+        "id": "code",
+        "std": 86.0
+      },
+      {
+        "id": "auth",
+        "std": 49.1
+      }
+    ],
+    "mobile": {
+      "id": "intro",
+      "std": 51.8
+    }
+  },
+  "api/terminal-malam": {
+    "pages": [
+      {
+        "id": "intro",
+        "std": 32.8
+      },
+      {
+        "id": "quickstart",
+        "std": 27.9
+      },
+      {
+        "id": "endpoint",
+        "std": 29.3
+      },
+      {
+        "id": "schema",
+        "std": 26.7
+      },
+      {
+        "id": "code",
+        "std": 23.7
+      },
+      {
+        "id": "auth",
+        "std": 28.6
+      }
+    ],
+    "mobile": {
+      "id": "intro",
+      "std": 52.4
+    }
+  },
+  "clinic/klinik-nirmala": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 56.8
+      },
+      {
+        "id": "doctors",
+        "std": 67.8
+      },
+      {
+        "id": "doctor_detail",
+        "std": 56.3
+      },
+      {
+        "id": "booking",
+        "std": 50.6
+      },
+      {
+        "id": "confirmation",
+        "std": 51.0
+      },
+      {
+        "id": "departments",
+        "std": 60.5
+      },
+      {
+        "id": "login",
+        "std": 67.3
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 61.3
+    }
+  },
+  "clinic/klinik-samudra": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 93.8
+      },
+      {
+        "id": "doctors",
+        "std": 60.7
+      },
+      {
+        "id": "doctor_detail",
+        "std": 53.0
+      },
+      {
+        "id": "booking",
+        "std": 49.3
+      },
+      {
+        "id": "confirmation",
+        "std": 49.0
+      },
+      {
+        "id": "departments",
+        "std": 83.8
+      },
+      {
+        "id": "login",
+        "std": 63.9
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 94.3
+    }
+  },
+  "clinic/klinik-sehati": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 58.6
+      },
+      {
+        "id": "doctors",
+        "std": 70.5
+      },
+      {
+        "id": "doctor_detail",
+        "std": 58.3
+      },
+      {
+        "id": "booking",
+        "std": 52.1
+      },
+      {
+        "id": "confirmation",
+        "std": 52.1
+      },
+      {
+        "id": "departments",
+        "std": 63.8
+      },
+      {
+        "id": "login",
+        "std": 75.6
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 62.4
+    }
+  },
+  "company/biro-arang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 44.0
+      },
+      {
+        "id": "services",
+        "std": 34.7
+      },
+      {
+        "id": "portfolio",
+        "std": 64.0
+      },
+      {
+        "id": "portfolio_detail",
+        "std": 65.2
+      },
+      {
+        "id": "about",
+        "std": 49.3
+      },
+      {
+        "id": "team",
+        "std": 58.1
+      },
+      {
+        "id": "contact",
+        "std": 34.2
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 64.8
+    }
+  },
+  "company/karya-lapang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 42.3
+      },
+      {
+        "id": "services",
+        "std": 34.6
+      },
+      {
+        "id": "portfolio",
+        "std": 66.5
+      },
+      {
+        "id": "portfolio_detail",
+        "std": 72.9
+      },
+      {
+        "id": "about",
+        "std": 49.8
+      },
+      {
+        "id": "team",
+        "std": 61.7
+      },
+      {
+        "id": "contact",
+        "std": 33.7
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 62.9
+    }
+  },
+  "company/studio-savana": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 63.4
+      },
+      {
+        "id": "services",
+        "std": 46.1
+      },
+      {
+        "id": "portfolio",
+        "std": 50.7
+      },
+      {
+        "id": "portfolio_detail",
+        "std": 55.4
+      },
+      {
+        "id": "about",
+        "std": 41.9
+      },
+      {
+        "id": "team",
+        "std": 49.2
+      },
+      {
+        "id": "contact",
+        "std": 28.9
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 66.5
+    }
+  },
+  "ecommerce/butik-putih": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 68.6
+      },
+      {
+        "id": "catalog",
+        "std": 70.8
+      },
+      {
+        "id": "product",
+        "std": 68.1
+      },
+      {
+        "id": "cart",
+        "std": 50.7
+      },
+      {
+        "id": "checkout",
+        "std": 48.1
+      },
+      {
+        "id": "account",
+        "std": 44.7
+      },
+      {
+        "id": "login",
+        "std": 66.0
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 73.3
+    }
+  },
+  "ecommerce/galeri-arang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 63.6
+      },
+      {
+        "id": "catalog",
+        "std": 68.2
+      },
+      {
+        "id": "product",
+        "std": 64.6
+      },
+      {
+        "id": "cart",
+        "std": 45.6
+      },
+      {
+        "id": "checkout",
+        "std": 43.5
+      },
+      {
+        "id": "account",
+        "std": 42.1
+      },
+      {
+        "id": "login",
+        "std": 61.1
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 70.0
+    }
+  },
+  "ecommerce/toko-bahari": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 61.9
+      },
+      {
+        "id": "catalog",
+        "std": 57.6
+      },
+      {
+        "id": "product",
+        "std": 55.6
+      },
+      {
+        "id": "cart",
+        "std": 44.9
+      },
+      {
+        "id": "checkout",
+        "std": 43.1
+      },
+      {
+        "id": "account",
+        "std": 40.1
+      },
+      {
+        "id": "login",
+        "std": 56.2
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 66.4
+    }
+  },
+  "lms/akademi-curug": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 41.3
+      },
+      {
+        "id": "courses",
+        "std": 40.1
+      },
+      {
+        "id": "course",
+        "std": 33.1
+      },
+      {
+        "id": "lesson",
+        "std": 56.5
+      },
+      {
+        "id": "instructors",
+        "std": 33.3
+      },
+      {
+        "id": "login",
+        "std": 30.7
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 46.2
+    }
+  },
+  "lms/kelas-terang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 57.7
+      },
+      {
+        "id": "courses",
+        "std": 59.4
+      },
+      {
+        "id": "course",
+        "std": 42.2
+      },
+      {
+        "id": "lesson",
+        "std": 80.1
+      },
+      {
+        "id": "instructors",
+        "std": 42.0
+      },
+      {
+        "id": "login",
+        "std": 46.2
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 53.7
+    }
+  },
+  "lms/pustaka-malam": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 57.7
+      },
+      {
+        "id": "courses",
+        "std": 56.0
+      },
+      {
+        "id": "course",
+        "std": 40.5
+      },
+      {
+        "id": "lesson",
+        "std": 64.2
+      },
+      {
+        "id": "instructors",
+        "std": 38.0
+      },
+      {
+        "id": "login",
+        "std": 49.2
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 58.1
+    }
+  },
+  "marketplace/bursa-malam": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 59.3
+      },
+      {
+        "id": "catalog",
+        "std": 52.6
+      },
+      {
+        "id": "product",
+        "std": 57.5
+      },
+      {
+        "id": "cart",
+        "std": 35.6
+      },
+      {
+        "id": "checkout",
+        "std": 31.3
+      },
+      {
+        "id": "seller",
+        "std": 48.4
+      },
+      {
+        "id": "login",
+        "std": 54.5
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 61.1
+    }
+  },
+  "marketplace/lapak-terang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 66.2
+      },
+      {
+        "id": "catalog",
+        "std": 55.6
+      },
+      {
+        "id": "product",
+        "std": 60.2
+      },
+      {
+        "id": "cart",
+        "std": 37.4
+      },
+      {
+        "id": "checkout",
+        "std": 32.1
+      },
+      {
+        "id": "seller",
+        "std": 51.6
+      },
+      {
+        "id": "login",
+        "std": 53.4
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 64.7
+    }
+  },
+  "marketplace/pasar-padang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 52.6
+      },
+      {
+        "id": "catalog",
+        "std": 39.4
+      },
+      {
+        "id": "product",
+        "std": 38.6
+      },
+      {
+        "id": "cart",
+        "std": 30.4
+      },
+      {
+        "id": "checkout",
+        "std": 27.7
+      },
+      {
+        "id": "seller",
+        "std": 51.6
+      },
+      {
+        "id": "login",
+        "std": 37.8
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 56.0
+    }
+  },
+  "news/harian-senyap": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 62.0
+      },
+      {
+        "id": "article",
+        "std": 57.9
+      },
+      {
+        "id": "category",
+        "std": 58.4
+      },
+      {
+        "id": "author",
+        "std": 53.1
+      },
+      {
+        "id": "search",
+        "std": 38.7
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 72.7
+    }
+  },
+  "news/kabar-fajar": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 57.9
+      },
+      {
+        "id": "article",
+        "std": 60.0
+      },
+      {
+        "id": "category",
+        "std": 54.3
+      },
+      {
+        "id": "author",
+        "std": 56.4
+      },
+      {
+        "id": "search",
+        "std": 48.6
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 64.1
+    }
+  },
+  "news/warta-terang": {
+    "pages": [
+      {
+        "id": "home",
+        "std": 67.2
+      },
+      {
+        "id": "article",
+        "std": 59.1
+      },
+      {
+        "id": "category",
+        "std": 59.6
+      },
+      {
+        "id": "author",
+        "std": 57.1
+      },
+      {
+        "id": "search",
+        "std": 38.7
+      }
+    ],
+    "mobile": {
+      "id": "home",
+      "std": 80.9
+    }
+  },
+  "saas/dasbor-senja": {
+    "pages": [
+      {
+        "id": "overview",
+        "std": 39.3
+      },
+      {
+        "id": "analytics",
+        "std": 25.7
+      },
+      {
+        "id": "billing",
+        "std": 31.1
+      },
+      {
+        "id": "team",
+        "std": 23.0
+      },
+      {
+        "id": "settings",
+        "std": 22.2
+      },
+      {
+        "id": "login",
+        "std": 41.0
+      }
+    ],
+    "mobile": {
+      "id": "overview",
+      "std": 49.6
+    }
+  },
+  "saas/konsol-malam": {
+    "pages": [
+      {
+        "id": "overview",
+        "std": 40.1
+      },
+      {
+        "id": "analytics",
+        "std": 27.8
+      },
+      {
+        "id": "billing",
+        "std": 37.3
+      },
+      {
+        "id": "team",
+        "std": 27.2
+      },
+      {
+        "id": "settings",
+        "std": 23.6
+      },
+      {
+        "id": "login",
+        "std": 56.6
+      }
+    ],
+    "mobile": {
+      "id": "overview",
+      "std": 44.2
+    }
+  },
+  "saas/panel-jernih": {
+    "pages": [
+      {
+        "id": "overview",
+        "std": 36.9
+      },
+      {
+        "id": "analytics",
+        "std": 28.1
+      },
+      {
+        "id": "billing",
+        "std": 38.0
+      },
+      {
+        "id": "team",
+        "std": 25.1
+      },
+      {
+        "id": "settings",
+        "std": 23.6
+      },
+      {
+        "id": "login",
+        "std": 65.4
+      }
+    ],
+    "mobile": {
+      "id": "overview",
+      "std": 44.3
+    }
+  }
+}

@@ -183,7 +183,7 @@
       "barTitle": "Template gallery",
       "previewHint": "Click to preview",
       "byline": "by {name} · {n} templates",
-      "intro": "Screenshots of one open-source template. AI writes your own code, and five security gates check it before handover.",
+      "intro": "Screenshots of one example template made by FUSE. AI writes your own code, and five security gates check it before handover.",
       "specChecks": "Checks",
       "checksCount": "{n} checks",
       "specStandards": "Standards",
@@ -193,10 +193,9 @@
       "reviewedBy": "Checked by {name}",
       "seeAllTemplates": "See all templates",
       "viewerTemplatesLabel": "Templates in this category",
-      "viewerGalleryLabel": "Screenshots of open-source templates — not client sites",
-      "viewerCreditLicense": "License",
-      "viewerCreditSource": "Source",
-      "viewerCreditNewTab": "(opens in a new tab)",
+      "viewerGalleryLabel": "Screenshots of example templates made by FUSE — not client sites",
+      "viewerMadeBy": "Example template made by FUSE",
+      "viewerTabTag": "Example",
       "heroRecent": "Recent templates",
       "heroPause": "Pause",
       "heroPlay": "Play",
@@ -205,7 +204,7 @@
     "shelf": {
       "pill": "Template shelf",
       "title": "Start from a shelf, not a blank page.",
-      "lede": "Eight kinds of website, three real open-source templates each. Open a cover to see the pages inside and what gets checked.",
+      "lede": "Eight kinds of website, three Indonesian example templates each. Open a cover to see the pages inside and what gets checked.",
       "tabsLabel": "Shelf view",
       "tabShelves": "Shelves",
       "tabAll": "All",
@@ -1312,92 +1311,84 @@
     "wishlist": "Wishlist"
   },
   "templates": {
-    "gocart": {
-      "desc": "A multi-vendor store with a white layout, a pale mint hero and purple accents."
+    "pasar-padang": {
+      "desc": "Indonesian example template: a local-goods marketplace in meadow green."
     },
-    "mercur": {
-      "desc": "A B2C marketplace storefront in stark black and white with bold capital type."
+    "lapak-terang": {
+      "desc": "Indonesian example template: a bright, clean marketplace for small businesses."
     },
-    "spree-storefront": {
-      "desc": "A marketplace storefront with an airy, editorial look in white and navy."
+    "bursa-malam": {
+      "desc": "Indonesian example template: a craft and food marketplace in a dark editorial style."
     },
-    "htmlcodex-eshop": {
-      "desc": "A classic Bootstrap online shop with a steel-blue navigation bar on white."
+    "toko-bahari": {
+      "desc": "Indonesian example template: a casual clothing shop in sea blue."
     },
-    "uikit-ecommerce": {
-      "desc": "An online shop built with UIkit, with a black top bar, a dark hero and azure accents."
+    "butik-putih": {
+      "desc": "Indonesian example template: a bright, tidy everyday clothing shop."
     },
-    "medusa-nextjs-starter": {
-      "desc": "A minimal Next.js shop in white and light grey with dark text."
+    "galeri-arang": {
+      "desc": "Indonesian example template: a limited-edition shop in a dark editorial style."
     },
-    "tailthemes-seminar": {
-      "desc": "An online course site in calm sage green with dark green buttons."
+    "akademi-curug": {
+      "desc": "Indonesian example template: an online course site in waterfall white."
     },
-    "htmlcodex-elearning": {
-      "desc": "An e-learning website in bright teal and navy on a pale cyan background."
+    "kelas-terang": {
+      "desc": "Indonesian example template: a bright, clean short-course platform."
     },
-    "kiaalap": {
-      "desc": "An education admin dashboard with a navy sidebar and indigo accents."
+    "pustaka-malam": {
+      "desc": "Indonesian example template: an in-depth class site in a dark editorial style."
     },
-    "volt-bootstrap-5-dashboard": {
-      "desc": "A Bootstrap admin dashboard with a dark sidebar and warm sand and amber tones."
+    "dasbor-senja": {
+      "desc": "Indonesian example template: a sales dashboard in sunset orange."
     },
-    "studio-admin-shadcn": {
-      "desc": "A Next.js admin dashboard built with shadcn/ui in neutral black and white."
+    "panel-jernih": {
+      "desc": "Indonesian example template: a bright, clear operations dashboard."
     },
-    "tabler": {
-      "desc": "A light admin dashboard with tidy cards, tables and blue accents."
+    "konsol-malam": {
+      "desc": "Indonesian example template: an analytics console in a dark editorial style."
     },
-    "novena-bootstrap": {
-      "desc": "A medical clinic website in navy and pale blue with pink accents."
+    "klinik-samudra": {
+      "desc": "Indonesian example template: a family clinic site in deep-sea blue."
     },
-    "clear-care-clarity": {
-      "desc": "A clinic booking website in warm cream with steel blue and wood-brown accents."
+    "klinik-sehati": {
+      "desc": "Indonesian example template: a bright, clean clinic booking site."
     },
-    "medic-bootstrap": {
-      "desc": "A medical clinic website in teal and white with purple accents."
+    "klinik-nirmala": {
+      "desc": "Indonesian example template: a specialist clinic site in a dark editorial style."
     },
-    "startbootstrap-creative": {
-      "desc": "A one-page company website with a photo hero and orange accents."
+    "studio-savana": {
+      "desc": "Indonesian example template: a creative studio site in savanna red."
     },
-    "startbootstrap-modern-business": {
-      "desc": "A multi-page business website with a dark hero, light sections and Bootstrap blue."
+    "karya-lapang": {
+      "desc": "Indonesian example template: a bright, spacious consultancy site."
     },
-    "airspace-bootstrap": {
-      "desc": "An agency website in white and charcoal with muted purple accents."
+    "biro-arang": {
+      "desc": "Indonesian example template: a creative agency site in a dark editorial style."
     },
-    "ghost-casper": {
-      "desc": "A publication theme for Ghost with a purple-to-pink gradient hero and clean white posts."
+    "kabar-fajar": {
+      "desc": "Indonesian example template: a news portal in dawn purple."
     },
-    "ghost-headline": {
-      "desc": "A local news theme for Ghost in white and black with red accents."
+    "warta-terang": {
+      "desc": "Indonesian example template: a bright, clean city news portal."
     },
-    "masthead-free": {
-      "desc": "A newspaper theme for Astro with newsprint cream, serif headlines and dark red section labels."
+    "harian-senyap": {
+      "desc": "Indonesian example template: an online daily in a dark editorial style."
     },
-    "redoc": {
-      "desc": "A three-panel API reference in white and pale blue-grey with code samples on the right."
+    "dok-salju": {
+      "desc": "Indonesian example template: payment API docs in winter white."
     },
-    "scalar-galaxy": {
-      "desc": "A single-page API reference in near-monochrome white with coloured method badges."
+    "referensi-jernih": {
+      "desc": "Indonesian example template: a bright, clean billing API reference."
     },
-    "docusaurus-openapi-docs": {
-      "desc": "API documentation on Docusaurus with a light grey sidebar and green accents."
+    "terminal-malam": {
+      "desc": "Indonesian example template: payment API docs in a dark style."
     }
   },
   "footer": {
-    "credits": "Template credits"
+    "credits": "Example templates"
   },
   "credits": {
-    "title": "Open-source template credits",
-    "intro": "FUSE shows screenshots of open-source templates as examples of kinds of website. The templates and their content remain the property of their authors and are used under their licences.",
-    "columns": {
-      "category": "Category",
-      "template": "Template",
-      "license": "Licence",
-      "source": "Source",
-      "attribution": "Attribution"
-    },
-    "noAttribution": "—"
+    "title": "Example templates",
+    "intro": "The 24 example templates in this gallery were made by FUSE to show the kinds of website you can build. They are Indonesian example templates: all copy is in Indonesian and the illustrations are drawn in CSS, with no photos or code from anyone else."
   }
 }

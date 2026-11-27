@@ -69,3 +69,11 @@ Proxmox.png
 # local clones of open-source templates for screenshots (scripts/templates/capture.py)
 /scripts/templates/.cache/
 /scripts/templates/__pycache__/
+
+# FUSE example templates: generated HTML and scratch files (regenerate with scripts/templates-local/generate.mjs)
+/scripts/templates-local/site/
+/scripts/templates-local/.cache/
+
+# Tukang run artefacts
+/uji-red.txt
+/laporan.md
