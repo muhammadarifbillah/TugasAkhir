@@ -230,6 +230,40 @@ describe("book shelf", () => {
     expect(html).not.toContain("#F6F1E6");
   });
 
+  const pagesTags = (side: string) => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    return [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
+  };
+
+  it("the bottom page strip lies flat under the cover so it stays visible", () => {
+    const tags = pagesTags("bottom");
+    expect(tags).toHaveLength(12);
+    for (const t of tags) {
+      const cls = (t.match(/class="([^"]*)"/)?.[1] ?? "").split(" ");
+      expect(t).not.toContain("rotateX");
+      expect(cls).toContain("top-full");
+      const h = cls.map((c) => c.match(/^h-\[(\d+)px\]$/)?.[1]).find(Boolean);
+      expect(Number(h)).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it("the right page strip stays visible under reduced motion", () => {
+    const tags = pagesTags("right");
+    expect(tags).toHaveLength(12);
+    for (const t of tags) {
+      const cls = (t.match(/class="([^"]*)"/)?.[1] ?? "").split(" ");
+      expect(cls).toContain("motion-reduce:[transform:none]");
+      expect(cls.some((c) => /^motion-reduce:w-\[\d+px\]$/.test(c))).toBe(true);
+    }
+  });
+
+  it("snow covers keep a soft mist edge", () => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const snow = bookChunks(html).filter((c) => c.includes('data-cover-tone="snow"'));
+    expect(snow.length).toBeGreaterThan(0);
+    for (const c of snow) expect(c.match(/<rect[^>]*fill="none"[^>]*stroke="([^"]*)"/)?.[1]).toBe("#B3CFE5");
+  });
+
   it("landing.books covers every verified book in both languages without forbidden words", () => {
     const id = DICTS.id.landing.books as Json | undefined;
     const en = DICTS.en.landing.books as Json | undefined;
