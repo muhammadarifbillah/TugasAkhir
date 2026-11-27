@@ -25,7 +25,7 @@ const slide = {
 const ARROW =
   "inline-flex size-11 items-center justify-center rounded-full border border-[#B3CFE5] text-[#0A1931] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]";
 const PRIMARY =
-  "inline-flex min-h-11 items-center rounded-full bg-[#1A3D63] px-4 text-sm font-semibold text-[#F6FAFD] transition-colors hover:bg-[#0A1931] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] focus-visible:ring-offset-2";
+  "inline-flex min-h-11 items-center rounded-full bg-[#1A3D63] px-4 text-sm font-semibold text-[#F6FAFD] transition-colors hover:bg-[#0A1931] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6FAFD]";
 
 export function ViewerBody({
   category,
@@ -59,8 +59,8 @@ export function ViewerBody({
   const item = labels.items[category.id] as unknown as Item;
   const pageNames = category.pages.map((p) => item.pages[p.id]);
   const specs = [
-    [copy.specPages, pageNames.join(" ? "), copy.specFeatures, category.features.map((f) => item.features[f]).join(" ? ")],
-    [copy.specStack, category.stack.join(" ? "), copy.specChecks, fmt(copy.checksCount, { n: category.checks.length })],
+    [copy.specPages, pageNames.join(" · "), copy.specFeatures, category.features.map((f) => item.features[f]).join(" · ")],
+    [copy.specStack, category.stack.join(" · "), copy.specChecks, fmt(copy.checksCount, { n: category.checks.length })],
     [copy.specStandards, copy.standardsValue, copy.specScanner, copy.scannerValue],
   ];
 
