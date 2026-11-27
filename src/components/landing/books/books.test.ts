@@ -156,6 +156,80 @@ describe("book shelf", () => {
     expect(src).toContain("[background:var(--fuse-card-bg)]");
   });
 
+  it("books stand freely on the shelves, without boards", () => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    expect(html).not.toContain("fuse-card-bg");
+    expect(read("src/components/landing/books/book-shelf.tsx")).not.toContain("BOARD");
+  });
+
+  it("each book shows snow page thickness on the right and at the bottom", () => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    for (const side of ["right", "bottom"]) {
+      const tags = [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
+      expect(tags, side).toHaveLength(12);
+      for (const t of tags) expect(t.match(/style="([^"]*)"/)?.[1], side).toContain("#F6FAFD");
+    }
+    const src = read("src/components/landing/books/book-shelf.tsx");
+    for (const s of ["#F6F1E6", "#DCD3C0"]) expect(src, s).not.toContain(s);
+  });
+
+  it("a caption under each book gives its title and its source stage", () => {
+    for (const lang of LANGS) {
+      const names = stageNames(lang);
+      const items = itemsOf(lang);
+      const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf(lang), stageNames: names }));
+      const caps = [
+        ...html.matchAll(/<span[^>]*data-book-caption[^>]*><span class="([^"]*)">([^<]*)<\/span><span class="([^"]*)">([^<]*)<\/span><\/span>/g),
+      ];
+      expect(caps, lang).toHaveLength(12);
+      caps.forEach((m, i) => {
+        const b = RESULT_BOOKS[i];
+        expect(m[1].split(" "), `${lang}/${b.id}`).toContain("font-semibold");
+        expect(m[2], `${lang}/${b.id}`).toBe(escape(items[b.id].title));
+        expect(m[3].split(" "), `${lang}/${b.id}`).toContain("text-muted-foreground");
+        expect(m[4], `${lang}/${b.id}`).toBe(escape(names[b.stage]));
+      });
+    }
+  });
+
+  const TONE_BG: Record<string, string> = { ink: "#0A1931", deep: "#1A3D63", mist: "#B3CFE5", snow: "#F6FAFD" };
+  const TONE_FG: Record<string, string> = { ink: "#F6FAFD", deep: "#F6FAFD", mist: "#0A1931", snow: "#0A1931" };
+  const bookChunks = (html: string) => html.split(/(?=<button[^>]*data-book=")/).slice(1).map((c) => c.slice(0, c.indexOf("</button>")));
+
+  it("covers rotate through palette tones with contrasting text and ribbon", () => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const chunks = bookChunks(html);
+    expect(chunks).toHaveLength(12);
+    const tones = chunks.map((c) => c.match(/data-cover-tone="([^"]*)"/)?.[1] ?? "");
+    for (const t of tones) expect(Object.keys(TONE_BG)).toContain(t);
+    expect(new Set(tones.slice(0, 6)).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(tones.slice(6)).size).toBeGreaterThanOrEqual(3);
+    chunks.forEach((c, i) => {
+      const t = tones[i];
+      expect(c.match(/<rect[^>]*fill="([^"]*)"/)?.[1], `${i} bg`).toBe(TONE_BG[t]);
+      expect(c.match(/<text[^>]*fill="([^"]*)"/)?.[1], `${i} fg`).toBe(TONE_FG[t]);
+      const ribbon = c.match(/<div[^>]*data-book-ribbon[^>]*style="([^"]*)"/)?.[1] ?? c.match(/<div[^>]*style="([^"]*)"[^>]*data-book-ribbon/)?.[1];
+      expect(ribbon, `${i} ribbon`).toBeDefined();
+      expect(ribbon!.toLowerCase(), `${i} ribbon`).not.toContain(TONE_BG[t].toLowerCase());
+    });
+  });
+
+  it("cover art draws with the tone text colour", () => {
+    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    bookChunks(html).forEach((c, i) => {
+      const t = c.match(/data-cover-tone="([^"]*)"/)?.[1] ?? "";
+      expect(c.match(/<g[^>]*stroke="([^"]*)"/)?.[1], `${i}`).toBe(TONE_FG[t]);
+    });
+  });
+
+  it("the open spread is snow with a mist crease", () => {
+    const html = renderToStaticMarkup(createElement(BookSpread, { book: RESULT_BOOKS[0], copy: copyOf("en"), stageName: "x" }));
+    const root = html.match(/^<div class="([^"]*)"/)?.[1] ?? "";
+    expect(root.includes("bg-[#F6FAFD]") || root.includes("bg-[var(--fuse-snow)]")).toBe(true);
+    expect(html).toContain("md:border-[#B3CFE5]");
+    expect(html).not.toContain("#F6F1E6");
+  });
+
   it("landing.books covers every verified book in both languages without forbidden words", () => {
     const id = DICTS.id.landing.books as Json | undefined;
     const en = DICTS.en.landing.books as Json | undefined;
