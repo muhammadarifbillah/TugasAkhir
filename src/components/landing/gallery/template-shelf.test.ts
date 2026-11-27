@@ -221,6 +221,36 @@ describe("template shelf", () => {
     }
   });
 
+  it("shelf row never wraps on desktop and book items may shrink at lg", () => {
+    const html = renderShelf();
+    const rows = [...html.matchAll(/<section[^>]*data-shelf[^>]*>[\s\S]*?(<ul[^>]*>)([\s\S]*?)<\/ul>/g)];
+    expect(rows).toHaveLength(4);
+    for (const [, ul, body] of rows) {
+      const c = classOf(ul);
+      expect(c).not.toContain("lg:flex-wrap");
+      expect(c).not.toContain("flex-wrap");
+      for (const k of ["overflow-x-auto", "snap-x"]) expect(c).toContain(k);
+      const lis = [...body.matchAll(/<li[\s>][^>]*>/g)].map((m) => classOf(m[0]));
+      expect(lis.length).toBeGreaterThan(0);
+      for (const li of lis) for (const k of ["shrink-0", "snap-start", "lg:min-w-0", "lg:shrink"]) expect(li).toContain(k);
+    }
+    expect(read("src/components/landing/gallery/template-shelf.tsx")).not.toContain("lg:flex-wrap");
+  });
+
+  it("plank follows the single book row inside a w-fit max-w-full wrapper with w-full", () => {
+    const html = renderShelf();
+    const sections = [...html.matchAll(/<section[^>]*data-shelf[^>]*>([\s\S]*?)<\/section>/g)].map((m) => m[1]);
+    expect(sections).toHaveLength(4);
+    for (const body of sections) {
+      const m = /<div class="([^"]*)">(<ul[^>]*>)[\s\S]*?<\/ul>(<div[^>]*data-shelf-plank[^>]*>)<\/div><\/div>$/.exec(body);
+      expect(m, "wrapper around ul + plank").not.toBeNull();
+      const wrap = m![1].split(/\s+/);
+      for (const k of ["w-fit", "max-w-full"]) expect(wrap).toContain(k);
+      expect(classOf(m![2]), "row must not wrap or the plank sits under row 2").not.toContain("lg:flex-wrap");
+      expect(classOf(m![3])).toContain("w-full");
+    }
+  });
+
   it("landing.shelf keys match in id and en", () => {
     const id = DICTS.id.landing.shelf as Record<string, string> | undefined;
     const en = DICTS.en.landing.shelf as Record<string, string> | undefined;
