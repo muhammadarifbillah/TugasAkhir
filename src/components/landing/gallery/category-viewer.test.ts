@@ -378,6 +378,23 @@ describe("category viewer", () => {
     for (const k of ["w-full", "max-w-full"]) expect(preview, k).toMatch(new RegExp(`class="[^"]*\\b${k}(?=[\\s"])`));
   });
 
+  it("preview hint is painted above the mist circle (relative z-10)", () => {
+    for (const lang of LANGS) {
+      const hint = tagOf(render(lang, SITE_CATEGORIES[0]), "data-viewer-preview-hint");
+      for (const k of ["relative", "z-10"]) expect(hint, k).toMatch(new RegExp(`class="[^"]*\\b${k}(?=[\\s"])`));
+    }
+  });
+
+  it("spec table stacks label/value pairs full width below sm and stays a fixed table from sm", () => {
+    const html = render("id", SITE_CATEGORIES[0]);
+    const table = section(html, "data-viewer-specs");
+    const open = table.slice(0, table.indexOf(">"));
+    for (const k of ["max-sm:block", "sm:table", "table-fixed"]) expect(open, k).toContain(k);
+    const cells = [...table.matchAll(/<(tbody|tr|th|td)[\s>][^>]*>/g)].map((m) => m[0]);
+    expect(cells.length).toBe(1 + 3 + 6 + 6);
+    for (const c of cells) expect(c, c).toContain("max-sm:block");
+  });
+
   it("page caption sits after the mist circle on an opaque snow panel above it", () => {
     for (const lang of LANGS) {
       const html = render(lang, SITE_CATEGORIES[0]);
