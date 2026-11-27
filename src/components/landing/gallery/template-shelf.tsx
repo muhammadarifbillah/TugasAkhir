@@ -6,6 +6,7 @@ import { CategoryIcon } from "@/components/site-art/category-icon";
 import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
+import { PALETTE } from "@/lib/palette";
 import { SITE_CATEGORIES, type ShelfId, type SiteCategory } from "@/lib/site-categories";
 import { groupByShelf, searchCategories, visibleCategories } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
@@ -39,19 +40,19 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
         >
           <span
             data-book=""
-            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[8.5rem] max-w-full sm:w-[12.5rem]"}`}
+            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(10_25_49/0.55)] ${wide ? "w-full" : "w-[8.5rem] max-w-full sm:w-[12.5rem]"}`}
           >
             <span
               className="absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-3 overflow-hidden rounded-l-sm rounded-r-md bg-card pl-4 pr-2 pt-4"
-              style={{ backgroundImage: `linear-gradient(160deg, hsl(${c.hue} 55% 32%), hsl(${c.hue} 60% 20%))` }}
+              style={{ backgroundImage: `linear-gradient(160deg, ${PALETTE[c.tone.hero[0]]}, ${PALETTE[c.tone.hero[1]]})` }}
             >
-              <CategoryIcon id={c.id} className="size-6 text-white" />
-              <span className="flex aspect-square w-full items-center overflow-hidden rounded-sm border-2 border-white bg-white">
+              <CategoryIcon id={c.id} className="size-6 text-[var(--fuse-snow)]" />
+              <span className="flex aspect-square w-full items-center overflow-hidden rounded-sm border-2 border-[var(--fuse-snow)] bg-[var(--fuse-snow)]">
                 <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-[160%] max-w-none -translate-x-[18.75%]" />
               </span>
             </span>
-            <span data-book-spine="" className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(0_0_0/0.5),rgb(0_0_0/0.2))]" />
-            <span className="absolute inset-y-1 right-0 w-1 rounded-r-sm bg-[#F3EBD8]" />
+            <span data-book-spine="" className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]" />
+            <span className="absolute inset-y-1 right-0 w-1 rounded-r-sm bg-[var(--fuse-snow)]" />
           </span>
           <span data-book-title="" className="mt-3 block text-sm font-medium text-foreground">
             {name}
@@ -126,7 +127,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
                   <div
                     aria-hidden="true"
                     data-shelf-plank=""
-                    className="h-3.5 w-full rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(255_255_255/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.18)]"
+                    className="h-3.5 w-full rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(246_250_253/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(10_25_49/0.6),inset_0_1px_0_rgb(246_250_253/0.18)]"
                   />
                 </div>
               </section>

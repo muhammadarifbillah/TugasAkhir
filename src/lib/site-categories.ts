@@ -4,6 +4,8 @@
  * Pure data, no React and no stages.ts import (the dashboard may import this;
  * site-categories.test.ts cross-checks the NIST/ISO codes against stages.ts).
  */
+import type { PaletteName } from "./palette";
+
 export const BLOCK_KINDS = ["nav", "hero", "cards", "list", "form", "table", "chart", "sidebar", "cart", "player", "schedule", "code"] as const;
 export type BlockKind = (typeof BLOCK_KINDS)[number];
 export type CategoryId = "marketplace" | "ecommerce" | "lms" | "saas" | "clinic" | "company" | "news" | "api";
@@ -19,9 +21,16 @@ export interface SecurityCheck {
   nist: string;
   iso: string;
 }
+/** Palette roles of a category: page field, accent and soft fills, and the two hero gradient stops. */
+export interface CategoryTone {
+  field: "snow" | "mist";
+  accent: PaletteName;
+  soft: PaletteName;
+  hero: readonly [PaletteName, PaletteName];
+}
 export interface SiteCategory {
   id: CategoryId;
-  hue: number;
+  tone: CategoryTone;
   shelf: ShelfId;
   pages: readonly [SitePage, SitePage, SitePage];
   /** Dictionary keys: categories.items.<id>.features.<key> */
@@ -36,7 +45,7 @@ export interface SiteCategory {
 export const SITE_CATEGORIES: readonly SiteCategory[] = [
   {
     id: "marketplace",
-    hue: 24,
+    tone: { field: "snow", accent: "steel", soft: "deep", hero: ["deep", "steel"] },
     shelf: "sell",
     templates: [],
     pages: [
@@ -54,7 +63,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "ecommerce",
-    hue: 340,
+    tone: { field: "snow", accent: "deep", soft: "steel", hero: ["ink", "deep"] },
     shelf: "sell",
     templates: ["e-commerce"],
     pages: [
@@ -72,7 +81,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "lms",
-    hue: 265,
+    tone: { field: "mist", accent: "deep", soft: "steel", hero: ["deep", "ink"] },
     shelf: "learn",
     templates: ["lms"],
     pages: [
@@ -90,7 +99,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "saas",
-    hue: 205,
+    tone: { field: "snow", accent: "deep", soft: "ink", hero: ["steel", "deep"] },
     shelf: "business",
     templates: ["saas"],
     pages: [
@@ -108,7 +117,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "clinic",
-    hue: 160,
+    tone: { field: "mist", accent: "ink", soft: "steel", hero: ["steel", "ink"] },
     shelf: "business",
     templates: [],
     pages: [
@@ -126,7 +135,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "company",
-    hue: 45,
+    tone: { field: "snow", accent: "ink", soft: "steel", hero: ["ink", "steel"] },
     shelf: "business",
     templates: ["custom"],
     pages: [
@@ -144,7 +153,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "news",
-    hue: 0,
+    tone: { field: "mist", accent: "ink", soft: "deep", hero: ["ink", "deep"] },
     shelf: "learn",
     templates: [],
     pages: [
@@ -162,7 +171,7 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "api",
-    hue: 130,
+    tone: { field: "snow", accent: "steel", soft: "ink", hero: ["ink", "steel"] },
     shelf: "tech",
     templates: ["rest-api"],
     pages: [
