@@ -1,0 +1,509 @@
+{
+  "marketplace": [
+    {
+      "slug": "gocart",
+      "name": "GoCart (multi-vendor e-commerce template)",
+      "source": "https://github.com/GreatStackDev/gocart",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/GreatStackDev/gocart/blob/main/LICENSE.md",
+      "attribution": null,
+      "demo": "https://gocart-gs.vercel.app/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://gocart-gs.vercel.app/", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "category", "url": "https://gocart-gs.vercel.app/shop", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "product", "url": "https://gocart-gs.vercel.app/product/prod_1", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "seller", "url": "https://gocart-gs.vercel.app/shop/happyshop", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        {
+          "id": "cart",
+          "url": "https://gocart-gs.vercel.app/product/prod_1",
+          "actions": [
+            { "do": "click", "selector": "button:has-text('Add to Cart')" },
+            { "do": "click", "selector": "a[href='/cart']" },
+            { "do": "wait", "ms": 1500 },
+            { "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }
+          ]
+        },
+        { "id": "orders", "url": "https://gocart-gs.vercel.app/orders", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "open-store", "url": "https://gocart-gs.vercel.app/create-store", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] }
+      ]
+    },
+    {
+      "slug": "mercur",
+      "name": "Mercur B2C Marketplace Storefront",
+      "source": "https://github.com/mercurjs/mercur",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/mercurjs/mercur/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://demo.mercurjs.com/gb",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://demo.mercurjs.com/gb" },
+        { "id": "category", "url": "https://demo.mercurjs.com/gb/categories/sneakers" },
+        { "id": "product", "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide" },
+        { "id": "seller", "url": "https://demo.mercurjs.com/gb/sellers/sole-society" },
+        {
+          "id": "cart",
+          "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide",
+          "actions": [
+            { "do": "click", "selector": "button:has-text('Add to cart')" },
+            { "do": "wait", "ms": 2000 },
+            { "do": "goto", "url": "https://demo.mercurjs.com/gb/cart" }
+          ]
+        },
+        {
+          "id": "checkout",
+          "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide",
+          "actions": [
+            { "do": "click", "selector": "button:has-text('Add to cart')" },
+            { "do": "wait", "ms": 2000 },
+            { "do": "goto", "url": "https://demo.mercurjs.com/gb/checkout" }
+          ]
+        },
+        { "id": "login", "url": "https://demo.mercurjs.com/gb/login" }
+      ]
+    },
+    {
+      "slug": "spree-storefront",
+      "name": "Spree Commerce Next.js Storefront (demo marketplace)",
+      "source": "https://github.com/spree/storefront",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/spree/storefront/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://demo.spreecommerce.org/us/en",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://demo.spreecommerce.org/us/en" },
+        { "id": "category", "url": "https://demo.spreecommerce.org/us/en/c/kitchen" },
+        { "id": "product", "url": "https://demo.spreecommerce.org/us/en/products/desk-fan" },
+        { "id": "seller", "url": "https://demo.spreecommerce.org/us/en/sellers/fernwood-kitchen" },
+        {
+          "id": "cart",
+          "url": "https://demo.spreecommerce.org/us/en/products/desk-fan",
+          "actions": [
+            { "do": "click", "selector": "button:has-text('Add to cart')" },
+            { "do": "wait", "ms": 2500 },
+            { "do": "goto", "url": "https://demo.spreecommerce.org/us/en/cart" }
+          ]
+        },
+        { "id": "login", "url": "https://demo.spreecommerce.org/us/en/account" }
+      ]
+    }
+  ],
+  "ecommerce": [
+    {
+      "slug": "htmlcodex-eshop",
+      "name": "E Shop – Bootstrap eCommerce Template (HTML Codex)",
+      "source": "https://htmlcodex.com/bootstrap-ecommerce-template/",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://htmlcodex.com/license/",
+      "attribution": "Designed by HTML Codex (https://htmlcodex.com) — tautan kredit di footer tidak boleh dihapus; lisensi CC BY 4.0",
+      "demo": "https://demo.htmlcodex.com/419/EShop/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://demo.htmlcodex.com/419/EShop/index.html" },
+        { "id": "catalog", "url": "https://demo.htmlcodex.com/419/EShop/product-list.html" },
+        { "id": "product", "url": "https://demo.htmlcodex.com/419/EShop/product-detail.html" },
+        { "id": "cart", "url": "https://demo.htmlcodex.com/419/EShop/cart.html" },
+        { "id": "checkout", "url": "https://demo.htmlcodex.com/419/EShop/checkout.html" },
+        { "id": "account", "url": "https://demo.htmlcodex.com/419/EShop/my-account.html" },
+        { "id": "login", "url": "https://demo.htmlcodex.com/419/EShop/login.html" },
+        { "id": "wishlist", "url": "https://demo.htmlcodex.com/419/EShop/wishlist.html" },
+        { "id": "contact", "url": "https://demo.htmlcodex.com/419/EShop/contact.html" }
+      ]
+    },
+    {
+      "slug": "uikit-ecommerce",
+      "name": "UIkit E-commerce Template",
+      "source": "https://github.com/chekromul/uikit-ecommerce-template",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/chekromul/uikit-ecommerce-template/blob/master/LICENSE",
+      "attribution": null,
+      "demo": "https://chekromul.github.io/uikit-ecommerce-template/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://chekromul.github.io/uikit-ecommerce-template/index.html" },
+        { "id": "catalog", "url": "https://chekromul.github.io/uikit-ecommerce-template/category.html" },
+        { "id": "product", "url": "https://chekromul.github.io/uikit-ecommerce-template/product.html" },
+        { "id": "cart", "url": "https://chekromul.github.io/uikit-ecommerce-template/cart.html" },
+        { "id": "checkout", "url": "https://chekromul.github.io/uikit-ecommerce-template/checkout.html" },
+        { "id": "account", "url": "https://chekromul.github.io/uikit-ecommerce-template/account.html" },
+        { "id": "wishlist", "url": "https://chekromul.github.io/uikit-ecommerce-template/favorites.html" },
+        { "id": "contact", "url": "https://chekromul.github.io/uikit-ecommerce-template/contacts.html" }
+      ]
+    },
+    {
+      "slug": "medusa-nextjs-starter",
+      "name": "Medusa Next.js Starter",
+      "source": "https://github.com/medusajs/nextjs-starter-medusa",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/medusajs/nextjs-starter-medusa/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://next.medusajs.com/us",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://next.medusajs.com/us" },
+        { "id": "catalog", "url": "https://next.medusajs.com/us/store" },
+        { "id": "product", "url": "https://next.medusajs.com/us/products/hoodie" },
+        {
+          "id": "cart",
+          "url": "https://next.medusajs.com/us/products/hoodie",
+          "actions": [
+            { "do": "click", "selector": "button:has-text('Add to cart')" },
+            { "do": "wait", "ms": 2000 },
+            { "do": "goto", "url": "https://next.medusajs.com/us/cart" }
+          ]
+        },
+        { "id": "login", "url": "https://next.medusajs.com/us/account" }
+      ]
+    }
+  ],
+  "lms": [
+    {
+      "slug": "tailthemes-seminar",
+      "name": "Seminar – online course template (TailThemes)",
+      "source": "https://github.com/tailthemes/seminar",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/tailthemes/seminar/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://previews.tailthemes.com/preview/seminar?chrome=0",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://previews.tailthemes.com/preview/seminar?chrome=0" },
+        { "id": "courses", "url": "https://previews.tailthemes.com/preview/seminar/courses?chrome=0" },
+        { "id": "course", "url": "https://previews.tailthemes.com/preview/seminar/course?chrome=0" },
+        { "id": "lesson", "url": "https://previews.tailthemes.com/preview/seminar/lesson?chrome=0" },
+        { "id": "dashboard", "url": "https://previews.tailthemes.com/preview/seminar/studio?chrome=0" },
+        { "id": "instructors", "url": "https://previews.tailthemes.com/preview/seminar/mentors?chrome=0" }
+      ]
+    },
+    {
+      "slug": "htmlcodex-elearning",
+      "name": "eLEARNING – eLearning HTML Template (HTML Codex)",
+      "source": "https://htmlcodex.com/elearning-html-template/",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://htmlcodex.com/license/",
+      "attribution": "Designed by HTML Codex (https://htmlcodex.com) — tautan kredit di footer tidak boleh dihapus; lisensi CC BY 4.0",
+      "demo": "https://demo.htmlcodex.com/2151/eLearning/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://demo.htmlcodex.com/2151/eLearning/index.html", "actions": [{ "do": "wait", "ms": 2500 }, { "do": "wait", "selector": ".header-carousel .owl-item.active" }, { "do": "css", "css": ".header-carousel .owl-item:not(.active){display:none!important}.header-carousel .owl-stage{transform:none!important;transition:none!important}.header-carousel *{animation:none!important}" }] },
+        { "id": "courses", "url": "https://demo.htmlcodex.com/2151/eLearning/courses.html", "actions": [{ "do": "wait", "ms": 2500 }] },
+        { "id": "course", "url": "https://demo.htmlcodex.com/2151/eLearning/course-details.html", "actions": [{ "do": "wait", "ms": 2500 }] },
+        { "id": "instructors", "url": "https://demo.htmlcodex.com/2151/eLearning/team.html", "actions": [{ "do": "wait", "ms": 2500 }] }
+      ]
+    },
+    {
+      "slug": "kiaalap",
+      "name": "Kiaalap – Bootstrap 5 Education Dashboard",
+      "source": "https://github.com/puikinsh/kiaalap",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/puikinsh/kiaalap/blob/master/LICENSE",
+      "attribution": null,
+      "demo": "https://colorlib.com/polygon/kiaalap/index.html",
+      "local": null,
+      "pages": [
+        { "id": "dashboard", "url": "https://colorlib.com/polygon/kiaalap/index.html" },
+        { "id": "courses", "url": "https://colorlib.com/polygon/kiaalap/all-courses.html" },
+        { "id": "course", "url": "https://colorlib.com/polygon/kiaalap/course-info.html" },
+        { "id": "pricing", "url": "https://colorlib.com/polygon/kiaalap/course-payment.html" },
+        { "id": "instructors", "url": "https://colorlib.com/polygon/kiaalap/all-professors.html" },
+        { "id": "login", "url": "https://colorlib.com/polygon/kiaalap/login.html" }
+      ]
+    }
+  ],
+  "saas": [
+    {
+      "slug": "volt-bootstrap-5-dashboard",
+      "name": "Volt – Bootstrap 5 Admin Dashboard",
+      "source": "https://github.com/themesberg/volt-bootstrap-5-dashboard",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/themesberg/volt-bootstrap-5-dashboard/blob/master/LICENSE.md",
+      "attribution": null,
+      "demo": "https://demo.themesberg.com/volt/",
+      "local": null,
+      "pages": [
+        { "id": "overview", "url": "https://demo.themesberg.com/volt/pages/dashboard/dashboard.html" },
+        {
+          "id": "team",
+          "url": "https://demo.themesberg.com/volt/pages/dashboard/dashboard.html",
+          "actions": [{ "do": "scroll", "selector": "h2:has-text('Team members'), h5:has-text('Team members'), :text('Team members')", "offset": 120 }]
+        },
+        { "id": "billing", "url": "https://demo.themesberg.com/volt/pages/transactions.html" },
+        { "id": "settings", "url": "https://demo.themesberg.com/volt/pages/settings.html" },
+        { "id": "login", "url": "https://demo.themesberg.com/volt/pages/examples/sign-in.html" }
+      ]
+    },
+    {
+      "slug": "studio-admin-shadcn",
+      "name": "Studio Admin (next-shadcn-admin-dashboard)",
+      "source": "https://github.com/arhamkhnz/next-shadcn-admin-dashboard",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/arhamkhnz/next-shadcn-admin-dashboard/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://studio-admin.arhamkhnz.com/",
+      "local": null,
+      "pages": [
+        { "id": "overview", "url": "https://studio-admin.arhamkhnz.com/dashboard/default" },
+        { "id": "analytics", "url": "https://studio-admin.arhamkhnz.com/dashboard/analytics" },
+        { "id": "team", "url": "https://studio-admin.arhamkhnz.com/dashboard/users" },
+        { "id": "invoice", "url": "https://studio-admin.arhamkhnz.com/dashboard/invoice" },
+        { "id": "billing", "url": "https://studio-admin.arhamkhnz.com/dashboard/finance" },
+        { "id": "login", "url": "https://studio-admin.arhamkhnz.com/auth/v1/login" }
+      ]
+    },
+    {
+      "slug": "tabler",
+      "name": "Tabler",
+      "source": "https://github.com/tabler/tabler",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/tabler/tabler/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://preview.tabler.io/",
+      "local": null,
+      "pages": [
+        { "id": "overview", "url": "https://preview.tabler.io/", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "team", "url": "https://preview.tabler.io/users.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "billing", "url": "https://preview.tabler.io/billing.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "settings", "url": "https://preview.tabler.io/settings.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "invoice", "url": "https://preview.tabler.io/invoice.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "activity", "url": "https://preview.tabler.io/activity.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "login", "url": "https://preview.tabler.io/sign-in.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] }
+      ]
+    }
+  ],
+  "clinic": [
+    {
+      "slug": "novena-bootstrap",
+      "name": "Novena – Medical Bootstrap Template",
+      "source": "https://github.com/themefisher/novena-bootstrap",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/themefisher/novena-bootstrap/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://novena-bootstrap.vercel.app/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://novena-bootstrap.vercel.app/" },
+        { "id": "doctors", "url": "https://novena-bootstrap.vercel.app/doctor.html" },
+        { "id": "doctor_detail", "url": "https://novena-bootstrap.vercel.app/doctor-single.html" },
+        { "id": "departments", "url": "https://novena-bootstrap.vercel.app/department.html" },
+        { "id": "booking", "url": "https://novena-bootstrap.vercel.app/appoinment.html" },
+        { "id": "confirmation", "url": "https://novena-bootstrap.vercel.app/confirmation.html" }
+      ]
+    },
+    {
+      "slug": "clear-care-clarity",
+      "name": "Clear Care Medical (Opencals template-clarity)",
+      "source": "https://github.com/letsopencals/template-clarity",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/letsopencals/template-clarity/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://template-clarity.vercel.app/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://template-clarity.vercel.app/" },
+        { "id": "doctors", "url": "https://template-clarity.vercel.app/clinicians" },
+        { "id": "departments", "url": "https://template-clarity.vercel.app/departments" },
+        { "id": "booking", "url": "https://template-clarity.vercel.app/care" },
+        { "id": "confirmation", "url": "https://template-clarity.vercel.app/thank-you" },
+        { "id": "login", "url": "https://template-clarity.vercel.app/auth/sign-in" }
+      ]
+    },
+    {
+      "slug": "medic-bootstrap",
+      "name": "Medic – Bootstrap Medical Template",
+      "source": "https://github.com/themefisher/medic-bootstrap",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/themefisher/medic-bootstrap/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://medic-bootstrap.vercel.app/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://medic-bootstrap.vercel.app/" },
+        { "id": "doctors", "url": "https://medic-bootstrap.vercel.app/team.html" },
+        { "id": "departments", "url": "https://medic-bootstrap.vercel.app/service.html" },
+        { "id": "booking", "url": "https://medic-bootstrap.vercel.app/appointment.html" }
+      ]
+    }
+  ],
+  "company": [
+    {
+      "slug": "startbootstrap-creative",
+      "name": "Start Bootstrap – Creative",
+      "source": "https://github.com/StartBootstrap/startbootstrap-creative",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/StartBootstrap/startbootstrap-creative/blob/master/LICENSE",
+      "attribution": null,
+      "demo": "https://startbootstrap.github.io/startbootstrap-creative/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://startbootstrap.github.io/startbootstrap-creative/" },
+        { "id": "about", "url": "https://startbootstrap.github.io/startbootstrap-creative/#about", "actions": [{ "do": "scroll", "selector": "#about", "offset": 0 }] },
+        { "id": "services", "url": "https://startbootstrap.github.io/startbootstrap-creative/#services", "actions": [{ "do": "scroll", "selector": "#services", "offset": 0 }] },
+        { "id": "portfolio", "url": "https://startbootstrap.github.io/startbootstrap-creative/#portfolio", "actions": [{ "do": "scroll", "selector": "#portfolio", "offset": 0 }] },
+        { "id": "contact", "url": "https://startbootstrap.github.io/startbootstrap-creative/#contact", "actions": [{ "do": "scroll", "selector": "#contact", "offset": 0 }] }
+      ]
+    },
+    {
+      "slug": "startbootstrap-modern-business",
+      "name": "Start Bootstrap – Modern Business",
+      "source": "https://github.com/StartBootstrap/startbootstrap-modern-business",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/StartBootstrap/startbootstrap-modern-business/blob/master/LICENSE",
+      "attribution": null,
+      "demo": "https://startbootstrap.github.io/startbootstrap-modern-business/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/" },
+        { "id": "about", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/about.html" },
+        {
+          "id": "team",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/about.html",
+          "actions": [{ "do": "scroll", "selector": "h2:has-text('Our team')", "offset": 120 }]
+        },
+        { "id": "portfolio", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/portfolio-overview.html" },
+        { "id": "portfolio_detail", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/portfolio-item.html" },
+        { "id": "blog", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/blog-home.html" },
+        { "id": "contact", "url": "https://startbootstrap.github.io/startbootstrap-modern-business/contact.html" }
+      ]
+    },
+    {
+      "slug": "airspace-bootstrap",
+      "name": "Airspace – Bootstrap Agency Template",
+      "source": "https://github.com/themefisher/airspace-bootstrap",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/themefisher/airspace-bootstrap/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://airspace-bootstrap.vercel.app/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://airspace-bootstrap.vercel.app/" },
+        { "id": "about", "url": "https://airspace-bootstrap.vercel.app/about.html" },
+        {
+          "id": "team",
+          "url": "https://airspace-bootstrap.vercel.app/about.html",
+          "skip": "about.html has no team section in the live demo (only about, feature, testimonial and call-to-action sections)"
+        },
+        { "id": "services", "url": "https://airspace-bootstrap.vercel.app/service.html" },
+        { "id": "portfolio", "url": "https://airspace-bootstrap.vercel.app/portfolio.html" },
+        { "id": "portfolio_detail", "url": "https://airspace-bootstrap.vercel.app/portfolio-single.html" },
+        { "id": "blog", "url": "https://airspace-bootstrap.vercel.app/blog-grid.html" },
+        { "id": "contact", "url": "https://airspace-bootstrap.vercel.app/contact.html" }
+      ]
+    }
+  ],
+  "news": [
+    {
+      "slug": "ghost-casper",
+      "name": "Casper (tema bawaan Ghost)",
+      "source": "https://github.com/TryGhost/Casper",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/TryGhost/Casper/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://demo.ghost.io/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://demo.ghost.io/" },
+        { "id": "article", "url": "https://demo.ghost.io/welcome/" },
+        { "id": "category", "url": "https://demo.ghost.io/tag/getting-started/" },
+        { "id": "author", "url": "https://demo.ghost.io/author/ghost/" },
+        { "id": "search", "url": "https://demo.ghost.io/#/search" },
+        { "id": "subscribe", "url": "https://demo.ghost.io/#/portal/signup", "skip": "signup modal only says 'This site is invite-only' on the public demo; no signup form to show" },
+        { "id": "about", "url": "https://demo.ghost.io/about/" }
+      ]
+    },
+    {
+      "slug": "ghost-headline",
+      "name": "Headline (tema berita lokal Ghost)",
+      "source": "https://github.com/TryGhost/Headline",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/TryGhost/Headline/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://headline.ghost.io/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://headline.ghost.io/" },
+        { "id": "article", "url": "https://headline.ghost.io/the-weekly-planet-an-outdated-idea-is-still-shaping-climate-policy/" },
+        { "id": "category", "url": "https://headline.ghost.io/tag/environment/" },
+        { "id": "author", "url": "https://headline.ghost.io/author/kelly/" },
+        { "id": "search", "url": "https://headline.ghost.io/#/search" },
+        { "id": "subscribe", "url": "https://headline.ghost.io/#/portal/signup" },
+        { "id": "about", "url": "https://headline.ghost.io/about/" }
+      ]
+    },
+    {
+      "slug": "masthead-free",
+      "name": "Masthead (free edition) — tema koran Astro/EmDash",
+      "source": "https://github.com/ondelva/astro-theme-masthead",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/ondelva/astro-theme-masthead/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://masthead-free.ondelva.com/",
+      "local": null,
+      "pages": [
+        { "id": "home", "url": "https://masthead-free.ondelva.com/", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "article", "url": "https://masthead-free.ondelva.com/posts/council-votes-to-rebuild-the-seawall", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "category", "url": "https://masthead-free.ondelva.com/category/news", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "author", "url": "https://masthead-free.ondelva.com/authors/mara-okafor", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "search", "url": "https://masthead-free.ondelva.com/search", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "tag", "url": "https://masthead-free.ondelva.com/tag/budget", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] },
+        { "id": "about", "url": "https://masthead-free.ondelva.com/pages/about", "actions": [{ "do": "hide", "selector": "body > div:has-text('Masthead demo (free edition)'):not(:has(header, main, nav))", "optional": true }] }
+      ]
+    }
+  ],
+  "api": [
+    {
+      "slug": "redoc",
+      "name": "Redoc (demo Redocly Cafe)",
+      "source": "https://github.com/Redocly/redoc",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/Redocly/redoc/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://redocly.github.io/redoc/",
+      "local": null,
+      "pages": [
+        { "id": "intro", "url": "https://redocly.github.io/redoc/" },
+        { "id": "auth", "url": "https://redocly.github.io/redoc/authorization" },
+        { "id": "resource", "url": "https://redocly.github.io/redoc/orders" },
+        { "id": "endpoint", "url": "https://redocly.github.io/redoc/orders/createorder" },
+        { "id": "code", "url": "https://redocly.github.io/redoc/authorization/createaccesstoken" }
+      ]
+    },
+    {
+      "slug": "scalar-galaxy",
+      "name": "Scalar API Reference (demo Scalar Galaxy)",
+      "source": "https://github.com/scalar/scalar",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/scalar/scalar/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://galaxy.scalar.com/",
+      "local": null,
+      "pages": [
+        { "id": "intro", "url": "https://galaxy.scalar.com/#scalar-galaxy/description/introduction" },
+        { "id": "auth", "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/authentication" },
+        { "id": "endpoint", "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/planets/GET/planets" },
+        { "id": "code", "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/authentication/POST/auth/token" },
+        { "id": "resource", "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/celestial-bodies" },
+        { "id": "schema", "url": "https://galaxy.scalar.com/#scalar-galaxy/models" }
+      ]
+    },
+    {
+      "slug": "docusaurus-openapi-docs",
+      "name": "Docusaurus OpenAPI Docs (demo resmi)",
+      "source": "https://github.com/PaloAltoNetworks/docusaurus-openapi-docs",
+      "license": "MIT",
+      "licenseUrl": "https://github.com/PaloAltoNetworks/docusaurus-openapi-docs/blob/main/LICENSE",
+      "attribution": null,
+      "demo": "https://docusaurus-openapi.tryingpan.dev/",
+      "local": null,
+      "pages": [
+        { "id": "quickstart", "url": "https://docusaurus-openapi.tryingpan.dev/" },
+        { "id": "intro", "url": "https://docusaurus-openapi.tryingpan.dev/petstore/swagger-petstore-yaml" },
+        { "id": "resource", "url": "https://docusaurus-openapi.tryingpan.dev/petstore/pet" },
+        { "id": "endpoint", "url": "https://docusaurus-openapi.tryingpan.dev/petstore/add-pet" },
+        { "id": "code", "url": "https://docusaurus-openapi.tryingpan.dev/petstore/find-pets-by-status" },
+        { "id": "schema", "url": "https://docusaurus-openapi.tryingpan.dev/petstore/schemas/cat" }
+      ]
+    }
+  ]
+}

@@ -1252,5 +1252,129 @@
         }
       }
     }
+  },
+  "templatePages": {
+    "about": "Tentang",
+    "account": "Akun & pesanan",
+    "activity": "Log aktivitas",
+    "analytics": "Analitik",
+    "article": "Artikel",
+    "auth": "Autentikasi",
+    "author": "Profil penulis",
+    "billing": "Tagihan & langganan",
+    "blog": "Blog",
+    "booking": "Buat janji",
+    "cart": "Keranjang",
+    "catalog": "Katalog",
+    "category": "Kategori",
+    "checkout": "Checkout",
+    "code": "Contoh kode",
+    "confirmation": "Konfirmasi janji",
+    "contact": "Kontak",
+    "course": "Detail kursus",
+    "courses": "Katalog kursus",
+    "dashboard": "Dasbor",
+    "departments": "Poli & layanan",
+    "doctor_detail": "Profil dokter",
+    "doctors": "Daftar dokter",
+    "endpoint": "Referensi endpoint",
+    "home": "Beranda",
+    "instructors": "Pengajar",
+    "intro": "Pengantar",
+    "invoice": "Faktur",
+    "lesson": "Materi pelajaran",
+    "login": "Masuk",
+    "open-store": "Buka toko",
+    "orders": "Pesanan",
+    "overview": "Ringkasan",
+    "portfolio": "Portofolio",
+    "portfolio_detail": "Studi kasus",
+    "pricing": "Harga",
+    "product": "Detail produk",
+    "quickstart": "Mulai cepat",
+    "resource": "Grup resource",
+    "schema": "Skema data",
+    "search": "Pencarian",
+    "seller": "Toko penjual",
+    "services": "Layanan",
+    "settings": "Pengaturan",
+    "subscribe": "Langganan",
+    "tag": "Tag",
+    "team": "Tim",
+    "wishlist": "Daftar keinginan"
+  },
+  "templates": {
+    "gocart": {
+      "desc": "Toko multi-penjual bernuansa putih dengan hero hijau mint pucat dan aksen ungu."
+    },
+    "mercur": {
+      "desc": "Etalase marketplace B2C hitam-putih tegas dengan huruf kapital tebal."
+    },
+    "spree-storefront": {
+      "desc": "Etalase marketplace bergaya editorial yang lapang dalam putih dan navy."
+    },
+    "htmlcodex-eshop": {
+      "desc": "Toko daring Bootstrap klasik dengan bilah navigasi biru baja di atas putih."
+    },
+    "uikit-ecommerce": {
+      "desc": "Toko daring berbasis UIkit dengan bilah atas hitam, hero gelap, dan aksen biru azure."
+    },
+    "medusa-nextjs-starter": {
+      "desc": "Toko Next.js minimalis dalam putih dan abu muda dengan teks gelap."
+    },
+    "tailthemes-seminar": {
+      "desc": "Situs kursus daring bernuansa hijau sage yang tenang dengan tombol hijau tua."
+    },
+    "htmlcodex-elearning": {
+      "desc": "Situs e-learning bernuansa teal cerah dan navy di atas latar cyan pucat."
+    },
+    "kiaalap": {
+      "desc": "Dasbor admin pendidikan dengan sidebar navy dan aksen indigo."
+    },
+    "volt-bootstrap-5-dashboard": {
+      "desc": "Dasbor admin Bootstrap dengan sidebar gelap serta nuansa krem pasir dan jingga."
+    },
+    "studio-admin-shadcn": {
+      "desc": "Dasbor admin Next.js berbasis shadcn/ui dalam hitam-putih netral."
+    },
+    "tabler": {
+      "desc": "Dasbor admin terang dengan kartu dan tabel rapi serta aksen biru."
+    },
+    "novena-bootstrap": {
+      "desc": "Situs klinik medis bernuansa navy dan biru pucat dengan aksen merah muda."
+    },
+    "clear-care-clarity": {
+      "desc": "Situs pemesanan klinik bernuansa krem hangat dengan aksen biru baja dan cokelat kayu."
+    },
+    "medic-bootstrap": {
+      "desc": "Situs klinik medis bernuansa tosca dan putih dengan aksen ungu."
+    },
+    "startbootstrap-creative": {
+      "desc": "Situs perusahaan satu halaman dengan hero berfoto dan aksen oranye."
+    },
+    "startbootstrap-modern-business": {
+      "desc": "Situs bisnis multi-halaman dengan hero gelap, bagian terang, dan biru Bootstrap."
+    },
+    "airspace-bootstrap": {
+      "desc": "Situs agensi dalam putih dan hitam arang dengan aksen ungu keabuan."
+    },
+    "ghost-casper": {
+      "desc": "Tema publikasi Ghost dengan hero gradasi ungu ke merah muda dan tulisan putih bersih."
+    },
+    "ghost-headline": {
+      "desc": "Tema berita lokal Ghost dalam putih dan hitam dengan aksen merah."
+    },
+    "masthead-free": {
+      "desc": "Tema koran Astro dengan warna krem kertas koran, judul serif, dan label rubrik merah tua."
+    },
+    "redoc": {
+      "desc": "Referensi API tiga panel dalam putih dan abu kebiruan dengan contoh kode di kanan."
+    },
+    "scalar-galaxy": {
+      "desc": "Referensi API satu halaman yang nyaris monokrom putih dengan lencana metode berwarna."
+    },
+    "docusaurus-openapi-docs": {
+      "desc": "Dokumentasi API berbasis Docusaurus dengan sidebar abu muda dan aksen hijau."
+    }
   }
 }

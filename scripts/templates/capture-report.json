@@ -1,0 +1,1145 @@
+{
+  "templates": {
+    "marketplace/gocart": {
+      "name": "GoCart (multi-vendor e-commerce template)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://gocart-gs.vercel.app/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "category",
+          "url": "https://gocart-gs.vercel.app/shop",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "product",
+          "url": "https://gocart-gs.vercel.app/product/prod_1",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "seller",
+          "url": "https://gocart-gs.vercel.app/shop/happyshop",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "cart",
+          "url": "https://gocart-gs.vercel.app/product/prod_1",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "orders",
+          "url": "https://gocart-gs.vercel.app/orders",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "open-store",
+          "url": "https://gocart-gs.vercel.app/create-store",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "marketplace/mercur": {
+      "name": "Mercur B2C Marketplace Storefront",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://demo.mercurjs.com/gb",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "category",
+          "url": "https://demo.mercurjs.com/gb/categories/sneakers",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "product",
+          "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "seller",
+          "url": "https://demo.mercurjs.com/gb/sellers/sole-society",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "cart",
+          "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "checkout",
+          "url": "https://demo.mercurjs.com/gb/products/cloudpeak-golden-slide",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://demo.mercurjs.com/gb/login",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "marketplace/spree-storefront": {
+      "name": "Spree Commerce Next.js Storefront (demo marketplace)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://demo.spreecommerce.org/us/en",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "category",
+          "url": "https://demo.spreecommerce.org/us/en/c/kitchen",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "product",
+          "url": "https://demo.spreecommerce.org/us/en/products/desk-fan",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "seller",
+          "url": "https://demo.spreecommerce.org/us/en/sellers/fernwood-kitchen",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "cart",
+          "url": "https://demo.spreecommerce.org/us/en/products/desk-fan",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://demo.spreecommerce.org/us/en/account",
+          "status": "ok",
+          "reason": "kept existing image"
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": "kept existing image"
+      },
+      "replaces": null
+    },
+    "ecommerce/htmlcodex-eshop": {
+      "name": "E Shop – Bootstrap eCommerce Template (HTML Codex)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://demo.htmlcodex.com/419/EShop/index.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "catalog",
+          "url": "https://demo.htmlcodex.com/419/EShop/product-list.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "product",
+          "url": "https://demo.htmlcodex.com/419/EShop/product-detail.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "cart",
+          "url": "https://demo.htmlcodex.com/419/EShop/cart.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "checkout",
+          "url": "https://demo.htmlcodex.com/419/EShop/checkout.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "account",
+          "url": "https://demo.htmlcodex.com/419/EShop/my-account.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://demo.htmlcodex.com/419/EShop/login.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "wishlist",
+          "url": "https://demo.htmlcodex.com/419/EShop/wishlist.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "contact",
+          "url": "https://demo.htmlcodex.com/419/EShop/contact.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "ecommerce/uikit-ecommerce": {
+      "name": "UIkit E-commerce Template",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/index.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "catalog",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/category.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "product",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/product.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "cart",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/cart.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "checkout",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/checkout.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "account",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/account.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "wishlist",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/favorites.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "contact",
+          "url": "https://chekromul.github.io/uikit-ecommerce-template/contacts.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "ecommerce/medusa-nextjs-starter": {
+      "name": "Medusa Next.js Starter",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://next.medusajs.com/us",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "catalog",
+          "url": "https://next.medusajs.com/us/store",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "product",
+          "url": "https://next.medusajs.com/us/products/hoodie",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "cart",
+          "url": "https://next.medusajs.com/us/products/hoodie",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://next.medusajs.com/us/account",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "lms/tailthemes-seminar": {
+      "name": "Seminar – online course template (TailThemes)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://previews.tailthemes.com/preview/seminar?chrome=0",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "courses",
+          "url": "https://previews.tailthemes.com/preview/seminar/courses?chrome=0",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "course",
+          "url": "https://previews.tailthemes.com/preview/seminar/course?chrome=0",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "lesson",
+          "url": "https://previews.tailthemes.com/preview/seminar/lesson?chrome=0",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "dashboard",
+          "url": "https://previews.tailthemes.com/preview/seminar/studio?chrome=0",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "instructors",
+          "url": "https://previews.tailthemes.com/preview/seminar/mentors?chrome=0",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "lms/htmlcodex-elearning": {
+      "name": "eLEARNING – eLearning HTML Template (HTML Codex)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://demo.htmlcodex.com/2151/eLearning/index.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "courses",
+          "url": "https://demo.htmlcodex.com/2151/eLearning/courses.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "course",
+          "url": "https://demo.htmlcodex.com/2151/eLearning/course-details.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "instructors",
+          "url": "https://demo.htmlcodex.com/2151/eLearning/team.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "lms/kiaalap": {
+      "name": "Kiaalap – Bootstrap 5 Education Dashboard",
+      "pages": [
+        {
+          "id": "dashboard",
+          "url": "https://colorlib.com/polygon/kiaalap/index.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "courses",
+          "url": "https://colorlib.com/polygon/kiaalap/all-courses.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "course",
+          "url": "https://colorlib.com/polygon/kiaalap/course-info.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "pricing",
+          "url": "https://colorlib.com/polygon/kiaalap/course-payment.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "instructors",
+          "url": "https://colorlib.com/polygon/kiaalap/all-professors.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://colorlib.com/polygon/kiaalap/login.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "saas/volt-bootstrap-5-dashboard": {
+      "name": "Volt – Bootstrap 5 Admin Dashboard",
+      "pages": [
+        {
+          "id": "overview",
+          "url": "https://demo.themesberg.com/volt/pages/dashboard/dashboard.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "team",
+          "url": "https://demo.themesberg.com/volt/pages/dashboard/dashboard.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "billing",
+          "url": "https://demo.themesberg.com/volt/pages/transactions.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "settings",
+          "url": "https://demo.themesberg.com/volt/pages/settings.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://demo.themesberg.com/volt/pages/examples/sign-in.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "saas/studio-admin-shadcn": {
+      "name": "Studio Admin (next-shadcn-admin-dashboard)",
+      "pages": [
+        {
+          "id": "overview",
+          "url": "https://studio-admin.arhamkhnz.com/dashboard/default",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "analytics",
+          "url": "https://studio-admin.arhamkhnz.com/dashboard/analytics",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "team",
+          "url": "https://studio-admin.arhamkhnz.com/dashboard/users",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "invoice",
+          "url": "https://studio-admin.arhamkhnz.com/dashboard/invoice",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "billing",
+          "url": "https://studio-admin.arhamkhnz.com/dashboard/finance",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://studio-admin.arhamkhnz.com/auth/v1/login",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "saas/tabler": {
+      "name": "Tabler",
+      "pages": [
+        {
+          "id": "overview",
+          "url": "https://preview.tabler.io/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "team",
+          "url": "https://preview.tabler.io/users.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "billing",
+          "url": "https://preview.tabler.io/billing.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "settings",
+          "url": "https://preview.tabler.io/settings.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "invoice",
+          "url": "https://preview.tabler.io/invoice.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "activity",
+          "url": "https://preview.tabler.io/activity.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://preview.tabler.io/sign-in.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "clinic/novena-bootstrap": {
+      "name": "Novena – Medical Bootstrap Template",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://novena-bootstrap.vercel.app/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "doctors",
+          "url": "https://novena-bootstrap.vercel.app/doctor.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "doctor_detail",
+          "url": "https://novena-bootstrap.vercel.app/doctor-single.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "departments",
+          "url": "https://novena-bootstrap.vercel.app/department.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "booking",
+          "url": "https://novena-bootstrap.vercel.app/appoinment.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "confirmation",
+          "url": "https://novena-bootstrap.vercel.app/confirmation.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "clinic/clear-care-clarity": {
+      "name": "Clear Care Medical (Opencals template-clarity)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://template-clarity.vercel.app/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "doctors",
+          "url": "https://template-clarity.vercel.app/clinicians",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "departments",
+          "url": "https://template-clarity.vercel.app/departments",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "booking",
+          "url": "https://template-clarity.vercel.app/care",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "confirmation",
+          "url": "https://template-clarity.vercel.app/thank-you",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "login",
+          "url": "https://template-clarity.vercel.app/auth/sign-in",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "clinic/medic-bootstrap": {
+      "name": "Medic – Bootstrap Medical Template",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://medic-bootstrap.vercel.app/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "doctors",
+          "url": "https://medic-bootstrap.vercel.app/team.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "departments",
+          "url": "https://medic-bootstrap.vercel.app/service.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "booking",
+          "url": "https://medic-bootstrap.vercel.app/appointment.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "company/startbootstrap-creative": {
+      "name": "Start Bootstrap – Creative",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://startbootstrap.github.io/startbootstrap-creative/",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "about",
+          "url": "https://startbootstrap.github.io/startbootstrap-creative/#about",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "services",
+          "url": "https://startbootstrap.github.io/startbootstrap-creative/#services",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "portfolio",
+          "url": "https://startbootstrap.github.io/startbootstrap-creative/#portfolio",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "contact",
+          "url": "https://startbootstrap.github.io/startbootstrap-creative/#contact",
+          "status": "ok",
+          "reason": "kept existing image"
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": "kept existing image"
+      },
+      "replaces": null
+    },
+    "company/startbootstrap-modern-business": {
+      "name": "Start Bootstrap – Modern Business",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "about",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/about.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "team",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/about.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "portfolio",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/portfolio-overview.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "portfolio_detail",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/portfolio-item.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "blog",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/blog-home.html",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "contact",
+          "url": "https://startbootstrap.github.io/startbootstrap-modern-business/contact.html",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "company/airspace-bootstrap": {
+      "name": "Airspace – Bootstrap Agency Template",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://airspace-bootstrap.vercel.app/",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "about",
+          "url": "https://airspace-bootstrap.vercel.app/about.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "team",
+          "url": "https://airspace-bootstrap.vercel.app/about.html",
+          "status": "rejected",
+          "reason": "about.html has no team section in the live demo (only about, feature, testimonial and call-to-action sections)"
+        },
+        {
+          "id": "services",
+          "url": "https://airspace-bootstrap.vercel.app/service.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "portfolio",
+          "url": "https://airspace-bootstrap.vercel.app/portfolio.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "portfolio_detail",
+          "url": "https://airspace-bootstrap.vercel.app/portfolio-single.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "blog",
+          "url": "https://airspace-bootstrap.vercel.app/blog-grid.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        },
+        {
+          "id": "contact",
+          "url": "https://airspace-bootstrap.vercel.app/contact.html",
+          "status": "ok",
+          "reason": "kept existing image"
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": "kept existing image"
+      },
+      "replaces": null
+    },
+    "news/ghost-casper": {
+      "name": "Casper (tema bawaan Ghost)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://demo.ghost.io/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "article",
+          "url": "https://demo.ghost.io/welcome/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "category",
+          "url": "https://demo.ghost.io/tag/getting-started/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "author",
+          "url": "https://demo.ghost.io/author/ghost/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "search",
+          "url": "https://demo.ghost.io/#/search",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "subscribe",
+          "url": "https://demo.ghost.io/#/portal/signup",
+          "status": "rejected",
+          "reason": "signup modal only says 'This site is invite-only' on the public demo; no signup form to show"
+        },
+        {
+          "id": "about",
+          "url": "https://demo.ghost.io/about/",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "news/ghost-headline": {
+      "name": "Headline (tema berita lokal Ghost)",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://headline.ghost.io/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "article",
+          "url": "https://headline.ghost.io/the-weekly-planet-an-outdated-idea-is-still-shaping-climate-policy/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "category",
+          "url": "https://headline.ghost.io/tag/environment/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "author",
+          "url": "https://headline.ghost.io/author/kelly/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "search",
+          "url": "https://headline.ghost.io/#/search",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "subscribe",
+          "url": "https://headline.ghost.io/#/portal/signup",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "about",
+          "url": "https://headline.ghost.io/about/",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "news/masthead-free": {
+      "name": "Masthead (free edition) — tema koran Astro/EmDash",
+      "pages": [
+        {
+          "id": "home",
+          "url": "https://masthead-free.ondelva.com/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "article",
+          "url": "https://masthead-free.ondelva.com/posts/council-votes-to-rebuild-the-seawall",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "category",
+          "url": "https://masthead-free.ondelva.com/category/news",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "author",
+          "url": "https://masthead-free.ondelva.com/authors/mara-okafor",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "search",
+          "url": "https://masthead-free.ondelva.com/search",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "tag",
+          "url": "https://masthead-free.ondelva.com/tag/budget",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "about",
+          "url": "https://masthead-free.ondelva.com/pages/about",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "api/redoc": {
+      "name": "Redoc (demo Redocly Cafe)",
+      "pages": [
+        {
+          "id": "intro",
+          "url": "https://redocly.github.io/redoc/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "auth",
+          "url": "https://redocly.github.io/redoc/authorization",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "resource",
+          "url": "https://redocly.github.io/redoc/orders",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "endpoint",
+          "url": "https://redocly.github.io/redoc/orders/createorder",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "code",
+          "url": "https://redocly.github.io/redoc/authorization/createaccesstoken",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "api/scalar-galaxy": {
+      "name": "Scalar API Reference (demo Scalar Galaxy)",
+      "pages": [
+        {
+          "id": "intro",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/description/introduction",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "auth",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/authentication",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "endpoint",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/planets/GET/planets",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "code",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/authentication/POST/auth/token",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "resource",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/tag/celestial-bodies",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "schema",
+          "url": "https://galaxy.scalar.com/#scalar-galaxy/models",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    },
+    "api/docusaurus-openapi-docs": {
+      "name": "Docusaurus OpenAPI Docs (demo resmi)",
+      "pages": [
+        {
+          "id": "quickstart",
+          "url": "https://docusaurus-openapi.tryingpan.dev/",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "intro",
+          "url": "https://docusaurus-openapi.tryingpan.dev/petstore/swagger-petstore-yaml",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "resource",
+          "url": "https://docusaurus-openapi.tryingpan.dev/petstore/pet",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "endpoint",
+          "url": "https://docusaurus-openapi.tryingpan.dev/petstore/add-pet",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "code",
+          "url": "https://docusaurus-openapi.tryingpan.dev/petstore/find-pets-by-status",
+          "status": "ok",
+          "reason": null
+        },
+        {
+          "id": "schema",
+          "url": "https://docusaurus-openapi.tryingpan.dev/petstore/schemas/cat",
+          "status": "ok",
+          "reason": null
+        }
+      ],
+      "mobile": {
+        "status": "ok",
+        "reason": null
+      },
+      "replaces": null
+    }
+  },
+  "replacements": []
+}
