@@ -150,6 +150,26 @@ describe("hero wall", () => {
     expect(src).toContain("fmt(copy.openPanel");
   });
 
+  // r22 round 3: on the desktop 3D wall only the panel buttons take the pointer; the mobile carousel keeps scrolling.
+  it("the desktop wall passes the pointer through to the panel buttons", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const cls = (re: RegExp) => src.match(re)![1].split(/\s+/);
+    const row = cls(/<ul className="([^"]+)"/);
+    const group = cls(/role="group"[\s\S]*?className="([^"]+)"/);
+    const button = cls(/data-gallery-panel=""[\s\S]*?className="([^"]+)"/);
+    expect(row).toContain("lg:pointer-fine:pointer-events-none");
+    expect(group).toContain("lg:pointer-fine:pointer-events-none");
+    expect(button).toContain("pointer-events-auto");
+    for (const list of [row, group]) expect(list).not.toContain("pointer-events-none");
+  });
+
+  // r22 round 3: "Dokumentasi REST API" was cut to "DOKUMENTASI REST …".
+  it("panel labels are never truncated", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/)![1].split(/\s+/);
+    for (const c of ["truncate", "text-ellipsis"]) expect(label, c).not.toContain(c);
+  });
+
   it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {
     const css = read("src/app/globals.css");
     for (const s of ["@keyframes gallery-focus", "animation-timeline: view(inline)", "@supports (animation-timeline: view())", "prefers-reduced-motion: no-preference"])

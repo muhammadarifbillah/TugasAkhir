@@ -99,6 +99,15 @@ describe("gallery logic", () => {
     }
   });
 
+  // r22 round 3: a panel behind z=0 sat behind the preserve-3d ul plane, so the ul swallowed its hover and click.
+  it("wallPose keeps every panel at z >= 0 with the centre exactly at 0", () => {
+    for (const n of [3, 8]) {
+      const z = Array.from({ length: n }, (_, i) => wallPose(i, n).z);
+      for (const v of z) expect(v, `n=${n}`).toBeGreaterThanOrEqual(0);
+      expect(Math.min(...z), `n=${n}`).toBe(0);
+    }
+  });
+
   it("filterByShelf keeps one shelf or everything", () => {
     const before = SITE_CATEGORIES.map((c) => c.id);
     const all = filterByShelf(SITE_CATEGORIES, null);

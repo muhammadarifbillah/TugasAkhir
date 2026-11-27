@@ -6,6 +6,8 @@ import { describe, expect, it } from "vitest";
 import { GalleryProvider } from "../gallery/gallery-provider";
 import { LANDING_MOTION_QUERY } from "../motion";
 import { HeroBackdrop } from "./hero-backdrop";
+import { HeroFloor } from "./hero-floor";
+import { HeroGrass } from "./hero-grass";
 import { HeroSection } from "./hero-section";
 
 type Json = Record<string, unknown>;
@@ -75,6 +77,23 @@ describe("hero composition (r22 round 2)", () => {
     const html = section();
     expect(html).toContain(copy.hint);
     expect(html).toContain((id.categories as { galleryLabel: string }).galleryLabel);
+  });
+});
+
+describe("hero floor and grass (r22 round 3)", () => {
+  it("orbs stay in the outer 30 % on each side so they never cover the centred caption", () => {
+    const html = renderToStaticMarkup(createElement(HeroFloor));
+    const W = Number(html.match(/viewBox="0 0 (\d+) /)![1]);
+    const orbs = [...html.matchAll(/<g class="hero-orb"><circle cx="([\d.]+)" cy="[\d.]+" r="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    expect(orbs.length).toBeGreaterThanOrEqual(3);
+    for (const [cx, r] of orbs) expect(cx + r <= 0.3 * W || cx - r >= 0.7 * W, `orb at ${cx}`).toBe(true);
+  });
+
+  it("the water behind the grass glows teal and the blade tips catch it", () => {
+    expect(renderToStaticMarkup(createElement(HeroFloor))).toContain("#0e2a3a");
+    const grass = renderToStaticMarkup(createElement(HeroGrass));
+    expect(grass).toContain("#16283a");
+    expect(grass).toContain('fill="#000"');
   });
 });
 
