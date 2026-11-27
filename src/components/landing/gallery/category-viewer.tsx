@@ -107,7 +107,7 @@ export function ViewerBody({
               </AnimatePresence>
             </button>
           </div>
-          <p data-viewer-preview-hint="" className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1A3D63]">
+          <p data-viewer-preview-hint="" className="relative z-10 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1A3D63]">
             {copy.previewHint}
           </p>
           <div className="mt-3 flex items-center justify-between gap-3">
@@ -160,18 +160,19 @@ export function ViewerBody({
           <Description className="mt-4 text-base italic leading-relaxed text-[#1A3D63]">{item.desc}</Description>
           <p className="mt-3 text-sm leading-relaxed text-[#0A1931]">{copy.intro}</p>
           <hr className="mt-5 border-[#B3CFE5]" />
-          <table data-viewer-specs="" className="mt-4 w-full table-fixed text-left">
-            <tbody>
+          {/* Below sm every label/value pair stacks full width; from sm it is a 2-pair × 3-row table. */}
+          <table data-viewer-specs="" className="mt-4 w-full table-fixed text-left max-sm:block sm:table">
+            <tbody className="max-sm:block">
               {specs.map(([k1, v1, k2, v2]) => (
-                <tr key={k1} className="align-top">
-                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63]">
+                <tr key={k1} className="align-top max-sm:block">
+                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
                     {k1}
                   </th>
-                  <td className="py-2 pr-3 text-sm text-[#0A1931]">{v1}</td>
-                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63]">
+                  <td className="py-2 pr-3 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v1}</td>
+                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
                     {k2}
                   </th>
-                  <td className="py-2 text-sm text-[#0A1931]">{v2}</td>
+                  <td className="py-2 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v2}</td>
                 </tr>
               ))}
             </tbody>
