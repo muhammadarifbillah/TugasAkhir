@@ -179,7 +179,19 @@
       "checksTitle": "What {name} checks in the code",
       "checkCodes": "Mapped to NIST SSDF {nist} · ISO/IEC 27001 {iso}",
       "scanned": "Generated code is scanned by Semgrep & Trivy.",
-      "start": "Start from this template"
+      "start": "Start from this template",
+      "barTitle": "Template gallery",
+      "previewHint": "Click to preview",
+      "byline": "by {name} · {n} pages",
+      "intro": "Three sample pages you can change. AI writes the code, and five security gates check it before handover.",
+      "specChecks": "Checks",
+      "checksCount": "{n} checks",
+      "specStandards": "Standards",
+      "standardsValue": "NIST SSDF · ISO/IEC 27001",
+      "specScanner": "Scanners",
+      "scannerValue": "Semgrep & Trivy",
+      "reviewedBy": "Checked by {name}",
+      "seeAllTemplates": "See all templates"
     },
     "shelf": {
       "pill": "Template shelf",

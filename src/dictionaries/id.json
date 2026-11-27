@@ -179,7 +179,19 @@
       "checksTitle": "Yang diperiksa {name} di kode",
       "checkCodes": "Dipetakan ke NIST SSDF {nist} · ISO/IEC 27001 {iso}",
       "scanned": "Kode yang dihasilkan dipindai Semgrep & Trivy.",
-      "start": "Mulai dari template ini"
+      "start": "Mulai dari template ini",
+      "barTitle": "Galeri template",
+      "previewHint": "Klik untuk pratinjau",
+      "byline": "oleh {name} · {n} halaman",
+      "intro": "Tiga halaman contoh yang bisa Anda ubah. AI menulis kodenya, lima gerbang keamanan memeriksanya sebelum diserahkan.",
+      "specChecks": "Pemeriksaan",
+      "checksCount": "{n} pemeriksaan",
+      "specStandards": "Standar",
+      "standardsValue": "NIST SSDF · ISO/IEC 27001",
+      "specScanner": "Pemindai",
+      "scannerValue": "Semgrep & Trivy",
+      "reviewedBy": "Diperiksa oleh {name}",
+      "seeAllTemplates": "Lihat semua template"
     },
     "shelf": {
       "pill": "Rak template",
