@@ -2,7 +2,7 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, m } from "motion/react";
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FuseLockup } from "@/components/brand/fuse-lockup";
 import { SiteArt } from "@/components/site-art/site-art";
@@ -56,6 +56,7 @@ export function ViewerBody({
 }) {
   const Title = slots?.Title ?? "h2";
   const Description = slots?.Description ?? "p";
+  const specId = useId();
   const item = labels.items[category.id] as unknown as Item;
   const pageNames = category.pages.map((p) => item.pages[p.id]);
   const specs = [
@@ -161,18 +162,19 @@ export function ViewerBody({
           <p className="mt-3 text-sm leading-relaxed text-[#0A1931]">{copy.intro}</p>
           <hr className="mt-5 border-[#B3CFE5]" />
           {/* Below sm every label/value pair stacks full width; from sm it is a 2-pair × 3-row table. */}
-          <table data-viewer-specs="" className="mt-4 w-full table-fixed text-left max-sm:block sm:table">
-            <tbody className="max-sm:block">
-              {specs.map(([k1, v1, k2, v2]) => (
-                <tr key={k1} className="align-top max-sm:block">
-                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
+          {/* Explicit roles: WebKit drops table semantics once display is changed by max-sm:block. */}
+          <table data-viewer-specs="" role="table" className="mt-4 w-full table-fixed text-left max-sm:block sm:table">
+            <tbody role="rowgroup" className="max-sm:block">
+              {specs.map(([k1, v1, k2, v2], i) => (
+                <tr key={k1} role="row" className="align-top max-sm:block">
+                  <th scope="row" role="rowheader" id={`${specId}-${i}-a`} className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
                     {k1}
                   </th>
-                  <td className="py-2 pr-3 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v1}</td>
-                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
+                  <td role="cell" headers={`${specId}-${i}-a`} className="py-2 pr-3 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v1}</td>
+                  <th scope="row" role="rowheader" id={`${specId}-${i}-b`} className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63] max-sm:block max-sm:pb-0">
                     {k2}
                   </th>
-                  <td className="py-2 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v2}</td>
+                  <td role="cell" headers={`${specId}-${i}-b`} className="py-2 text-sm text-[#0A1931] max-sm:block max-sm:pt-0.5">{v2}</td>
                 </tr>
               ))}
             </tbody>

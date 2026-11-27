@@ -62,3 +62,6 @@ Proxmox.png
 
 # Playwright MCP screenshots and console logs
 .playwright-mcp/
+
+# design references (third-party images, kept local)
+/referensi/
