@@ -8,6 +8,7 @@ import id from "@/dictionaries/id.json";
 import { fmt } from "@/lib/format";
 import { dashboardStats, scoreSourceText } from "@/lib/dashboard-view";
 import type { Dictionary } from "@/lib/i18n";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { DashboardEmpty } from "./dashboard-empty";
 import { DashboardStats } from "./dashboard-stats";
 import { GateRail } from "./gate-rail";
@@ -115,15 +116,22 @@ describe("dashboard components", () => {
 
   const empty = () => renderToStaticMarkup(createElement(DashboardEmpty, { dict: en, lang: "en" }));
 
-  const COLLAGE = /<div class="dashboard-collage"[^>]*>(?:[\s\S]*?<\/svg>){3}<\/div>/;
+  const COLLAGE = /<div class="dashboard-collage"[^>]*>(?:<span[^>]*><img[^>]*\/?><\/span>){3}<\/div>/;
 
-  it("DashboardEmpty renders an aria-hidden collage of three SiteArt pages and no hero-tape hooks", () => {
+  // R27: the three SiteArt illustrations became screenshots of the first template of three categories.
+  it("DashboardEmpty renders an aria-hidden collage of three template screenshots and no hero-tape hooks", () => {
     const html = empty();
     const at = html.indexOf('class="dashboard-collage"');
     expect(at).toBeGreaterThan(-1);
     expect(html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1)).toContain('aria-hidden="true"');
     const collage = html.match(COLLAGE)?.[0] ?? "";
-    expect(collage.match(/<svg/g)).toHaveLength(3);
+    const imgs = collage.match(/<img[^>]*>/g) ?? [];
+    expect(imgs).toHaveLength(3);
+    const srcs = imgs.map((t) => decodeURIComponent(/ src="([^"]*)"/.exec(t)![1].replace(/&amp;/g, "&")));
+    (["company", "ecommerce", "lms"] as const).forEach((c, i) => expect(srcs[i]).toContain(SITE_TEMPLATES[c][0].pages[0].thumb));
+    for (const img of imgs) for (const k of ['alt=""', "/_next/image?url=", "object-cover", "object-top"]) expect(img).toContain(k);
+    expect(collage).not.toContain("<svg");
+    expect(read("src/components/dashboard/dashboard-empty.tsx")).not.toContain("SiteArt");
     for (const hook of ["hero-tape", "dashboard-poster", "data-hero-stage", "data-pose", "iso-face"]) expect(html).not.toContain(hook);
   });
 

@@ -1,16 +1,17 @@
 import "./dashboard.css";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, GitPullRequest, RefreshCw } from "lucide-react";
 import type { ProjectCardData } from "@/components/project-list";
 import { Hallmark } from "@/components/landing/hallmark";
 import { CategoryIcon } from "@/components/site-art/category-icon";
-import { SiteArt } from "@/components/site-art/site-art";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n";
 import { GATE_CODES, gateRail } from "@/lib/dashboard-view";
 import { fmt } from "@/lib/format";
 import { categoryForTemplate } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { GateRail } from "./gate-rail";
 import { ScoreBlock } from "./score-block";
 
@@ -38,6 +39,7 @@ export function ProjectCard({
   renderTitle?: (title: React.ReactElement) => React.ReactNode;
 }) {
   const category = categoryForTemplate(p.template);
+  const template = SITE_TEMPLATES[category.id][0];
   const status = statusBadge(p.status, dict.dashboard);
   const { activeIndex } = gateRail(p.activeStage, p.stageProgress);
   const stageNames = GATE_CODES.map((code) => dict.stages[code].name);
@@ -46,10 +48,21 @@ export function ProjectCard({
   return (
     <article className="project-card flex h-full flex-col gap-3" aria-labelledby={titleId}>
       <div data-card-part="bezel" className="project-card-bezel mb-5">
-        <div data-card-part="screen" className="project-card-screen" aria-hidden="true">
+        <div data-card-part="screen" data-category={category.id} className="project-card-screen" aria-hidden="true">
+          {/* Two stacked 16:10 pages: the hover rule in dashboard.css slides .project-card-art up by half to show the second. */}
           <div className="project-card-art">
-            <SiteArt category={category} pageIndex={0} labels={dict.categories} />
-            <SiteArt category={category} pageIndex={1} labels={dict.categories} />
+            {template.pages.slice(0, 2).map((page) => (
+              <span key={page.id} className="relative block aspect-[16/10] w-full">
+                <Image
+                  src={page.src}
+                  alt=""
+                  fill
+                  sizes="(min-width:1280px) 26rem, (min-width:768px) 45vw, 92vw"
+                  draggable={false}
+                  className="object-cover object-top"
+                />
+              </span>
+            ))}
           </div>
         </div>
         <div data-card-part="lip" aria-hidden="true" className="project-card-lip">

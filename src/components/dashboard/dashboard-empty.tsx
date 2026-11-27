@@ -1,20 +1,25 @@
 import "./dashboard.css";
+import Image from "next/image";
 import Link from "next/link";
-import { SiteArt } from "@/components/site-art/site-art";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Dictionary } from "@/lib/i18n";
-import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 
-const COLLAGE = (["company", "ecommerce", "lms"] as const).map((id) => SITE_CATEGORIES.find((c) => c.id === id)!);
+const COLLAGE = (["company", "ecommerce", "lms"] as const).map((id) => SITE_TEMPLATES[id][0]);
 
 export function DashboardEmpty({ dict, lang }: { dict: Dictionary; lang: string }) {
   return (
     <Card>
       <CardContent className="flex flex-col items-center gap-4 p-6 text-center">
         <div className="dashboard-collage" aria-hidden="true">
-          {COLLAGE.map((c) => (
-            <SiteArt key={c.id} category={c} pageIndex={0} labels={dict.categories} />
+          {COLLAGE.map((t, i) => (
+            <span
+              key={t.slug}
+              className={`relative block aspect-[16/10] overflow-hidden rounded-xl shadow-[var(--fuse-shadow-soft,none)] ${i === 1 ? "-translate-y-3" : ""}`}
+            >
+              <Image src={t.pages[0].thumb} alt="" fill sizes="12rem" draggable={false} className="object-cover object-top" />
+            </span>
           ))}
         </div>
         <h2 className="text-lg font-semibold">{dict.dashboard.emptyTitle}</h2>

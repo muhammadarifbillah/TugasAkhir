@@ -1,12 +1,13 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { useId, useState } from "react";
 import { CategoryIcon } from "@/components/site-art/category-icon";
-import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { SITE_CATEGORIES, type ShelfId, type SiteCategory } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { groupByShelf, searchCategories, visibleCategories } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
 
@@ -55,12 +56,23 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
             <span
               className={`absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-1.5 overflow-hidden rounded-l-sm rounded-r-md pb-3 pl-3.5 pr-1.5 pt-3 ${COVER_TONES[tone].cover}`}
             >
-              <CategoryIcon id={c.id} className="size-4 shrink-0" />
-              <span data-book-title="" className="line-clamp-3 text-center text-[11px] font-semibold leading-tight">
+              <Image
+                src={SITE_TEMPLATES[c.id][0].mobile}
+                alt=""
+                fill
+                sizes="(min-width:640px) 7rem, 6rem"
+                draggable={false}
+                className="object-cover object-top"
+              />
+              {/* Ink at 85% under the name: snow text stays about 10.9:1 even over a white screenshot (the test computes it). */}
+              <span
+                aria-hidden="true"
+                data-cover-scrim=""
+                className="absolute inset-0 bg-[linear-gradient(180deg,rgb(10_25_49/0.85)_0%,rgb(10_25_49/0.85)_55%,rgb(10_25_49/0)_85%)]"
+              />
+              <CategoryIcon id={c.id} className="relative size-4 shrink-0 text-[#F6FAFD]" />
+              <span data-book-title="" className="relative line-clamp-3 text-center text-[11px] font-semibold leading-tight text-[#F6FAFD]">
                 {name}
-              </span>
-              <span aria-hidden="true" className="mt-auto block w-full overflow-hidden rounded-sm ring-1 ring-[#B3CFE5]">
-                <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-full" />
               </span>
             </span>
             <span data-book-spine="" className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]" />

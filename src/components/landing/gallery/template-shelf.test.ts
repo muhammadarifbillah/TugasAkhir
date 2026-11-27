@@ -3,8 +3,11 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { contrastRatio } from "@/lib/contrast";
 import { fmt } from "@/lib/format";
+import { PALETTE } from "@/lib/palette";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { GalleryProvider } from "./gallery-provider";
 import { SHELF_ORDER, groupByShelf, searchCategories } from "./gallery-logic";
 import { TemplateShelf } from "./template-shelf";
@@ -308,15 +311,63 @@ describe("template shelf", () => {
     expect(html).not.toContain(escape(copy.pagesCount));
   });
 
-  it("each cover shows the category's SiteArt, hidden from assistive tech", () => {
+  // R27: the SiteArt page on the cover is replaced by the mobile screenshot of the category's first real template (2:3-ish).
+  it("each cover is the mobile screenshot of the category's first template: lazy next/image, empty alt, no SiteArt", () => {
     const covers = [...renderShelf().matchAll(/<button[^>]*data-shelf-cover[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1]);
     expect(covers).toHaveLength(8);
-    const seen = covers.map((body) => {
-      const art = /<span[^>]*aria-hidden="true"[^>]*><svg[^>]*data-category="([^"]+)"/.exec(body);
-      expect(art, "SiteArt inside an aria-hidden wrapper").not.toBeNull();
-      return art![1];
+    const order = groupByShelf(SITE_CATEGORIES).flatMap((g) => g.items);
+    covers.forEach((body, i) => {
+      const imgs = [...body.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
+      expect(imgs, `${order[i].id} one img`).toHaveLength(1);
+      const img = imgs[0];
+      const src = decodeURIComponent(/ src="([^"]*)"/.exec(img)![1].replace(/&amp;/g, "&"));
+      expect(src).toContain(SITE_TEMPLATES[order[i].id][0].mobile);
+      expect(img).toContain("/_next/image?url=");
+      expect(img).toContain('alt=""');
+      expect(img).toContain('loading="lazy"');
+      expect(img).toContain('sizes="(min-width:640px) 7rem, 6rem"');
+      for (const k of ["object-cover", "object-top"]) expect(img).toContain(k);
+      expect(body).not.toContain("<svg role=\"img\"");
+      expect(body).not.toContain("data-category=");
+      // name and icon stay on the cover, above the screenshot
+      expect(body).toMatch(/<svg[^>]*aria-hidden="true"/);
+      expect(body).toContain("data-book-title");
     });
-    expect(seen.sort()).toEqual(ids(SITE_CATEGORIES).sort());
+    const src = SRC();
+    expect(src).not.toContain("SiteArt");
+    expect(src).not.toContain("site-art/site-art");
+    expect(src).toContain('from "next/image"');
+  });
+
+  it("a palette scrim sits over the screenshot so the cover name keeps >= 4.5:1 contrast", () => {
+    const covers = [...renderShelf().matchAll(/<button[^>]*data-shelf-cover[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1]);
+    for (const body of covers) {
+      const scrim = /<span[^>]*data-cover-scrim[^>]*>/.exec(body)?.[0];
+      expect(scrim, "scrim").toBeDefined();
+      expect(scrim).toContain('aria-hidden="true"');
+      expect(body.indexOf("data-cover-scrim")).toBeGreaterThan(body.indexOf("<img"));
+      expect(body.indexOf("data-book-title")).toBeGreaterThan(body.indexOf("data-cover-scrim"));
+      const title = /<span[^>]*data-book-title[^>]*>/.exec(body)![0];
+      expect(title).toContain("text-[#F6FAFD]");
+    }
+    // Worst case under the name is a white screenshot: snow text over ink at 85% blended onto snow.
+    const blend = (a: number) => {
+      const ink = [0x0a, 0x19, 0x31];
+      const snow = [0xf6, 0xfa, 0xfd];
+      const hex = ink.map((c, i) => Math.round(c * a + snow[i] * (1 - a)).toString(16).padStart(2, "0")).join("");
+      return `#${hex}`;
+    };
+    expect(contrastRatio(PALETTE.snow, blend(0.85))).toBeGreaterThanOrEqual(4.5);
+    expect(SRC()).toContain("rgb(10_25_49/0.85)");
+  });
+
+  it("the shelf count label talks about templates (3), not pages", () => {
+    for (const lang of ["id", "en"] as const) {
+      const s = (DICTS[lang].landing.shelf as Record<string, string>).pagesCount;
+      expect(s, lang).toContain("3");
+      expect(s.toLowerCase(), lang).toContain("template");
+      expect(s.toLowerCase(), lang).not.toMatch(/page|halaman/);
+    }
   });
 
   it("deep covers stay visible on the dark deep panel", () => {

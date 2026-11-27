@@ -209,7 +209,7 @@
       "searchPlaceholder": "Cari: toko, kursus, klinik…",
       "count": "{n} template ditemukan",
       "empty": "Tidak ada template yang cocok dengan \"{q}\".",
-      "pagesCount": "3 halaman",
+      "pagesCount": "3 template",
       "seeAll": "Lihat semua",
       "seeAllShelf": "Lihat semua template di rak {shelf}",
       "shelfOnly": "Rak: {shelf}",
@@ -1096,7 +1096,6 @@
   },
   "categories": {
     "galleryLabel": "Ilustrasi template — bukan situs klien",
-    "artLabel": "Ilustrasi halaman {page} untuk template {category}",
     "shelves": {
       "sell": "Jualan online",
       "learn": "Belajar & komunitas",
@@ -1381,5 +1380,20 @@
     "docusaurus-openapi-docs": {
       "desc": "Dokumentasi API berbasis Docusaurus dengan sidebar abu muda dan aksen hijau."
     }
+  },
+  "footer": {
+    "credits": "Kredit template"
+  },
+  "credits": {
+    "title": "Kredit template open-source",
+    "intro": "FUSE menampilkan tangkapan layar template open-source sebagai contoh jenis website. Template dan isinya tetap milik pembuatnya dan dipakai sesuai lisensinya.",
+    "columns": {
+      "category": "Kategori",
+      "template": "Template",
+      "license": "Lisensi",
+      "source": "Sumber",
+      "attribution": "Atribusi"
+    },
+    "noAttribution": "—"
   }
 }
