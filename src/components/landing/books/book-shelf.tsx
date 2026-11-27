@@ -18,10 +18,10 @@ const itemOf = (copy: Copy, id: BookId) => (copy.items as Record<BookId, Item>)[
 
 /** Cover tones: steel stays off small text (fails AA), so it only paints ribbons and lines. */
 const TONES = {
-  ink: { bg: "#0A1931", fg: "#F6FAFD", ribbon: "#B3CFE5" },
-  deep: { bg: "#1A3D63", fg: "#F6FAFD", ribbon: "#B3CFE5" },
-  mist: { bg: "#B3CFE5", fg: "#0A1931", ribbon: "#1A3D63" },
-  snow: { bg: "#F6FAFD", fg: "#0A1931", ribbon: "#4A7FA7" },
+  ink: { bg: "#0A1931", fg: "#F6FAFD", ribbon: "#B3CFE5", edge: "#B3CFE5" },
+  deep: { bg: "#1A3D63", fg: "#F6FAFD", ribbon: "#B3CFE5", edge: "#B3CFE5" },
+  mist: { bg: "#B3CFE5", fg: "#0A1931", ribbon: "#1A3D63", edge: "#1A3D63" },
+  snow: { bg: "#F6FAFD", fg: "#0A1931", ribbon: "#4A7FA7", edge: "#B3CFE5" },
 } as const;
 type Tone = keyof typeof TONES;
 const TONE_ORDER: Tone[] = ["ink", "deep", "mist", "snow"];
@@ -156,7 +156,7 @@ export function BookCover({ book, title }: { book: ResultBook; title: string }) 
   return (
     <svg viewBox="0 0 120 170" aria-hidden="true" className="block h-full w-full">
       <rect width="120" height="170" rx="4" fill={tone.bg} />
-      <rect x="1" y="1" width="118" height="168" rx="3.5" fill="none" stroke={tone.ribbon} strokeWidth={book.shelf === "studio" ? 2 : 1} strokeOpacity={0.8} />
+      <rect x="1" y="1" width="118" height="168" rx="3.5" fill="none" stroke={tone.edge} strokeWidth={book.shelf === "studio" ? 2 : 1} strokeOpacity={0.8} />
       <rect x="0" y="0" width="6" height="170" fill={tone.ribbon} opacity={0.85} />
       {lines.map((l, i) => (
         <text key={l} x="60" y={lines.length === 1 ? 44 : 38 + i * 15} textAnchor="middle" fill={tone.fg} fontSize="12" fontWeight="600">
@@ -244,13 +244,13 @@ function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: 
         <div
           data-book-pages="right"
           aria-hidden="true"
-          className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[14px] origin-left [transform:rotateY(90deg)]"
+          className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[14px] origin-left [transform:rotateY(90deg)] motion-reduce:[transform:none] motion-reduce:w-[4px]"
           style={{ background: "repeating-linear-gradient(90deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
         />
         <div
           data-book-pages="bottom"
           aria-hidden="true"
-          className="absolute left-[3px] top-full h-[10px] w-[calc(100%-6px)] origin-top [transform:rotateX(-90deg)]"
+          className="absolute left-[3px] top-full h-[6px] w-[calc(100%-3px)]"
           style={{ background: "repeating-linear-gradient(180deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
         />
         <div
