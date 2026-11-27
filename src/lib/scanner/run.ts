@@ -123,7 +123,7 @@ export async function scanProjectArtifacts(files: Record<string, string>): Promi
   const toolsSkipped: { tool: string; reason: string }[] = [];
 
   const { files: safeFiles } = filterSafeArtifacts(files);
-  const dir = await mkdtemp(path.join(tmpdir(), "saksi-scan-"));
+  const dir = await mkdtemp(path.join(tmpdir(), "fuse-scan-"));
   try {
     for (const [rel, content] of Object.entries(safeFiles)) {
       const target = path.join(dir, rel);

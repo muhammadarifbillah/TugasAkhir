@@ -14,7 +14,7 @@ test("interactiveDocument stamps the nonce on every inline script", () => {
   assert.equal(scripts.length, 2);
   for (const tag of scripts) assert.ok(tag.includes(`nonce="${NONCE}"`), tag);
   assert.ok(doc.includes('Content-Security-Policy'));
-  assert.ok(doc.includes("saksi-mockup"));
+  assert.ok(doc.includes("fuse-mockup"));
 });
 
 test("interactiveDocument keeps existing nonces and external scripts", () => {

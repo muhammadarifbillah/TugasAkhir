@@ -86,7 +86,7 @@ export function DeliverablesPanel({
   const projectDone = projectStatus === "completed";
 
   const badgeUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/api/badge/${projectId}`;
-  const badgeMarkdown = `[![Saksi](https://img.shields.io/badge/Saksi-NIST%20SP%20800--218-brightgreen)](${badgeUrl})`;
+  const badgeMarkdown = `[![FUSE](https://img.shields.io/badge/FUSE-NIST%20SP%20800--218-brightgreen)](${badgeUrl})`;
 
   async function push() {
     const usingExisting = existingRepoUrl.trim().length > 0;
@@ -100,7 +100,7 @@ export function DeliverablesPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
-          repoName: repoName.trim() || "saksi-website",
+          repoName: repoName.trim() || "fuse-website",
           visibility,
           commitMessage,
           pat: pat.trim() || undefined,
@@ -203,7 +203,7 @@ export function DeliverablesPanel({
 
   function downloadZip() {
     if (fileCount === 0) return;
-    void downloadBlob(`/api/export/zip?projectId=${projectId}`, `saksi-${projectId}.zip`, "zip");
+    void downloadBlob(`/api/export/zip?projectId=${projectId}`, `fuse-${projectId}.zip`, "zip");
   }
 
   function download(kind: "manual" | "iso" | "traceability", format: "pdf" | "md") {

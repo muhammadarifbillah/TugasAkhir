@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       target.baseSha,
       files,
       commitMessage?.trim() ||
-        `feat: ${target.created ? `initial release` : `update`} ${project.currentVersion} via Saksi`,
+        `feat: ${target.created ? `initial release` : `update`} ${project.currentVersion} via FUSE`,
     );
     const repoUrl = target.repoUrl;
 

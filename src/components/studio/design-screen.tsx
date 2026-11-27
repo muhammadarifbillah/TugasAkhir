@@ -35,7 +35,7 @@ function mockupCsp(nonce: string): string {
   );
 }
 
-const MOCKUP_MESSAGE_SOURCE = "saksi-mockup";
+const MOCKUP_MESSAGE_SOURCE = "fuse-mockup";
 
 const MOCKUP_BRIDGE = `(function () {
   function send(href) {

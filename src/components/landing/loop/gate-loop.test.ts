@@ -386,7 +386,7 @@ describe("gate loop", () => {
 
   it("gate-loop source keeps the CSV export, gates ambient motion and never loops", () => {
     const src = read("src/components/landing/loop/gate-loop.tsx");
-    for (const s of ["buildMatrixCsv", '"saksi-matriks-nist-iso.csv"', "useAmbientMotion", "pathLength", "animateMotion", 'repeatCount="1"', "beginElement", "skipAnimations={false}"])
+    for (const s of ["buildMatrixCsv", '"fuse-matriks-nist-iso.csv"', "useAmbientMotion", "pathLength", "animateMotion", 'repeatCount="1"', "beginElement", "skipAnimations={false}"])
       expect(src, s).toContain(s);
     for (const s of ['repeatCount="indefinite"', "setInterval", "backdrop", "<motion.", "useAnimate", 'from "gsap"']) expect(src, s).not.toContain(s);
     const hook = read("src/components/landing/use-ambient-motion.ts");

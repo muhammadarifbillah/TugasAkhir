@@ -129,7 +129,7 @@ export function GateLoop({ gates, labels, matrix }: { gates: LoopGate[]; labels:
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "saksi-matriks-nist-iso.csv";
+    a.download = "fuse-matriks-nist-iso.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
