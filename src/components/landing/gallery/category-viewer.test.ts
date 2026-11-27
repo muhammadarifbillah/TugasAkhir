@@ -365,4 +365,27 @@ describe("category viewer", () => {
     const full = renderToStaticMarkup(createElement(FuseLockup, { label: "FUSE" }));
     expect(full.match(/fuse-word/g)?.length).toBe(1);
   });
+
+  it("every viewer grid column has min-w-0 and the preview is w-full max-w-full, so 390 px never overflows", () => {
+    const html = render("id", SITE_CATEGORIES[0]);
+    const grid = tagOf(html, "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_8.5rem]");
+    const at = html.indexOf(grid) + grid.length;
+    for (const order of ["order-1", "order-2", "order-3"]) {
+      const tag = tagOf(html.slice(at), `class="${order}`);
+      expect(tag, order).toMatch(/class="[^"]*\bmin-w-0\b/);
+    }
+    const preview = tagOf(html, "data-viewer-preview=");
+    for (const k of ["w-full", "max-w-full"]) expect(preview, k).toMatch(new RegExp(`class="[^"]*\\b${k}(?=[\\s"])`));
+  });
+
+  it("page caption sits after the mist circle on an opaque snow panel above it", () => {
+    for (const lang of LANGS) {
+      const html = render(lang, SITE_CATEGORIES[0]);
+      const text = escape(fmt(copyOf(lang).pageOf, { n: 1, total: 3 }));
+      const at = html.indexOf(`>${text}<`);
+      expect(at, text).toBeGreaterThan(html.indexOf("data-viewer-circle"));
+      const tag = html.slice(html.lastIndexOf("<", at), at + 1);
+      for (const k of ["bg-[#F6FAFD]", "relative", "z-10"]) expect(tag, k).toContain(k);
+    }
+  });
 });
