@@ -159,10 +159,10 @@ describe("gate loop geometry", () => {
   });
 
   // Replaced (fuse-v2-r11): "the return lane passes outside the text columns of the first and last station" is covered
-  // by A2 below; LOOP_LABEL_HALF (centred text columns) is gone and A2 checks every text box against both lanes.
+  // by A2 below; the old half-width constant of the centred text columns is gone and A2 checks every text box against both lanes.
 
   // Changed (fuse-v2-r11): LANE_HALF now comes from the geometry (22, wider lane) plus LANE_DROP (10) for the side
-  // below; the margin >= LOOP_LABEL_HALF + 16 + LANE_HALF assertion is dropped with that constant.
+  // below; the old margin >= label half + 16 + lane half assertion is dropped with that constant.
   it("the whole loop, lane width included, stays inside the viewBox", () => {
     const { forward, back } = loopLayout(5);
     for (const d of [forward, back])
@@ -229,7 +229,7 @@ describe("gate loop", () => {
     for (const t of pressed) expect(t).toMatch(/data-loop-station(-m)?="0"/);
   });
 
-  // Replaced (fuse-v2-r11): "station text columns are as wide as 2 x LOOP_LABEL_HALF ..." is covered by B4 below;
+  // Replaced (fuse-v2-r11): "station text columns are as wide as 2 x the label half-width ..." is covered by B4 below;
   // the text no longer sits centred under the station.
 
   it("desktop lane is layered: side, surface and edge for the forward and the return lane", () => {
