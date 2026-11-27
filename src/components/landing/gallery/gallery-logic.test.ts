@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
-import { VIEWER_INITIAL, filterByShelf, keyToAction, pointerTilt, viewerReducer, wallPose, type ViewerState } from "./gallery-logic";
+import { VIEWER_INITIAL, filterByShelf, keyToAction, pointerTilt, viewerReducer, visibleCategories, wallPose, type ViewerState } from "./gallery-logic";
 
 const opened = (page: 0 | 1 | 2 = 0): ViewerState => ({ open: "marketplace", page, dir: 1 });
 
@@ -73,6 +73,13 @@ describe("gallery logic", () => {
     expect(filterByShelf(SITE_CATEGORIES, "learn").map((c) => c.id)).toEqual(["lms", "news"]);
     expect(filterByShelf(SITE_CATEGORIES, "tech").map((c) => c.id)).toEqual(["api"]);
     expect(SITE_CATEGORIES.map((c) => c.id)).toEqual(before);
+  });
+
+  it("visibleCategories filters by shelf only in the all view", () => {
+    expect(visibleCategories(SITE_CATEGORIES, "all", "learn").map((c) => c.id)).toEqual(["lms", "news"]);
+    expect(visibleCategories(SITE_CATEGORIES, "all", null)).toHaveLength(8);
+    expect(visibleCategories(SITE_CATEGORIES, "shelves", "learn")).toHaveLength(8);
+    expect(visibleCategories(SITE_CATEGORIES, "shelves", null)).toHaveLength(8);
   });
 
   it("pointerTilt is clamped to -1..1 and safe for zero width", () => {

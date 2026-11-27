@@ -144,7 +144,7 @@ describe("template shelf", () => {
 
   it("shelf source lays shelves side by side and paints planks opaquely", () => {
     const src = read("src/components/landing/gallery/template-shelf.tsx");
-    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "filterByShelf", "data-shelf-plank", "bg-card", "motion-reduce:"]) expect(src).toContain(s);
+    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "visibleCategories", "data-shelf-plank", "bg-card", "motion-reduce:"]) expect(src).toContain(s);
     for (const s of ["bg-[var(--fuse-card-bg)]", "backdrop", "setInterval"]) expect(src).not.toContain(s);
   });
 
@@ -249,6 +249,14 @@ describe("template shelf", () => {
       expect(classOf(m![2]), "row must not wrap or the plank sits under row 2").not.toContain("lg:flex-wrap");
       expect(classOf(m![3])).toContain("w-full");
     }
+  });
+
+  it("grid and aria-live count share visibleCategories so the number matches the shelf filter", () => {
+    const src = read("src/components/landing/gallery/template-shelf.tsx");
+    expect(src).toMatch(/const visible = visibleCategories\(results, view, shelf\)/);
+    expect(src).toContain("{ n: visible.length }");
+    expect(src).not.toContain("{ n: results.length }");
+    expect(src).toContain("visible.map((c) => book(c, true))");
   });
 
   it("landing.shelf keys match in id and en", () => {
