@@ -159,26 +159,30 @@ describe("book shelf", () => {
     for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "rotateY", "useReducedMotion", "bookReducer", "booksOnShelf", "skipAnimations={false}", "motion-reduce:"])
       expect(src, s).toContain(s);
     for (const s of ["backdrop", "<motion.", "useAnimate", "setInterval"]) expect(src, s).not.toContain(s);
-    // User-triggered motion: the cover swing plays for everyone, reduce motion only shortens it.
-    expect(src).toContain("{!state.turned && (");
-    expect(src).toContain("reduced ? 0.4 : 0.95");
+    // User-triggered motion: the spread flies out of the clicked cover, then that cover swings open.
+    expect(src).toContain("setOrigin({");
+    expect(src).toContain("delay: travel");
+    expect(src).toContain("data-book-open");
+    expect(src).toContain("reducedMotion=\"never\"");
   });
 
-  it("shelf boards and the book dialog paint the gradient card surface as a background, not a colour", () => {
+  it("the shelf is a landing card, and the spread paints solid palette paper", () => {
     const src = read("src/components/landing/books/book-shelf.tsx");
     for (const s of ["bg-[var(--fuse-card-bg)]", "var(--fuse-card-bg)_", 'stroke="var(--fuse-card-bg)"']) expect(src, s).not.toContain(s);
-    expect(src).toContain("[background:var(--fuse-card-bg)]");
+    expect(src).toContain("clay-card");
+    expect(src).toContain("bg-[var(--fuse-snow)]");
   });
 
-  it("each shelf sits in a warm paper case, and the books stand inside it", () => {
+  it("each shelf sits in a themed card, and the books stand inside it", () => {
     const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
     expect(html).not.toContain("fuse-card-bg");
     const cases = [...html.matchAll(/<div[^>]*data-book-case=""[^>]*>/g)].map((m) => m[0]);
     expect(cases).toHaveLength(2);
     for (const c of cases) {
-      expect(c).toContain("bg-[#FAF3E9]");
-      expect(c).toContain("rounded-[1.5rem]");
-      expect(c).toContain("--foreground:#2A2118");
+      // The case follows the landing cards instead of painting its own warm paper surface.
+      expect(c).toContain("clay-card");
+      expect(c).not.toContain("#FAF3E9");
+      expect(c).not.toContain("--foreground");
     }
     // Each rail lives inside a case, and the case's heading comes first.
     for (const shelf of ["home", "studio"]) {
@@ -220,16 +224,17 @@ describe("book shelf", () => {
     expect(src).toContain('reducedMotion="never"');
   });
 
-  it("each book shows paper page thickness on the right and at the bottom", () => {
+  it("each book shows palette page thickness on the right and at the bottom", () => {
     const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     for (const side of ["right", "bottom"]) {
       const tags = [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
       expect(tags, side).toHaveLength(12);
-      for (const t of tags) expect(t.match(/style="([^"]*)"/)?.[1], side).toContain("#FFFCF6");
+      for (const t of tags) expect(t.match(/style="([^"]*)"/)?.[1], side).toContain("#F6FAFD");
     }
     const src = read("src/components/landing/books/book-shelf.tsx");
-    // Warm paper and bookmark accents, from the bookstore reference.
-    for (const s of ["#FAF3E9", "#FFFCF6", "#E4D6C4", "RIBBONS"]) expect(src, s).toContain(s);
+    // Snow sheets between mist rules, and the warm paper of the reference is gone.
+    for (const s of ["#F6FAFD", "#B3CFE5"]) expect(src, s).toContain(s);
+    for (const s of ["#FAF3E9", "#FFFCF6", "#E4D6C4", "#D9604F", "RIBBONS"]) expect(src, s).not.toContain(s);
   });
 
   it("a caption under each book gives its title and its source stage", () => {
