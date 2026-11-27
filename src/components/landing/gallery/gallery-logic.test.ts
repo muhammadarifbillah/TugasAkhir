@@ -24,6 +24,36 @@ const project = (p: ReturnType<typeof wallPose>, u: number, pw: number) => {
 };
 const projectedEdges = (pw: number) => Array.from({ length: N }, (_, i) => [project(wallPose(i, N), -pw / 2, pw), project(wallPose(i, N), pw / 2, pw)]);
 
+const LABEL_NAMES = ["id", "en"].map((l) => {
+  const items = JSON.parse(readFileSync(join(process.cwd(), `src/dictionaries/${l}.json`), "utf8")).categories.items as Record<string, { name: string }>;
+  return SITE_CATEGORIES.map((c) => items[c.id].name.toUpperCase());
+});
+/** Inner padding (pr-2 / pl-2) of the first and last labels, which align towards the inside (hero-wall.tsx). */
+const LABEL_PAD = 8;
+/** Projected [left, right] of each label's text: wrapped like the browser, first right-aligned, last left-aligned, rest centred. */
+const labelBoxes = (list: string[], vw: number, pw: number) => {
+  return list.map((name, i) => {
+    const outer = i === 0 || i === list.length - 1;
+    // hero-wall.tsx label: text-[clamp(0.8rem,1vw,1rem)] (outer: 0.7rem floor, so "MARKETPLACE" fits the 116 px left on
+    // screen at 1024), tracking 0.2em; ~0.62em per caps glyph in the light face.
+    const fs = Math.min(16, Math.max(outer ? 11.2 : 12.8, vw / 100));
+    const textWidth = (s: string) => s.length * fs * 0.82;
+    // Outer labels also keep 30 % of the panel free on the off-screen side (pl/pr-[30%]), so they wrap inside what is visible.
+    const room = outer ? pw * 0.7 - LABEL_PAD : pw;
+    const lines: string[] = [];
+    for (const word of name.split(" ")) {
+      expect(textWidth(word), `${vw}px "${word}" fits the panel`).toBeLessThanOrEqual(room);
+      const last = lines.at(-1);
+      if (last !== undefined && textWidth(`${last} ${word}`) <= room) lines[lines.length - 1] = `${last} ${word}`;
+      else lines.push(word);
+    }
+    expect(lines.length, `${vw}px "${name}" lines`).toBeLessThanOrEqual(2);
+    const w = Math.min(room, Math.max(...lines.map(textWidth)));
+    const [a, b] = i === 0 ? [pw / 2 - LABEL_PAD - w, pw / 2 - LABEL_PAD] : i === list.length - 1 ? [-pw / 2 + LABEL_PAD, -pw / 2 + LABEL_PAD + w] : [-w / 2, w / 2];
+    return [project(wallPose(i, N), a, pw), project(wallPose(i, N), b, pw)];
+  });
+};
+
 describe("gallery logic", () => {
   it("viewerReducer opens a category on page 1 and close resets", () => {
     expect(viewerReducer(VIEWER_INITIAL, { type: "open", id: "marketplace" })).toEqual({ open: "marketplace", page: 0, dir: 1 });
@@ -140,30 +170,22 @@ describe("gallery logic", () => {
 
   // r23 round 2: slimmer panels, so labels wrap (at most two lines) inside the panel width and never cover a neighbour's.
   it("projected panel labels of neighbours never overlap by more than 4 px", () => {
-    const names = ["id", "en"].map((l) => {
-      const items = JSON.parse(readFileSync(join(process.cwd(), `src/dictionaries/${l}.json`), "utf8")).categories.items as Record<string, { name: string }>;
-      return SITE_CATEGORIES.map((c) => items[c.id].name.toUpperCase());
-    });
-    for (const { vw, pw } of VIEWS) {
-      // hero-wall.tsx label: text-[clamp(0.8rem,1vw,1rem)], tracking 0.2em; ~0.62em per caps glyph in the light face.
-      const fs = Math.min(16, Math.max(12.8, vw / 100));
-      const textWidth = (s: string) => s.length * fs * 0.82;
-      for (const list of names) {
-        const boxes = list.map((name, i) => {
-          const lines: string[] = [];
-          for (const word of name.split(" ")) {
-            expect(textWidth(word), `${vw}px "${word}" fits the panel`).toBeLessThanOrEqual(pw);
-            const last = lines.at(-1);
-            if (last !== undefined && textWidth(`${last} ${word}`) <= pw) lines[lines.length - 1] = `${last} ${word}`;
-            else lines.push(word);
-          }
-          expect(lines.length, `${vw}px "${name}" lines`).toBeLessThanOrEqual(2);
-          const w = Math.min(pw, Math.max(...lines.map(textWidth)));
-          return [project(wallPose(i, N), -w / 2, pw), project(wallPose(i, N), w / 2, pw)];
-        });
+    for (const { vw, pw } of VIEWS)
+      for (const list of LABEL_NAMES) {
+        const boxes = labelBoxes(list, vw, pw);
         for (let i = 1; i < N; i++) expect(boxes[i - 1][1] - boxes[i][0], `${vw}px labels ${i - 1}|${i}`).toBeLessThanOrEqual(4);
       }
-    }
+  });
+
+  // r23 round 3: the cut edge panels pushed a centred label off screen ("RKETPLACE", "DOKUMENTA…"). The first label is
+  // right-aligned and the last left-aligned (towards the inside, pr-2/pl-2), so the whole text box stays on screen.
+  it("projected label text of every panel lies inside the viewport with at least 4 px to spare", () => {
+    for (const { vw, pw } of VIEWS)
+      for (const list of LABEL_NAMES)
+        labelBoxes(list, vw, pw).forEach(([l, r], i) => {
+          expect(l, `${vw}px label ${i} left`).toBeGreaterThanOrEqual(-vw / 2 + 4);
+          expect(r, `${vw}px label ${i} right`).toBeLessThanOrEqual(vw / 2 - 4);
+        });
   });
 
   // r22 round 3: a panel behind z=0 sat behind the preserve-3d ul plane, so the ul swallowed its hover and click.
