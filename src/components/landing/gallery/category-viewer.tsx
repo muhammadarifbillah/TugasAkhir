@@ -2,21 +2,29 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, m } from "motion/react";
+import Image from "next/image";
 import { useId, useRef } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { FuseLockup } from "@/components/brand/fuse-lockup";
-import { SiteArt } from "@/components/site-art/site-art";
+import en from "@/dictionaries/en.json";
+import id from "@/dictionaries/id.json";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { EASE } from "../motion";
-import { keyToAction, type PageIndex, type ViewerAction, type ViewerState } from "./gallery-logic";
+import { keyToAction, tabKey, type ViewerAction, type ViewerState } from "./gallery-logic";
 
 type Labels = Dictionary["categories"];
 type Copy = Dictionary["landing"]["gallery"];
-type Item = { name: string; desc: string; pages: Record<string, string>; features: Record<string, string>; checks: Record<string, string> };
+type Item = { name: string; desc: string; features: Record<string, string>; checks: Record<string, string> };
+type TemplateCopy = { templatePages: Record<string, string>; templates: Record<string, { desc: string }> };
 
-const PAGES = [0, 1, 2] as const;
+// shortcut: both dictionaries ship to the client for these two subtrees; pass them through GalleryProvider once page.tsx may change.
+const TEMPLATE_COPY: Record<string, TemplateCopy> = { id, en };
+const licenseLabel = (license: string) => license.replace(/-/g, " ");
+const LINK = "font-semibold text-[#1A3D63] underline underline-offset-2 hover:text-[#0A1931] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]";
+
 const slide = {
   enter: (dir: 1 | -1) => ({ x: dir * 40, opacity: 0 }),
   center: { x: 0, opacity: 1 },
@@ -29,12 +37,14 @@ const PRIMARY =
 
 export function ViewerBody({
   category,
+  template,
   page,
   dir,
   lang,
   appName,
   labels,
   copy,
+  onTemplate,
   onPage,
   onNext,
   onPrev,
@@ -42,13 +52,15 @@ export function ViewerBody({
   slots,
 }: {
   category: SiteCategory;
-  page: PageIndex;
+  template: number;
+  page: number;
   dir: 1 | -1;
   lang: string;
   appName: string;
   labels: Labels;
   copy: Copy;
-  onPage: (p: PageIndex) => void;
+  onTemplate: (i: number) => void;
+  onPage: (p: number) => void;
   onNext: () => void;
   onPrev: () => void;
   onSeeAll?: () => void;
@@ -57,8 +69,13 @@ export function ViewerBody({
   const Title = slots?.Title ?? "h2";
   const Description = slots?.Description ?? "p";
   const specId = useId();
+  const tabsId = useId();
+  const panelId = `${tabsId}-panel`;
   const item = labels.items[category.id] as unknown as Item;
-  const pageNames = category.pages.map((p) => item.pages[p.id]);
+  const names = TEMPLATE_COPY[lang] ?? TEMPLATE_COPY.en;
+  const templates = SITE_TEMPLATES[category.id];
+  const tpl = templates[template];
+  const pageNames = tpl.pages.map((p) => names.templatePages[p.id]);
   const specs = [
     [copy.specPages, pageNames.join(" · "), copy.specFeatures, category.features.map((f) => item.features[f]).join(" · ")],
     [copy.specStack, category.stack.join(" · "), copy.specChecks, fmt(copy.checksCount, { n: category.checks.length })],
@@ -80,7 +97,7 @@ export function ViewerBody({
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_8.5rem] lg:gap-8">
-        <div className="order-1 min-w-0">
+        <div role="tabpanel" id={panelId} aria-labelledby={`${tabsId}-tab-${template}`} className="order-1 min-w-0">
           <div data-viewer-preview="" className="relative grid w-full max-w-full place-items-center py-6">
             <span
               data-viewer-circle=""
@@ -93,41 +110,81 @@ export function ViewerBody({
               onClick={onNext}
               className="relative block w-[80%] overflow-hidden rounded-[1.25rem] border border-[#B3CFE5] shadow-[0_24px_40px_-20px_rgb(10_25_49/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]"
             >
-              <AnimatePresence initial={false} mode="popLayout" custom={dir}>
-                <m.div
-                  key={page}
-                  custom={dir}
-                  variants={slide}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.28, ease: EASE }}
-                >
-                  <SiteArt category={category} pageIndex={page} labels={labels} className="block h-auto w-full" />
-                </m.div>
-              </AnimatePresence>
+              <span data-viewer-browser="" className="flex flex-col bg-[#0A1931]">
+                <span data-viewer-browser-bar="" className="flex h-7 shrink-0 items-center gap-1.5 px-3">
+                  {["bg-[#B3CFE5]", "bg-[#4A7FA7]", "bg-[#F6FAFD]"].map((dot) => (
+                    <span key={dot} data-viewer-dot="" aria-hidden="true" className={`size-2 shrink-0 rounded-full ${dot}`} />
+                  ))}
+                  <span className="ml-2 min-w-0 flex-1 truncate rounded-full bg-[#1A3D63] px-3 text-center text-[11px] leading-5 text-[#B3CFE5]">
+                    {tpl.slug}.fuse.dev
+                  </span>
+                </span>
+                <span className="relative block aspect-[16/10] overflow-hidden bg-[#F6FAFD]">
+                  <AnimatePresence initial={false} mode="popLayout" custom={dir}>
+                    <m.span
+                      key={`${template}-${page}`}
+                      custom={dir}
+                      variants={slide}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ duration: 0.28, ease: EASE }}
+                      className="absolute inset-0 block"
+                    >
+                      <Image
+                        src={tpl.pages[page].src}
+                        alt={`${tpl.name} — ${pageNames[page]}`}
+                        fill
+                        sizes="(min-width:1024px) 34vw, 92vw"
+                        draggable={false}
+                        className="object-cover object-top"
+                      />
+                    </m.span>
+                  </AnimatePresence>
+                </span>
+              </span>
             </button>
           </div>
           <p data-viewer-preview-hint="" className="relative z-10 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1A3D63]">
             {copy.previewHint}
           </p>
+          <div data-viewer-credit="" className="relative z-10 mt-2 text-center text-xs leading-relaxed text-[#1A3D63]">
+            <p>
+              <span className="font-semibold text-[#0A1931]">{tpl.name}</span>
+              {" · "}
+              {copy.viewerCreditLicense}{" "}
+              <a href={tpl.licenseUrl} target="_blank" rel="noopener noreferrer" className={LINK}>
+                {licenseLabel(tpl.license)}
+                <span className="sr-only"> {copy.viewerCreditNewTab}</span>
+              </a>
+              {" · "}
+              <a href={tpl.source} target="_blank" rel="noopener noreferrer" className={LINK}>
+                {copy.viewerCreditSource}
+                <span className="sr-only"> {copy.viewerCreditNewTab}</span>
+              </a>
+            </p>
+            {tpl.attribution && <p className="mt-1">{tpl.attribution}</p>}
+          </div>
           <div className="mt-3 flex items-center justify-between gap-3">
             <button type="button" aria-label={copy.prevPage} onClick={onPrev} className={ARROW}>
               <ChevronLeft aria-hidden="true" className="size-5" />
             </button>
-            <p className="relative z-10 rounded-full bg-[#F6FAFD] px-3 text-sm font-medium text-[#0A1931]">{fmt(copy.pageOf, { n: page + 1, total: 3 })}</p>
+            <p className="relative z-10 rounded-full bg-[#F6FAFD] px-3 text-sm font-medium text-[#0A1931]">{fmt(copy.pageOf, { n: page + 1, total: tpl.pages.length })}</p>
             <button type="button" aria-label={copy.nextPage} onClick={onNext} className={ARROW}>
               <ChevronRight aria-hidden="true" className="size-5" />
             </button>
           </div>
           <p className="mt-2 text-center text-xs text-[#1A3D63]">{copy.pageHint}</p>
-          <p className="mt-1 text-center text-xs text-[#1A3D63]">{labels.galleryLabel}</p>
+          <p className="mt-1 text-center text-xs text-[#1A3D63]">{copy.viewerGalleryLabel}</p>
         </div>
 
         <div className="order-2 flex min-w-0 items-center gap-2 lg:order-3 lg:items-start">
-          <ul aria-label={copy.thumbsLabel} className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
-            {PAGES.map((i) => (
-              <li key={i} className="w-28 shrink-0 lg:w-full">
+          <ul
+            aria-label={copy.thumbsLabel}
+            className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:max-h-[34rem] lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:pr-1"
+          >
+            {tpl.pages.map((p, i) => (
+              <li key={p.id} className="w-28 shrink-0 lg:w-full">
                 <button
                   type="button"
                   data-viewer-thumb=""
@@ -137,7 +194,7 @@ export function ViewerBody({
                   className="block w-full rounded-xl border border-transparent p-2 opacity-70 transition-[opacity,background-color] hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] aria-[current=true]:border-l-[3px] aria-[current=true]:border-l-[#4A7FA7] aria-[current=true]:bg-[#B3CFE5] aria-[current=true]:opacity-100"
                 >
                   <span aria-hidden="true" className="block overflow-hidden rounded-lg">
-                    <SiteArt category={category} pageIndex={i} labels={labels} className="block h-auto w-full" />
+                    <Image src={p.thumb} alt="" width={400} height={250} sizes="8rem" draggable={false} className="block h-auto w-full" />
                   </span>
                 </button>
               </li>
@@ -158,7 +215,39 @@ export function ViewerBody({
           <p data-viewer-byline="" className="mt-2 text-xs uppercase tracking-wide text-[#1A3D63]">
             {fmt(copy.byline, { name: appName, n: category.pages.length })}
           </p>
-          <Description className="mt-4 text-base italic leading-relaxed text-[#1A3D63]">{item.desc}</Description>
+          <div
+            role="tablist"
+            aria-label={copy.viewerTemplatesLabel}
+            className="mt-4 flex flex-wrap gap-2"
+            onKeyDown={(e) => {
+              const i = tabKey(e.key, template, templates.length);
+              if (i === null) return;
+              // Arrows here switch templates; keep them from paging the preview (dialog-level handler).
+              e.preventDefault();
+              e.stopPropagation();
+              onTemplate(i);
+              e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[i]?.focus();
+            }}
+          >
+            {templates.map((t, i) => (
+              <button
+                key={t.slug}
+                type="button"
+                role="tab"
+                id={`${tabsId}-tab-${i}`}
+                aria-selected={i === template}
+                aria-controls={panelId}
+                tabIndex={i === template ? 0 : -1}
+                onClick={() => onTemplate(i)}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#B3CFE5] px-4 text-left text-sm font-medium text-[#0A1931] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6FAFD] aria-selected:border-[#1A3D63] aria-selected:bg-[#1A3D63] aria-selected:text-[#F6FAFD] aria-selected:hover:bg-[#0A1931]"
+              >
+                <span>{t.name}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{licenseLabel(t.license)}</span>
+              </button>
+            ))}
+          </div>
+          <Description className="mt-4 text-base italic leading-relaxed text-[#1A3D63]">{names.templates[tpl.slug]?.desc}</Description>
+          <p className="mt-3 text-sm leading-relaxed text-[#0A1931]">{item.desc}</p>
           <p className="mt-3 text-sm leading-relaxed text-[#0A1931]">{copy.intro}</p>
           <hr className="mt-5 border-[#B3CFE5]" />
           {/* Below sm every label/value pair stacks full width; from sm it is a 2-pair × 3-row table. */}
@@ -285,12 +374,14 @@ export function CategoryViewer({
               </DialogPrimitive.Close>
               <ViewerBody
                 category={category}
+                template={state.template}
                 page={state.page}
                 dir={state.dir}
                 lang={lang}
                 appName={appName}
                 labels={labels}
                 copy={copy}
+                onTemplate={(i) => dispatch({ type: "template", index: i })}
                 onPage={(p) => dispatch({ type: "goto", page: p })}
                 onNext={() => dispatch({ type: "next" })}
                 onPrev={() => dispatch({ type: "prev" })}

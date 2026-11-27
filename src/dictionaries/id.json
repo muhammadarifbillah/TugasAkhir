@@ -191,7 +191,12 @@
       "specScanner": "Pemindai",
       "scannerValue": "Semgrep & Trivy",
       "reviewedBy": "Diperiksa oleh {name}",
-      "seeAllTemplates": "Lihat semua template"
+      "seeAllTemplates": "Lihat semua template",
+      "viewerTemplatesLabel": "Template kategori ini",
+      "viewerGalleryLabel": "Tangkapan layar template open-source — bukan situs klien",
+      "viewerCreditLicense": "Lisensi",
+      "viewerCreditSource": "Sumber",
+      "viewerCreditNewTab": "(membuka tab baru)"
     },
     "shelf": {
       "pill": "Rak template",
