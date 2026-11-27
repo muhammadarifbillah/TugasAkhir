@@ -13,20 +13,22 @@ export function HeroWall() {
   const { open, labels, copy } = useGallery();
   const wallRef = useRef<HTMLDivElement>(null);
 
-  // Parallax only where the landing motion gate allows it; a CSS variable, no timers.
+  // Parallax only where the landing motion gate allows it; a CSS variable, no timers. Listen on the hero section: the
+  // desktop wall is pointer-events-none, so its own pointerleave fired in every gap between panels.
   useEffect(() => {
     const el = wallRef.current;
     if (!el || !window.matchMedia(LANDING_MOTION_QUERY).matches) return;
+    const area = el.closest<HTMLElement>("#mulai-hero") ?? el;
     const move = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
+      const rect = area.getBoundingClientRect();
       el.style.setProperty("--tilt", String(pointerTilt(e.clientX, rect.left, rect.width)));
     };
     const leave = () => el.style.setProperty("--tilt", "0");
-    el.addEventListener("pointermove", move);
-    el.addEventListener("pointerleave", leave);
+    area.addEventListener("pointermove", move);
+    area.addEventListener("pointerleave", leave);
     return () => {
-      el.removeEventListener("pointermove", move);
-      el.removeEventListener("pointerleave", leave);
+      area.removeEventListener("pointermove", move);
+      area.removeEventListener("pointerleave", leave);
     };
   }, []);
 
@@ -43,6 +45,13 @@ export function HeroWall() {
         {SITE_CATEGORIES.map((c, i) => {
           const pose = wallPose(i, SITE_CATEGORIES.length);
           const name = (labels.items[c.id] as { name: string }).name;
+          // The outer panels run off the screen: their labels align towards the inside and wrap within the visible 70 %.
+          const align =
+            i === 0
+              ? "lg:pointer-fine:justify-end lg:pointer-fine:text-right lg:pointer-fine:pr-2 lg:pointer-fine:pl-[30%] lg:text-[clamp(0.7rem,1vw,1rem)]"
+              : i === SITE_CATEGORIES.length - 1
+                ? "lg:pointer-fine:justify-start lg:pointer-fine:text-left lg:pointer-fine:pl-2 lg:pointer-fine:pr-[30%] lg:text-[clamp(0.7rem,1vw,1rem)]"
+                : "lg:text-[clamp(0.8rem,1vw,1rem)]";
           return (
             <li
               key={c.id}
@@ -56,7 +65,7 @@ export function HeroWall() {
                   zIndex: Math.round((pose.z + 1) * 100),
                 } as React.CSSProperties
               }
-              className="gallery-carousel-item w-[62vw] max-w-[320px] shrink-0 snap-center lg:pointer-fine:w-[clamp(9rem,13vw,15rem)] lg:pointer-fine:max-w-none lg:pointer-fine:[--pw:clamp(9rem,13vw,15rem)] lg:pointer-fine:[grid-area:1/1] lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]"
+              className="gallery-carousel-item w-[62vw] max-w-[320px] shrink-0 snap-center lg:pointer-fine:w-[var(--pw)] lg:pointer-fine:max-w-none lg:pointer-fine:[--pw:clamp(9rem,10vw_+_3.6rem,17rem)] lg:pointer-fine:[grid-area:1/1] lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]"
             >
               <button
                 type="button"
@@ -65,13 +74,14 @@ export function HeroWall() {
                 onClick={(e) => open(c.id, e.currentTarget)}
                 className="group pointer-events-auto block min-h-11 w-full rounded-[6px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000] hover:brightness-115 focus-visible:brightness-115 motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:hover:-translate-y-3.5 motion-safe:focus-visible:-translate-y-3.5 motion-reduce:transition-none"
               >
-                <span aria-hidden="true" className="-mx-8 mb-2 block whitespace-nowrap text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] lg:text-[clamp(0.6rem,0.85vw,0.85rem)]">
+                {/* Wraps inside the panel (at most two lines on desktop); the fixed two-line box keeps all art on one baseline. */}
+                <span aria-hidden="true" className={`mb-2 flex min-h-[2lh] items-end justify-center text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] ${align}`}>
                   {name}
                 </span>
                 <span
                   aria-hidden="true"
                   data-panel-art=""
-                  className="block aspect-[2/3] overflow-hidden rounded-[6px] bg-[#000] transition-shadow group-hover:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] group-focus-visible:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] motion-reduce:transition-none"
+                  className="block aspect-[2/3] overflow-hidden lg:pointer-fine:aspect-[10/19] rounded-[6px] bg-[#000] transition-shadow group-hover:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] group-focus-visible:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] motion-reduce:transition-none"
                 >
                   <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
                 </span>
@@ -82,7 +92,7 @@ export function HeroWall() {
                 data-panel-reflection=""
                 className="mt-[6px] block aspect-[100/60] overflow-hidden rounded-[6px] opacity-45 [filter:url(#hero-ripple)] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.9),transparent_85%)]"
               >
-                <span className="block aspect-[2/3] -scale-y-100">
+                <span className="block aspect-[2/3] -scale-y-100 lg:pointer-fine:aspect-[10/19]">
                   <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
                 </span>
               </span>

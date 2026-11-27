@@ -98,11 +98,18 @@ describe("hero wall", () => {
     }
   });
 
-  // herosection.jpeg: portrait 2:3 panels everywhere, 62vw carousel cards, slimmer desktop columns.
+  // herosection.jpeg: 62vw 2:3 carousel cards on touch; r23 round 2: the reference panels are slim (±1:1.9), so the
+  // desktop art is 10/19 and --pw grows with the viewport (gallery-logic.test.ts projects these widths).
   it("wall and carousel sizes follow the panorama spec", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const pw = src.match(/\[--pw:clamp\(([\d.]+)rem,([\d.]+)vw_\+_([\d.]+)rem,([\d.]+)rem\)\]/);
+    expect(pw, "--pw clamp(min, A vw + B rem, max)").not.toBeNull();
+    const [min, a, b, max] = pw!.slice(1).map(Number);
+    for (const [vw, want] of [[1024, 160], [1440, 201.6], [1920, 249.6]])
+      expect(Math.min(max * 16, Math.max(min * 16, (a * vw) / 100 + b * 16)), `--pw at ${vw}`).toBeCloseTo(want, 1);
+    expect(src).toContain(`lg:pointer-fine:w-[var(--pw)]`);
     for (const s of [
-      "lg:pointer-fine:w-[clamp(9rem,13vw,15rem)]",
+      "lg:pointer-fine:aspect-[10/19]",
       "aspect-[2/3]",
       "w-[62vw]",
       "gallery-carousel-item",
@@ -134,9 +141,8 @@ describe("hero wall", () => {
     expect(src).toContain(
       "lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]",
     );
-    expect(src).toContain("[--pw:clamp(9rem,13vw,15rem)]");
 
-    const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/);
+    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/);
     expect(label, "label span").not.toBeNull();
     for (const c of ["uppercase", "font-light"]) expect(label![1].split(/\s+/), c).toContain(c);
     expect(label![1]).toMatch(/(?<![\w:-])tracking-\[/);
@@ -166,8 +172,52 @@ describe("hero wall", () => {
   // r22 round 3: "Dokumentasi REST API" was cut to "DOKUMENTASI REST …".
   it("panel labels are never truncated", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/)![1].split(/\s+/);
+    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/)![1].split(/\s+/);
     for (const c of ["truncate", "text-ellipsis"]) expect(label, c).not.toContain(c);
+  });
+
+  // r23 round 2: on slim panels a label wraps to at most two lines inside its own panel (gallery-logic.test.ts checks the
+  // projected boxes); a fixed two-line box keeps every panel's art on the same baseline.
+  it("panel labels wrap inside the panel width at a fixed two-line height", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/)![1].split(/\s+/);
+    // The desktop font size moved to the per-panel part (round 3, next test).
+    for (const c of ["text-center", "min-h-[2lh]", "items-end", "tracking-[0.2em]"]) expect(label, c).toContain(c);
+    expect(label.filter((c) => /whitespace-nowrap|(^|:)-mx-/.test(c))).toEqual([]);
+  });
+
+  // r23 round 3: the edge panels run off the screen, so on the desktop wall the first label aligns right and the last
+  // left (towards the inside, with pr-2/pl-2, and 30 % kept free on the off-screen side so they wrap inside what is
+  // visible); the rest stay centred (gallery-logic.test.ts projects the text boxes).
+  it("desktop edge labels align towards the inside, the others stay centred", () => {
+    const spans = [...html().matchAll(/<span aria-hidden="true" class="([^"]*)">([^<]*)<\/span>/g)].filter((m) => m[1].includes("min-h-[2lh]"));
+    expect(spans).toHaveLength(8);
+    spans.forEach(([, cls], i) => {
+      const c = cls.split(/\s+/);
+      for (const base of ["text-center", "justify-center"]) expect(c, `${i} ${base}`).toContain(base);
+      const want =
+        i === 0
+          ? ["lg:pointer-fine:justify-end", "lg:pointer-fine:text-right", "lg:pointer-fine:pr-2", "lg:pointer-fine:pl-[30%]"]
+          : i === 7
+            ? ["lg:pointer-fine:justify-start", "lg:pointer-fine:text-left", "lg:pointer-fine:pl-2", "lg:pointer-fine:pr-[30%]"]
+            : [];
+      for (const w of want) expect(c, `${i} ${w}`).toContain(w);
+      // Outer labels get a 0.7rem floor: at 1024 only 116 px of the cut edge panel is on screen.
+      const font = want.length ? "lg:text-[clamp(0.7rem,1vw,1rem)]" : "lg:text-[clamp(0.8rem,1vw,1rem)]";
+      expect(c.filter((x) => x.startsWith("lg:text-[")), `${i} font`).toEqual([font]);
+      expect(c.filter((x) => /^lg:pointer-fine:(justify-|text-(left|right)|p[lr]-)/.test(x) && !want.includes(x)), `${i}`).toEqual([]);
+    });
+  });
+
+  // r23: the group is pointer-events-none on desktop, so pointerleave fired in every gap between panels and reset the tilt.
+  it("parallax listens on the hero section, not on the pass-through wall", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    expect(src).toContain('closest<HTMLElement>("#mulai-hero")');
+    for (const e of ["pointermove", "pointerleave"]) {
+      expect(src).toContain(`area.addEventListener("${e}"`);
+      expect(src).toContain(`area.removeEventListener("${e}"`);
+      expect(src).not.toContain(`el.addEventListener("${e}"`);
+    }
   });
 
   it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {

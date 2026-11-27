@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { wallPose } from "../gallery/gallery-logic";
 import { GalleryProvider } from "../gallery/gallery-provider";
 import { LANDING_MOTION_QUERY } from "../motion";
 import { HeroBackdrop } from "./hero-backdrop";
@@ -71,6 +72,52 @@ describe("hero composition (r22 round 2)", () => {
     const wrapper = html.lastIndexOf("<div", wall - 1);
     const wrapperClasses = (html.slice(wrapper, html.indexOf(">", wrapper)).match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
     expect(zOf(classesOf(html, "data-hero-floor"))).toBeLessThan(zOf(wrapperClasses));
+  });
+
+  // r23: bigger wall; split the first screen like herosection.jpeg: title 0-30 %, wall art ±28-76 %, floor 70-100 %.
+  // A layout model of the classes that set it (jsdom has no layout); the orchestrator checks the browser.
+  it("the first screen splits into title, wall and floor at 1440x900 and 1024x768", () => {
+    const html = section();
+    const num = (cls: string[], re: RegExp) => {
+      const m = cls.map((c) => c.match(re)).find(Boolean);
+      expect(m, `${re} in ${cls.join(" ")}`).toBeTruthy();
+      return m!.slice(1).map(Number);
+    };
+    const titleAt = html.lastIndexOf("<div", html.indexOf("<h1"));
+    const titleBox = (html.slice(titleAt, html.indexOf(">", titleAt)).match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    const [ptMin, ptVw, ptMax] = num(titleBox, /^lg:pt-\[clamp\(([\d.]+)rem,([\d.]+)vw,([\d.]+)rem\)\]$/);
+    // One-line title stack: h1 40 (lg:text-4xl, fits max-w-4xl), mt-2 8, sub 26 (one line in 60ch), mt-3 12, button 44.
+    expect(titleBox).toContain("max-w-4xl");
+    expect(classesOf(html, "<p ")).toContain("max-w-[60ch]");
+    expect(classesOf(html, 'href="/id/register"')).toContain("mt-3");
+    const STACK = 40 + 8 + 26 + 12 + 44;
+    const wall = html.lastIndexOf("<div", html.indexOf('role="group"'));
+    const wrapper = html.lastIndexOf("<div", wall - 1);
+    const wrapperClasses = (html.slice(wrapper, html.indexOf(">", wrapper)).match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    for (const c of ["lg:absolute", "lg:inset-x-0", "lg:-translate-y-1/2"]) expect(wrapperClasses, c).toContain(c);
+    const [top] = num(wrapperClasses, /^lg:top-\[([\d.]+)%\]$/);
+    expect(classesOf(html, "data-hero-floor")).toContain("h-[30%]");
+
+    for (const { vw, vh, pw } of [{ vw: 1440, vh: 900, pw: 201.6 }, { vw: 1024, vh: 768, pw: 160 }]) {
+      const hh = Math.max(640, vh - 56);
+      // HeroBackdrop: moon bottom at y=110 of a 1440x520 viewBox, xMidYMin slice over vw x clamp(13rem,36vw,32.5rem).
+      const moon = 110 * Math.max(vw / 1440, Math.min(520, Math.max(208, 0.36 * vw)) / 520);
+      const pt = Math.min(ptMax * 16, Math.max(ptMin * 16, (ptVw * vw) / 100));
+      expect(pt, `${vw}px title below the moon`).toBeGreaterThanOrEqual(moon);
+      const titleBottom = pt + STACK;
+      expect(titleBottom / hh, `${vw}px title bottom`).toBeLessThanOrEqual(0.3);
+
+      // Wall wrapper centred at top%: ul pt-6, two-line label (1.5 line height + mb-2), 10/19 art, 6px + 0.6 pw reflection.
+      const label = 2 * 1.5 * Math.min(16, Math.max(12.8, vw / 100)) + 8;
+      const wrapperH = 24 + label + 1.9 * pw + 6 + 0.6 * pw;
+      const artCentre = (top / 100) * hh - wrapperH / 2 + 24 + label + 0.95 * pw;
+      const edge = wallPose(7, 8);
+      const edgeH = (1.9 * pw * edge.scale * 1200) / (1200 - edge.z * pw);
+      expect((artCentre - edgeH / 2) / hh, `${vw}px wall top`).toBeGreaterThanOrEqual(0.26);
+      expect((artCentre + edgeH / 2) / hh, `${vw}px wall bottom`).toBeLessThanOrEqual(0.78);
+      const centreLabelTop = artCentre - (0.95 * pw + label) * wallPose(3, 8).scale;
+      expect(centreLabelTop, `${vw}px centre label clears the button`).toBeGreaterThanOrEqual(titleBottom + 8);
+    }
   });
 
   it("the hero shows the hint and the gallery label", () => {
