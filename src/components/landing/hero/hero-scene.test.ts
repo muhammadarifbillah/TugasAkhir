@@ -37,6 +37,13 @@ describe("hero scene", () => {
     expect(seen.size).toBe(8);
   });
 
+  // r22 round 2: unrounded Math.cos output in the palm fronds can differ between server and client (hydration).
+  it("computed path coordinates are rounded to at most 2 decimals", () => {
+    SITE_CATEGORIES.forEach((c, i) => {
+      for (const [, d] of scene(i).matchAll(/ d="([^"]*)"/g)) expect(d, c.id).not.toMatch(/\d\.\d{3,}/);
+    });
+  });
+
   it("the skeleton follows the first page's blocks, so categories with different blocks differ", () => {
     const strip = (h: string) => h.replace(/data-mood="\d"/, "").replace(/id="[^"]*"|url\(#[^)]*\)/g, "");
     // Same mood, different categories: only the skeleton can tell them apart.

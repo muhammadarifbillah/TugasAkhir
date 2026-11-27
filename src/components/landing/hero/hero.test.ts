@@ -36,6 +36,46 @@ describe("hero backdrop", () => {
     expect(renderToStaticMarkup(createElement(HeroBackdrop))).toBe(html);
     for (const s of ["<text", "<image"]) expect(html, s).not.toContain(s);
   });
+
+  // r22 round 2: the reference frames the moon with dense foliage on both sides, not one small clump.
+  it("HeroBackdrop has at least two leaf clusters", () => {
+    const html = renderToStaticMarkup(createElement(HeroBackdrop));
+    expect(html.match(/data-hero-leaves/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+  });
+});
+
+/** Class list of the first tag carrying `attr`. */
+const classesOf = (html: string, attr: string) => {
+  const at = html.indexOf(attr);
+  const tag = html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
+  return (tag.match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+};
+const zOf = (classes: string[]) => {
+  const z = classes.map((c) => c.match(/^(-?)z-(?:\[(-?\d+)\]|(\d+))$/)).find(Boolean);
+  expect(z, classes.join(" ")).toBeTruthy();
+  return Number(z![1] + (z![2] ?? z![3]));
+};
+
+describe("hero composition (r22 round 2)", () => {
+  it("the hero fills the first screen on desktop with a sane minimum", () => {
+    const tag = section().slice(0, section().indexOf(">") + 1);
+    expect(tag).toContain("lg:h-[calc(100svh-3.5rem)]");
+    expect(tag).toMatch(/lg:min-h-\[\d+px\]/);
+  });
+
+  it("the water floor sits behind the wall so its burst and orbs never cover a panel", () => {
+    const html = section();
+    const wall = html.lastIndexOf("<div", html.indexOf('role="group"'));
+    const wrapper = html.lastIndexOf("<div", wall - 1);
+    const wrapperClasses = (html.slice(wrapper, html.indexOf(">", wrapper)).match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(zOf(classesOf(html, "data-hero-floor"))).toBeLessThan(zOf(wrapperClasses));
+  });
+
+  it("the hero shows the hint and the gallery label", () => {
+    const html = section();
+    expect(html).toContain(copy.hint);
+    expect(html).toContain((id.categories as { galleryLabel: string }).galleryLabel);
+  });
 });
 
 describe("hero section", () => {

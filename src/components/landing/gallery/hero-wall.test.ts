@@ -44,13 +44,28 @@ describe("hero wall", () => {
     expect(out).not.toContain("backdrop");
   });
 
+  // r22 round 2: x and z are in panel widths (--pw), so the projected wall keeps its gaps at every desktop width.
   it("each panel carries its wallPose as CSS variables", () => {
     const out = html();
     for (const i of [0, 7]) {
       const p = wallPose(i, 8);
       expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--tz:${p.z}px`);
+      expect(out).toContain(`--x:${p.x}`);
+      expect(out).toContain(`--z:${p.z}`);
     }
+  });
+
+  // r22 round 2: nearer (edge) panels paint in front, symmetric; the hover is a visible lift, brighter, with a white edge glow.
+  it("edge panels stack in front and the hovered panel lifts 14px with a glow", () => {
+    const out = html();
+    const z = [...out.matchAll(/<li[^>]*style="[^"]*z-index:(\d+)/g)].map((m) => Number(m[1]));
+    expect(z).toHaveLength(8);
+    expect(z).toEqual([...z].reverse());
+    for (const i of [0, 1, 2]) expect(z[i], `z-index ${i}`).toBeGreaterThan(z[i + 1]);
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    expect(src).toContain("lg:pointer-fine:[transform-style:preserve-3d]");
+    for (const s of ["motion-safe:hover:-translate-y-3.5", "motion-safe:focus-visible:-translate-y-3.5", "brightness-115", "group-hover:shadow-[", "group-focus-visible:shadow-["])
+      expect(src, s).toContain(s);
   });
 
   // herosection.jpeg: each panel is one mood scene with a website skeleton, no longer three stacked SiteArt pages.
@@ -78,7 +93,7 @@ describe("hero wall", () => {
     for (const i of [0, 3, 7]) {
       const p = wallPose(i, 8);
       expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--tz:${p.z}px`);
+      expect(out).toContain(`--z:${p.z}`);
       expect(out).toContain(`--s:${p.scale}`);
     }
   });
@@ -115,7 +130,11 @@ describe("hero wall", () => {
     for (const c of ["snap-x", "snap-mandatory", "overflow-x-auto"]) expect(row, c).toContain(c);
     // The concave curve is layout, not motion: it stays on desktop under reduced motion, so the row is centred and unclipped there.
     for (const c of ["lg:pointer-fine:overflow-visible", "lg:pointer-fine:justify-center"]) expect(row, c).toContain(c);
-    expect(src).toContain("lg:pointer-fine:[transform:rotateY(var(--ry))_translateZ(var(--tz))_scale(var(--s))]");
+    // r22 round 2: translate first (in panel widths), then turn and scale in place; the old order pushed panels into each other.
+    expect(src).toContain(
+      "lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]",
+    );
+    expect(src).toContain("[--pw:clamp(9rem,13vw,15rem)]");
 
     const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/);
     expect(label, "label span").not.toBeNull();

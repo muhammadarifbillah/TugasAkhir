@@ -63,13 +63,40 @@ describe("gallery logic", () => {
       else expect(p.rotateY, `rotateY ${i}`).toBeLessThan(0);
       const mirror = poses[n - 1 - i];
       expect(p.rotateY).toBe(-mirror.rotateY);
+      expect(p.x).toBe(-mirror.x);
       expect(p.z).toBe(mirror.z);
       expect(p.scale).toBe(mirror.scale);
-      for (const v of [p.rotateY, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
+      for (const v of [p.rotateY, p.x, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
     });
     const odd = wallPose(1, 3);
     expect(odd.rotateY).toBe(0);
-    for (const v of [odd.rotateY, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
+    expect(odd.x).toBe(0);
+    for (const v of [odd.rotateY, odd.x, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
+  });
+
+  // r22 round 2: panels overlapped (translateZ before rotateY, z in px against a vw width). The li now applies
+  // translateX(x·pw) translateZ(z·pw) rotateY(ry) scale(s) under perspective 1200px; project both edges like the browser.
+  it("wallPose projects a wall with 2-10 px gaps that fits inside 1024, 1440 and 1920 viewports", () => {
+    const P = 1200;
+    const n = 8;
+    for (const [vw, pw] of [[1024, 144], [1440, 187], [1920, 240]]) {
+      const edges = Array.from({ length: n }, (_, i) => {
+        const p = wallPose(i, n);
+        const r = (p.rotateY * Math.PI) / 180;
+        return [-pw / 2, pw / 2].map((u) => {
+          const X = p.x * pw + p.scale * u * Math.cos(r);
+          const Z = p.z * pw - p.scale * u * Math.sin(r);
+          return (X * P) / (P - Z);
+        });
+      });
+      for (let i = 1; i < n; i++) {
+        const gap = edges[i][0] - edges[i - 1][1];
+        expect(gap, `${vw}px gap ${i - 1}|${i}`).toBeGreaterThanOrEqual(2);
+        expect(gap, `${vw}px gap ${i - 1}|${i}`).toBeLessThanOrEqual(10);
+      }
+      expect(edges[0][0], `${vw}px left`).toBeGreaterThanOrEqual(-vw / 2 + 8);
+      expect(edges[n - 1][1], `${vw}px right`).toBeLessThanOrEqual(vw / 2 - 8);
+    }
   });
 
   it("filterByShelf keeps one shelf or everything", () => {
