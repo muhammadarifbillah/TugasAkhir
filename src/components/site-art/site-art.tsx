@@ -158,7 +158,7 @@ const cart: Primitive = (b, p) => {
   );
 };
 
-const player: Primitive = (b, p) => {
+const player: Primitive = (b) => {
   const cx = b.x + b.w / 2;
   const cy = b.y + b.h / 2 - 3;
   return (
@@ -189,7 +189,7 @@ const schedule: Primitive = (b, p) => {
 
 // Light palette tones only: the code block is ink, so ink-coloured tokens would vanish.
 const CODE_COLORS = [PALETTE.mist, PALETTE.steel, PALETTE.snow];
-const code: Primitive = (b, p) => {
+const code: Primitive = (b) => {
   const lines = Math.max(1, Math.floor((b.h - 8) / 9));
   return (
     <>

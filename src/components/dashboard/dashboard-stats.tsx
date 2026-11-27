@@ -3,6 +3,9 @@ import { Activity, CheckCircle2, GitPullRequest, ShieldCheck } from "lucide-reac
 import type { Dictionary } from "@/lib/i18n";
 import { dashboardStats } from "@/lib/dashboard-view";
 
+// Decorative icon chips use the palette; the stat label carries the meaning.
+const ICON_CHIP = "bg-primary/15 text-primary";
+
 export function DashboardStats({
   cards,
   dict,
@@ -12,13 +15,12 @@ export function DashboardStats({
 }) {
   const s = dashboardStats(cards);
   const items = [
-    { key: "inProgress", Icon: Activity, tone: "bg-info/15 text-info", label: dict.dashboard.inProgress, value: s.inProgress },
-    { key: "completed", Icon: CheckCircle2, tone: "bg-success/15 text-success", label: dict.dashboard.completed, value: s.completed },
-    { key: "inRevision", Icon: GitPullRequest, tone: "bg-warning/15 text-warning", label: dict.dashboard.inRevision, value: s.inRevision },
+    { key: "inProgress", Icon: Activity, label: dict.dashboard.inProgress, value: s.inProgress },
+    { key: "completed", Icon: CheckCircle2, label: dict.dashboard.completed, value: s.completed },
+    { key: "inRevision", Icon: GitPullRequest, label: dict.dashboard.inRevision, value: s.inRevision },
     {
       key: "avgScore",
       Icon: ShieldCheck,
-      tone: "bg-primary/15 text-primary",
       label: dict.dashboard.statAvgScore,
       value: s.avgScanScore ?? "—",
       hint: s.avgScanScore === null ? dict.dashboard.statNoScans : dict.dashboard.statAvgScoreHint,
@@ -30,9 +32,9 @@ export function DashboardStats({
         {dict.dashboard.statsTitle}
       </h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {items.map(({ key, Icon, tone, label, value, hint }) => (
+        {items.map(({ key, Icon, label, value, hint }) => (
           <div key={key} data-stat={key} className="dashboard-stat flex flex-col gap-3 p-4">
-            <span aria-hidden="true" className={`flex size-11 rounded-full items-center justify-center ${tone}`}>
+            <span aria-hidden="true" className={`flex size-11 rounded-full items-center justify-center ${ICON_CHIP}`}>
               <Icon className="size-5" />
             </span>
             <div>

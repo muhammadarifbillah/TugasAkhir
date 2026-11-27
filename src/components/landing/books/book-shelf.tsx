@@ -36,7 +36,7 @@ function titleLines(title: string): string[] {
 
 /** Line art for each result, drawn in the cover's 120 × 170 box (centre ≈ 60, 108). */
 function CoverArt({ icon, accent }: { icon: ResultBook["icon"]; accent: string }) {
-  const line = { fill: "none", stroke: "#E8EEF7", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const line = { fill: "none", stroke: "#B3CFE5", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   switch (icon) {
     case "files":
       return (
@@ -160,7 +160,7 @@ export function BookCover({ book, title }: { book: ResultBook; title: string }) 
       <rect x="1" y="1" width="118" height="168" rx="3.5" fill="none" stroke={edge} strokeWidth={book.shelf === "studio" ? 2 : 1} strokeOpacity={0.8} />
       <rect x="0" y="0" width="6" height="170" fill={accent} opacity={0.85} />
       {lines.map((l, i) => (
-        <text key={l} x="60" y={lines.length === 1 ? 44 : 38 + i * 15} textAnchor="middle" fill="#FFFFFF" fontSize="12" fontWeight="600">
+        <text key={l} x="60" y={lines.length === 1 ? 44 : 38 + i * 15} textAnchor="middle" fill="#F6FAFD" fontSize="12" fontWeight="600">
           {l}
         </text>
       ))}
@@ -192,7 +192,7 @@ export function BookSpread({
     [copy.stage, stageName],
   ];
   return (
-    <div className="grid overflow-hidden rounded-[1.5rem] bg-[#F6F1E6] text-[#0A1931] shadow-[var(--fuse-shadow-soft)] md:grid-cols-2">
+    <div className="grid overflow-hidden rounded-[1.5rem] bg-[var(--fuse-snow)] text-[#0A1931] shadow-[var(--fuse-shadow-soft)] md:grid-cols-2">
       <div data-book-page="left" className="relative p-7 md:border-r md:border-[#0A1931]/15 md:p-9">
         <Icon className="size-14 text-[#1A3D63]" aria-hidden="true" />
         <Title className="font-wide mt-5 text-2xl md:text-3xl">{item.title}</Title>
@@ -227,7 +227,7 @@ function ShelfBook({ book, copy, onOpen }: { book: ResultBook; copy: Copy; onOpe
       <div className="relative aspect-[120/170] w-full transition-[transform,translate] duration-300 ease-out [transform-style:preserve-3d] group-hover:-translate-y-2 group-focus-visible:-translate-y-2 group-focus-visible:ring-2 group-focus-visible:ring-ring motion-safe:[transform:rotateY(-18deg)] motion-safe:group-hover:[transform:rotateY(-8deg)] motion-safe:group-focus-visible:[transform:rotateY(-8deg)] motion-reduce:translate-none motion-reduce:[transform:none]">
         <BookCover book={book} title={title} />
         {book.shelf === "studio" && (
-          <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-white">
+          <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-[var(--fuse-snow)]">
             {copy.studioBadge}
           </span>
         )}
@@ -235,14 +235,14 @@ function ShelfBook({ book, copy, onOpen }: { book: ResultBook; copy: Copy; onOpe
           data-book-spine=""
           aria-hidden="true"
           className="absolute right-full top-0 flex h-full w-[18px] origin-right items-center justify-center overflow-hidden [transform:rotateY(-90deg)]"
-          style={{ background: `color-mix(in oklab, ${stageVar(book)} 45%, #0A1931)` }}
+          style={{ background: "var(--fuse-deep)" }}
         >
-          <span className="whitespace-nowrap text-[9px] font-semibold text-white [writing-mode:vertical-rl]">{title}</span>
+          <span className="whitespace-nowrap text-[9px] font-semibold text-[var(--fuse-snow)] [writing-mode:vertical-rl]">{title}</span>
         </div>
         <div
           aria-hidden="true"
           className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[14px] origin-left [transform:rotateY(90deg)]"
-          style={{ background: "repeating-linear-gradient(90deg, #F6F1E6 0 2px, #DCD3C0 2px 3px)" }}
+          style={{ background: "repeating-linear-gradient(90deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
         />
         <div
           data-book-ribbon=""
@@ -306,7 +306,7 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
       >
         {book && (
           <DialogPrimitive.Portal>
-            <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[rgb(5_13_28/0.82)] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
+            <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[rgb(10_25_49/0.85)] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
             <DialogPrimitive.Content
               data-lenis-prevent=""
               onCloseAutoFocus={(e) => {

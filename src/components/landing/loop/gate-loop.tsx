@@ -33,7 +33,7 @@ const ICONS: Record<string, React.ElementType> = {
 };
 
 const STATION =
-  "relative flex size-16 items-center justify-center rounded-2xl border border-[color-mix(in_oklab,var(--fuse-accent-text)_35%,transparent)] bg-card text-[var(--fuse-accent-text)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] transition-colors hover:border-[var(--fuse-accent-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[var(--fuse-accent-text)] aria-pressed:bg-[color-mix(in_oklab,var(--fuse-accent-text)_18%,var(--card))]";
+  "relative flex size-16 items-center justify-center rounded-2xl border border-[color-mix(in_oklab,var(--fuse-accent-text)_35%,transparent)] bg-card text-[var(--fuse-accent-text)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] transition-colors hover:border-[var(--fuse-accent-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[var(--fuse-accent-text)] aria-pressed:bg-[color-mix(in_oklab,var(--fuse-accent-text)_18%,transparent)]";
 
 function StationButton({ gate, i, selected, label, onSelect, mobile }: {
   gate: LoopGate; i: number; selected: boolean; label: string; onSelect: () => void; mobile?: boolean;

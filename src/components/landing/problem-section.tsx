@@ -32,7 +32,7 @@ export function ProblemSection({
       <ul className={`grid gap-4 ${stat.show ? "" : "lg:col-span-2"}`}>
         {items.map((item) => (
           <li key={item} className="clay-card flex gap-4 p-6">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--clay-danger-tint)] text-[var(--clay-danger)]">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--clay-tint)] text-[var(--fuse-accent-text)]">
               <TriangleAlert className="size-5" aria-hidden="true" />
             </span>
             <span className="leading-relaxed">{item}</span>

@@ -1,6 +1,6 @@
 import type { Dictionary } from "@/lib/i18n";
 import { scoreSourceText } from "@/lib/dashboard-view";
-import { scoreBand, scoreColorClass } from "@/lib/project-stats";
+import { scoreBand } from "@/lib/project-stats";
 
 type Labels = Pick<
   Dictionary["dashboard"],
@@ -45,7 +45,7 @@ export function ScoreBlock({
   return (
     <div className={compact ? undefined : "rounded-lg border px-3 py-2"}>
       <span className="text-[11px] text-muted-foreground">{labels.scoreLabel}</span>
-      <div className={`flex items-baseline gap-2 ${scoreColorClass(score)}`}>
+      <div className={`flex items-baseline gap-2 ${score === null ? "text-muted-foreground" : "text-foreground"}`}>
         <span className={`${compact ? "text-xl" : "text-3xl"} font-semibold tabular-nums`}>{score ?? "—"}</span>
         {bandText && <span className="text-sm font-medium">{bandText}</span>}
       </div>

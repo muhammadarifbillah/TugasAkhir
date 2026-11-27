@@ -410,8 +410,6 @@ html:not(.dark)[data-contrast="high"]:has(.dashboard-surface) {
   --clay-glow: rgb(74 127 167 / 0.5);
   --clay-hl: rgb(246 250 253 / 0.1);
   --clay-tint: rgb(74 127 167 / 0.18);
-  --clay-danger: #FCA5A5;
-  --clay-danger-tint: rgba(252, 165, 165, 0.14);
   --clay-figure-from: #F6FAFD;
   --clay-figure-to: #B3CFE5;
   --clay-ghost-bg: rgb(26 61 99 / 0.6);
@@ -441,8 +439,6 @@ html:not(.dark) .landing {
   --clay-glow: rgb(74 127 167 / 0.35);
   --clay-hl: rgb(246 250 253 / 0.9);
   --clay-tint: rgb(74 127 167 / 0.12);
-  --clay-danger: #B91C1C;
-  --clay-danger-tint: rgba(185, 28, 28, 0.10);
   --clay-figure-from: #0A1931;
   --clay-figure-to: #1A3D63;
   --clay-ghost-bg: rgb(246 250 253 / 0.8);
