@@ -183,7 +183,7 @@
       "barTitle": "Galeri template",
       "previewHint": "Klik untuk pratinjau",
       "byline": "oleh {name} · {n} template",
-      "intro": "Tangkapan layar satu template open-source. AI menulis kode Anda sendiri, lima gerbang keamanan memeriksanya sebelum diserahkan.",
+      "intro": "Tangkapan layar satu contoh template buatan FUSE. AI menulis kode Anda sendiri, lima gerbang keamanan memeriksanya sebelum diserahkan.",
       "specChecks": "Pemeriksaan",
       "checksCount": "{n} pemeriksaan",
       "specStandards": "Standar",
@@ -193,10 +193,9 @@
       "reviewedBy": "Diperiksa oleh {name}",
       "seeAllTemplates": "Lihat semua template",
       "viewerTemplatesLabel": "Template kategori ini",
-      "viewerGalleryLabel": "Tangkapan layar template open-source — bukan situs klien",
-      "viewerCreditLicense": "Lisensi",
-      "viewerCreditSource": "Sumber",
-      "viewerCreditNewTab": "(membuka tab baru)",
+      "viewerGalleryLabel": "Tangkapan layar contoh template buatan FUSE — bukan situs klien",
+      "viewerMadeBy": "Contoh template buatan FUSE",
+      "viewerTabTag": "Contoh",
       "heroRecent": "Template terbaru",
       "heroPause": "Jeda",
       "heroPlay": "Putar",
@@ -205,7 +204,7 @@
     "shelf": {
       "pill": "Rak template",
       "title": "Mulai dari rak, bukan dari halaman kosong.",
-      "lede": "Delapan jenis website, masing-masing tiga template open-source nyata. Buka sampulnya untuk melihat halaman di dalamnya dan yang diperiksa.",
+      "lede": "Delapan jenis website, masing-masing tiga contoh template berbahasa Indonesia. Buka sampulnya untuk melihat halaman di dalamnya dan yang diperiksa.",
       "tabsLabel": "Tampilan rak",
       "tabShelves": "Rak",
       "tabAll": "Semua",
@@ -1312,92 +1311,84 @@
     "wishlist": "Daftar keinginan"
   },
   "templates": {
-    "gocart": {
-      "desc": "Toko multi-penjual bernuansa putih dengan hero hijau mint pucat dan aksen ungu."
+    "pasar-padang": {
+      "desc": "Pasar daring produk lokal bernuansa hijau padang, dengan kartu produk lapang dan harga yang jelas."
     },
-    "mercur": {
-      "desc": "Etalase marketplace B2C hitam-putih tegas dengan huruf kapital tebal."
+    "lapak-terang": {
+      "desc": "Marketplace UMKM yang terang dan bersih, dengan latar putih salju dan aksen biru tua."
     },
-    "spree-storefront": {
-      "desc": "Etalase marketplace bergaya editorial yang lapang dalam putih dan navy."
+    "bursa-malam": {
+      "desc": "Marketplace kriya dan kuliner bergaya editorial gelap, dengan judul serif di atas biru malam."
     },
-    "htmlcodex-eshop": {
-      "desc": "Toko daring Bootstrap klasik dengan bilah navigasi biru baja di atas putih."
+    "toko-bahari": {
+      "desc": "Toko pakaian santai bernuansa biru laut, dengan hero bergradasi ombak dan foto produk besar."
     },
-    "uikit-ecommerce": {
-      "desc": "Toko daring berbasis UIkit dengan bilah atas hitam, hero gelap, dan aksen biru azure."
+    "butik-putih": {
+      "desc": "Toko pakaian harian yang terang dan rapi, dengan banyak ruang putih dan tombol biru tua."
     },
-    "medusa-nextjs-starter": {
-      "desc": "Toko Next.js minimalis dalam putih dan abu muda dengan teks gelap."
+    "galeri-arang": {
+      "desc": "Toko koleksi terbatas bergaya editorial gelap, dengan judul serif dan kartu bersudut tegas."
     },
-    "tailthemes-seminar": {
-      "desc": "Situs kursus daring bernuansa hijau sage yang tenang dengan tombol hijau tua."
+    "akademi-curug": {
+      "desc": "Situs kursus daring bernuansa putih air terjun, dengan garis tirai lembut dan aksen hijau toska."
     },
-    "htmlcodex-elearning": {
-      "desc": "Situs e-learning bernuansa teal cerah dan navy di atas latar cyan pucat."
+    "kelas-terang": {
+      "desc": "Platform kursus singkat yang terang dan bersih, dengan katalog kartu dan aksen biru tua."
     },
-    "kiaalap": {
-      "desc": "Dasbor admin pendidikan dengan sidebar navy dan aksen indigo."
+    "pustaka-malam": {
+      "desc": "Situs kelas mendalam bergaya editorial gelap, dengan judul serif dan silabus yang rapi."
     },
-    "volt-bootstrap-5-dashboard": {
-      "desc": "Dasbor admin Bootstrap dengan sidebar gelap serta nuansa krem pasir dan jingga."
+    "dasbor-senja": {
+      "desc": "Dasbor penjualan bernuansa oranye senja, dengan grafik batang hangat dan kartu angka besar."
     },
-    "studio-admin-shadcn": {
-      "desc": "Dasbor admin Next.js berbasis shadcn/ui dalam hitam-putih netral."
+    "panel-jernih": {
+      "desc": "Dasbor operasional yang terang dan jernih, dengan sidebar putih dan grafik biru tua."
     },
-    "tabler": {
-      "desc": "Dasbor admin terang dengan kartu dan tabel rapi serta aksen biru."
+    "konsol-malam": {
+      "desc": "Konsol analitik bergaya gelap editorial, dengan tabel tegas di atas biru malam."
     },
-    "novena-bootstrap": {
-      "desc": "Situs klinik medis bernuansa navy dan biru pucat dengan aksen merah muda."
+    "klinik-samudra": {
+      "desc": "Situs klinik keluarga bernuansa laut dalam, dengan formulir cari jadwal langsung di beranda."
     },
-    "clear-care-clarity": {
-      "desc": "Situs pemesanan klinik bernuansa krem hangat dengan aksen biru baja dan cokelat kayu."
+    "klinik-sehati": {
+      "desc": "Situs klinik yang terang dan bersih untuk membuat janji dokter tanpa antre."
     },
-    "medic-bootstrap": {
-      "desc": "Situs klinik medis bernuansa tosca dan putih dengan aksen ungu."
+    "klinik-nirmala": {
+      "desc": "Situs klinik spesialis bergaya editorial gelap, dengan profil dokter dan jadwal yang jelas."
     },
-    "startbootstrap-creative": {
-      "desc": "Situs perusahaan satu halaman dengan hero berfoto dan aksen oranye."
+    "studio-savana": {
+      "desc": "Situs studio kreatif bernuansa savana merah, dengan hero besar dan deretan karya pilihan."
     },
-    "startbootstrap-modern-business": {
-      "desc": "Situs bisnis multi-halaman dengan hero gelap, bagian terang, dan biru Bootstrap."
+    "karya-lapang": {
+      "desc": "Situs konsultan yang terang dan lapang, dengan daftar layanan bernomor dan studi kasus."
     },
-    "airspace-bootstrap": {
-      "desc": "Situs agensi dalam putih dan hitam arang dengan aksen ungu keabuan."
+    "biro-arang": {
+      "desc": "Situs biro kreatif bergaya editorial gelap, dengan judul serif dan portofolio berbingkai tegas."
     },
-    "ghost-casper": {
-      "desc": "Tema publikasi Ghost dengan hero gradasi ungu ke merah muda dan tulisan putih bersih."
+    "kabar-fajar": {
+      "desc": "Portal berita bernuansa ungu fajar, dengan kepala koran serif dan daftar berita terpopuler."
     },
-    "ghost-headline": {
-      "desc": "Tema berita lokal Ghost dalam putih dan hitam dengan aksen merah."
+    "warta-terang": {
+      "desc": "Portal berita kota yang terang dan bersih, dengan rubrik jelas dan kolom bacaan lega."
     },
-    "masthead-free": {
-      "desc": "Tema koran Astro dengan warna krem kertas koran, judul serif, dan label rubrik merah tua."
+    "harian-senyap": {
+      "desc": "Harian daring bergaya editorial gelap untuk laporan mendalam dan opini pilihan."
     },
-    "redoc": {
-      "desc": "Referensi API tiga panel dalam putih dan abu kebiruan dengan contoh kode di kanan."
+    "dok-salju": {
+      "desc": "Dokumentasi API pembayaran bernuansa putih musim dingin, dengan contoh kode di panel kanan."
     },
-    "scalar-galaxy": {
-      "desc": "Referensi API satu halaman yang nyaris monokrom putih dengan lencana metode berwarna."
+    "referensi-jernih": {
+      "desc": "Referensi API tagihan yang terang dan bersih, dengan tabel parameter dan lencana metode."
     },
-    "docusaurus-openapi-docs": {
-      "desc": "Dokumentasi API berbasis Docusaurus dengan sidebar abu muda dan aksen hijau."
+    "terminal-malam": {
+      "desc": "Dokumentasi API pembayaran bergaya gelap, dengan panel kode dan menu samping yang tegas."
     }
   },
   "footer": {
-    "credits": "Kredit template"
+    "credits": "Contoh template"
   },
   "credits": {
-    "title": "Kredit template open-source",
-    "intro": "FUSE menampilkan tangkapan layar template open-source sebagai contoh jenis website. Template dan isinya tetap milik pembuatnya dan dipakai sesuai lisensinya.",
-    "columns": {
-      "category": "Kategori",
-      "template": "Template",
-      "license": "Lisensi",
-      "source": "Sumber",
-      "attribution": "Atribusi"
-    },
-    "noAttribution": "—"
+    "title": "Contoh template",
+    "intro": "Ke-24 contoh template di galeri ini dibuat sendiri oleh FUSE untuk menggambarkan jenis website yang bisa Anda bangun. Semua teksnya berbahasa Indonesia, ilustrasinya digambar dengan CSS, tanpa foto atau kode dari pihak lain."
   }
 }

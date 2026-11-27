@@ -13,68 +13,31 @@ export async function generateMetadata({ params }: CreditsPageProps): Promise<Me
   return { title: `${dict.credits.title} · ${dict.app.name}` };
 }
 
-const LINK = "underline underline-offset-2 break-all hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
-const CELL = "block px-0 py-1 align-top md:table-cell md:px-3 md:py-3";
-// On mobile each row stacks into a card, so each cell carries its own column label.
-const LABEL = "mr-1 font-medium text-muted-foreground md:hidden";
-
-/** Credits for the 24 open-source templates whose screenshots the gallery shows (MIT / CC BY attribution). */
+/** The 24 example templates of the gallery, all made by FUSE in Indonesian, grouped per category. */
 export default async function CreditsPage({ params }: CreditsPageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-  const c = dict.credits;
+  const descs = dict.templates as Record<string, { desc: string }>;
 
   return (
     <div className="mx-auto w-full max-w-6xl bg-background px-4 py-12 text-foreground">
-      <h1 className="text-3xl font-semibold">{c.title}</h1>
-      <p className="mt-4 max-w-prose text-muted-foreground">{c.intro}</p>
-      <table className="mt-10 block w-full text-left text-sm md:table">
-        <thead className="sr-only md:not-sr-only md:table-header-group">
-          <tr className="border-b border-border">
-            {(["category", "template", "license", "source", "attribution"] as const).map((k) => (
-              <th key={k} scope="col" className="px-3 py-2 font-medium">
-                {c.columns[k]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        {SITE_CATEGORIES.map((cat) => {
-          const category = dict.categories.items[cat.id].name;
-          return (
-            <tbody key={cat.id} data-credit-group={cat.id} className="block md:table-row-group">
+      <h1 className="text-3xl font-semibold">{dict.credits.title}</h1>
+      <p className="mt-4 max-w-prose text-muted-foreground">{dict.credits.intro}</p>
+      <div className="mt-10 grid gap-8 md:grid-cols-2">
+        {SITE_CATEGORIES.map((cat) => (
+          <section key={cat.id} data-credit-group={cat.id} className="border-t border-border pt-4">
+            <h2 className="text-lg font-semibold">{dict.categories.items[cat.id].name}</h2>
+            <ul className="mt-3 space-y-3">
               {SITE_TEMPLATES[cat.id].map((t) => (
-                <tr key={t.slug} data-credit-row={t.slug} className="mb-4 block rounded-lg border border-border p-4 md:mb-0 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:p-0">
-                  <td className={CELL}>
-                    <span className={LABEL}>{c.columns.category}:</span>
-                    {category}
-                  </td>
-                  <th scope="row" className={`${CELL} font-medium`}>
-                    <span className={LABEL}>{c.columns.template}:</span>
-                    {t.name}
-                  </th>
-                  <td className={CELL}>
-                    <span className={LABEL}>{c.columns.license}:</span>
-                    <a href={t.licenseUrl} target="_blank" rel="noopener noreferrer" className={LINK}>
-                      {t.license}
-                    </a>
-                  </td>
-                  <td className={CELL}>
-                    <span className={LABEL}>{c.columns.source}:</span>
-                    <a href={t.source} target="_blank" rel="noopener noreferrer" className={LINK}>
-                      {t.source.replace(/^https?:\/\//, "")}
-                    </a>
-                  </td>
-                  <td className={CELL}>
-                    <span className={LABEL}>{c.columns.attribution}:</span>
-                    {/* The data's note after " — " is an internal reminder in Indonesian; only the credit line is shown. */}
-                    {t.attribution ? t.attribution.split(" — ")[0] : c.noAttribution}
-                  </td>
-                </tr>
+                <li key={t.slug} data-credit-item={t.slug}>
+                  <p className="font-medium">{t.name}</p>
+                  <p className="text-sm text-muted-foreground">{descs[t.slug]?.desc}</p>
+                </li>
               ))}
-            </tbody>
-          );
-        })}
-      </table>
+            </ul>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }

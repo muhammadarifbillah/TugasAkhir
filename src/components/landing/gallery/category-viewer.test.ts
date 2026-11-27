@@ -50,7 +50,6 @@ const render = (lang: "id" | "en", c: SiteCategory, page = 0, template = 0) =>
   );
 const tplOf = (c: SiteCategory, t = 0) => SITE_TEMPLATES[c.id][t];
 const pageNamesOf = (lang: "id" | "en", c: SiteCategory, t = 0) => tplOf(c, t).pages.map((p) => DICTS[lang].templatePages[p.id]);
-const licenseOf = (license: string) => license.replace(/-/g, " ");
 const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
 
 function keys(value: unknown, prefix = ""): string[] {
@@ -148,7 +147,7 @@ describe("category viewer", () => {
             const tpl = tplOf(c, i);
             const open = tab.slice(0, tab.indexOf(">") + 1);
             expect(tab).toContain(escape(tpl.name));
-            expect(tab).toContain(escape(licenseOf(tpl.license)));
+            expect(tab).toContain(escape(copyOf(lang).viewerTabTag));
             expect(open).toContain(`aria-selected="${i === t}"`);
             expect(open).toContain(`aria-controls="${panelId}"`);
             expect(open).toContain(`tabindex="${i === t ? 0 : -1}"`);
@@ -234,40 +233,29 @@ describe("category viewer", () => {
         }
   });
 
-  // R26 §6A-6: licence attribution under the preview.
-  it("credit line names the template, links its licence and source in a new tab, and shows CC-BY attribution", () => {
-    let ccby = 0;
+  // R29 §6A-6: example templates made by FUSE: one dictionary line, no external licence or source links.
+  it("credit line names the template and says it is a FUSE example, with no external licence or source link", () => {
+    expect(copyOf("id").viewerMadeBy).toBe("Contoh template buatan FUSE");
+    expect(copyOf("en").viewerMadeBy).toBeTruthy();
     for (const lang of LANGS)
       for (const c of SITE_CATEGORIES)
         for (const t of [0, 1, 2]) {
           const tpl = tplOf(c, t);
           const html = render(lang, c, 0, t);
           const credit = section(html, "data-viewer-credit");
-          const copy = copyOf(lang);
           expect(credit).toContain(escape(tpl.name));
-          const links = [...credit.matchAll(/<a[^>]*>[\s\S]*?<\/a>/g)].map((m) => m[0]);
-          const lic = links.find((a) => a.includes(`href="${tpl.licenseUrl}"`));
-          const srcLink = links.find((a) => a.includes(`href="${tpl.source}"`));
-          expect(lic, `${c.id}/${tpl.slug} licence`).toBeDefined();
-          expect(srcLink, `${c.id}/${tpl.slug} source`).toBeDefined();
-          expect(lic).toContain(escape(licenseOf(tpl.license)));
-          expect(srcLink).toContain(escape(copy.viewerCreditSource));
-          for (const a of [lic!, srcLink!]) {
-            expect(a).toContain('target="_blank"');
-            expect(a).toContain('rel="noopener noreferrer"');
-          }
-          expect(credit).toContain(escape(copy.viewerCreditLicense));
-          if (tpl.license.startsWith("CC-BY")) {
-            ccby++;
-            expect(credit).toContain(escape(tpl.attribution!));
-          }
+          expect(credit).toContain(escape(copyOf(lang).viewerMadeBy));
+          expect(credit).not.toContain("<a");
+          expect(html, `${lang}/${tpl.slug}`).not.toMatch(/href="https?:/);
+          expect(html).not.toContain('target="_blank"');
           expect(html.indexOf("data-viewer-credit")).toBeGreaterThan(html.indexOf("data-viewer-browser"));
         }
-    expect(ccby).toBeGreaterThan(0);
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    for (const k of ["licenseUrl", "tpl.source", "attribution", "viewerCredit"]) expect(src, k).not.toContain(k);
   });
 
   // R26 §6A-7: the lede is the active template's description; the category description follows.
-  it("lede is the active template's description and the gallery label says screenshots of open-source templates", () => {
+  it("lede is the active template's description and the gallery label says screenshots of FUSE example templates", () => {
     for (const lang of LANGS)
       for (const c of SITE_CATEGORIES)
         for (const t of [0, 1]) {
@@ -279,8 +267,8 @@ describe("category viewer", () => {
           expect(before.slice(before.lastIndexOf("<")), "italic lede").toMatch(/class="[^"]*\bitalic\b/);
           expect(html.indexOf(escape(itemOf(lang, c).desc))).toBeGreaterThan(at);
         }
-    expect(copyOf("id").viewerGalleryLabel).toBe("Tangkapan layar template open-source — bukan situs klien");
-    expect(copyOf("en").viewerGalleryLabel).toBe("Screenshots of open-source templates — not client sites");
+    expect(copyOf("id").viewerGalleryLabel).toBe("Tangkapan layar contoh template buatan FUSE — bukan situs klien");
+    expect(copyOf("en").viewerGalleryLabel).toBe("Screenshots of example templates made by FUSE — not client sites");
     for (const lang of LANGS) expect(render(lang, SITE_CATEGORIES[0])).toContain(escape(copyOf(lang).viewerGalleryLabel));
   });
 

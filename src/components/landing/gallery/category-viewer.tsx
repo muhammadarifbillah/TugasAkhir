@@ -22,8 +22,6 @@ type TemplateCopy = { templatePages: Record<string, string>; templates: Record<s
 
 // shortcut: both dictionaries ship to the client for these two subtrees; pass them through GalleryProvider once page.tsx may change.
 const TEMPLATE_COPY: Record<string, TemplateCopy> = { id, en };
-const licenseLabel = (license: string) => license.replace(/-/g, " ");
-const LINK = "font-semibold text-[#1A3D63] underline underline-offset-2 hover:text-[#0A1931] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]";
 
 const slide = {
   enter: (dir: 1 | -1) => ({ x: dir * 40, opacity: 0 }),
@@ -148,23 +146,11 @@ export function ViewerBody({
           <p data-viewer-preview-hint="" className="relative z-10 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1A3D63]">
             {copy.previewHint}
           </p>
-          <div data-viewer-credit="" className="relative z-10 mt-2 text-center text-xs leading-relaxed text-[#1A3D63]">
-            <p>
-              <span className="font-semibold text-[#0A1931]">{tpl.name}</span>
-              {" · "}
-              {copy.viewerCreditLicense}{" "}
-              <a href={tpl.licenseUrl} target="_blank" rel="noopener noreferrer" className={LINK}>
-                {licenseLabel(tpl.license)}
-                <span className="sr-only"> {copy.viewerCreditNewTab}</span>
-              </a>
-              {" · "}
-              <a href={tpl.source} target="_blank" rel="noopener noreferrer" className={LINK}>
-                {copy.viewerCreditSource}
-                <span className="sr-only"> {copy.viewerCreditNewTab}</span>
-              </a>
-            </p>
-            {tpl.attribution && <p className="mt-1">{tpl.attribution}</p>}
-          </div>
+          <p data-viewer-credit="" className="relative z-10 mt-2 text-center text-xs leading-relaxed text-[#1A3D63]">
+            <span className="font-semibold text-[#0A1931]">{tpl.name}</span>
+            {" · "}
+            {copy.viewerMadeBy}
+          </p>
           <div className="mt-3 flex items-center justify-between gap-3">
             <button type="button" aria-label={copy.prevPage} onClick={onPrev} className={ARROW}>
               <ChevronLeft aria-hidden="true" className="size-5" />
@@ -242,7 +228,7 @@ export function ViewerBody({
                 className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#B3CFE5] px-4 text-left text-sm font-medium text-[#0A1931] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6FAFD] aria-selected:border-[#1A3D63] aria-selected:bg-[#1A3D63] aria-selected:text-[#F6FAFD] aria-selected:hover:bg-[#0A1931]"
               >
                 <span>{t.name}</span>
-                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{licenseLabel(t.license)}</span>
+                <span className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{copy.viewerTabTag}</span>
               </button>
             ))}
           </div>
