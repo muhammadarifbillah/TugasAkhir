@@ -1,0 +1,25 @@
+/* Hero ambient motion (herosection.jpeg): only on desktop fine pointers with motion allowed, same gate as LANDING_MOTION_QUERY. */
+@keyframes hero-twinkle {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.25; }
+}
+@keyframes hero-float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+@keyframes hero-glint {
+  from { translate: -14px 0; }
+  to { translate: 14px 0; }
+}
+
+@media (min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .hero-star:nth-of-type(3n) { animation: hero-twinkle 4s ease-in-out infinite; }
+  .hero-star:nth-of-type(3n + 1) { animation: hero-twinkle 6s ease-in-out -2s infinite; }
+  .hero-orb { animation: hero-float 7s ease-in-out infinite; }
+  .hero-orb:nth-of-type(2n) { animation-duration: 9s; animation-delay: -3s; }
+  .hero-glint { animation: hero-glint 8s ease-in-out infinite alternate; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-star, .hero-orb, .hero-glint { animation: none; }
+}

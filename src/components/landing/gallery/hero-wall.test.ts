@@ -40,26 +40,42 @@ describe("hero wall", () => {
       expect(out).toContain(`>${escape(name)}<`);
     });
     expect(out).toContain(`aria-label="${escape(copy.wallLabel)}"`);
-    expect(out).toContain(escape(labels.galleryLabel));
-    expect(out).toContain(escape(copy.hint));
+    // The hint and gallery label moved to HeroSection (herosection.jpeg: they sit above the water floor, hero.test.ts).
     expect(out).not.toContain("backdrop");
   });
 
+  // r22 round 2: x and z are in panel widths (--pw), so the projected wall keeps its gaps at every desktop width.
   it("each panel carries its wallPose as CSS variables", () => {
     const out = html();
     for (const i of [0, 7]) {
       const p = wallPose(i, 8);
       expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--tz:${p.z}px`);
+      expect(out).toContain(`--x:${p.x}`);
+      expect(out).toContain(`--z:${p.z}`);
     }
   });
 
-  it("HeroWall panels are portrait frames with three stacked pages", () => {
+  // r22 round 2: nearer (edge) panels paint in front, symmetric; the hover is a visible lift, brighter, with a white edge glow.
+  it("edge panels stack in front and the hovered panel lifts 14px with a glow", () => {
+    const out = html();
+    const z = [...out.matchAll(/<li[^>]*style="[^"]*z-index:(\d+)/g)].map((m) => Number(m[1]));
+    expect(z).toHaveLength(8);
+    expect(z).toEqual([...z].reverse());
+    for (const i of [0, 1, 2]) expect(z[i], `z-index ${i}`).toBeGreaterThan(z[i + 1]);
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    expect(src).toContain("lg:pointer-fine:[transform-style:preserve-3d]");
+    for (const s of ["motion-safe:hover:-translate-y-3.5", "motion-safe:focus-visible:-translate-y-3.5", "brightness-115", "group-hover:shadow-[", "group-focus-visible:shadow-["])
+      expect(src, s).toContain(s);
+  });
+
+  // herosection.jpeg: each panel is one mood scene with a website skeleton, no longer three stacked SiteArt pages.
+  it("HeroWall panels are portrait HeroScene frames with a mirrored reflection", () => {
     const out = html();
     expect(out.match(/data-gallery-panel/g)?.length).toBe(8);
     expect(out.match(/data-panel-art/g)?.length).toBe(8);
-    expect(out.match(/data-panel-page/g)?.length).toBe(24);
+    expect(out).not.toContain("data-panel-page");
     expect(out.match(/data-panel-reflection/g)?.length).toBe(8);
+    for (let i = 1; i <= 8; i++) expect(out.match(new RegExp(`data-mood="${i}"`, "g"))?.length, `mood ${i}`).toBe(2);
     for (const attr of ["data-panel-art", "data-panel-reflection"]) {
       const tags = [...out.matchAll(new RegExp(`<[a-z]+[^>]*${attr}[^>]*>`, "g"))].map((m) => m[0]);
       expect(tags).toHaveLength(8);
@@ -77,18 +93,18 @@ describe("hero wall", () => {
     for (const i of [0, 3, 7]) {
       const p = wallPose(i, 8);
       expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--tz:${p.z}px`);
+      expect(out).toContain(`--z:${p.z}`);
       expect(out).toContain(`--s:${p.scale}`);
     }
   });
 
+  // herosection.jpeg: portrait 2:3 panels everywhere, 62vw carousel cards, slimmer desktop columns.
   it("wall and carousel sizes follow the panorama spec", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
     for (const s of [
-      "lg:pointer-fine:w-[clamp(8.5rem,14vw,15rem)]",
-      "lg:pointer-fine:aspect-[2/3]",
-      "aspect-[3/4]",
-      "w-[80vw]",
+      "lg:pointer-fine:w-[clamp(9rem,13vw,15rem)]",
+      "aspect-[2/3]",
+      "w-[62vw]",
       "gallery-carousel-item",
       "scale(var(--s))",
       "[perspective:1200px]",
@@ -102,26 +118,56 @@ describe("hero wall", () => {
     for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
   });
 
-  it("hover slide of the panel art never exceeds the column's spare height, and the static row scrolls", () => {
+  // herosection.jpeg replaces the sliding SiteArt column: HeroScene panels, hairline gaps, thin caps labels, rippled reflection.
+  it("panels use HeroScene with a hairline gap, thin uppercase labels and a rippled mirrored reflection", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const art = read("src/components/site-art/site-art.tsx");
-    const W = Number(art.match(/const W = (\d+)/)![1]);
-    const H = Number(art.match(/const H = (\d+)/)![1]);
-    const column = 3 * (H / W); // three stacked pages, in panel widths
-    const frames = [...src.matchAll(/aspect-\[(\d+)\/(\d+)\]/g)]
-      .filter((m) => m[1] !== "100") // the reflection strip, not a frame
-      .map((m) => Number(m[2]) / Number(m[1]));
-    expect(frames.sort()).toEqual([4 / 3, 3 / 2]);
-    const shifts = [...src.matchAll(/group-(?:hover|focus-visible):-translate-y-\[(\d+(?:\.\d+)?)%\]/g)].map((m) => Number(m[1]));
-    expect(shifts.length).toBeGreaterThanOrEqual(2);
-    for (const frame of frames)
-      for (const s of shifts) expect(s / 100, `shift ${s}% in frame ${frame}`).toBeLessThanOrEqual((column - frame) / column);
-
+    expect(src).toContain("<HeroScene");
+    expect(src).not.toContain("SiteArt");
     const row = src.match(/<ul className="([^"]+)"/)![1].split(/\s+/);
-    for (const c of ["snap-x", "snap-mandatory", "overflow-x-auto", "lg:pointer-fine:motion-safe:overflow-visible", "lg:pointer-fine:motion-safe:justify-center"])
-      expect(row, c).toContain(c);
-    // Without motion the flat row is wider than the screen: it must stay scrollable and not centred (centring clips the left edge).
-    for (const c of ["lg:pointer-fine:overflow-visible", "lg:pointer-fine:justify-center"]) expect(row, c).not.toContain(c);
+    const gap = row.map((c) => c.match(/^lg:pointer-fine:gap-\[(\d+)px\]$/)).find(Boolean);
+    expect(gap, "desktop gap-[Npx]").toBeTruthy();
+    expect(Number(gap![1])).toBeLessThanOrEqual(8);
+    for (const c of ["snap-x", "snap-mandatory", "overflow-x-auto"]) expect(row, c).toContain(c);
+    // The concave curve is layout, not motion: it stays on desktop under reduced motion, so the row is centred and unclipped there.
+    for (const c of ["lg:pointer-fine:overflow-visible", "lg:pointer-fine:justify-center"]) expect(row, c).toContain(c);
+    // r22 round 2: translate first (in panel widths), then turn and scale in place; the old order pushed panels into each other.
+    expect(src).toContain(
+      "lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]",
+    );
+    expect(src).toContain("[--pw:clamp(9rem,13vw,15rem)]");
+
+    const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/);
+    expect(label, "label span").not.toBeNull();
+    for (const c of ["uppercase", "font-light"]) expect(label![1].split(/\s+/), c).toContain(c);
+    expect(label![1]).toMatch(/(?<![\w:-])tracking-\[/);
+
+    const at = src.indexOf("data-panel-reflection");
+    const refl = src.slice(at, src.indexOf("</li>", at));
+    expect(refl).toContain("url(#hero-ripple)");
+    expect(refl).toMatch(/scaleY\(-1\)|-scale-y-100/);
+    expect(refl).toContain("<HeroScene");
+    expect(src).toContain("open(c.id, e.currentTarget)");
+    expect(src).toContain("fmt(copy.openPanel");
+  });
+
+  // r22 round 3: on the desktop 3D wall only the panel buttons take the pointer; the mobile carousel keeps scrolling.
+  it("the desktop wall passes the pointer through to the panel buttons", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const cls = (re: RegExp) => src.match(re)![1].split(/\s+/);
+    const row = cls(/<ul className="([^"]+)"/);
+    const group = cls(/role="group"[\s\S]*?className="([^"]+)"/);
+    const button = cls(/data-gallery-panel=""[\s\S]*?className="([^"]+)"/);
+    expect(row).toContain("lg:pointer-fine:pointer-events-none");
+    expect(group).toContain("lg:pointer-fine:pointer-events-none");
+    expect(button).toContain("pointer-events-auto");
+    for (const list of [row, group]) expect(list).not.toContain("pointer-events-none");
+  });
+
+  // r22 round 3: "Dokumentasi REST API" was cut to "DOKUMENTASI REST …".
+  it("panel labels are never truncated", () => {
+    const src = read("src/components/landing/gallery/hero-wall.tsx");
+    const label = src.match(/<span[^>]*className="([^"]*)"[^>]*>\s*\{name\}/)![1].split(/\s+/);
+    for (const c of ["truncate", "text-ellipsis"]) expect(label, c).not.toContain(c);
   });
 
   it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {
@@ -148,10 +194,15 @@ describe("hero wall", () => {
     expect(() => renderToStaticMarkup(createElement(HeroWall))).toThrow();
   });
 
+  // Owner decision 2026-11-27: the hero is HeroSection (which renders HeroWall) with one button, no shelf link.
   it("page.tsx renders the gallery hero and no longer the tape", () => {
     const page = read("src/app/[lang]/page.tsx");
     expect(page).not.toContain("HeroTape");
-    for (const s of ["<GalleryProvider", "<HeroWall", "l.gallery.headline", "l.gallery.sub", 'href="#rak"']) expect(page).toContain(s);
-    expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(2);
+    for (const s of ["<GalleryProvider", "<HeroSection", "headline={l.gallery.headline}", "sub={l.gallery.sub}", "ctaHref={cta.href}", "ctaLabel={l[cta.label]}"])
+      expect(page).toContain(s);
+    expect(page).not.toContain('href="#rak"');
+    expect(page.indexOf("<HeroSection")).toBeGreaterThan(page.indexOf("<GalleryProvider"));
+    expect(page.indexOf("<HeroSection")).toBeLessThan(page.indexOf("</GalleryProvider>"));
+    expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(1);
   });
 });

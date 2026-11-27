@@ -63,13 +63,17 @@ const FINAL_KEYS = [
 
 describe("landing information architecture", () => {
   it("section anchors follow the final FUSE v2 order", () => {
-    const ids = [...read(PAGE).matchAll(/\bid="([a-z-]+)"/g)].map((m) => m[1]).filter((id) => !id.endsWith("-title"));
+    // The hero anchor moved into HeroSection (herosection.jpeg, 2026-11-27); it still renders first on the page.
+    const page = read(PAGE).replace("<HeroSection", '<HeroSection id="mulai-hero"');
+    expect(read("src/components/landing/hero/hero-section.tsx")).toContain('id="mulai-hero"');
+    const ids = [...page.matchAll(/\bid="([a-z-]+)"/g)].map((m) => m[1]).filter((id) => !id.endsWith("-title"));
     expect(ids).toEqual(["mulai-hero", "rak", "masalah", "gerbang", "pratinjau", "hasil", "batasan", "mulai"]);
   });
 
   it("page renders gallery, strip with facts, shelf, problem, loop, preview, books, limits with FAQ and CTA in order", () => {
     const page = read(PAGE);
-    const order = ["<HeroWall", "<StandardsStrip", "<TemplateShelf", "<ProblemSection", "<GateLoop", "<ProductPreview", "<BookShelf", "l.limits", "<Faq", 'id="mulai"'];
+    // herosection.jpeg (2026-11-27): the hero is HeroSection, which renders HeroWall inside.
+    const order = ["<HeroSection", "<StandardsStrip", "<TemplateShelf", "<ProblemSection", "<GateLoop", "<ProductPreview", "<BookShelf", "l.limits", "<Faq", 'id="mulai"'];
     const at = order.map((s) => page.indexOf(s));
     for (const [i, s] of order.entries()) expect(at[i], s).toBeGreaterThanOrEqual(0);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
@@ -104,7 +108,9 @@ describe("primary CTA", () => {
     const page = read(PAGE);
     expect(page).toContain("primaryCta(");
     expect(page).not.toContain("/login");
-    expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(2);
+    // The hero passes the CTA to HeroSection as a prop; the closing CTA still links directly.
+    expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(1);
+    expect(page).toContain("ctaHref={cta.href}");
     expect(page).toContain('href="#gerbang"');
     expect(page).toContain("l.ctaGates");
   });

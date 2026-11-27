@@ -43,25 +43,69 @@ describe("gallery logic", () => {
     for (const k of ["Enter", "a", "ArrowUp"]) expect(keyToAction(k)).toBeNull();
   });
 
-  it("wallPose builds a coverflow panorama with a prominent centre", () => {
+  // Owner decision 2026-11-27 (herosection.jpeg): the wall is concave, the viewer stands inside the cylinder.
+  it("wallPose builds a concave wall: edge panels larger and closer, all turned to face the centre", () => {
     const n = 8;
     const poses = Array.from({ length: n }, (_, i) => wallPose(i, n));
-    expect(poses.map((p) => p.rotateY)).toEqual([39, 24, 12, 3, -3, -12, -24, -39]);
-    expect(poses.map((p) => p.z)).toEqual([-216, -108, -36, 0, 0, -36, -108, -216]);
-    expect(poses.map((p) => p.scale)).toEqual([1, 1, 1, 1.06, 1.06, 1, 1, 1]);
+    for (const edge of [0, 7])
+      for (const mid of [3, 4]) {
+        expect(poses[edge].scale, `scale ${edge}>${mid}`).toBeGreaterThan(poses[mid].scale);
+        expect(poses[edge].z, `z ${edge}>${mid}`).toBeGreaterThan(poses[mid].z);
+      }
+    // Monotonic towards the edges on the left half (the right half mirrors it).
+    for (const i of [0, 1, 2]) {
+      expect(poses[i].scale).toBeGreaterThan(poses[i + 1].scale);
+      expect(poses[i].z).toBeGreaterThan(poses[i + 1].z);
+      expect(poses[i].rotateY).toBeGreaterThan(poses[i + 1].rotateY);
+    }
     poses.forEach((p, i) => {
+      if (i < (n - 1) / 2) expect(p.rotateY, `rotateY ${i}`).toBeGreaterThan(0);
+      else expect(p.rotateY, `rotateY ${i}`).toBeLessThan(0);
       const mirror = poses[n - 1 - i];
       expect(p.rotateY).toBe(-mirror.rotateY);
+      expect(p.x).toBe(-mirror.x);
       expect(p.z).toBe(mirror.z);
       expect(p.scale).toBe(mirror.scale);
-      for (const v of [p.rotateY, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
+      for (const v of [p.rotateY, p.x, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
     });
-    // Step between neighbours grows towards the edges (left half, mirrored on the right).
-    const steps = [0, 1, 2].map((i) => Math.abs(poses[i].rotateY) - Math.abs(poses[i + 1].rotateY));
-    expect(steps[0]).toBeGreaterThan(steps[1]);
-    expect(steps[1]).toBeGreaterThan(steps[2]);
     const odd = wallPose(1, 3);
-    for (const v of [odd.rotateY, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
+    expect(odd.rotateY).toBe(0);
+    expect(odd.x).toBe(0);
+    for (const v of [odd.rotateY, odd.x, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
+  });
+
+  // r22 round 2: panels overlapped (translateZ before rotateY, z in px against a vw width). The li now applies
+  // translateX(x·pw) translateZ(z·pw) rotateY(ry) scale(s) under perspective 1200px; project both edges like the browser.
+  it("wallPose projects a wall with 2-10 px gaps that fits inside 1024, 1440 and 1920 viewports", () => {
+    const P = 1200;
+    const n = 8;
+    for (const [vw, pw] of [[1024, 144], [1440, 187], [1920, 240]]) {
+      const edges = Array.from({ length: n }, (_, i) => {
+        const p = wallPose(i, n);
+        const r = (p.rotateY * Math.PI) / 180;
+        return [-pw / 2, pw / 2].map((u) => {
+          const X = p.x * pw + p.scale * u * Math.cos(r);
+          const Z = p.z * pw - p.scale * u * Math.sin(r);
+          return (X * P) / (P - Z);
+        });
+      });
+      for (let i = 1; i < n; i++) {
+        const gap = edges[i][0] - edges[i - 1][1];
+        expect(gap, `${vw}px gap ${i - 1}|${i}`).toBeGreaterThanOrEqual(2);
+        expect(gap, `${vw}px gap ${i - 1}|${i}`).toBeLessThanOrEqual(10);
+      }
+      expect(edges[0][0], `${vw}px left`).toBeGreaterThanOrEqual(-vw / 2 + 8);
+      expect(edges[n - 1][1], `${vw}px right`).toBeLessThanOrEqual(vw / 2 - 8);
+    }
+  });
+
+  // r22 round 3: a panel behind z=0 sat behind the preserve-3d ul plane, so the ul swallowed its hover and click.
+  it("wallPose keeps every panel at z >= 0 with the centre exactly at 0", () => {
+    for (const n of [3, 8]) {
+      const z = Array.from({ length: n }, (_, i) => wallPose(i, n).z);
+      for (const v of z) expect(v, `n=${n}`).toBeGreaterThanOrEqual(0);
+      expect(Math.min(...z), `n=${n}`).toBe(0);
+    }
   });
 
   it("filterByShelf keeps one shelf or everything", () => {

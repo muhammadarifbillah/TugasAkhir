@@ -21,9 +21,14 @@ const STATUS_ALLOWED = ["src/components/project-list.tsx"];
 /** Status tokens are the §0 exception: their values are not palette colours and stay unchanged. */
 const STATUS_TOKENS = ["--destructive", "--destructive-foreground", "--success", "--success-foreground", "--warning", "--danger"];
 
+/** Keputusan pemilik 2026-11-27: hero meniru warna herosection.jpeg. Only these two paths leave the palette. */
+const HERO_EXEMPT = ["src/components/landing/hero/", "src/components/landing/gallery/hero-wall.tsx"];
+const heroExempt = (rel: string) => HERO_EXEMPT.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
+
 function scopedFiles(): string[] {
   const out: string[] = [];
   const visit = (rel: string) => {
+    if (heroExempt(rel) || heroExempt(`${rel}/`)) return;
     const abs = path.join(ROOT, rel);
     if (fs.statSync(abs).isDirectory()) {
       for (const name of fs.readdirSync(abs)) visit(`${rel}/${name}`);
@@ -132,6 +137,18 @@ describe("palette guard", () => {
       for (const h of findOffPalette(text)) hits.push(`${f}:${lineOf(text, h.index)}: ${h.match}`);
     }
     expect(hits).toEqual([]);
+  });
+
+  it("the hero exemption is exactly the hero folder and hero-wall.tsx; page.tsx stays palette-only", () => {
+    expect(HERO_EXEMPT).toEqual(["src/components/landing/hero/", "src/components/landing/gallery/hero-wall.tsx"]);
+    const heroDir = "src/components/landing/hero";
+    const heroFiles = fs.readdirSync(path.join(ROOT, heroDir)).filter((f) => /\.(ts|tsx|css)$/.test(f) && !/\.test\./.test(f));
+    expect(heroFiles.length).toBeGreaterThan(0);
+    const files = scopedFiles();
+    for (const f of heroFiles) expect(files, f).not.toContain(`${heroDir}/${f}`);
+    expect(files).not.toContain("src/components/landing/gallery/hero-wall.tsx");
+    for (const f of ["src/app/[lang]/page.tsx", "src/components/landing/gallery/template-shelf.tsx", "src/components/landing/gallery/category-viewer.tsx", "src/components/landing/fuse-waves.tsx"])
+      expect(files, f).toContain(f);
   });
 
   it("status colours appear only where a status is shown", () => {

@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { HeroScene } from "../hero/hero-scene";
 import { LANDING_MOTION_QUERY } from "../motion";
 import { pointerTilt, wallPose } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
 
-const PAGES = [0, 1, 2] as const;
-const FRAME = "overflow-hidden rounded-[1.25rem] border border-border shadow-[var(--fuse-shadow-soft)]";
-
-/** Hero gallery: snap carousel on touch/small screens, curved CSS 3D wall on desktop pointers. */
+/** Hero gallery (herosection.jpeg): snap carousel on touch/small screens, concave CSS 3D wall on desktop pointers. */
 export function HeroWall() {
   const { open, labels, copy } = useGallery();
   const wallRef = useRef<HTMLDivElement>(null);
@@ -34,69 +31,65 @@ export function HeroWall() {
   }, []);
 
   return (
-    <div>
-      <div
-        ref={wallRef}
-        role="group"
-        aria-label={copy.wallLabel}
-        className="transition-transform duration-700 [transform-style:preserve-3d] lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"
-      >
-        <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[10vw] pb-4 lg:pointer-fine:motion-safe:justify-center lg:pointer-fine:gap-3 lg:pointer-fine:motion-safe:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:[perspective:1200px]">
-          {SITE_CATEGORIES.map((c, i) => {
-            const pose = wallPose(i, SITE_CATEGORIES.length);
-            const name = (labels.items[c.id] as { name: string }).name;
-            const pages = (data?: true) =>
-              PAGES.map((p) => (
-                <span key={p} data-panel-page={data ? "" : undefined} className="block">
-                  <SiteArt category={c} pageIndex={p} labels={labels} className="block h-auto w-full" />
-                </span>
-              ));
-            return (
-              <li
-                key={c.id}
-                style={{ "--ry": `${pose.rotateY}deg`, "--tz": `${pose.z}px`, "--s": pose.scale } as React.CSSProperties}
-                className="gallery-carousel-item w-[80vw] max-w-[360px] shrink-0 snap-center lg:pointer-fine:w-[clamp(8.5rem,14vw,15rem)] lg:pointer-fine:max-w-none lg:pointer-fine:motion-safe:[transform:rotateY(var(--ry))_translateZ(var(--tz))_scale(var(--s))]"
+    <div
+      ref={wallRef}
+      role="group"
+      aria-label={copy.wallLabel}
+      className="transition-transform duration-700 [transform-style:preserve-3d] motion-reduce:transition-none lg:pointer-fine:pointer-events-none lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"
+    >
+      {/* Desktop: every li sits in one grid cell at the centre and is placed by its pose; preserve-3d depth-sorts them.
+          The ul and group pass the pointer through so only the panel buttons hit-test (the mobile carousel keeps scrolling). */}
+      <ul className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-[19vw] pb-4 pt-6 lg:pointer-fine:pointer-events-none lg:pointer-fine:grid lg:pointer-fine:justify-center lg:pointer-fine:justify-items-center lg:pointer-fine:gap-[6px] lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:pb-0 lg:pointer-fine:pt-6 lg:pointer-fine:[perspective:1200px] lg:pointer-fine:[transform-style:preserve-3d]">
+        {SITE_CATEGORIES.map((c, i) => {
+          const pose = wallPose(i, SITE_CATEGORIES.length);
+          const name = (labels.items[c.id] as { name: string }).name;
+          return (
+            <li
+              key={c.id}
+              style={
+                {
+                  "--x": pose.x,
+                  "--z": pose.z,
+                  "--ry": `${pose.rotateY}deg`,
+                  "--s": pose.scale,
+                  // Nearer (edge) panels paint in front where 3D sorting is unavailable.
+                  zIndex: Math.round((pose.z + 1) * 100),
+                } as React.CSSProperties
+              }
+              className="gallery-carousel-item w-[62vw] max-w-[320px] shrink-0 snap-center lg:pointer-fine:w-[clamp(9rem,13vw,15rem)] lg:pointer-fine:max-w-none lg:pointer-fine:[--pw:clamp(9rem,13vw,15rem)] lg:pointer-fine:[grid-area:1/1] lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]"
+            >
+              <button
+                type="button"
+                data-gallery-panel=""
+                aria-label={fmt(copy.openPanel, { category: name })}
+                onClick={(e) => open(c.id, e.currentTarget)}
+                className="group pointer-events-auto block min-h-11 w-full rounded-[6px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000] hover:brightness-115 focus-visible:brightness-115 motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:hover:-translate-y-3.5 motion-safe:focus-visible:-translate-y-3.5 motion-reduce:transition-none"
               >
-                <button
-                  type="button"
-                  data-gallery-panel=""
-                  aria-label={fmt(copy.openPanel, { category: name })}
-                  onClick={(e) => open(c.id, e.currentTarget)}
-                  className="group block w-full rounded-[1.25rem] text-left transition-transform duration-300 hover:-translate-y-3 focus-visible:-translate-y-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:focus-visible:translate-y-0"
-                >
-                  <span aria-hidden="true" className="font-narrow mb-2 block truncate text-center text-sm uppercase tracking-wider text-foreground">
-                    {name}
-                  </span>
-                  {/* Three 16:10 pages are 1.875w tall; a 2:3 frame shows 1.5w, so the slide stops at 20 %. */}
-                  <span className={`block aspect-[3/4] lg:pointer-fine:aspect-[2/3] ${FRAME}`}>
-                    <span
-                      aria-hidden="true"
-                      data-panel-art=""
-                      className="flex flex-col motion-safe:transition-transform motion-safe:duration-[1200ms] motion-safe:ease-out motion-safe:group-hover:-translate-y-[20%] motion-safe:group-focus-visible:-translate-y-[20%]"
-                    >
-                      {pages(true)}
-                    </span>
-                  </span>
-                </button>
-                {/* Floor reflection: 22 % of the 2:3 frame height (1.5w × 0.22 = 0.33w). */}
+                <span aria-hidden="true" className="-mx-8 mb-2 block whitespace-nowrap text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] lg:text-[clamp(0.6rem,0.85vw,0.85rem)]">
+                  {name}
+                </span>
                 <span
                   aria-hidden="true"
-                  data-panel-reflection=""
-                  className={`mt-2 hidden aspect-[100/33] opacity-30 [mask-image:linear-gradient(to_bottom,rgb(10_25_49/0.5),transparent_75%)] lg:pointer-fine:motion-safe:block ${FRAME}`}
+                  data-panel-art=""
+                  className="block aspect-[2/3] overflow-hidden rounded-[6px] bg-[#000] transition-shadow group-hover:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] group-focus-visible:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] motion-reduce:transition-none"
                 >
-                  <span className="flex -scale-y-100 flex-col">{pages()}</span>
+                  <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
                 </span>
-              </li>
-            );
-          })}
-        </ul>
-        <div
-          aria-hidden="true"
-          className="mx-auto hidden h-0.5 w-4/5 bg-[radial-gradient(closest-side,var(--fuse-glow),transparent)] lg:pointer-fine:motion-safe:block"
-        />
-      </div>
-      <p className="mt-4 text-center text-sm text-muted-foreground">{copy.hint}</p>
-      <p className="mt-1 text-center text-xs text-muted-foreground">{labels.galleryLabel}</p>
+              </button>
+              {/* Water reflection: the panel's lower 40 % mirrored, rippled by #hero-ripple (HeroFloor) and faded out. */}
+              <span
+                aria-hidden="true"
+                data-panel-reflection=""
+                className="mt-[6px] block aspect-[100/60] overflow-hidden rounded-[6px] opacity-45 [filter:url(#hero-ripple)] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.9),transparent_85%)]"
+              >
+                <span className="block aspect-[2/3] -scale-y-100">
+                  <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
+                </span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

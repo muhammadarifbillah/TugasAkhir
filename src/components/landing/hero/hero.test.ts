@@ -1,0 +1,161 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import { GalleryProvider } from "../gallery/gallery-provider";
+import { LANDING_MOTION_QUERY } from "../motion";
+import { HeroBackdrop } from "./hero-backdrop";
+import { HeroFloor } from "./hero-floor";
+import { HeroGrass } from "./hero-grass";
+import { HeroSection } from "./hero-section";
+
+type Json = Record<string, unknown>;
+type ProviderProps = Parameters<typeof GalleryProvider>[0];
+
+const ROOT = process.cwd();
+const DIR = "src/components/landing/hero";
+const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+const id = JSON.parse(read("src/dictionaries/id.json")) as { landing: Json & { ctaPrimary: string }; categories: Json; app: { name: string } };
+const copy = id.landing.gallery as ProviderProps["copy"] & { headline: string; sub: string };
+
+const section = () =>
+  renderToStaticMarkup(
+    createElement(
+      GalleryProvider,
+      { lang: "id", appName: id.app.name, labels: id.categories, copy } as unknown as ProviderProps,
+      createElement(HeroSection, { headline: copy.headline, sub: copy.sub, ctaHref: "/id/register", ctaLabel: id.landing.ctaPrimary }),
+    ),
+  );
+
+describe("hero backdrop", () => {
+  it("HeroBackdrop is an aria-hidden sky with a moon, at least 40 stars and leaf silhouettes, identical on every render", () => {
+    const html = renderToStaticMarkup(createElement(HeroBackdrop));
+    const root = html.slice(0, html.indexOf(">") + 1);
+    expect(root).toContain('aria-hidden="true"');
+    for (const s of ["data-hero-moon", "data-hero-leaves"]) expect(html, s).toContain(s);
+    expect(html.match(/<circle/g)?.length ?? 0).toBeGreaterThanOrEqual(40);
+    expect(renderToStaticMarkup(createElement(HeroBackdrop))).toBe(html);
+    for (const s of ["<text", "<image"]) expect(html, s).not.toContain(s);
+  });
+
+  // r22 round 2: the reference frames the moon with dense foliage on both sides, not one small clump.
+  it("HeroBackdrop has at least two leaf clusters", () => {
+    const html = renderToStaticMarkup(createElement(HeroBackdrop));
+    expect(html.match(/data-hero-leaves/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+  });
+});
+
+/** Class list of the first tag carrying `attr`. */
+const classesOf = (html: string, attr: string) => {
+  const at = html.indexOf(attr);
+  const tag = html.slice(html.lastIndexOf("<", at), html.indexOf(">", at) + 1);
+  return (tag.match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+};
+const zOf = (classes: string[]) => {
+  const z = classes.map((c) => c.match(/^(-?)z-(?:\[(-?\d+)\]|(\d+))$/)).find(Boolean);
+  expect(z, classes.join(" ")).toBeTruthy();
+  return Number(z![1] + (z![2] ?? z![3]));
+};
+
+describe("hero composition (r22 round 2)", () => {
+  it("the hero fills the first screen on desktop with a sane minimum", () => {
+    const tag = section().slice(0, section().indexOf(">") + 1);
+    expect(tag).toContain("lg:h-[calc(100svh-3.5rem)]");
+    expect(tag).toMatch(/lg:min-h-\[\d+px\]/);
+  });
+
+  it("the water floor sits behind the wall so its burst and orbs never cover a panel", () => {
+    const html = section();
+    const wall = html.lastIndexOf("<div", html.indexOf('role="group"'));
+    const wrapper = html.lastIndexOf("<div", wall - 1);
+    const wrapperClasses = (html.slice(wrapper, html.indexOf(">", wrapper)).match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+    expect(zOf(classesOf(html, "data-hero-floor"))).toBeLessThan(zOf(wrapperClasses));
+  });
+
+  it("the hero shows the hint and the gallery label", () => {
+    const html = section();
+    expect(html).toContain(copy.hint);
+    expect(html).toContain((id.categories as { galleryLabel: string }).galleryLabel);
+  });
+});
+
+describe("hero floor and grass (r22 round 3)", () => {
+  it("orbs stay in the outer 30 % on each side so they never cover the centred caption", () => {
+    const html = renderToStaticMarkup(createElement(HeroFloor));
+    const W = Number(html.match(/viewBox="0 0 (\d+) /)![1]);
+    const orbs = [...html.matchAll(/<g class="hero-orb"><circle cx="([\d.]+)" cy="[\d.]+" r="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    expect(orbs.length).toBeGreaterThanOrEqual(3);
+    for (const [cx, r] of orbs) expect(cx + r <= 0.3 * W || cx - r >= 0.7 * W, `orb at ${cx}`).toBe(true);
+  });
+
+  it("the water behind the grass glows teal and the blade tips catch it", () => {
+    expect(renderToStaticMarkup(createElement(HeroFloor))).toContain("#0e2a3a");
+    const grass = renderToStaticMarkup(createElement(HeroGrass));
+    expect(grass).toContain("#16283a");
+    expect(grass).toContain('fill="#000"');
+  });
+});
+
+describe("hero section", () => {
+  it("HeroSection is always black and stacks backdrop, title, one CTA, wall, floor and grass in order", () => {
+    const html = section();
+    const tag = html.slice(0, html.indexOf(">") + 1);
+    expect(tag.startsWith("<section")).toBe(true);
+    expect(tag).toContain('id="mulai-hero"');
+    expect(tag).toMatch(/(?<![\w:-])bg-(?:\[#000\]|black)(?![\w/-])/);
+    // Fixed black in both themes: nothing on the section switches with dark:.
+    expect(tag).not.toContain("dark:");
+    for (const s of ["isolate", "overflow-hidden"]) expect(tag, s).toContain(s);
+
+    // "<p " and "<a " with a space: SVG "<path" must not count as a paragraph.
+    const order = ["data-hero-backdrop", "<h1", "<p ", "<a ", 'role="group"', "data-hero-floor", "data-hero-grass"];
+    const at = order.map((s) => html.indexOf(s));
+    order.forEach((s, i) => expect(at[i], s).toBeGreaterThan(-1));
+    expect([...at].sort((a, b) => a - b)).toEqual(at);
+    expect(html.match(/<h1/g)).toHaveLength(1);
+    const title = html.slice(at[1], at[4]);
+    expect(title.match(/<a\b/g)).toHaveLength(1);
+    expect(title).toContain('href="/id/register"');
+    expect(title).toContain(id.landing.ctaPrimary);
+    expect(html).not.toContain('href="#rak"');
+    for (const s of ["data-hero-floor", "data-hero-grass"]) {
+      const t = html.slice(html.lastIndexOf("<", html.indexOf(s)), html.indexOf(">", html.indexOf(s)) + 1);
+      expect(t, s).toContain('aria-hidden="true"');
+    }
+    expect(html).toContain('id="hero-ripple"');
+    expect(html).toContain(copy.hint);
+  });
+
+  it("hero.css keeps all ambient animation inside the landing motion media query and turns it off on reduce", () => {
+    const css = read(`${DIR}/hero.css`);
+    const media = `@media ${LANDING_MOTION_QUERY}`;
+    const start = css.indexOf(media);
+    expect(start, media).toBeGreaterThan(-1);
+    let depth = 0;
+    let end = -1;
+    for (let i = css.indexOf("{", start); i < css.length; i++) {
+      if (css[i] === "{") depth++;
+      else if (css[i] === "}" && --depth === 0) {
+        end = i;
+        break;
+      }
+    }
+    expect(end).toBeGreaterThan(start);
+    const uses = [...css.matchAll(/(?<![\w-])animation(?:-name)?\s*:(?!\s*none)/g)].map((m) => m.index);
+    expect(uses.length).toBeGreaterThan(0);
+    for (const u of uses) expect(u > start && u < end, `animation at ${u}`).toBe(true);
+    expect(css).toContain("prefers-reduced-motion: reduce");
+    expect(css).toContain("@keyframes");
+  });
+
+  it("no hero source uses backdrop-blur or raster images", () => {
+    const files = readdirSync(join(ROOT, DIR)).filter((f) => /\.(tsx?|css)$/.test(f) && !f.includes(".test."));
+    expect(files.length).toBeGreaterThanOrEqual(7);
+    for (const f of files) {
+      const text = read(`${DIR}/${f}`);
+      for (const s of ["backdrop-blur", "backdrop-filter", "<image", "<img", ".png", ".jpg", "Math.random"]) expect(text, `${f} ${s}`).not.toContain(s);
+    }
+    expect(read(`${DIR}/hero-section.tsx`)).toContain('import "./hero.css"');
+  });
+});

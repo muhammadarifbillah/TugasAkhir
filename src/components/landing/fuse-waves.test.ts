@@ -33,15 +33,16 @@ describe("FuseWaves", () => {
     expect(root).toContain('preserveAspectRatio="none"');
   });
 
-  it("hero waves are h-28 or lower and shorter than the hero bottom padding", () => {
+  // Owner decision 2026-11-27 ("persis herosection.jpeg"): the hero ends in black grass over a water floor, not waves.
+  it("the hero is HeroSection and carries no FuseWaves", () => {
     const src = pageSrc();
-    const { tag, h } = wavesHeight('id="mulai-hero"');
-    expect(tag).not.toContain("h-[40%]");
-    expect(h).toBeLessThanOrEqual(28);
-    const heroAt = src.indexOf('id="mulai-hero"');
-    const heroTag = src.slice(src.lastIndexOf("<section", heroAt), src.indexOf(">", heroAt) + 1);
-    const pb = Number(heroTag.match(/(?<![\w:-])pb-(\d+)\b/)![1]);
-    expect(h).toBeLessThan(pb);
+    expect(src).toContain("<HeroSection");
+    const hero = src.slice(src.indexOf("<GalleryProvider"), src.indexOf("</GalleryProvider>"));
+    expect(hero).toContain("<HeroSection");
+    expect(hero).not.toContain("<FuseWaves");
+    const section = readFileSync(join(process.cwd(), "src/components/landing/hero/hero-section.tsx"), "utf8");
+    expect(section).not.toContain("FuseWaves");
+    expect(section).toContain("<HeroGrass");
   });
 
   it("CTA waves stay bottom-0 inside an overflow-hidden card and are at most h-24", () => {
@@ -69,28 +70,16 @@ describe("FuseWaves", () => {
     for (const s of ["<animate", "<image", "filter", "blur", "<text"]) expect(html, s).not.toContain(s);
   });
 
-  it("page.tsx places FuseWaves in the hero and the closing CTA behind the content", () => {
+  it("page.tsx places FuseWaves in the closing CTA behind the content", () => {
     const src = readFileSync(join(process.cwd(), "src/app/[lang]/page.tsx"), "utf8");
     expect(src).toMatch(/import \{[^}]*\bFuseWaves\b[^}]*\} from "@\/components\/landing\/fuse-waves";/);
+    // The hero no longer has waves (herosection.jpeg, 2026-11-27): exactly one FuseWaves on the page, in the CTA.
+    expect(count(src, "<FuseWaves")).toBe(1);
 
-    for (const marker of ['id="mulai-hero"', 'id="mulai"']) {
-      const part = sectionFrom(src, marker);
-      expect(count(part, "<FuseWaves"), marker).toBe(1);
-      const tag = tagAt(part, part.indexOf("<FuseWaves"));
-      for (const cls of ["pointer-events-none", "absolute", "bottom-0"]) expect(tag, `${marker} ${cls}`).toContain(cls);
-    }
-
-    const heroAt = src.indexOf('id="mulai-hero"');
-    const heroTag = src.slice(src.lastIndexOf("<section", heroAt), src.indexOf(">", heroAt) + 1);
-    expect(heroTag).toContain("isolate");
-    // the hint and gallery label under HeroWall must sit above the waves, not on the deep layer
-    const pb = heroTag.match(/(?<![\w:-])pb-(\d+)\b/);
-    expect(pb, "hero pb-*").not.toBeNull();
-    expect(Number(pb![1]), "hero pb-*").toBeGreaterThanOrEqual(28);
-    const hero = sectionFrom(src, 'id="mulai-hero"');
-    expect(hero.indexOf("<FuseWaves")).toBeGreaterThan(hero.indexOf("<h1"));
-    expect(hero.indexOf("<h1")).toBeGreaterThan(-1);
-    expect(tagAt(hero, hero.indexOf("<FuseWaves"))).toContain("-z-10");
+    const part = sectionFrom(src, 'id="mulai"');
+    expect(count(part, "<FuseWaves")).toBe(1);
+    const tag = tagAt(part, part.indexOf("<FuseWaves"));
+    for (const cls of ["pointer-events-none", "absolute", "bottom-0"]) expect(tag, cls).toContain(cls);
 
     const cta = sectionFrom(src, 'id="mulai"');
     const wavesAt = cta.indexOf("<FuseWaves");

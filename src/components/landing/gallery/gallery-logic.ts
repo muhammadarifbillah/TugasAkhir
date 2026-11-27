@@ -41,14 +41,45 @@ export function keyToAction(key: string): "next" | "prev" | null {
 /** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */
 const noNegZero = (n: number) => n + 0;
 
-/** Coverflow panorama: panels turn to face the centre more steeply towards the edges and recede; the centre pair is enlarged. */
-export function wallPose(i: number, n: number): { rotateY: number; z: number; scale: number } {
+/** Perspective (1200px) and projected gap (6px) in desktop panel widths at 1440px (13vw = 187px). */
+const WALL_DEPTH = 1200 / 187;
+const WALL_GAP = 6 / 187;
+
+/**
+ * Right-half pose at offset `a` (>= 0) from the centre (`a0` is the centre-most offset), x not yet placed.
+ * z starts at 0: a panel behind the preserve-3d ul plane (z < 0) loses its hover and click to the ul.
+ */
+const sidePose = (a: number, a0: number) => ({
+  rotateY: noNegZero(-Math.round(8 * a)),
+  z: noNegZero(Math.round(0.059 * (a * a - a0 * a0) * 1000) / 1000),
+  scale: Math.round((0.65 + 0.023 * Math.max(0, a * a - 0.25)) * 100) / 100,
+});
+
+/**
+ * Concave wall (viewer inside the cylinder): towards the edges panels come closer, grow and turn to face the centre.
+ * x and z are in panel widths for `translateX(x·pw) translateZ(z·pw) rotateY(ry) scale(s)`; x lays the panels out from
+ * the centre so their projected edges sit WALL_GAP apart.
+ */
+export function wallPose(i: number, n: number): { x: number; rotateY: number; z: number; scale: number } {
   const o = i - (n - 1) / 2;
-  return {
-    rotateY: noNegZero(-Math.sign(o) * Math.round(6 * Math.abs(o) + 1.5 * o * o)),
-    z: noNegZero(-Math.round(18 * (o * o - 0.25))),
-    scale: Math.abs(o) < 1 ? 1.06 : 1,
-  };
+  const a = Math.abs(o);
+  const D = WALL_DEPTH;
+  const a0 = n % 2 ? 0 : 0.5;
+  const centre = sidePose(0, a0);
+  // Outer projected edge of the previous panel; an odd wall starts from the centre panel's right edge.
+  let edge = n % 2 ? (0.5 * centre.scale * D) / (D - centre.z) : -WALL_GAP / 2;
+  let x = 0;
+  for (let k = n % 2 ? 1 : 0.5; k <= a; k++) {
+    const p = sidePose(k, a0);
+    const r = (p.rotateY * Math.PI) / 180;
+    const half = 0.5 * p.scale;
+    // Inner edge (u = -half) projects to edge + gap: solve X·D/(D-Z) for x.
+    x = ((edge + WALL_GAP) * (D - (p.z + half * Math.sin(r)))) / D + half * Math.cos(r);
+    x = Math.round(x * 1000) / 1000;
+    edge = ((x + half * Math.cos(r)) * D) / (D - (p.z - half * Math.sin(r)));
+  }
+  const pose = sidePose(a, a0);
+  return { x: noNegZero(Math.sign(o) * x), rotateY: noNegZero(Math.sign(o) * pose.rotateY), z: pose.z, scale: pose.scale };
 }
 
 /** Pointer position across `width` mapped to -1..1 (3 decimals). */
