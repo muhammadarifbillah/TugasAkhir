@@ -2,9 +2,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { VIEWER_INITIAL, filterByShelf, keyToAction, pointerTilt, viewerReducer, visibleCategories, wallPose, type ViewerState } from "./gallery-logic";
 
-const opened = (page: 0 | 1 | 2 = 0): ViewerState => ({ open: "marketplace", page, dir: 1 });
+const opened = (page = 0, template = 0): ViewerState => ({ open: "marketplace", template, page, dir: 1 });
+const count = (template: number) => SITE_TEMPLATES.marketplace[template].pages.length;
 
 /** Desktop wall: perspective 1200px, 8 panels, 10/19 art. hh = hero height (100svh - 3.5rem); pw = --pw at that width (hero-wall.test.ts). */
 const P = 1200;
@@ -56,24 +58,45 @@ const labelBoxes = (list: string[], vw: number, pw: number) => {
 
 describe("gallery logic", () => {
   it("viewerReducer opens a category on page 1 and close resets", () => {
-    expect(viewerReducer(VIEWER_INITIAL, { type: "open", id: "marketplace" })).toEqual({ open: "marketplace", page: 0, dir: 1 });
+    expect(viewerReducer(VIEWER_INITIAL, { type: "open", id: "marketplace" })).toEqual({ open: "marketplace", template: 0, page: 0, dir: 1 });
     expect(viewerReducer(VIEWER_INITIAL, { type: "open", id: "lms", page: 2 }).page).toBe(2);
-    expect(viewerReducer(opened(1), { type: "close" })).toEqual(VIEWER_INITIAL);
+    expect(viewerReducer(opened(1, 2), { type: "close" })).toEqual(VIEWER_INITIAL);
+    // Opening another category starts again at its first template.
+    expect(viewerReducer(opened(3, 2), { type: "open", id: "lms" })).toEqual({ open: "lms", template: 0, page: 0, dir: 1 });
   });
 
-  it("next and prev wrap around the three pages with a direction", () => {
-    let s = opened(0);
-    for (const want of [1, 2, 0]) {
-      s = viewerReducer(s, { type: "next" });
-      expect(s.page).toBe(want);
-      expect(s.dir).toBe(1);
-    }
-    s = opened(0);
-    for (const want of [2, 1]) {
+  it("template picks one of the three templates and sends the page back to 0", () => {
+    expect(viewerReducer(opened(4, 0), { type: "template", index: 2 })).toEqual({ open: "marketplace", template: 2, page: 0, dir: 1 });
+    expect(viewerReducer(opened(3, 2), { type: "template", index: 1 })).toEqual({ open: "marketplace", template: 1, page: 0, dir: -1 });
+    const s = opened(3, 1);
+    expect(viewerReducer(s, { type: "template", index: 1 })).toBe(s);
+    const closed = { ...VIEWER_INITIAL };
+    expect(viewerReducer(closed, { type: "template", index: 1 })).toBe(closed);
+  });
+
+  it("next and prev wrap around the active template's real page count with a direction", () => {
+    for (const template of [0, 2]) {
+      const n = count(template);
+      let s = opened(0, template);
+      for (let i = 1; i <= n; i++) {
+        s = viewerReducer(s, { type: "next" });
+        expect(s.page, `t${template} next ${i}`).toBe(i % n);
+        expect(s.dir).toBe(1);
+      }
+      s = viewerReducer(opened(0, template), { type: "prev" });
+      expect(s).toMatchObject({ page: n - 1, dir: -1, template });
       s = viewerReducer(s, { type: "prev" });
-      expect(s.page).toBe(want);
-      expect(s.dir).toBe(-1);
+      expect(s.page).toBe(n - 2);
     }
+  });
+
+  it("home and end jump to the first and last page of the active template", () => {
+    expect(viewerReducer(opened(2, 1), { type: "end" })).toMatchObject({ page: count(1) - 1, dir: 1, template: 1 });
+    expect(viewerReducer(opened(4, 1), { type: "home" })).toMatchObject({ page: 0, dir: -1, template: 1 });
+    const first = opened(0, 0);
+    expect(viewerReducer(first, { type: "home" })).toBe(first);
+    const last = opened(count(0) - 1, 0);
+    expect(viewerReducer(last, { type: "end" })).toBe(last);
   });
 
   it("goto sets the direction and is a no-op for the same page or a closed viewer", () => {
@@ -87,9 +110,11 @@ describe("gallery logic", () => {
     expect(viewerReducer(closed, { type: "goto", page: 2 })).toBe(closed);
   });
 
-  it("keyToAction maps the arrow keys only", () => {
+  it("keyToAction maps the arrow keys, Home and End only", () => {
     expect(keyToAction("ArrowRight")).toBe("next");
     expect(keyToAction("ArrowLeft")).toBe("prev");
+    expect(keyToAction("Home")).toBe("home");
+    expect(keyToAction("End")).toBe("end");
     for (const k of ["Enter", "a", "ArrowUp"]) expect(keyToAction(k)).toBeNull();
   });
 

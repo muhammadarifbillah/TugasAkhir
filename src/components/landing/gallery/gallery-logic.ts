@@ -1,41 +1,65 @@
 import type { Dictionary } from "@/lib/i18n";
 import type { CategoryId, ShelfId, SiteCategory } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 
-export type PageIndex = 0 | 1 | 2;
 export interface ViewerState {
   open: CategoryId | null;
-  page: PageIndex;
+  /** Index into SITE_TEMPLATES[open] (0-2). */
+  template: number;
+  /** Index into the active template's pages. */
+  page: number;
   dir: 1 | -1;
 }
 export type ViewerAction =
-  | { type: "open"; id: CategoryId; page?: PageIndex }
+  | { type: "open"; id: CategoryId; page?: number }
   | { type: "close" }
+  | { type: "template"; index: number }
   | { type: "next" }
   | { type: "prev" }
-  | { type: "goto"; page: PageIndex };
+  | { type: "home" }
+  | { type: "end" }
+  | { type: "goto"; page: number };
 
-export const VIEWER_INITIAL: ViewerState = { open: null, page: 0, dir: 1 };
+export const VIEWER_INITIAL: ViewerState = { open: null, template: 0, page: 0, dir: 1 };
+
+const goto = (s: ViewerState, page: number): ViewerState => (page === s.page ? s : { ...s, page, dir: page > s.page ? 1 : -1 });
 
 export function viewerReducer(s: ViewerState, a: ViewerAction): ViewerState {
   switch (a.type) {
     case "open":
-      return { open: a.id, page: a.page ?? 0, dir: 1 };
+      return { open: a.id, template: 0, page: a.page ?? 0, dir: 1 };
     case "close":
       return VIEWER_INITIAL;
   }
   if (s.open === null) return s;
+  const n = SITE_TEMPLATES[s.open][s.template].pages.length;
   switch (a.type) {
+    case "template":
+      return a.index === s.template ? s : { ...s, template: a.index, page: 0, dir: a.index > s.template ? 1 : -1 };
     case "next":
-      return { ...s, page: ((s.page + 1) % 3) as PageIndex, dir: 1 };
+      return { ...s, page: (s.page + 1) % n, dir: 1 };
     case "prev":
-      return { ...s, page: ((s.page + 2) % 3) as PageIndex, dir: -1 };
+      return { ...s, page: (s.page + n - 1) % n, dir: -1 };
+    case "home":
+      return goto(s, 0);
+    case "end":
+      return goto(s, n - 1);
     case "goto":
-      return a.page === s.page ? s : { ...s, page: a.page, dir: a.page > s.page ? 1 : -1 };
+      return goto(s, a.page);
   }
 }
 
-export function keyToAction(key: string): "next" | "prev" | null {
-  return key === "ArrowRight" ? "next" : key === "ArrowLeft" ? "prev" : null;
+export function keyToAction(key: string): "next" | "prev" | "home" | "end" | null {
+  return key === "ArrowRight" ? "next" : key === "ArrowLeft" ? "prev" : key === "Home" ? "home" : key === "End" ? "end" : null;
+}
+
+/** Tab index after a key press inside the template tablist (arrows wrap), or null for other keys. */
+export function tabKey(key: string, current: number, count: number): number | null {
+  if (key === "ArrowRight") return (current + 1) % count;
+  if (key === "ArrowLeft") return (current + count - 1) % count;
+  if (key === "Home") return 0;
+  if (key === "End") return count - 1;
+  return null;
 }
 
 /** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */

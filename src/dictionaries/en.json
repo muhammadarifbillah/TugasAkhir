@@ -191,7 +191,12 @@
       "specScanner": "Scanners",
       "scannerValue": "Semgrep & Trivy",
       "reviewedBy": "Checked by {name}",
-      "seeAllTemplates": "See all templates"
+      "seeAllTemplates": "See all templates",
+      "viewerTemplatesLabel": "Templates in this category",
+      "viewerGalleryLabel": "Screenshots of open-source templates — not client sites",
+      "viewerCreditLicense": "License",
+      "viewerCreditSource": "Source",
+      "viewerCreditNewTab": "(opens in a new tab)"
     },
     "shelf": {
       "pill": "Template shelf",
