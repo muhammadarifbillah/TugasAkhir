@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
@@ -34,6 +34,18 @@ function webpSize(buf: Buffer): { w: number; h: number } | null {
   }
   if (chunk === "VP8X") return { w: buf.readUIntLE(24, 3) + 1, h: buf.readUIntLE(27, 3) + 1 };
   return null;
+}
+
+/** First 32 bytes of a file: enough for the RIFF/WEBP header and the frame size. */
+function head(file: string): Buffer {
+  const buf = Buffer.alloc(32);
+  const fd = openSync(file, "r");
+  try {
+    readSync(fd, buf, 0, 32, 0);
+  } finally {
+    closeSync(fd);
+  }
+  return buf;
 }
 
 function walk(dir: string): string[] {
@@ -85,7 +97,7 @@ describe("site templates", () => {
       expect(web.startsWith("/templates/"), web).toBe(true);
       const file = join(PUBLIC, web);
       expect(existsSync(file), web).toBe(true);
-      expect(webpSize(readFileSync(file)), web).toEqual({ w, h });
+      expect(webpSize(head(file)), web).toEqual({ w, h });
     };
     for (const t of all()) {
       check(t.mobile, 360, 780);

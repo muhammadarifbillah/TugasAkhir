@@ -1252,5 +1252,129 @@
         }
       }
     }
+  },
+  "templatePages": {
+    "about": "About",
+    "account": "Account & orders",
+    "activity": "Activity log",
+    "analytics": "Analytics",
+    "article": "Article",
+    "auth": "Authentication",
+    "author": "Author",
+    "billing": "Billing & plan",
+    "blog": "Blog",
+    "booking": "Book appointment",
+    "cart": "Cart",
+    "catalog": "Catalog",
+    "category": "Category",
+    "checkout": "Checkout",
+    "code": "Code samples",
+    "confirmation": "Booking confirmation",
+    "contact": "Contact",
+    "course": "Course detail",
+    "courses": "Course catalog",
+    "dashboard": "Dashboard",
+    "departments": "Departments",
+    "doctor_detail": "Doctor profile",
+    "doctors": "Doctors",
+    "endpoint": "Endpoint reference",
+    "home": "Home",
+    "instructors": "Instructors",
+    "intro": "Introduction",
+    "invoice": "Invoice",
+    "lesson": "Lesson",
+    "login": "Sign in",
+    "open-store": "Open a store",
+    "orders": "Orders",
+    "overview": "Overview",
+    "portfolio": "Portfolio",
+    "portfolio_detail": "Case study",
+    "pricing": "Pricing",
+    "product": "Product detail",
+    "quickstart": "Quickstart",
+    "resource": "Resource group",
+    "schema": "Schemas",
+    "search": "Search",
+    "seller": "Seller store",
+    "services": "Services",
+    "settings": "Settings",
+    "subscribe": "Subscribe",
+    "tag": "Tag",
+    "team": "Team",
+    "wishlist": "Wishlist"
+  },
+  "templates": {
+    "gocart": {
+      "desc": "A multi-vendor store with a white layout, a pale mint hero and purple accents."
+    },
+    "mercur": {
+      "desc": "A B2C marketplace storefront in stark black and white with bold capital type."
+    },
+    "spree-storefront": {
+      "desc": "A marketplace storefront with an airy, editorial look in white and navy."
+    },
+    "htmlcodex-eshop": {
+      "desc": "A classic Bootstrap online shop with a steel-blue navigation bar on white."
+    },
+    "uikit-ecommerce": {
+      "desc": "An online shop built with UIkit, with a black top bar, a dark hero and azure accents."
+    },
+    "medusa-nextjs-starter": {
+      "desc": "A minimal Next.js shop in white and light grey with dark text."
+    },
+    "tailthemes-seminar": {
+      "desc": "An online course site in calm sage green with dark green buttons."
+    },
+    "htmlcodex-elearning": {
+      "desc": "An e-learning website in bright teal and navy on a pale cyan background."
+    },
+    "kiaalap": {
+      "desc": "An education admin dashboard with a navy sidebar and indigo accents."
+    },
+    "volt-bootstrap-5-dashboard": {
+      "desc": "A Bootstrap admin dashboard with a dark sidebar and warm sand and amber tones."
+    },
+    "studio-admin-shadcn": {
+      "desc": "A Next.js admin dashboard built with shadcn/ui in neutral black and white."
+    },
+    "tabler": {
+      "desc": "A light admin dashboard with tidy cards, tables and blue accents."
+    },
+    "novena-bootstrap": {
+      "desc": "A medical clinic website in navy and pale blue with pink accents."
+    },
+    "clear-care-clarity": {
+      "desc": "A clinic booking website in warm cream with steel blue and wood-brown accents."
+    },
+    "medic-bootstrap": {
+      "desc": "A medical clinic website in teal and white with purple accents."
+    },
+    "startbootstrap-creative": {
+      "desc": "A one-page company website with a photo hero and orange accents."
+    },
+    "startbootstrap-modern-business": {
+      "desc": "A multi-page business website with a dark hero, light sections and Bootstrap blue."
+    },
+    "airspace-bootstrap": {
+      "desc": "An agency website in white and charcoal with muted purple accents."
+    },
+    "ghost-casper": {
+      "desc": "A publication theme for Ghost with a purple-to-pink gradient hero and clean white posts."
+    },
+    "ghost-headline": {
+      "desc": "A local news theme for Ghost in white and black with red accents."
+    },
+    "masthead-free": {
+      "desc": "A newspaper theme for Astro with newsprint cream, serif headlines and dark red section labels."
+    },
+    "redoc": {
+      "desc": "A three-panel API reference in white and pale blue-grey with code samples on the right."
+    },
+    "scalar-galaxy": {
+      "desc": "A single-page API reference in near-monochrome white with coloured method badges."
+    },
+    "docusaurus-openapi-docs": {
+      "desc": "API documentation on Docusaurus with a light grey sidebar and green accents."
+    }
   }
 }

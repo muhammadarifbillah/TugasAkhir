@@ -65,3 +65,6 @@ Proxmox.png
 
 # design references (third-party images, kept local)
 /referensi/
+
+# local clones of open-source templates for screenshots (scripts/templates/capture.py)
+/scripts/templates/.cache/
