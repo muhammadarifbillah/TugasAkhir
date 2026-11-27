@@ -198,7 +198,8 @@ describe("hero section", () => {
 
   it("no hero source uses backdrop-blur or raster images", () => {
     const files = readdirSync(join(ROOT, DIR)).filter((f) => /\.(tsx?|css)$/.test(f) && !f.includes(".test."));
-    expect(files.length).toBeGreaterThanOrEqual(7);
+    // r25: hero-scene.tsx and moods.ts were removed (the wall shows template screenshots), leaving five sources.
+    expect(files.length).toBeGreaterThanOrEqual(5);
     for (const f of files) {
       const text = read(`${DIR}/${f}`);
       for (const s of ["backdrop-blur", "backdrop-filter", "<image", "<img", ".png", ".jpg", "Math.random"]) expect(text, `${f} ${s}`).not.toContain(s);
