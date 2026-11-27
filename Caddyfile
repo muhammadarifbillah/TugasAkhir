@@ -1,4 +1,4 @@
-# Caddyfile — automatic HTTPS reverse proxy for Saksi.
+# Caddyfile — automatic HTTPS reverse proxy for FUSE.
 # Set DOMAIN in the environment (see docker-compose.prod.yml / .env).
 {$DOMAIN} {
 	encode gzip

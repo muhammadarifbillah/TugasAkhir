@@ -1,6 +1,6 @@
-# Deploy Saksi (Proxmox + Docker)
+# Deploy FUSE (Proxmox + Docker)
 
-Panduan men-deploy Saksi secara publik memakai Docker Compose: **Caddy
+Panduan men-deploy FUSE secara publik memakai Docker Compose: **Caddy
 (HTTPS) + Next.js app + PostgreSQL**. Hanya Caddy yang terekspos (port 80/443);
 app dan database tetap di jaringan internal.
 
@@ -62,8 +62,8 @@ Isi nilai produksi:
 
 | Variabel | Nilai |
 |---|---|
-| `DOMAIN` | domain publik, mis. `saksi.example.com` |
-| `AUTH_URL` / `NEXTAUTH_URL` | `https://saksi.example.com` |
+| `DOMAIN` | domain publik, mis. `fuse.example.com` |
+| `AUTH_URL` / `NEXTAUTH_URL` | `https://fuse.example.com` |
 | `POSTGRES_PASSWORD` | kata sandi kuat (untuk container `db`) |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
 | `ENCRYPTION_MASTER_KEY` | `openssl rand -hex 32` |
@@ -84,10 +84,10 @@ Isi nilai produksi:
 ```bash
 # Di VM, arahkan tunnel ke app internal:
 cloudflared tunnel login
-cloudflared tunnel create saksi
+cloudflared tunnel create fuse
 # Konfigurasi CNAME domain → <tunnel-id>.cfargotunnel.com, lalu:
-cloudflared tunnel route dns saksi saksi.example.com
-cloudflared tunnel run --url http://localhost:3000 saksi
+cloudflared tunnel route dns fuse fuse.example.com
+cloudflared tunnel run --url http://localhost:3000 fuse
 ```
 
 Dengan jalur ini Caddy bisa dilewati (Cloudflare menangani TLS di edge); jalankan

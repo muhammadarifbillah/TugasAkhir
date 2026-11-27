@@ -1,9 +1,9 @@
 # PEDOMAN WAWANCARA
 
-## Penelitian: Pengembangan Aplikasi Saksi
+## Penelitian: Pengembangan Aplikasi FUSE
 ### AI-Powered Secure SDLC Website Generator
 
-> Catatan: produk ini sebelumnya bernama ShieldForge; nama diganti menjadi Saksi pada 2026-11-26. Judul skripsi tidak berubah.
+> Catatan: produk ini sebelumnya ShieldForge, lalu Saksi (2026-11-26); sejak 2026-11-27 bernama FUSE. Judul skripsi tidak berubah.
 
 ---
 
@@ -13,9 +13,9 @@
 
 ---
 
-## TENTANG APLIKASI SAKSI
+## TENTANG APLIKASI FUSE
 
-**Saksi** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
+**FUSE** adalah platform web berbasis kecerdasan buatan yang memandu pengembang melewati 5 tahapan Secure SDLC (Secure Software Development Life Cycle) untuk membangun website. Aplikasi ini menggunakan:
 
 - **5 Tahapan Berurutan:**
   1. **Analysis & Requirements** — Penentuan scope, rekomendasi stack teknologi, identifikasi requirement keamanan & privasi, klasifikasi data

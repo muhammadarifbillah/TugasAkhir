@@ -29,7 +29,7 @@ export async function resolveTarget(
     name: opts.repoName,
     private: opts.visibility === "private",
     auto_init: true,
-    description: `${opts.projectName} — generated with Saksi (NIST SP 800-218 / ISO 27001:2022).`,
+    description: `${opts.projectName} — generated with FUSE (NIST SP 800-218 / ISO 27001:2022).`,
   });
   const owner = created.data.owner?.login ?? me.data.login;
   const repo = created.data.name;

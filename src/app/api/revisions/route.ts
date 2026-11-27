@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       const commit = await octokit.rest.git.createCommit({
         owner,
         repo,
-        message: `feat: release ${nextVersion} via Saksi`,
+        message: `feat: release ${nextVersion} via FUSE`,
         tree: tree.data.sha,
         parents: [baseSha],
       });

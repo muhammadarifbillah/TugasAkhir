@@ -159,7 +159,7 @@ describe("brand name", () => {
     expect(lock.packages[""].name).toBe("fuse");
   });
 
-  it("no source names the product Saksi and no saksi- slug remains", () => {
+  it("no source names the product Saksi and no lowercase Saksi slug remains", () => {
     const list = (dir: string) =>
       (readdirSync(join(ROOT, dir), { recursive: true }) as string[])
         .map((f) => `${dir}/${f.replace(/\\/g, "/")}`)
