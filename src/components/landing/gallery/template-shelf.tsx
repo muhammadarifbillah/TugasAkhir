@@ -14,7 +14,7 @@ type Copy = Dictionary["landing"]["shelf"];
 
 const TAB =
   "min-h-11 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:text-background";
-const ROW = "flex snap-x items-end gap-5 overflow-x-auto px-2 pt-4 lg:flex-wrap lg:overflow-visible";
+const ROW = "flex snap-x items-end gap-5 overflow-x-auto px-2 pt-4";
 
 /** Template shelf: books grouped per shelf (or all in a grid), filtered client-side; each book opens the viewer. */
 export function TemplateShelf({ copy }: { copy: Copy }) {
@@ -28,7 +28,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
   const book = (c: SiteCategory, wide = false) => {
     const name = (gallery.labels.items[c.id] as { name: string }).name;
     return (
-      <li key={c.id} className={wide ? "" : "shrink-0 snap-start"}>
+      <li key={c.id} className={wide ? "" : "shrink-0 snap-start lg:min-w-0 lg:shrink"}>
         <button
           type="button"
           data-shelf-cover=""
@@ -38,7 +38,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
         >
           <span
             data-book=""
-            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[8.5rem] sm:w-[12.5rem]"}`}
+            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[8.5rem] max-w-full sm:w-[12.5rem]"}`}
           >
             <span
               className="absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-3 overflow-hidden rounded-l-sm rounded-r-md bg-card pl-4 pr-2 pt-4"

@@ -230,7 +230,7 @@ describe("template shelf", () => {
       expect(c).not.toContain("lg:flex-wrap");
       expect(c).not.toContain("flex-wrap");
       for (const k of ["overflow-x-auto", "snap-x"]) expect(c).toContain(k);
-      const lis = [...body.matchAll(/<li[^>]*>/g)].map((m) => classOf(m[0]));
+      const lis = [...body.matchAll(/<li[\s>][^>]*>/g)].map((m) => classOf(m[0]));
       expect(lis.length).toBeGreaterThan(0);
       for (const li of lis) for (const k of ["shrink-0", "snap-start", "lg:min-w-0", "lg:shrink"]) expect(li).toContain(k);
     }
