@@ -333,6 +333,28 @@ describe("template shelf", () => {
     expect(c).toContain("min-h-11");
   });
 
+  const toolbarRow = () => {
+    const m = /<div class="([^"]*)">(<div[^>]*data-shelf-toolbar[^>]*>)/.exec(renderShelf());
+    expect(m, "row > toolbar").not.toBeNull();
+    return { row: m![1].split(/\s+/), pill: classOf(m![2]) };
+  };
+
+  it("tab+search pill takes basis-full below sm (sm:basis-auto) so the input stays inside it at 390px", () => {
+    const { pill } = toolbarRow();
+    for (const k of ["basis-full", "sm:basis-auto", "min-w-0", "rounded-full"]) expect(pill).toContain(k);
+  });
+
+  it("input is never wider than the pill and the aria-live count wraps instead of overlapping", () => {
+    const html = renderShelf();
+    const { row, pill } = toolbarRow();
+    expect(row).toContain("flex-wrap");
+    const input = classOf(/<input[^>]*type="search"[^>]*>/.exec(html)![0]);
+    // a non-shrinking input (min-w-[10rem]) only fits when the pill owns the whole row below sm
+    if (!input.includes("min-w-0")) expect(pill).toContain("basis-full");
+    const live = classOf(/<p[^>]*aria-live="polite"[^>]*>/.exec(html)![0]);
+    for (const k of live) expect(k).not.toMatch(/^(absolute|-?m[lr]?-|-?mt-)/);
+  });
+
   it("cover tones rotate through palette pairs", () => {
     const html = renderShelf();
     const tones = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => /data-cover-tone="([^"]*)"/.exec(m[0])?.[1]);
