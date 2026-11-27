@@ -29,12 +29,12 @@ const BOTTOM_STOPS: Array<[number, string]> = [
 ];
 
 /** FUSE lockup: gradient F mark (mono under .dark via .fuse-mark) and "USE" in currentColor. */
-export function FuseLockup({ label, className }: { label: string; className?: string }) {
+export function FuseLockup({ label, className, markOnly }: { label: string; className?: string; markOnly?: boolean }) {
   const id = useId();
   const top = `${id}-top`;
   const bottom = `${id}-bottom`;
   return (
-    <svg role="img" aria-label={label} viewBox="0 -2 365 104" fill="none" className={cn("fuse-lockup", className)}>
+    <svg role="img" aria-label={label} viewBox={markOnly ? "0 -2 106 104" : "0 -2 365 104"} fill="none" className={cn("fuse-lockup", className)}>
       <defs>
         <linearGradient id={top} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="104.6" y2="40">
           {TOP_STOPS.map(([offset, color]) => (
@@ -49,12 +49,14 @@ export function FuseLockup({ label, className }: { label: string; className?: st
       </defs>
       <path className="fuse-mark" d={MARK_TOP} fill={`url(#${top})`} />
       <path className="fuse-mark" d={MARK_BOTTOM} fill={`url(#${bottom})`} />
-      <path
-        className="fuse-word"
-        fill="currentColor"
-        transform="translate(105.539 -33.096) scale(0.55556)"
-        d={WORD}
-      />
+      {!markOnly && (
+        <path
+          className="fuse-word"
+          fill="currentColor"
+          transform="translate(105.539 -33.096) scale(0.55556)"
+          d={WORD}
+        />
+      )}
     </svg>
   );
 }

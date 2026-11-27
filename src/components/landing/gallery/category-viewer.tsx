@@ -2,7 +2,9 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { AnimatePresence, m } from "motion/react";
+import { useRef } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { FuseLockup } from "@/components/brand/fuse-lockup";
 import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
@@ -21,7 +23,9 @@ const slide = {
   exit: (dir: 1 | -1) => ({ x: -dir * 40, opacity: 0 }),
 };
 const ARROW =
-  "inline-flex size-11 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  "inline-flex size-11 items-center justify-center rounded-full border border-[#B3CFE5] text-[#0A1931] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]";
+const PRIMARY =
+  "inline-flex min-h-11 items-center rounded-full bg-[#1A3D63] px-4 text-sm font-semibold text-[#F6FAFD] transition-colors hover:bg-[#0A1931] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F6FAFD]";
 
 export function ViewerBody({
   category,
@@ -34,6 +38,7 @@ export function ViewerBody({
   onPage,
   onNext,
   onPrev,
+  onSeeAll,
   slots,
 }: {
   category: SiteCategory;
@@ -46,106 +51,166 @@ export function ViewerBody({
   onPage: (p: PageIndex) => void;
   onNext: () => void;
   onPrev: () => void;
+  onSeeAll?: () => void;
   slots?: { Title?: React.ElementType; Description?: React.ElementType };
 }) {
   const Title = slots?.Title ?? "h2";
   const Description = slots?.Description ?? "p";
   const item = labels.items[category.id] as unknown as Item;
   const pageNames = category.pages.map((p) => item.pages[p.id]);
+  const specs = [
+    [copy.specPages, pageNames.join(" · "), copy.specFeatures, category.features.map((f) => item.features[f]).join(" · ")],
+    [copy.specStack, category.stack.join(" · "), copy.specChecks, fmt(copy.checksCount, { n: category.checks.length })],
+    [copy.specStandards, copy.standardsValue, copy.specScanner, copy.scannerValue],
+  ];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_96px] lg:gap-8">
-      <div className="order-1">
-        <button
-          type="button"
-          aria-label={copy.nextPage}
-          onClick={onNext}
-          className="block w-full overflow-hidden rounded-[1.5rem] border border-border shadow-[var(--fuse-shadow-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <div>
+      <div data-viewer-bar="" className="flex items-center justify-between gap-4 border-b border-[#B3CFE5] pb-4 pr-14">
+        <FuseLockup label={appName} className="h-5 w-auto text-[#0A1931]" />
+        <p className="hidden text-sm text-[#1A3D63] sm:block">{copy.barTitle}</p>
+        <a
+          data-viewer-cta="bar"
+          href={`/${lang}/projects/new`}
+          className={PRIMARY}
         >
-          <AnimatePresence initial={false} mode="popLayout" custom={dir}>
-            <m.div
-              key={page}
-              custom={dir}
-              variants={slide}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.28, ease: EASE }}
-            >
-              <SiteArt category={category} pageIndex={page} labels={labels} className="block h-auto w-full" />
-            </m.div>
-          </AnimatePresence>
-        </button>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <button type="button" aria-label={copy.prevPage} onClick={onPrev} className={ARROW}>
-            <ChevronLeft aria-hidden="true" className="size-5" />
-          </button>
-          <p className="text-sm font-medium text-foreground">{fmt(copy.pageOf, { n: page + 1, total: 3 })}</p>
-          <button type="button" aria-label={copy.nextPage} onClick={onNext} className={ARROW}>
-            <ChevronRight aria-hidden="true" className="size-5" />
-          </button>
-        </div>
-        <p className="mt-2 text-center text-xs text-muted-foreground">{copy.pageHint}</p>
-        <p className="mt-1 text-center text-xs text-muted-foreground">{labels.galleryLabel}</p>
+          {copy.start}
+        </a>
       </div>
 
-      <ul aria-label={copy.thumbsLabel} className="order-2 flex gap-3 overflow-x-auto lg:order-3 lg:flex-col lg:overflow-visible">
-        {PAGES.map((i) => (
-          <li key={i} className="w-28 shrink-0 lg:w-full">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_8.5rem] lg:gap-8">
+        <div className="order-1">
+          <div className="relative grid place-items-center py-6">
+            <span
+              data-viewer-circle=""
+              aria-hidden="true"
+              className="absolute left-1/2 top-1/2 aspect-square w-[85%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#B3CFE5]"
+            />
             <button
               type="button"
-              data-viewer-thumb=""
-              aria-label={pageNames[i]}
-              aria-current={i === page ? "true" : undefined}
-              onClick={() => onPage(i)}
-              className="block w-full overflow-hidden rounded-xl border border-border opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[current=true]:border-[var(--fuse-accent-text)] aria-[current=true]:opacity-100"
+              aria-label={copy.nextPage}
+              onClick={onNext}
+              className="relative block w-[80%] overflow-hidden rounded-[1.25rem] border border-[#B3CFE5] shadow-[0_24px_40px_-20px_rgb(10_25_49/0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]"
             >
-              <span aria-hidden="true">
-                <SiteArt category={category} pageIndex={i} labels={labels} className="block h-auto w-full" />
-              </span>
+              <AnimatePresence initial={false} mode="popLayout" custom={dir}>
+                <m.div
+                  key={page}
+                  custom={dir}
+                  variants={slide}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.28, ease: EASE }}
+                >
+                  <SiteArt category={category} pageIndex={page} labels={labels} className="block h-auto w-full" />
+                </m.div>
+              </AnimatePresence>
             </button>
-          </li>
-        ))}
-      </ul>
+          </div>
+          <p data-viewer-preview-hint="" className="text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1A3D63]">
+            {copy.previewHint}
+          </p>
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <button type="button" aria-label={copy.prevPage} onClick={onPrev} className={ARROW}>
+              <ChevronLeft aria-hidden="true" className="size-5" />
+            </button>
+            <p className="text-sm font-medium text-[#0A1931]">{fmt(copy.pageOf, { n: page + 1, total: 3 })}</p>
+            <button type="button" aria-label={copy.nextPage} onClick={onNext} className={ARROW}>
+              <ChevronRight aria-hidden="true" className="size-5" />
+            </button>
+          </div>
+          <p className="mt-2 text-center text-xs text-[#1A3D63]">{copy.pageHint}</p>
+          <p className="mt-1 text-center text-xs text-[#1A3D63]">{labels.galleryLabel}</p>
+        </div>
 
-      <div className="order-3 lg:order-2">
-        <Title className="font-wide text-2xl text-foreground md:text-3xl">{item.name}</Title>
-        <Description className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.desc}</Description>
-        <table className="mt-5 w-full text-left text-sm">
-          <tbody>
-            {[
-              [copy.specPages, pageNames.join(" · ")],
-              [copy.specFeatures, category.features.map((f) => item.features[f]).join(" · ")],
-              [copy.specStack, category.stack.join(" · ")],
-            ].map(([k, v]) => (
-              <tr key={k} className="border-t border-border">
-                <th scope="row" className="py-2 pr-3 align-top font-medium text-[var(--fuse-accent-text)]">
-                  {k}
-                </th>
-                <td className="py-2 text-foreground">{v}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <section data-viewer-checks="" className="mt-6">
-          <h3 className="text-sm font-semibold text-foreground">{fmt(copy.checksTitle, { name: appName })}</h3>
-          <ul className="mt-3 space-y-3">
-            {category.checks.map((check) => (
-              <li key={check.id} data-viewer-check="" className="text-sm text-foreground">
-                {item.checks[check.id]}
-                <span className="mt-0.5 block text-xs text-muted-foreground">
-                  {fmt(copy.checkCodes, { nist: check.nist, iso: check.iso })}
-                </span>
+        <div className="order-2 flex items-center gap-2 lg:order-3 lg:items-start">
+          <ul aria-label={copy.thumbsLabel} className="flex min-w-0 flex-1 gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
+            {PAGES.map((i) => (
+              <li key={i} className="w-28 shrink-0 lg:w-full">
+                <button
+                  type="button"
+                  data-viewer-thumb=""
+                  aria-label={pageNames[i]}
+                  aria-current={i === page ? "true" : undefined}
+                  onClick={() => onPage(i)}
+                  className="block w-full rounded-xl border border-transparent p-2 opacity-70 transition-[opacity,background-color] hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] aria-[current=true]:border-l-[3px] aria-[current=true]:border-l-[#4A7FA7] aria-[current=true]:bg-[#B3CFE5] aria-[current=true]:opacity-100"
+                >
+                  <span aria-hidden="true" className="block overflow-hidden rounded-lg">
+                    <SiteArt category={category} pageIndex={i} labels={labels} className="block h-auto w-full" />
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-muted-foreground">{copy.scanned}</p>
-        </section>
+          <button
+            type="button"
+            data-viewer-see-all=""
+            onClick={onSeeAll}
+            className="min-h-11 min-w-11 shrink-0 rounded-full px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#1A3D63] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7] lg:py-3 lg:[writing-mode:vertical-rl]"
+          >
+            {copy.seeAllTemplates}
+          </button>
+        </div>
 
-        <a className="clay-btn mt-6 inline-flex" href={`/${lang}/projects/new`}>
-          {copy.start}
-        </a>
+        <div className="order-3 lg:order-2">
+          <Title className="font-wide text-3xl text-[#0A1931] md:text-4xl">{item.name}</Title>
+          <p data-viewer-byline="" className="mt-2 text-xs uppercase tracking-wide text-[#1A3D63]">
+            {fmt(copy.byline, { name: appName, n: category.pages.length })}
+          </p>
+          <Description className="mt-4 text-base italic leading-relaxed text-[#1A3D63]">{item.desc}</Description>
+          <p className="mt-3 text-sm leading-relaxed text-[#0A1931]">{copy.intro}</p>
+          <hr className="mt-5 border-[#B3CFE5]" />
+          <table data-viewer-specs="" className="mt-4 w-full table-fixed text-left">
+            <tbody>
+              {specs.map(([k1, v1, k2, v2]) => (
+                <tr key={k1} className="align-top">
+                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63]">
+                    {k1}
+                  </th>
+                  <td className="py-2 pr-3 text-sm text-[#0A1931]">{v1}</td>
+                  <th scope="row" className="py-2 pr-2 text-[11px] font-semibold uppercase tracking-wide text-[#1A3D63]">
+                    {k2}
+                  </th>
+                  <td className="py-2 text-sm text-[#0A1931]">{v2}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <section data-viewer-review="" className="mt-6 border-t border-[#B3CFE5] pt-5">
+            <div className="flex items-center gap-3">
+              <span
+                data-viewer-avatar=""
+                aria-hidden="true"
+                className="grid size-11 shrink-0 place-items-center rounded-full bg-[#0A1931] text-[#F6FAFD]"
+              >
+                <FuseLockup markOnly label={appName} className="h-5 w-auto" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-[#0A1931]">{fmt(copy.reviewedBy, { name: appName })}</p>
+                <p className="text-xs text-[#1A3D63]">{copy.scannerValue}</p>
+              </div>
+            </div>
+            <h3 className="mt-4 text-sm font-semibold text-[#0A1931]">{fmt(copy.checksTitle, { name: appName })}</h3>
+            <ul className="mt-3 space-y-3">
+              {category.checks.map((check) => (
+                <li key={check.id} data-viewer-check="" className="text-sm text-[#0A1931]">
+                  {item.checks[check.id]}
+                  <span className="mt-0.5 block text-xs text-[#1A3D63]">
+                    {fmt(copy.checkCodes, { nist: check.nist, iso: check.iso })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <a
+            href={`/${lang}/projects/new`}
+            className={`mt-6 ${PRIMARY}`}
+          >
+            {copy.start}
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -169,6 +234,11 @@ export function CategoryViewer({
   onClosed: () => void;
 }) {
   const category = SITE_CATEGORIES.find((c) => c.id === state.open);
+  const toShelf = useRef(false);
+  const onSeeAll = () => {
+    toShelf.current = true;
+    dispatch({ type: "close" });
+  };
   return (
     <DialogPrimitive.Root
       open={state.open !== null}
@@ -190,19 +260,24 @@ export function CategoryViewer({
             }}
             onCloseAutoFocus={(e) => {
               e.preventDefault();
-              onClosed();
+              if (toShelf.current) {
+                toShelf.current = false;
+                const h = document.getElementById("rak-title");
+                h?.setAttribute("tabindex", "-1");
+                h?.focus();
+              } else onClosed();
             }}
-            className="fixed inset-0 z-50 overflow-y-auto bg-card bg-[image:var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)] focus:outline-none lg:inset-auto lg:left-1/2 lg:top-1/2 lg:max-h-[88vh] lg:w-[min(72rem,94vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[2rem]"
+            className="fixed inset-0 z-50 overflow-y-auto bg-[#F6FAFD] text-[#0A1931] shadow-[0_30px_80px_-30px_rgb(10_25_49/0.6)] focus:outline-none lg:inset-auto lg:left-1/2 lg:top-1/2 lg:max-h-[88vh] lg:w-[min(72rem,94vw)] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-[2rem]"
           >
             <m.div
               initial={{ opacity: 0, scale: 0.94, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.32, ease: EASE }}
-              className="relative p-5 pt-16 md:p-8 md:pt-16"
+              className="relative p-5 md:p-8"
             >
               <DialogPrimitive.Close
                 aria-label={copy.close}
-                className="absolute right-4 top-4 inline-flex size-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="absolute right-4 top-4 inline-flex size-11 items-center justify-center rounded-full text-[#0A1931] transition-colors hover:bg-[#B3CFE5]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4A7FA7]"
               >
                 <X aria-hidden="true" className="size-5" />
               </DialogPrimitive.Close>
@@ -217,6 +292,7 @@ export function CategoryViewer({
                 onPage={(p) => dispatch({ type: "goto", page: p })}
                 onNext={() => dispatch({ type: "next" })}
                 onPrev={() => dispatch({ type: "prev" })}
+                onSeeAll={onSeeAll}
                 slots={{ Title: DialogPrimitive.Title, Description: DialogPrimitive.Description }}
               />
             </m.div>

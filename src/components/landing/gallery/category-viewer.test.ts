@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
+import { FuseLockup } from "@/components/brand/fuse-lockup";
 import { ViewerBody } from "./category-viewer";
 
 type Json = Record<string, unknown>;
@@ -53,6 +54,44 @@ function strings(value: unknown): string[] {
   if (value === null || typeof value !== "object") return [];
   return Object.values(value as Json).flatMap(strings);
 }
+
+const NEW_KEYS = [
+  "barTitle",
+  "previewHint",
+  "byline",
+  "intro",
+  "specChecks",
+  "checksCount",
+  "specStandards",
+  "standardsValue",
+  "specScanner",
+  "scannerValue",
+  "reviewedBy",
+  "seeAllTemplates",
+] as const;
+
+/** Opening tag of the first element carrying `attr`. */
+const tagOf = (html: string, attr: string) => {
+  const at = html.indexOf(attr);
+  expect(at, attr).toBeGreaterThanOrEqual(0);
+  const start = html.lastIndexOf("<", at);
+  return html.slice(start, html.indexOf(">", at) + 1);
+};
+
+/** The element carrying `attr`, up to its matching closing tag. */
+const section = (html: string, attr: string) => {
+  const open = tagOf(html, attr);
+  const start = html.indexOf(open);
+  const name = /^<([a-z0-9]+)/.exec(open)![1];
+  const re = new RegExp(`<${name}[\\s>]|</${name}>`, "g");
+  re.lastIndex = start + open.length;
+  let depth = 1;
+  for (let m = re.exec(html); m; m = re.exec(html)) {
+    depth += m[0].startsWith("</") ? -1 : 1;
+    if (depth === 0) return html.slice(start, m.index);
+  }
+  return html.slice(start);
+};
 
 const FORBIDDEN = [
   "certified",
@@ -156,8 +195,8 @@ describe("category viewer", () => {
       return m![1];
     };
     const content = classOf("DialogPrimitive.Content");
-    expect(content).toContain("bg-card");
-    expect(content).toContain("bg-[image:var(--fuse-card-bg)]");
+    expect(content).toContain("bg-[#F6FAFD]");
+    expect(content).toContain("text-[#0A1931]");
     for (const s of ["bg-[var(", "bg-transparent", "opacity-"]) expect(content).not.toContain(s);
     const bgTokens = content.split(/\s+/).filter((t) => /(^|:)bg-/.test(t));
     for (const t of bgTokens) expect(t, t).not.toMatch(/\/(0?\.\d+|\d{1,2})\b/);
@@ -191,5 +230,139 @@ describe("category viewer", () => {
       expect(g.checkCodes).toContain("{nist}");
       expect(g.checkCodes).toContain("{iso}");
     }
+    for (const g of [id!, en!]) {
+      for (const k of NEW_KEYS) expect(g[k], k).toBeTruthy();
+      expect(g.byline).toContain("{name}");
+      expect(g.byline).toContain("{n}");
+      expect(g.checksCount).toContain("{n}");
+      expect(g.reviewedBy).toContain("{name}");
+    }
+  });
+
+  it("ViewerBody has a top bar with the FUSE lockup, the gallery title and a template CTA", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const html = render(lang, c);
+        expect(html.match(/data-viewer-bar/g)?.length, `${lang}/${c.id}`).toBe(1);
+        const bar = section(html, "data-viewer-bar");
+        expect(bar).toContain(`<svg role="img" aria-label="${escape(DICTS[lang].app.name)}"`);
+        expect(bar).toContain(escape(copyOf(lang).barTitle));
+        expect(bar).toMatch(new RegExp(`<a[^>]*data-viewer-cta="bar"[^>]*href="/${lang}/projects/new"|<a[^>]*href="/${lang}/projects/new"[^>]*data-viewer-cta="bar"`));
+        expect(html.split(`href="/${lang}/projects/new"`).length - 1).toBe(2);
+      }
+  });
+
+  it("preview sits on a mist circle with a small caps hint", () => {
+    for (const lang of LANGS) {
+      const html = render(lang, SITE_CATEGORIES[0]);
+      const circle = tagOf(html, "data-viewer-circle");
+      expect(circle).toContain("rounded-full");
+      expect(circle).toContain("bg-[#B3CFE5]");
+      const hint = tagOf(html, "data-viewer-preview-hint");
+      expect(hint).toContain("uppercase");
+      expect(section(html, "data-viewer-preview-hint")).toContain(escape(copyOf(lang).previewHint));
+      expect(html).toContain(`aria-label="${escape(copyOf(lang).nextPage)}"`);
+    }
+  });
+
+  it("title block shows byline, italic lede and intro paragraph", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const html = render(lang, c);
+        const copy = copyOf(lang);
+        expect(section(html, "data-viewer-byline")).toContain(escape(fmt(copy.byline, { name: DICTS[lang].app.name, n: 3 })));
+        const desc = escape(itemOf(lang, c).desc);
+        const before = html.slice(0, html.indexOf(desc));
+        const open = before.slice(before.lastIndexOf("<"));
+        expect(open, `${lang}/${c.id}`).toMatch(/class="[^"]*\bitalic\b/);
+        expect(html).toContain(escape(copy.intro));
+      }
+  });
+
+  it("spec table has three rows of two label/value pairs", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const html = render(lang, c);
+        const copy = copyOf(lang);
+        const at = html.indexOf("<table");
+        expect(at).toBeGreaterThanOrEqual(0);
+        const table = html.slice(at, html.indexOf("</table>", at));
+        expect(table.slice(0, table.indexOf(">"))).toContain("data-viewer-specs");
+        const rows = table.split("<tr").slice(1);
+        expect(rows).toHaveLength(3);
+        for (const r of rows) {
+          expect(r.split('<th scope="row"').length - 1).toBe(2);
+          expect(r.split("<td").length - 1).toBe(2);
+        }
+        for (const k of ["specPages", "specFeatures", "specStack", "specChecks", "specStandards", "specScanner"] as const)
+          expect(table, k).toContain(escape(copy[k]));
+        const item = itemOf(lang, c);
+        for (const p of c.pages) expect(table).toContain(escape(item.pages[p.id]));
+        for (const f of c.features) expect(table).toContain(escape(item.features[f]));
+        for (const s of c.stack) expect(table).toContain(escape(s));
+        expect(table).toContain(c.pages.map((p) => escape(item.pages[p.id])).join(" · "));
+        expect(table).toContain(c.features.map((f) => escape(item.features[f])).join(" · "));
+        expect(table).toContain(c.stack.map((s) => escape(s)).join(" · "));
+        expect(table).toContain(escape(fmt(copy.checksCount, { n: 3 })));
+        expect(table).toContain(escape(copy.standardsValue));
+        expect(table).toContain(escape(copy.scannerValue));
+      }
+  });
+
+  it("reviewed-by block replaces a testimonial: FUSE mark avatar, name line, scanner line, three mapped checks", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const html = render(lang, c);
+        const copy = copyOf(lang);
+        const at = html.indexOf("data-viewer-review");
+        expect(at).toBeGreaterThanOrEqual(0);
+        const review = section(html, "data-viewer-review");
+        expect(section(review, "data-viewer-avatar")).toContain("<svg");
+        expect(review).toContain(escape(fmt(copy.reviewedBy, { name: DICTS[lang].app.name })));
+        expect(review).toContain(escape(copy.scannerValue));
+        expect(html.slice(at).match(/data-viewer-check(?!s)/g)?.length).toBe(3);
+      }
+  });
+
+  it("thumbnail rail marks the active page with mist and a 3px steel left bar", () => {
+    for (const page of [0, 2] as const) {
+      const html = render("id", SITE_CATEGORIES[0], page);
+      const thumbs = html.match(/<button[^>]*data-viewer-thumb[^>]*>/g) ?? [];
+      expect(thumbs).toHaveLength(3);
+      for (const t of thumbs)
+        for (const k of ["aria-[current=true]:bg-[#B3CFE5]", "aria-[current=true]:border-l-[3px]", "aria-[current=true]:border-l-[#4A7FA7]"])
+          expect(t, k).toContain(k);
+      expect(html.match(/aria-current="true"/g)?.length).toBe(1);
+    }
+  });
+
+  it("vertical see-all label is a button that leads to the shelf", () => {
+    for (const lang of LANGS) {
+      const html = render(lang, SITE_CATEGORIES[0]);
+      const tag = tagOf(html, "data-viewer-see-all");
+      expect(tag.startsWith('<button type="button"')).toBe(true);
+      expect(tag).toContain("lg:[writing-mode:vertical-rl]");
+      expect(section(html, "data-viewer-see-all")).toContain(escape(copyOf(lang).seeAllTemplates));
+    }
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    expect(src).toContain("onSeeAll");
+    expect(src).toContain('"rak-title"');
+  });
+
+  it("viewer body uses palette literals, never theme tokens that vanish on the snow panel", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const html = render(lang, c);
+        for (const t of ["text-foreground", "text-muted-foreground", "border-border", "bg-card", "var(--fuse-accent-text)", "clay-btn", "hover:bg-muted"])
+          expect(html, `${lang}/${c.id}: ${t}`).not.toContain(t);
+      }
+  });
+
+  it("FuseLockup markOnly renders the two mark paths without the USE word", () => {
+    const mark = renderToStaticMarkup(createElement(FuseLockup, { label: "FUSE", markOnly: true } as Parameters<typeof FuseLockup>[0]));
+    expect(mark.match(/class="fuse-mark"/g)?.length).toBe(2);
+    expect(mark).not.toContain("fuse-word");
+    const full = renderToStaticMarkup(createElement(FuseLockup, { label: "FUSE" }));
+    expect(full.match(/fuse-word/g)?.length).toBe(1);
   });
 });
