@@ -89,7 +89,14 @@ def run_actions(page: Page, actions: list[dict]) -> None:
                 page.goto(a["url"], timeout=60000, wait_until="domcontentloaded")
                 settle(page)
             elif kind == "hide":
-                page.locator(sel).evaluate_all("els => els.forEach(e => e.style.setProperty('display', 'none', 'important'))")
+                hidden = page.locator(sel).evaluate_all(
+                    "els => (els.forEach(e => e.style.setProperty('display', 'none', 'important')), els.length)"
+                )
+                if not hidden:
+                    raise ValueError("no element matches")
+            elif kind == "css":
+                page.add_style_tag(content=a["css"])
+                page.wait_for_timeout(a.get("after", 300))
             elif kind == "press":
                 page.keyboard.press(a["key"])
             else:

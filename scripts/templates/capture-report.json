@@ -888,8 +888,8 @@
         {
           "id": "subscribe",
           "url": "https://demo.ghost.io/#/portal/signup",
-          "status": "ok",
-          "reason": null
+          "status": "rejected",
+          "reason": "signup modal only says 'This site is invite-only' on the public demo; no signup form to show"
         },
         {
           "id": "about",

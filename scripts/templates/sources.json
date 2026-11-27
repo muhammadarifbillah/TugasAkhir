@@ -10,22 +10,22 @@
       "demo": "https://gocart-gs.vercel.app/",
       "local": null,
       "pages": [
-        { "id": "home", "url": "https://gocart-gs.vercel.app/", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] },
-        { "id": "category", "url": "https://gocart-gs.vercel.app/shop", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] },
-        { "id": "product", "url": "https://gocart-gs.vercel.app/product/prod_1", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] },
-        { "id": "seller", "url": "https://gocart-gs.vercel.app/shop/happyshop", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] },
+        { "id": "home", "url": "https://gocart-gs.vercel.app/", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "category", "url": "https://gocart-gs.vercel.app/shop", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "product", "url": "https://gocart-gs.vercel.app/product/prod_1", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "seller", "url": "https://gocart-gs.vercel.app/shop/happyshop", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
         {
           "id": "cart",
           "url": "https://gocart-gs.vercel.app/product/prod_1",
           "actions": [
-            { "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true },
             { "do": "click", "selector": "button:has-text('Add to Cart')" },
             { "do": "click", "selector": "a[href='/cart']" },
-            { "do": "wait", "ms": 1500 }
+            { "do": "wait", "ms": 1500 },
+            { "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }
           ]
         },
-        { "id": "orders", "url": "https://gocart-gs.vercel.app/orders", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] },
-        { "id": "open-store", "url": "https://gocart-gs.vercel.app/create-store", "actions": [{ "do": "click", "selector": "button:has-text('Claim Offer') + button", "optional": true }] }
+        { "id": "orders", "url": "https://gocart-gs.vercel.app/orders", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] },
+        { "id": "open-store", "url": "https://gocart-gs.vercel.app/create-store", "actions": [{ "do": "wait", "selector": "p:has-text('20% OFF')" }, { "do": "hide", "selector": "div.bg-gradient-to-r:has(> div > p:has-text('20% OFF'))" }] }
       ]
     },
     {
@@ -187,7 +187,7 @@
       "demo": "https://demo.htmlcodex.com/2151/eLearning/",
       "local": null,
       "pages": [
-        { "id": "home", "url": "https://demo.htmlcodex.com/2151/eLearning/index.html", "actions": [{ "do": "wait", "ms": 2500 }] },
+        { "id": "home", "url": "https://demo.htmlcodex.com/2151/eLearning/index.html", "actions": [{ "do": "wait", "ms": 2500 }, { "do": "wait", "selector": ".header-carousel .owl-item.active" }, { "do": "css", "css": ".header-carousel .owl-item:not(.active){display:none!important}.header-carousel .owl-stage{transform:none!important;transition:none!important}.header-carousel *{animation:none!important}" }] },
         { "id": "courses", "url": "https://demo.htmlcodex.com/2151/eLearning/courses.html", "actions": [{ "do": "wait", "ms": 2500 }] },
         { "id": "course", "url": "https://demo.htmlcodex.com/2151/eLearning/course-details.html", "actions": [{ "do": "wait", "ms": 2500 }] },
         { "id": "instructors", "url": "https://demo.htmlcodex.com/2151/eLearning/team.html", "actions": [{ "do": "wait", "ms": 2500 }] }
@@ -262,13 +262,13 @@
       "demo": "https://preview.tabler.io/",
       "local": null,
       "pages": [
-        { "id": "overview", "url": "https://preview.tabler.io/" },
-        { "id": "team", "url": "https://preview.tabler.io/users.html" },
-        { "id": "billing", "url": "https://preview.tabler.io/billing.html" },
-        { "id": "settings", "url": "https://preview.tabler.io/settings.html" },
-        { "id": "invoice", "url": "https://preview.tabler.io/invoice.html" },
-        { "id": "activity", "url": "https://preview.tabler.io/activity.html" },
-        { "id": "login", "url": "https://preview.tabler.io/sign-in.html" }
+        { "id": "overview", "url": "https://preview.tabler.io/", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "team", "url": "https://preview.tabler.io/users.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "billing", "url": "https://preview.tabler.io/billing.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "settings", "url": "https://preview.tabler.io/settings.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "invoice", "url": "https://preview.tabler.io/invoice.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "activity", "url": "https://preview.tabler.io/activity.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] },
+        { "id": "login", "url": "https://preview.tabler.io/sign-in.html", "actions": [{ "do": "wait", "selector": ".tblr-banner" }, { "do": "hide", "selector": ".tblr-banner" }] }
       ]
     }
   ],
@@ -408,7 +408,7 @@
         { "id": "category", "url": "https://demo.ghost.io/tag/getting-started/" },
         { "id": "author", "url": "https://demo.ghost.io/author/ghost/" },
         { "id": "search", "url": "https://demo.ghost.io/#/search" },
-        { "id": "subscribe", "url": "https://demo.ghost.io/#/portal/signup" },
+        { "id": "subscribe", "url": "https://demo.ghost.io/#/portal/signup", "skip": "signup modal only says 'This site is invite-only' on the public demo; no signup form to show" },
         { "id": "about", "url": "https://demo.ghost.io/about/" }
       ]
     },

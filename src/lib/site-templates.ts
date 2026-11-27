@@ -375,7 +375,6 @@ export const SITE_TEMPLATES: Record<CategoryId, readonly [SiteTemplate, SiteTemp
         { id: "category", src: "/templates/news/ghost-casper/category.webp", thumb: "/templates/news/ghost-casper/category@thumb.webp" },
         { id: "author", src: "/templates/news/ghost-casper/author.webp", thumb: "/templates/news/ghost-casper/author@thumb.webp" },
         { id: "search", src: "/templates/news/ghost-casper/search.webp", thumb: "/templates/news/ghost-casper/search@thumb.webp" },
-        { id: "subscribe", src: "/templates/news/ghost-casper/subscribe.webp", thumb: "/templates/news/ghost-casper/subscribe@thumb.webp" },
         { id: "about", src: "/templates/news/ghost-casper/about.webp", thumb: "/templates/news/ghost-casper/about@thumb.webp" },
       ],
     },
