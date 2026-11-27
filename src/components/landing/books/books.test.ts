@@ -19,6 +19,14 @@ const DICTS = {
   en: JSON.parse(read("src/dictionaries/en.json")) as Dict,
 };
 const LANGS = ["id", "en"] as const;
+
+/** The marquee paints each shelf three times; assertions about "the books" only look at the live rail. */
+const live = (html: string) =>
+  html
+    .split(/<div[^>]*data-book-track=/)
+    .slice(1)
+    .filter((part) => part.startsWith('"live"'))
+    .join("");
 const FORBIDDEN = ["certified", "compliant", "certification", "bersertifikat", "sertifikasi resmi", "patuh", "aman 100%", "100% aman", "100% secure", "guaranteed", "terjamin", "dijamin"];
 const STAGES = ["analysis", "design", "development", "testing", "handover"] as const;
 
@@ -103,13 +111,14 @@ describe("book shelf", () => {
   it("BookShelf renders two shelves of labelled books with spine and ribbon", () => {
     const copy = copyOf("id");
     const items = itemsOf("id");
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy, stageNames: stageNames("id") }));
-    const home = html.indexOf('data-book-shelf="home"');
-    const studio = html.indexOf('data-book-shelf="studio"');
+    const page = renderToStaticMarkup(createElement(BookShelf, { copy, stageNames: stageNames("id") }));
+    const html = live(page);
+    const home = page.indexOf('data-book-shelf="home"');
+    const studio = page.indexOf('data-book-shelf="studio"');
     expect(home).toBeGreaterThan(-1);
     expect(studio).toBeGreaterThan(home);
-    expect(html).toContain(escape(copy.shelfHome));
-    expect(html).toContain(escape(copy.shelfStudio));
+    expect(page).toContain(escape(copy.shelfHome));
+    expect(page).toContain(escape(copy.shelfStudio));
     const tags = [...html.matchAll(/<button[^>]*data-book="[^"]+"[^>]*>/g)].map((m) => m[0]);
     expect(tags).toHaveLength(12);
     expect(html.match(/data-book="/g)).toHaveLength(12);
@@ -124,7 +133,7 @@ describe("book shelf", () => {
     expect(html.match(/data-book-spine/g)).toHaveLength(12);
     expect(html.match(/data-book-ribbon/g)).toHaveLength(12);
     expect(html.split(escape(copy.studioBadge)).length - 1).toBeGreaterThanOrEqual(6);
-    for (const s of ["alsoInStudio", "backdrop", "blur", "<image"]) expect(html, s).not.toContain(s);
+    for (const s of ["alsoInStudio", "backdrop", "blur", "<image"]) expect(page, s).not.toContain(s);
   });
 
   it("BookSpread shows contents, format, when and the source stage", () => {
@@ -158,14 +167,32 @@ describe("book shelf", () => {
     expect(src).toContain("[background:var(--fuse-card-bg)]");
   });
 
-  it("books stand freely on the shelves, without boards", () => {
+  it("books stand on a plank that runs along each shelf", () => {
     const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
     expect(html).not.toContain("fuse-card-bg");
-    expect(read("src/components/landing/books/book-shelf.tsx")).not.toContain("BOARD");
+    expect(html.match(/data-book-plank/g)).toHaveLength(2);
+    // The plank paints after the rail, so it covers the feet: the books sink into the shelf.
+    expect(html.indexOf("data-book-track")).toBeLessThan(html.indexOf("data-book-plank"));
+  });
+
+  it("each shelf paints three identical rails, and only the live one can be tabbed into", () => {
+    for (const lang of LANGS) {
+      const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf(lang), stageNames: stageNames(lang) }));
+      const rails = html.split(/<div[^>]*data-book-track=/).slice(1);
+      expect(rails).toHaveLength(6);
+      for (let shelf = 0; shelf < 2; shelf++) {
+        const group = rails.slice(shelf * 3, shelf * 3 + 3);
+        expect(group.map((r) => r.match(/^"([^"]+)"/)?.[1])).toEqual(["live", "clone", "clone"]);
+        const ids = group.map((r) => [...r.matchAll(/data-book="([^"]+)"/g)].map((m) => m[1]));
+        expect(ids[1]).toEqual(ids[0]);
+        expect(ids[2]).toEqual(ids[0]);
+        for (const clone of group.slice(1)) expect(clone).toContain("inert");
+      }
+    }
   });
 
   it("each book shows snow page thickness on the right and at the bottom", () => {
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     for (const side of ["right", "bottom"]) {
       const tags = [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
       expect(tags, side).toHaveLength(12);
@@ -179,7 +206,7 @@ describe("book shelf", () => {
     for (const lang of LANGS) {
       const names = stageNames(lang);
       const items = itemsOf(lang);
-      const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf(lang), stageNames: names }));
+      const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf(lang), stageNames: names })));
       const caps = [
         ...html.matchAll(/<span[^>]*data-book-caption[^>]*><span class="([^"]*)">([^<]*)<\/span><span class="([^"]*)">([^<]*)<\/span><\/span>/g),
       ];
@@ -199,7 +226,7 @@ describe("book shelf", () => {
   const bookChunks = (html: string) => html.split(/(?=<button[^>]*data-book=")/).slice(1).map((c) => c.slice(0, c.indexOf("</button>")));
 
   it("covers rotate through palette tones with contrasting text and ribbon", () => {
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     const chunks = bookChunks(html);
     expect(chunks).toHaveLength(12);
     const tones = chunks.map((c) => c.match(/data-cover-tone="([^"]*)"/)?.[1] ?? "");
@@ -217,7 +244,7 @@ describe("book shelf", () => {
   });
 
   it("cover art draws with the tone text colour", () => {
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     bookChunks(html).forEach((c, i) => {
       const t = c.match(/data-cover-tone="([^"]*)"/)?.[1] ?? "";
       expect(c.match(/<g[^>]*stroke="([^"]*)"/)?.[1], `${i}`).toBe(TONE_FG[t]);
@@ -233,7 +260,7 @@ describe("book shelf", () => {
   });
 
   const pagesTags = (side: string) => {
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     return [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
   };
 
@@ -260,7 +287,7 @@ describe("book shelf", () => {
   });
 
   it("snow covers keep a soft mist edge", () => {
-    const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
+    const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     const snow = bookChunks(html).filter((c) => c.includes('data-cover-tone="snow"'));
     expect(snow.length).toBeGreaterThan(0);
     for (const c of snow) expect(c.match(/<rect[^>]*fill="none"[^>]*stroke="([^"]*)"/)?.[1]).toBe("#B3CFE5");

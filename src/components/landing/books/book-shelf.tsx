@@ -212,6 +212,10 @@ export function BookSpread({
   );
 }
 
+/** Cover box is 132px wide at 120:170, so books meet the plank at this offset. */
+const COVER_W = 132;
+const COVER_H = Math.round((COVER_W * 170) / 120);
+
 function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: Copy; stageName: string; onOpen: (id: BookId, el: HTMLElement) => void }) {
   const title = itemOf(copy, book.id).title;
   const toneName = toneOf(book);
@@ -224,27 +228,26 @@ function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: 
       data-cover-tone={toneName}
       aria-label={fmt(copy.open, { title })}
       onClick={(e) => onOpen(book.id, e.currentTarget)}
-      className="group relative mx-auto block w-full max-w-[120px] [perspective:900px] focus-visible:outline-none"
+      style={{ width: COVER_W }}
+      className="group relative block shrink-0 text-start focus-visible:outline-none"
     >
-      <div className="relative aspect-[120/170] w-full transition-[transform,translate] duration-300 ease-out [transform-style:preserve-3d] group-hover:-translate-y-2 group-focus-visible:-translate-y-2 group-focus-visible:ring-2 group-focus-visible:ring-ring motion-safe:[transform:rotateY(-18deg)] motion-safe:group-hover:[transform:rotateY(-8deg)] motion-safe:group-focus-visible:[transform:rotateY(-8deg)] motion-reduce:translate-none motion-reduce:[transform:none]">
+      <div className="relative aspect-[120/170] w-full rounded-l-sm rounded-r-md shadow-[4px_8px_14px_-6px_rgb(10_25_49/0.6)] transition-transform duration-300 ease-out group-hover:-translate-y-2 group-focus-visible:-translate-y-2 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-y-0">
         <BookCover book={book} title={title} />
         {book.shelf === "studio" && (
           <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-[var(--fuse-snow)]">
             {copy.studioBadge}
           </span>
         )}
+        {/* Same book grammar as the template shelf: dark spine on the left, snow page block on the right. */}
         <div
           data-book-spine=""
           aria-hidden="true"
-          className="absolute right-full top-0 flex h-full w-[18px] origin-right items-center justify-center overflow-hidden [transform:rotateY(-90deg)]"
-          style={{ background: `linear-gradient(90deg, rgb(10 25 49 / 0.45), rgb(10 25 49 / 0.15)), ${tone.bg}` }}
-        >
-          <span className="whitespace-nowrap text-[9px] font-semibold [writing-mode:vertical-rl]" style={{ color: tone.fg }}>{title}</span>
-        </div>
+          className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]"
+        />
         <div
           data-book-pages="right"
           aria-hidden="true"
-          className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[14px] origin-left [transform:rotateY(90deg)] motion-reduce:[transform:none] motion-reduce:w-[4px]"
+          className="absolute inset-y-1 right-0 w-[4px] rounded-r-sm motion-reduce:[transform:none] motion-reduce:w-[4px]"
           style={{ background: "repeating-linear-gradient(90deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
         />
         <div
@@ -269,6 +272,50 @@ function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: 
   );
 }
 
+/** The plank the books stand on, same board as the template shelf. */
+function Plank() {
+  return (
+    <div
+      data-book-plank=""
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 -mx-2 h-3 rounded-sm bg-[#B3CFE5] ring-1 ring-inset ring-[#0A1931]/20 shadow-[0_14px_20px_-10px_rgb(10_25_49/0.55)] md:-mx-4"
+      style={{ top: COVER_H - 5 }}
+    />
+  );
+}
+
+/**
+ * One shelf, moving forever. The row paints three identical rails and the
+ * keyframes shift by exactly one rail, so the wrap is invisible; hovering or
+ * tabbing pauses it so a moving cover is still easy to click.
+ */
+function BookRow({
+  items, copy, stageNames, onOpen,
+}: { items: ResultBook[]; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
+  return (
+    <div data-book-case="" className="group/row relative mt-8">
+      <div className="relative overflow-x-auto [scrollbar-width:none] pointer-fine:motion-safe:overflow-hidden">
+        <div className="flex w-max animate-[book-scroll_48s_linear_infinite] group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] motion-reduce:animate-none">
+          {[0, 1, 2].map((copyIndex) => (
+            <div
+              key={copyIndex}
+              data-book-track={copyIndex === 0 ? "live" : "clone"}
+              aria-hidden={copyIndex === 0 ? undefined : true}
+              inert={copyIndex === 0 ? undefined : true}
+              className="flex shrink-0 gap-7 pe-7"
+            >
+              {items.map((b) => (
+                <ShelfBook key={b.id} book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+      <Plank />
+    </div>
+  );
+}
+
 function Shelf({
   shelf, title, lede, copy, stageNames, onOpen,
 }: { shelf: ShelfId; title: string; lede: string; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
@@ -276,13 +323,7 @@ function Shelf({
     <section data-book-shelf={shelf} className="mt-14 first:mt-0">
       <h3 className="font-wide text-xl md:text-2xl">{title}</h3>
       <p className="mt-2 max-w-[60ch] text-muted-foreground">{lede}</p>
-      <ul className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-6">
-        {booksOnShelf(shelf).map((b) => (
-          <li key={b.id}>
-            <ShelfBook book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
-          </li>
-        ))}
-      </ul>
+      <BookRow items={booksOnShelf(shelf)} copy={copy} stageNames={stageNames} onOpen={onOpen} />
     </section>
   );
 }
@@ -347,7 +388,8 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                     style={{ transformOrigin: "left center", background: TONES[toneOf(book)].bg }}
                     initial={{ rotateY: 0 }}
                     animate={{ rotateY: -165 }}
-                    transition={{ duration: 0.7, ease: EASE }}
+                    // Expo-out hides the swing in the first frames; the cover needs a steady turn to read as an opening book.
+                    transition={{ duration: 0.95, ease: [0.45, 0, 0.15, 1] }}
                     onAnimationComplete={() => dispatch({ type: "turn" })}
                   >
                     <BookCover book={book} title={itemOf(copy, book.id).title} />

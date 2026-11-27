@@ -664,6 +664,20 @@ html[data-contrast="high"] .landing .clay-card {
   animation: none;
 }
 
+/*
+ * Result books: the shelf row renders three identical copies, so shifting by
+ * exactly one copy keeps the loop seamless. Two copies would show a blank tail
+ * whenever six books are narrower than the viewport.
+ */
+@keyframes book-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(-100% / 3), 0, 0);
+  }
+}
+
 @keyframes vt-fade {
   from {
     opacity: 0;
