@@ -7,8 +7,8 @@ import { ClaySection } from "@/components/landing/clay-section";
 import { Faq } from "@/components/landing/faq";
 import { FuseWaves } from "@/components/landing/fuse-waves";
 import { GalleryProvider } from "@/components/landing/gallery/gallery-provider";
-import { HeroWall } from "@/components/landing/gallery/hero-wall";
 import { TemplateShelf } from "@/components/landing/gallery/template-shelf";
+import { HeroSection } from "@/components/landing/hero/hero-section";
 import { LandingMotion } from "@/components/landing/landing-motion";
 import { GateLoop } from "@/components/landing/loop/gate-loop";
 import { primaryCta } from "@/components/landing/primary-cta";
@@ -66,25 +66,8 @@ export default async function HomePage({ params }: HomePageProps) {
       <div className="landing">
         <LandingMotion>
           <GalleryProvider lang={lang} appName={dict.app.name} labels={dict.categories} copy={l.gallery}>
-            {/* Hero: headline first (LCP), then the gallery wall of the eight categories. */}
-            <section id="mulai-hero" className="@container relative isolate overflow-hidden pb-32 pt-14 md:pt-20">
-              <div className="mx-auto max-w-4xl px-4 text-center">
-                <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.gallery.headline}</h1>
-                <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.gallery.sub}</p>
-                <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-                  <Link href={cta.href} className="clay-btn">
-                    {l[cta.label]}
-                  </Link>
-                  <Link href="#rak" className="clay-btn-ghost">
-                    {l.gallery.ctaShelf}
-                  </Link>
-                </div>
-              </div>
-              <FuseWaves className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-28 w-full" />
-              <div className="mt-12">
-                <HeroWall />
-              </div>
-            </section>
+            {/* Hero after herosection.jpeg: headline first (LCP), one button, then the concave wall of the eight categories. */}
+            <HeroSection headline={l.gallery.headline} sub={l.gallery.sub} ctaHref={cta.href} ctaLabel={l[cta.label]} />
 
             <StandardsStrip label={l.stripLabel} items={l.stripItems} facts={factList} />
 

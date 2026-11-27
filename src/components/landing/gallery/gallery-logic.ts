@@ -41,13 +41,14 @@ export function keyToAction(key: string): "next" | "prev" | null {
 /** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */
 const noNegZero = (n: number) => n + 0;
 
-/** Coverflow panorama: panels turn to face the centre more steeply towards the edges and recede; the centre pair is enlarged. */
+/** Concave wall (viewer inside the cylinder): towards the edges panels come closer, grow and turn to face the centre. */
 export function wallPose(i: number, n: number): { rotateY: number; z: number; scale: number } {
   const o = i - (n - 1) / 2;
+  const d = Math.max(0, o * o - 0.25);
   return {
-    rotateY: noNegZero(-Math.sign(o) * Math.round(6 * Math.abs(o) + 1.5 * o * o)),
-    z: noNegZero(-Math.round(18 * (o * o - 0.25))),
-    scale: Math.abs(o) < 1 ? 1.06 : 1,
+    rotateY: noNegZero(-Math.sign(o) * Math.round(10 * Math.abs(o))),
+    z: noNegZero(Math.round(14 * d)),
+    scale: noNegZero(Math.round((1 + 0.03 * d) * 100) / 100),
   };
 }
 

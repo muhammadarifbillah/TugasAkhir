@@ -49,7 +49,8 @@ describe("hero section", () => {
     expect(tag).not.toContain("dark:");
     for (const s of ["isolate", "overflow-hidden"]) expect(tag, s).toContain(s);
 
-    const order = ["data-hero-backdrop", "<h1", "<p", "<a", 'role="group"', "data-hero-floor", "data-hero-grass"];
+    // "<p " and "<a " with a space: SVG "<path" must not count as a paragraph.
+    const order = ["data-hero-backdrop", "<h1", "<p ", "<a ", 'role="group"', "data-hero-floor", "data-hero-grass"];
     const at = order.map((s) => html.indexOf(s));
     order.forEach((s, i) => expect(at[i], s).toBeGreaterThan(-1));
     expect([...at].sort((a, b) => a - b)).toEqual(at);
@@ -82,7 +83,7 @@ describe("hero section", () => {
       }
     }
     expect(end).toBeGreaterThan(start);
-    const uses = [...css.matchAll(/(?<![\w-])animation(?:-name)?\s*:\s*(?!none)/g)].map((m) => m.index);
+    const uses = [...css.matchAll(/(?<![\w-])animation(?:-name)?\s*:(?!\s*none)/g)].map((m) => m.index);
     expect(uses.length).toBeGreaterThan(0);
     for (const u of uses) expect(u > start && u < end, `animation at ${u}`).toBe(true);
     expect(css).toContain("prefers-reduced-motion: reduce");
