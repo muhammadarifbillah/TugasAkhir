@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { wallPose } from "../gallery/gallery-logic";
 import { GalleryProvider } from "../gallery/gallery-provider";
 import { LANDING_MOTION_QUERY } from "../motion";
 import { HeroBackdrop } from "./hero-backdrop";
@@ -75,9 +74,9 @@ describe("hero composition (r22 round 2)", () => {
     expect(zOf(classesOf(html, "data-hero-floor"))).toBeLessThan(zOf(wrapperClasses));
   });
 
-  // r23: bigger wall; split the first screen like herosection.jpeg: title 0-30 %, wall art ±28-76 %, floor 70-100 %.
+  // r28: title 0-30 %, the row of wide cards below it (card art ends by 76 %), floor 70-100 %.
   // A layout model of the classes that set it (jsdom has no layout); the orchestrator checks the browser.
-  it("the first screen splits into title, wall and floor at 1440x900 and 1024x768", () => {
+  it("the first screen splits into title, card row and floor at 1440x900 and 1024x768", () => {
     const html = section();
     const num = (cls: string[], re: RegExp) => {
       const m = cls.map((c) => c.match(re)).find(Boolean);
@@ -99,7 +98,12 @@ describe("hero composition (r22 round 2)", () => {
     const [top] = num(wrapperClasses, /^lg:top-\[([\d.]+)%\]$/);
     expect(classesOf(html, "data-hero-floor")).toContain("h-[30%]");
 
-    for (const { vw, vh, pw } of [{ vw: 1440, vh: 900, pw: 201.6 }, { vw: 1024, vh: 768, pw: 160 }]) {
+    const wallSrc = read("src/components/landing/gallery/hero-wall.tsx");
+    const cw = wallSrc.match(/w-\[clamp\(([\d.]+)rem,([\d.]+)vw,([\d.]+)rem\)\]/);
+    expect(cw, "card width clamp").not.toBeNull();
+    const [cMin, cVw, cMax] = cw!.slice(1).map(Number);
+
+    for (const { vw, vh } of [{ vw: 1440, vh: 900 }, { vw: 1024, vh: 768 }]) {
       const hh = Math.max(640, vh - 56);
       // HeroBackdrop: moon bottom at y=110 of a 1440x520 viewBox, xMidYMin slice over vw x clamp(13rem,36vw,32.5rem).
       const moon = 110 * Math.max(vw / 1440, Math.min(520, Math.max(208, 0.36 * vw)) / 520);
@@ -108,16 +112,15 @@ describe("hero composition (r22 round 2)", () => {
       const titleBottom = pt + STACK;
       expect(titleBottom / hh, `${vw}px title bottom`).toBeLessThanOrEqual(0.3);
 
-      // Wall wrapper centred at top%: ul pt-6, two-line label (1.5 line height + mb-2), 10/19 art, 6px + 0.6 pw reflection.
-      const label = 2 * 1.5 * Math.min(16, Math.max(12.8, vw / 100)) + 8;
-      const wrapperH = 24 + label + 1.9 * pw + 6 + 0.6 * pw;
-      const artCentre = (top / 100) * hh - wrapperH / 2 + 24 + label + 0.95 * pw;
-      const edge = wallPose(7, 8);
-      const edgeH = (1.9 * pw * edge.scale * 1200) / (1200 - edge.z * pw);
-      expect((artCentre - edgeH / 2) / hh, `${vw}px wall top`).toBeGreaterThanOrEqual(0.26);
-      expect((artCentre + edgeH / 2) / hh, `${vw}px wall bottom`).toBeLessThanOrEqual(0.78);
-      const centreLabelTop = artCentre - (0.95 * pw + label) * wallPose(3, 8).scale;
-      expect(centreLabelTop, `${vw}px centre label clears the button`).toBeGreaterThanOrEqual(titleBottom + 8);
+      // Wrapper centred at top%: caption row (44px pause pill + pb-3), 16/10 card, 6px gap + 16/4 reflection.
+      const w = Math.min(cMax * 16, Math.max(cMin * 16, (cVw * vw) / 100));
+      const header = 44 + 12;
+      const wrapperH = header + w / 1.6 + 6 + w / 4;
+      const wrapperTop = (top / 100) * hh - wrapperH / 2;
+      expect(wrapperTop, `${vw}px caption clears the button`).toBeGreaterThanOrEqual(titleBottom + 8);
+      const cardTop = wrapperTop + header;
+      expect(cardTop / hh, `${vw}px card top`).toBeGreaterThanOrEqual(0.26);
+      expect((cardTop + w / 1.6) / hh, `${vw}px card bottom`).toBeLessThanOrEqual(0.76);
     }
   });
 
