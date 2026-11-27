@@ -38,7 +38,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
         >
           <span
             data-book=""
-            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[7.5rem] sm:w-[8.5rem]"}`}
+            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(0_0_0/0.55)] ${wide ? "w-full" : "w-[8.5rem] sm:w-[12.5rem]"}`}
           >
             <span
               className="absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-3 overflow-hidden rounded-l-sm rounded-r-md bg-card pl-4 pr-2 pt-4"
@@ -103,9 +103,9 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
           {groupByShelf(results).map((g) => {
             const name = gallery.labels.shelves[g.shelf];
             return (
-              <section key={g.shelf} data-shelf="">
+              <section key={g.shelf} data-shelf="" className="min-w-0">
                 <div className="flex items-center justify-between gap-4">
-                  <h3 className="font-wide text-lg">{name}</h3>
+                  <h3 className="min-w-0 font-wide text-lg">{name}</h3>
                   <button
                     type="button"
                     data-see-all=""
@@ -114,18 +114,20 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
                       setView("all");
                       setShelf(g.shelf);
                     }}
-                    className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-medium text-[var(--fuse-accent-text)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 text-sm font-medium text-[var(--fuse-accent-text)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {copy.seeAll}
                     <ArrowRight aria-hidden="true" className="size-4" />
                   </button>
                 </div>
-                <ul className={ROW}>{g.items.map((c) => book(c))}</ul>
-                <div
-                  aria-hidden="true"
-                  data-shelf-plank=""
-                  className="h-3.5 rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(255_255_255/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.18)]"
-                />
+                <div className="w-fit max-w-full">
+                  <ul className={ROW}>{g.items.map((c) => book(c))}</ul>
+                  <div
+                    aria-hidden="true"
+                    data-shelf-plank=""
+                    className="h-3.5 w-full rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(255_255_255/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(0_0_0/0.6),inset_0_1px_0_rgb(255_255_255/0.18)]"
+                  />
+                </div>
               </section>
             );
           })}

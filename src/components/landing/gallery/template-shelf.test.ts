@@ -167,6 +167,60 @@ describe("template shelf", () => {
     for (const s of ["backdrop", "setInterval", "fetch("]) expect(src).not.toContain(s);
   });
 
+  const renderShelf = () => {
+    const d = DICTS.id;
+    return renderToStaticMarkup(
+      createElement(
+        GalleryProvider,
+        { lang: "id", appName: d.app.name, labels: labelsOf("id"), copy: d.landing.gallery as ProviderProps["copy"] } as ProviderProps,
+        createElement(TemplateShelf, { copy: d.landing.shelf as ShelfCopy }),
+      ),
+    );
+  };
+  const classOf = (tag: string) => (/class="([^"]*)"/.exec(tag)?.[1] ?? "").split(/\s+/);
+
+  it("shelf header fits a 390px column: section min-w-0, title may wrap, see-all shrink-0", () => {
+    const html = renderShelf();
+    const sections = [...html.matchAll(/<section[^>]*data-shelf[^>]*>/g)].map((m) => classOf(m[0]));
+    expect(sections).toHaveLength(4);
+    for (const c of sections) expect(c).toContain("min-w-0");
+    const titles = [...html.matchAll(/<h3[^>]*>/g)].map((m) => classOf(m[0]));
+    expect(titles).toHaveLength(4);
+    for (const c of titles) {
+      expect(c).toContain("min-w-0");
+      expect(c).not.toContain("truncate");
+      expect(c).not.toContain("whitespace-nowrap");
+    }
+    const seeAll = [...html.matchAll(/<button[^>]*data-see-all[^>]*>/g)].map((m) => classOf(m[0]));
+    expect(seeAll).toHaveLength(4);
+    for (const c of seeAll) for (const k of ["shrink-0", "whitespace-nowrap"]) expect(c).toContain(k);
+  });
+
+  it("shelf covers use the larger sm:w-[12.5rem] width", () => {
+    const html = renderShelf();
+    const books = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => classOf(m[0]));
+    expect(books).toHaveLength(8);
+    for (const c of books) {
+      expect(c).toContain("w-[8.5rem]");
+      expect(c).toContain("sm:w-[12.5rem]");
+      expect(c).toContain("aspect-[2/3]");
+    }
+    expect(read("src/components/landing/gallery/template-shelf.tsx")).not.toContain("sm:w-[8.5rem]");
+  });
+
+  it("book list and plank share a w-fit max-w-full wrapper so the plank is as wide as its covers", () => {
+    const html = renderShelf();
+    const sections = [...html.matchAll(/<section[^>]*data-shelf[^>]*>([\s\S]*?)<\/section>/g)].map((m) => m[1]);
+    expect(sections).toHaveLength(4);
+    for (const body of sections) {
+      const m = /<div class="([^"]*)"><ul[^>]*>[\s\S]*?<\/ul>(<div[^>]*data-shelf-plank[^>]*>)<\/div><\/div>$/.exec(body);
+      expect(m, "wrapper around ul + plank").not.toBeNull();
+      const wrap = m![1].split(/\s+/);
+      for (const k of ["w-fit", "max-w-full"]) expect(wrap).toContain(k);
+      expect(classOf(m![2])).toContain("w-full");
+    }
+  });
+
   it("landing.shelf keys match in id and en", () => {
     const id = DICTS.id.landing.shelf as Record<string, string> | undefined;
     const en = DICTS.en.landing.shelf as Record<string, string> | undefined;
