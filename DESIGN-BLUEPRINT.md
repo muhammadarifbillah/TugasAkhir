@@ -640,7 +640,7 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 
 | # | Element | Trigger | Motion | Reduced motion |
 |---|---|---|---|---|
-| M2 | Section headings (H2) | First time 80% in view (desktop gate) | fade + rise 16 px, 0.4 s, power2.out, once | none (heading always visible; nothing is hidden without JavaScript) |
+| M2 | Section headings (H2) | Scroll into view (`LANDING_MOTION_QUERY`) | fade + rise 16 px, CSS `animation-timeline: view()`, range `entry 0% entry 40%` | none (heading always visible; nothing is hidden without JavaScript) |
 | M4 | Clay cards / buttons | Hover, focus / press | cards lift 4 px with a deeper shadow; buttons squash (`translateY(1px) scale(.98)`) | shadow/colour only |
 | M6 | Facts numbers | First in view | count-up | kept |
 | M7 | Route change | Navigation | existing `<ViewTransition>` types | crossfade |
@@ -653,15 +653,15 @@ Motion is there to make the app feel responsive, not to decorate it. It uses thr
 
 Gallery interactions (M9 lift, M10, M11), the gate loop panel and the result books (M13) run at every width inside their own MotionConfig skipAnimations={false}; the M9 tilt is the only parallax and stays behind LANDING_MOTION_QUERY.
 
-Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, whole-section fade-ups (only the H2 heading enters, see M2) and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is allowed only under "Landing scroll (GSAP + Lenis)" below.
+Removed from the landing page: aurora, card tilt, parallax, bento spotlight/lift, whole-section fade-ups (only the H2 heading enters, see M2) and the looping hero demo; the shield emblem, the wordmark and the typing caret (M3). Scroll-linked animation is CSS only, as described under "Landing scroll (native)" below.
 
-**Landing scroll (GSAP + Lenis)** (PRD `docs/prd/2026-11-26-landing-dashboard-3d`, bab 24 a–c; replaces the earlier "no smooth-scroll library, no GSAP" rule):
-- **Landing only (a).** `LandingMotion` loads `gsap`, `gsap/ScrollTrigger` and `lenis` with dynamic `import()` only when `LANDING_MOTION_QUERY` in `motion.ts` matches: `(min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`. Otherwise the modules are not downloaded (0 B), not merely disabled. Dashboard, studio, settings and auth pages never import them and keep native scroll.
-- **Scroller is `#main`.** Lenis wraps `#main` with `#main-content` as content; `#main` is `position: relative` so `sr-only` text cannot make `window` scroll. `landing-scroll-init.ts` sets `autoRaf: false`, `anchors: true`, drives Lenis from `gsap.ticker`, calls `lagSmoothing(0)` and `ScrollTrigger.defaults({ scroller: main })`. Unmount (route change, StrictMode) kills every ScrollTrigger and destroys Lenis.
-- **Desktop only (b).** Below 1024 px or with a coarse pointer there is no ScrollTrigger and no `.pin-spacer`.
-- **Reduced motion (c): reduce, not remove.** Modules are not loaded; fades and colour changes may stay; no information disappears; no automatic loop.
-- **Limits.** No pins (GSAP only runs the M2 heading entrance), no snap, no automatic `scrollTo`, anchors jump directly.
-- **Licences.** GSAP: "Standard no-charge" licence (not MIT). Lenis: MIT. Anatomy kit (`components/iso/`): MIT.
+**Landing scroll (native)**:
+- **Scroller is `#main`.** The page scrolls natively inside `#main` (`position: relative`, so `sr-only` text cannot make `window` scroll). There is no smooth-scroll library and no scroll JavaScript.
+- **Anchors.** Anchor links glide with `scroll-behavior: smooth` on `#main`, set only under `prefers-reduced-motion: no-preference`; with reduced motion they jump.
+- **M2 entrance.** CSS `animation-timeline: view()` inside `@supports (animation-timeline: view())` and `@media` `LANDING_MOTION_QUERY` (`(min-width: 1024px) and (pointer: fine) and (prefers-reduced-motion: no-preference)`, `motion.ts`). Browsers without support, phones, coarse pointers and reduced motion show the heading static.
+- **Limits.** No pins, no snap, no automatic `scrollTo`.
+- **Reduced motion: reduce, not remove.** Fades and colour changes may stay; no information disappears; no automatic loop.
+- **Licences.** Anatomy kit (`components/iso/`): MIT.
 
 Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fast: 120ms`, `--dur-base: 200ms`, `--dur-slow: 300ms`. In-app interactions stay within 120–300 ms and never block input.
 
@@ -688,7 +688,7 @@ Tokens (`globals.css`): `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`, `--dur-fas
 - Animate only `transform`, `opacity` and colour.
 - Never put `layout`, `layoutId` or a transformed `m.*` on an ancestor of Monaco (`CodeWorkspace`, `MonacoDiff`, `RunWorkspace`), because it breaks cursor and click positions.
 - `prefers-reduced-motion: reduce` means **reduce, not remove** (Windows sets it whenever "Animation effects" is off). Removed: slides, zoom, bounce/ping, layout travel, page slides (they become a crossfade) and scroll snap. Kept: fades, colour changes, the score and landing count-ups, the temper rail (colour only), the gate loop detail panel and the result book spread (crossfades). Implemented in `globals.css` (tw-animate translate/scale vars zeroed, view-transition overrides) and `MotionConfig reducedMotion="user"` (Motion drops transforms, keeps opacity).
-- No glassmorphism (`backdrop-blur`). GSAP and Lenis are allowed on the landing page only, under "Landing scroll (GSAP + Lenis)".
+- No glassmorphism (`backdrop-blur`). No GSAP, Lenis or other scroll library; scroll-linked motion is CSS (see "Landing scroll (native)").
 - `prefers-contrast: more` / high-contrast toggle: landing card shadows removed and borders at full strength.
 
 ### 7.2 Hover States

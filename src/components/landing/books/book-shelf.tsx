@@ -318,7 +318,6 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
           <DialogPrimitive.Portal>
             <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[rgb(10_25_49/0.85)] data-[state=open]:animate-in data-[state=open]:fade-in-0" />
             <DialogPrimitive.Content
-              data-lenis-prevent=""
               onCloseAutoFocus={(e) => {
                 e.preventDefault();
                 trigger.current?.focus();

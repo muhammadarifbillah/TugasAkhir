@@ -177,9 +177,11 @@ describe("category viewer", () => {
     expect(hits).toEqual([]);
   });
 
-  it("CategoryViewer uses the Radix dialog, returns focus, handles arrows and blocks Lenis", () => {
+  it("CategoryViewer uses the Radix dialog, returns focus, handles arrows and scrolls natively", () => {
     const src = read("src/components/landing/gallery/category-viewer.tsx");
-    for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "onOpenChange", "keyToAction", "data-lenis-prevent", "AnimatePresence"])
+    expect(src).not.toContain("data-lenis-prevent");
+    expect(src).toContain("overflow-y-auto");
+    for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "onOpenChange", "keyToAction", "AnimatePresence"])
       expect(src).toContain(s);
     for (const s of ["backdrop", "<motion.", "setInterval"]) expect(src).not.toContain(s);
   });

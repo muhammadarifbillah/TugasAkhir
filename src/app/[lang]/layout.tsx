@@ -103,7 +103,7 @@ export default async function RootLayout({ children, params }: LangLayoutProps) 
             <div className="flex h-svh flex-col overflow-hidden">
               <OfflineBanner label={dict.app.offline} />
               <Header lang={lang} />
-              {/* relative keeps sr-only text from scrolling the window; #main-content is Lenis' content. */}
+              {/* relative keeps sr-only text from scrolling the window; #main is the page scroller. */}
               <main id="main" className="relative flex min-h-0 flex-1 flex-col overflow-y-auto">
                 <div id="main-content" className="flex shrink-0 grow flex-col">
                   {children}

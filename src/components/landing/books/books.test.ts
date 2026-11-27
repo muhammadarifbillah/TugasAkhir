@@ -143,9 +143,11 @@ describe("book shelf", () => {
     }
   });
 
-  it("book dialog uses Radix, returns focus, blocks Lenis and swaps rotation for a crossfade", () => {
+  it("book dialog uses Radix, returns focus, scrolls natively and swaps rotation for a crossfade", () => {
     const src = read("src/components/landing/books/book-shelf.tsx");
-    for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "data-lenis-prevent", "rotateY", "useReducedMotion", "bookReducer", "booksOnShelf", "skipAnimations={false}", "motion-reduce:"])
+    expect(src).not.toContain("data-lenis-prevent");
+    expect(src).toContain("overflow-y-auto");
+    for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "rotateY", "useReducedMotion", "bookReducer", "booksOnShelf", "skipAnimations={false}", "motion-reduce:"])
       expect(src, s).toContain(s);
     for (const s of ["backdrop", "<motion.", "useAnimate", "setInterval"]) expect(src, s).not.toContain(s);
   });
