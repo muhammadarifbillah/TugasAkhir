@@ -157,7 +157,7 @@ describe("hero wall", () => {
   // r25: owner wants real templates in browser-frame cards instead of the flat HeroScene art.
   describe("browser cards with real template screenshots (r25)", () => {
     const buttons = () => [...html().matchAll(/<button[^>]*data-gallery-panel[\s\S]*?<\/button>/g)].map((m) => m[0]);
-    const reflections = () => [...html().matchAll(/data-panel-reflection[\s\S]*?<\/li>/g)].map((m) => m[0]);
+    const reflections = () => [...html().matchAll(/<span[^>]*data-panel-reflection[\s\S]*?<\/li>/g)].map((m) => m[0]);
     const imgs = (s: string) => [...s.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
     const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
     const mobile = (i: number) => SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].mobile;
