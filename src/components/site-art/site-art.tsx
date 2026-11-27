@@ -1,15 +1,14 @@
 import { useId, type ReactNode } from "react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/format";
+import { PALETTE } from "@/lib/palette";
 import type { BlockKind, SiteCategory } from "@/lib/site-categories";
 
 const W = 320;
 const H = 200;
 const PAD = 8;
 const GAP = 6;
-const INK = "#0A1931";
-const SURFACE = "#F1F5F9";
-const DARK = "#0F172A";
+const INK = PALETTE.ink;
 const FONT = "ui-sans-serif, system-ui, sans-serif";
 
 interface Box {
@@ -22,6 +21,8 @@ interface Paint {
   accent: string;
   soft: string;
   hero: string;
+  /** Card, table, chart, cart, sidebar and form-field fill: the palette light that is not the page field. */
+  surface: string;
 }
 type Primitive = (b: Box, p: Paint) => ReactNode;
 
@@ -33,9 +34,9 @@ const bar = (x: number, y: number, w: number, opacity = 0.35, h = 4) => (
 const hero: Primitive = (b, p) => (
   <>
     <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6} fill={p.hero} />
-    <rect x={b.x + 12} y={b.y + b.h * 0.25} width={b.w * 0.5} height={7} rx={3.5} fill="#FFFFFF" opacity={0.95} />
-    <rect x={b.x + 12} y={b.y + b.h * 0.25 + 12} width={b.w * 0.34} height={4} rx={2} fill="#FFFFFF" opacity={0.7} />
-    <rect x={b.x + 12} y={b.y + b.h - 18} width={44} height={11} rx={5.5} fill="#FFFFFF" />
+    <rect x={b.x + 12} y={b.y + b.h * 0.25} width={b.w * 0.5} height={7} rx={3.5} fill={PALETTE.snow} opacity={0.95} />
+    <rect x={b.x + 12} y={b.y + b.h * 0.25 + 12} width={b.w * 0.34} height={4} rx={2} fill={PALETTE.snow} opacity={0.7} />
+    <rect x={b.x + 12} y={b.y + b.h - 18} width={44} height={11} rx={5.5} fill={PALETTE.snow} />
   </>
 );
 
@@ -47,7 +48,7 @@ const cards: Primitive = (b, p) => {
     const x = b.x + i * (cw + GAP);
     return (
       <g key={i}>
-        <rect x={x} y={b.y} width={cw} height={b.h} rx={5} fill={SURFACE} />
+        <rect x={x} y={b.y} width={cw} height={b.h} rx={5} fill={p.surface} />
         <rect x={x + 3} y={b.y + 3} width={cw - 6} height={img - 3} rx={3} fill={i === 1 ? p.accent : p.soft} />
         {bar(x + 5, b.y + img + 5, cw * 0.6, 0.5)}
         {b.h - img > 18 && bar(x + 5, b.y + img + 12, cw * 0.35, 0.2)}
@@ -78,7 +79,7 @@ const form: Primitive = (b, p) => {
         return (
           <g key={i}>
             {bar(b.x, y, 30, 0.45, 3)}
-            <rect x={b.x} y={y + 5} width={b.w} height={10} rx={3} fill="#FFFFFF" stroke={INK} strokeOpacity={0.15} />
+            <rect x={b.x} y={y + 5} width={b.w} height={10} rx={3} fill={p.surface} stroke={INK} strokeOpacity={0.15} />
           </g>
         );
       })}
@@ -93,7 +94,7 @@ const table: Primitive = (b, p) => {
   const cw = b.w / cols;
   return (
     <>
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={4} fill={SURFACE} />
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={4} fill={p.surface} />
       <rect x={b.x} y={b.y} width={b.w} height={10} rx={4} fill={p.soft} />
       {Array.from({ length: rows - 1 }, (_, r) =>
         Array.from({ length: cols }, (_, c) => (
@@ -115,7 +116,7 @@ const chart: Primitive = (b, p) => {
   const bw = (b.w - 12 - GAP * (n - 1)) / n;
   return (
     <>
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={5} fill={SURFACE} />
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={5} fill={p.surface} />
       {Array.from({ length: n }, (_, i) => {
         const h = (b.h - 12) * (0.3 + (0.7 * ((i * 37) % 10)) / 10);
         return (
@@ -139,7 +140,7 @@ const cart: Primitive = (b, p) => {
   const items = Math.max(1, Math.min(3, Math.floor((b.h - 30) / 20)));
   return (
     <>
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={5} fill={SURFACE} />
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={5} fill={p.surface} />
       {Array.from({ length: items }, (_, i) => {
         const y = b.y + 6 + i * 20;
         return (
@@ -157,16 +158,16 @@ const cart: Primitive = (b, p) => {
   );
 };
 
-const player: Primitive = (b, p) => {
+const player: Primitive = (b) => {
   const cx = b.x + b.w / 2;
   const cy = b.y + b.h / 2 - 3;
   return (
     <>
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6} fill={DARK} />
-      <circle cx={cx} cy={cy} r={12} fill={p.accent} />
-      <path d={`M ${cx - 4} ${cy - 6} L ${cx + 6} ${cy} L ${cx - 4} ${cy + 6} Z`} fill="#FFFFFF" />
-      <rect x={b.x + 8} y={b.y + b.h - 9} width={b.w - 16} height={3} rx={1.5} fill="#FFFFFF" opacity={0.2} />
-      <rect x={b.x + 8} y={b.y + b.h - 9} width={(b.w - 16) * 0.4} height={3} rx={1.5} fill={p.accent} />
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6} fill={INK} />
+      <circle cx={cx} cy={cy} r={12} fill={PALETTE.mist} />
+      <path d={`M ${cx - 4} ${cy - 6} L ${cx + 6} ${cy} L ${cx - 4} ${cy + 6} Z`} fill={INK} />
+      <rect x={b.x + 8} y={b.y + b.h - 9} width={b.w - 16} height={3} rx={1.5} fill={PALETTE.snow} opacity={0.2} />
+      <rect x={b.x + 8} y={b.y + b.h - 9} width={(b.w - 16) * 0.4} height={3} rx={1.5} fill={PALETTE.mist} />
     </>
   );
 };
@@ -181,24 +182,25 @@ const schedule: Primitive = (b, p) => {
     const c = i % cols;
     const busy = (i * 7) % 5 === 0;
     return (
-      <rect key={i} x={b.x + c * (sw + 4)} y={b.y + r * (sh + 4)} width={sw} height={sh} rx={3} fill={busy ? p.accent : i % 2 ? p.soft : SURFACE} />
+      <rect key={i} x={b.x + c * (sw + 4)} y={b.y + r * (sh + 4)} width={sw} height={sh} rx={3} fill={busy ? p.accent : i % 2 ? p.soft : p.surface} />
     );
   });
 };
 
-const CODE_COLORS = ["#7DD3FC", "#F9A8D4", "#FDE68A", "#86EFAC", "#C4B5FD"];
-const code: Primitive = (b, p) => {
+// Light palette tones only: the code block is ink, so ink-coloured tokens would vanish.
+const CODE_COLORS = [PALETTE.mist, PALETTE.steel, PALETTE.snow];
+const code: Primitive = (b) => {
   const lines = Math.max(1, Math.floor((b.h - 8) / 9));
   return (
     <>
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6} fill={DARK} />
+      <rect x={b.x} y={b.y} width={b.w} height={b.h} rx={6} fill={INK} />
       {Array.from({ length: lines }, (_, i) => {
         const y = b.y + 7 + i * 9;
         const indent = (i % 3) * 8;
         return (
           <g key={i}>
-            <rect x={b.x + 8 + indent} y={y} width={18} height={4} rx={2} fill={i === 0 ? p.accent : CODE_COLORS[i % 5]} />
-            <rect x={b.x + 30 + indent} y={y} width={b.w * (0.15 + ((i * 13) % 5) / 20)} height={4} rx={2} fill={CODE_COLORS[(i + 2) % 5]} opacity={0.8} />
+            <rect x={b.x + 8 + indent} y={y} width={18} height={4} rx={2} fill={CODE_COLORS[i % 3]} />
+            <rect x={b.x + 30 + indent} y={y} width={b.w * (0.15 + ((i * 13) % 5) / 20)} height={4} rx={2} fill={CODE_COLORS[(i + 2) % 3]} opacity={0.8} />
           </g>
         );
       })}
@@ -226,10 +228,13 @@ export function SiteArt({
   const item = labels.items[category.id] as { name: string; pages: Record<string, string> };
   const name = item.name;
   const pageName = item.pages[page.id];
+  const { tone } = category;
+  const field = PALETTE[tone.field];
   const paint: Paint = {
-    accent: `hsl(${category.hue} 72% 52%)`,
-    soft: `hsl(${category.hue} 80% 92%)`,
+    accent: PALETTE[tone.accent],
+    soft: PALETTE[tone.soft],
     hero: `url(#${id}-hero)`,
+    surface: tone.field === "mist" ? PALETTE.snow : PALETTE.mist,
   };
 
   const hasNav = page.blocks.includes("nav");
@@ -255,17 +260,18 @@ export function SiteArt({
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
       className={className}
+      data-category={category.id}
     >
       <defs>
         <linearGradient id={`${id}-hero`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor={`hsl(${category.hue} 72% 52%)`} />
-          <stop offset="1" stopColor={`hsl(${(category.hue + 35) % 360} 72% 62%)`} />
+          <stop offset="0" stopColor={PALETTE[tone.hero[0]]} />
+          <stop offset="1" stopColor={PALETTE[tone.hero[1]]} />
         </linearGradient>
       </defs>
-      <rect width={W} height={H} rx={8} fill="#FFFFFF" />
+      <rect width={W} height={H} rx={8} fill={field} />
       {hasSidebar && (
         <g>
-          <rect x={0} y={0} width={64} height={H} rx={8} fill={SURFACE} />
+          <rect x={0} y={0} width={64} height={H} rx={8} fill={paint.surface} />
           {!hasNav && (
             <text x={8} y={18} fontSize={7} {...sidebarFit} {...textProps}>
               {name}
@@ -282,7 +288,7 @@ export function SiteArt({
       )}
       {hasNav && (
         <g>
-          <rect x={left} y={0} width={W - left} height={24} fill="#FFFFFF" />
+          <rect x={left} y={0} width={W - left} height={24} fill={field} />
           <line x1={left} x2={W} y1={24} y2={24} stroke={INK} strokeOpacity={0.08} />
           <text x={left + 10} y={15.5} fontSize={9} {...textProps}>
             {name}

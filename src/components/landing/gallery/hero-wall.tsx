@@ -82,7 +82,7 @@ export function HeroWall() {
                 <span
                   aria-hidden="true"
                   data-panel-reflection=""
-                  className={`mt-2 hidden aspect-[100/33] opacity-30 [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.5),transparent_75%)] lg:pointer-fine:motion-safe:block ${FRAME}`}
+                  className={`mt-2 hidden aspect-[100/33] opacity-30 [mask-image:linear-gradient(to_bottom,rgb(10_25_49/0.5),transparent_75%)] lg:pointer-fine:motion-safe:block ${FRAME}`}
                 >
                   <span className="flex -scale-y-100 flex-col">{pages()}</span>
                 </span>

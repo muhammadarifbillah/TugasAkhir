@@ -6,7 +6,6 @@ import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import { fmt } from "@/lib/format";
-import { scoreColorClass } from "@/lib/project-stats";
 import { dashboardStats, scoreSourceText } from "@/lib/dashboard-view";
 import type { Dictionary } from "@/lib/i18n";
 import { DashboardEmpty } from "./dashboard-empty";
@@ -82,7 +81,7 @@ describe("dashboard components", () => {
     const html = renderToStaticMarkup(createElement(ScoreBlock, { ...p, labels: en.dashboard }));
     expect(html).toContain(">91<");
     expect(html).toContain(en.dashboard.scoreGood);
-    expect(html).toContain(scoreColorClass(91));
+    expect(html).toContain("text-foreground");
     const copy = {
       scanner: en.dashboard.scoreScanner,
       scannerNoDate: en.dashboard.scoreScannerNoDate,
@@ -97,6 +96,21 @@ describe("dashboard components", () => {
     expect(none).toContain("—");
     expect(none).toContain(en.dashboard.scoreNone);
     for (const band of [en.dashboard.scoreGood, en.dashboard.scoreFair, en.dashboard.scorePoor]) expect(none).not.toContain(band);
+  });
+
+  it("score uses palette text and the band label carries the meaning", () => {
+    const score = (n: number | null) =>
+      renderToStaticMarkup(
+        createElement(ScoreBlock, { score: n, scoreSource: n === null ? null : "scanner", scannedAt: null, scoreStale: false, labels: en.dashboard }),
+      );
+    const good = score(91);
+    expect(good).toContain(en.dashboard.scoreGood);
+    expect(good).toContain("text-foreground");
+    for (const n of [91, 70, 40]) {
+      const html = score(n);
+      for (const cls of ["text-success", "text-warning", "text-danger"]) expect(html, `${n} ${cls}`).not.toContain(cls);
+    }
+    expect(score(null)).toContain("text-muted-foreground");
   });
 
   const empty = () => renderToStaticMarkup(createElement(DashboardEmpty, { dict: en, lang: "en" }));
@@ -234,6 +248,15 @@ describe("dashboard components", () => {
     const none = statCard(stats(STATS_FIXTURE.map((c) => ({ ...c, scoreSource: null }))), "avgScore");
     expect(none).toContain("—");
     expect(none).toContain(en.dashboard.statNoScans);
+  });
+
+  it("stat icons are decorative palette chips", () => {
+    const html = stats(STATS_FIXTURE);
+    for (const s of ["-success", "-warning", "-info"]) expect(html, s).not.toContain(s);
+    for (const key of ["inProgress", "completed", "inRevision", "avgScore"]) {
+      const chip = statCard(html, key).match(/<span[^>]*aria-hidden="true"[^>]*>/)?.[0] ?? "";
+      expect(chip, key).toContain("bg-primary/15 text-primary");
+    }
   });
 
   it("compact GateRail drops its label row but keeps five segments; compact ScoreBlock keeps number, band and source without the box", () => {

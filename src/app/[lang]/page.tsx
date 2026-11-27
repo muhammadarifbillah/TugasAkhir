@@ -5,6 +5,7 @@ import { BookShelf } from "@/components/landing/books/book-shelf";
 import type { StageCode } from "@/components/landing/books/book-list";
 import { ClaySection } from "@/components/landing/clay-section";
 import { Faq } from "@/components/landing/faq";
+import { FuseWaves } from "@/components/landing/fuse-waves";
 import { GalleryProvider } from "@/components/landing/gallery/gallery-provider";
 import { HeroWall } from "@/components/landing/gallery/hero-wall";
 import { TemplateShelf } from "@/components/landing/gallery/template-shelf";
@@ -66,7 +67,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <LandingMotion>
           <GalleryProvider lang={lang} appName={dict.app.name} labels={dict.categories} copy={l.gallery}>
             {/* Hero: headline first (LCP), then the gallery wall of the eight categories. */}
-            <section id="mulai-hero" className="@container relative overflow-hidden pb-16 pt-14 md:pt-20">
+            <section id="mulai-hero" className="@container relative isolate overflow-hidden pb-32 pt-14 md:pt-20">
               <div className="mx-auto max-w-4xl px-4 text-center">
                 <h1 className="font-wide text-balance text-3xl md:text-5xl lg:text-6xl">{l.gallery.headline}</h1>
                 <p className="mx-auto mt-6 max-w-[58ch] text-base leading-relaxed text-muted-foreground md:text-lg">{l.gallery.sub}</p>
@@ -79,6 +80,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   </Link>
                 </div>
               </div>
+              <FuseWaves className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[40%] w-full" />
               <div className="mt-12">
                 <HeroWall />
               </div>
@@ -136,19 +138,22 @@ export default async function HomePage({ params }: HomePageProps) {
 
           {/* Start: a clay panel with an edge glow instead of a contact form. */}
           <section id="mulai" aria-labelledby="mulai-title" className="px-4 pb-28 pt-8">
-            <div className="clay-card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] px-6 py-16 text-center shadow-[var(--clay-shadow),0_0_70px_var(--fuse-glow)] md:px-12">
-              <span className="clay-pill">{l.pills.start}</span>
-              <h2 id="mulai-title" className="font-wide mt-5 text-balance text-3xl md:text-5xl">
-                {l.closingTitle}
-              </h2>
-              <p className="mx-auto mt-4 max-w-[48ch] text-muted-foreground">{l.closingLede}</p>
-              <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-                <Link href={cta.href} className="clay-btn">
-                  {l[cta.label]}
-                </Link>
-                <Link href="#gerbang" className="clay-btn-ghost">
-                  {l.ctaGates}
-                </Link>
+            <div className="clay-card relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] px-6 pt-16 pb-24 text-center shadow-[var(--clay-shadow),0_0_70px_var(--fuse-glow)] md:px-12">
+              <FuseWaves className="pointer-events-none absolute inset-x-0 bottom-0 h-20 w-full opacity-60" />
+              <div className="relative">
+                <span className="clay-pill">{l.pills.start}</span>
+                <h2 id="mulai-title" className="font-wide mt-5 text-balance text-3xl md:text-5xl">
+                  {l.closingTitle}
+                </h2>
+                <p className="mx-auto mt-4 max-w-[48ch] text-muted-foreground">{l.closingLede}</p>
+                <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+                  <Link href={cta.href} className="clay-btn">
+                    {l[cta.label]}
+                  </Link>
+                  <Link href="#gerbang" className="clay-btn-ghost">
+                    {l.ctaGates}
+                  </Link>
+                </div>
               </div>
             </div>
           </section>

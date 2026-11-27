@@ -52,13 +52,13 @@ describe("ProjectCard", () => {
   it("maps project.template to the category illustration: e-commerce, lms, saas, rest-api, custom, null and unknown", () => {
     for (const t of ["e-commerce", "lms", "saas", "rest-api", "custom", null, "zzz"]) {
       const html = card({ template: t });
-      expect(html, String(t)).toContain(`hsl(${categoryForTemplate(t).hue} `);
+      expect(html, String(t)).toContain('data-category="' + categoryForTemplate(t).id + '"');
       expect(html, String(t)).toContain(fmt(en.dashboard.cardTemplate, { category: categoryName(t) }));
     }
     for (const t of [null, "custom", "zzz"]) expect(categoryForTemplate(t).id).toBe("company");
-    expect(card({ template: null })).toContain("hsl(45 ");
+    expect(card({ template: null })).toContain('data-category="company"');
     expect(categoryForTemplate("e-commerce").id).toBe("ecommerce");
-    expect(card({ template: "e-commerce" })).toContain("hsl(340 ");
+    expect(card({ template: "e-commerce" })).toContain('data-category="ecommerce"');
   });
 
   it("completed projects keep the studio link and the revise button; others only the studio link", () => {

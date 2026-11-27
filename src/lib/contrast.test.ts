@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { STAGE_HEX, contrastRatio } from "./contrast";
+import { PALETTE, findOffPalette, type PaletteName } from "./palette";
 
 const css = fs.readFileSync(path.join(process.cwd(), "src/app/globals.css"), "utf8");
 const DARK = "html.dark:has(.landing),\nhtml.dark:has(.dashboard-surface) {";
@@ -21,14 +22,50 @@ function token(body: string, name: string): string {
 }
 
 const STAGES = ["--stage-1", "--stage-2", "--stage-3", "--stage-4", "--stage-5"];
-const TEXT_TOKENS = ["--foreground", "--muted-foreground", "--fuse-accent-text", "--success", "--warning", "--danger", "--info", ...STAGES];
+const PALETTE_TEXT = [
+  "--foreground",
+  "--muted-foreground",
+  "--fuse-accent-text",
+  "--info",
+  ...STAGES,
+  "--card-foreground",
+  "--secondary-foreground",
+  "--accent-foreground",
+];
+/** §0 exception: status token values are not palette colours and stay unchanged. */
+const STATUS_TOKENS = ["--destructive", "--destructive-foreground", "--success", "--success-foreground", "--warning", "--danger"];
 
-function expectAA(body: string, surfaces: string[]) {
+function expectAA(body: string, texts: string[], surfaces: string[]) {
+  expect(body).not.toBe("");
   for (const bg of surfaces)
-    for (const fg of TEXT_TOKENS) {
+    for (const fg of texts) {
       const ratio = contrastRatio(token(body, fg), token(body, bg));
       expect(ratio, `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
+}
+
+function expectRoles(body: string, roles: Partial<Record<PaletteName, string[]>>) {
+  expect(body).not.toBe("");
+  for (const [name, tokens] of Object.entries(roles) as [PaletteName, string[]][])
+    for (const t of tokens) expect(token(body, t).toUpperCase(), t).toBe(PALETTE[name]);
+}
+
+/** Every rule of globals.css with its enclosing at-rule preludes (comments removed). */
+function cssRules(): { ctx: string[]; selector: string; body: string }[] {
+  const out: { ctx: string[]; selector: string; body: string }[] = [];
+  const stack: string[] = [];
+  let buf = "";
+  for (const ch of css.replace(/\/\*[\s\S]*?\*\//g, "")) {
+    if (ch === "{") {
+      stack.push(buf.slice(buf.lastIndexOf(";") + 1).trim());
+      buf = "";
+    } else if (ch === "}") {
+      const selector = stack.pop() ?? "";
+      out.push({ ctx: [...stack], selector, body: buf });
+      buf = "";
+    } else buf += ch;
+  }
+  return out;
 }
 
 describe("stage colours as text", () => {
@@ -41,16 +78,47 @@ describe("stage colours as text", () => {
     STAGE_HEX.forEach((hex, i) => expect(root).toContain(`--stage-${i + 1}: ${hex};`));
   });
 
-  it("FUSE dark tokens: text tokens are AA on ink and deep", () => {
-    const dark = block(DARK);
-    expect(dark).not.toBe("");
-    expectAA(dark, ["--background", "--card"]);
+  it("FUSE dark tokens follow the Colors Ideas role map", () => {
+    expectRoles(block(DARK), {
+      ink: ["--background", "--primary-foreground", "--fuse-btn-fg"],
+      snow: ["--foreground", "--card-foreground", "--popover-foreground", "--secondary-foreground", "--accent-foreground"],
+      deep: ["--card", "--popover", "--secondary", "--muted", "--accent"],
+      mist: ["--primary", "--muted-foreground", "--info", ...STAGES, "--input", "--ring", "--fuse-accent-text", "--fuse-btn-bg"],
+      steel: ["--border"],
+    });
   });
 
-  it("FUSE light tokens: text tokens are AA on snow, white and mist surfaces", () => {
-    const light = block(LIGHT);
-    expect(light).not.toBe("");
-    expectAA(light, ["--background", "--card", "--secondary"]);
+  it("FUSE light tokens follow the Colors Ideas role map", () => {
+    expectRoles(block(LIGHT), {
+      snow: ["--background", "--card", "--popover", "--primary-foreground", "--fuse-btn-fg"],
+      ink: ["--foreground", "--card-foreground", "--popover-foreground", "--secondary-foreground", "--accent-foreground"],
+      deep: ["--primary", "--muted-foreground", "--info", ...STAGES, "--fuse-accent-text", "--fuse-btn-bg"],
+      mist: ["--secondary", "--muted", "--accent", "--border"],
+      steel: ["--input", "--ring"],
+    });
+  });
+
+  it("FUSE tokens use only palette colours outside the status exceptions", () => {
+    for (const body of [block(DARK), block(LIGHT)]) {
+      expect(body).not.toBe("");
+      for (const [, name, value] of body.matchAll(/(--[\w-]+):\s*([^;]+);/g)) {
+        if (STATUS_TOKENS.includes(name)) continue;
+        expect(findOffPalette(value), `${name}: ${value}`).toEqual([]);
+      }
+      expect(body).not.toContain("--tape-paper");
+    }
+    expect(token(block(DARK), "--shadow-color")).toBe("217 66% 12%");
+    expect(token(block(LIGHT), "--shadow-color")).toBe("211 58% 25%");
+  });
+
+  it("FUSE palette text tokens are AA on page, card and muted surfaces", () => {
+    for (const body of [block(DARK), block(LIGHT)]) expectAA(body, PALETTE_TEXT, ["--background", "--card", "--secondary"]);
+  });
+
+  it("FUSE status tokens stay AA on page and card", () => {
+    // Split from the palette text check: the light muted surface is now mist (§0), while the status tokens are an
+    // unchanged exception that is shown on badges with their own background, so they are only held to page and card.
+    for (const body of [block(DARK), block(LIGHT)]) expectAA(body, ["--success", "--warning", "--danger"], ["--background", "--card"]);
   });
 
   it("FUSE button and status-fill pairs are AA", () => {
@@ -64,12 +132,13 @@ describe("stage colours as text", () => {
         expect(contrastRatio(token(body, fg), token(body, bg)), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("FUSE non-text tokens reach 3:1 and steel stays out of small text", () => {
+  it("FUSE non-text tokens reach 3:1 and steel is never a text token", () => {
     for (const body of [block(DARK), block(LIGHT)]) {
       for (const fg of ["--input", "--ring"])
         for (const bg of ["--background", "--card"])
           expect(contrastRatio(token(body, fg), token(body, bg)), `${fg} on ${bg}`).toBeGreaterThanOrEqual(3);
-      for (const fg of TEXT_TOKENS) expect(token(body, fg).toUpperCase()).not.toBe("#4A7FA7");
+      for (const fg of [...PALETTE_TEXT, "--primary-foreground", "--popover-foreground", "--fuse-btn-fg"])
+        expect(token(body, fg).toUpperCase(), fg).not.toBe("#4A7FA7");
     }
     expect(contrastRatio("#4A7FA7", "#F6FAFD")).toBeLessThan(4.5);
   });
@@ -77,8 +146,6 @@ describe("stage colours as text", () => {
   it("FUSE utility tokens exist in both blocks", () => {
     const utils = ["--fuse-bg", "--fuse-card-bg", "--fuse-sheen", "--fuse-shadow-soft", "--fuse-glow", "--fuse-accent-text", "--fuse-btn-bg", "--fuse-btn-fg"];
     for (const body of [block(DARK), block(LIGHT)]) for (const name of utils) expect(token(body, name)).not.toBe("");
-    expect(token(block(DARK), "--tape-paper")).toBe("#ede6d3");
-    expect(token(block(LIGHT), "--tape-paper")).toBe("#f6f1e3");
     const root = block(":root {");
     for (const [name, hex] of [
       ["--fuse-ink", "#0A1931"],
@@ -116,36 +183,27 @@ describe("stage colours as text", () => {
           expect(fs.readFileSync(path.join(f.parentPath, f.name), "utf8"), f.name).not.toContain("dashboard-surface");
   });
 
-  it("FUSE high-contrast muted text is at least 7:1", () => {
-    for (const bg of ["#0A1931", "#1A3D63"]) expect(contrastRatio("#DCE9F5", bg)).toBeGreaterThanOrEqual(7);
-    for (const bg of ["#F6FAFD", "#E8F1F9"]) expect(contrastRatio("#0A1931", bg)).toBeGreaterThanOrEqual(7);
-    // every rule mentioning dashboard-surface with a high-contrast muted value
-    const rules = [...css.matchAll(/([^{}]*dashboard-surface[^{}]*)\{([^}]*)\}/g)].map((m) => m[2]);
-    const muted = rules.flatMap((body) => [...body.matchAll(/--muted-foreground:\s*([^;]+);/g)].map((m) => m[1].trim()));
-    expect(muted).toContain("#DCE9F5");
-    expect(muted).toContain("#0A1931");
-  });
-
-  it("keeps Pita Pindai tape and finding pairs readable", () => {
-    for (const bg of ["#ede6d3", "#f6f1e3"]) expect(contrastRatio("#222222", bg)).toBeGreaterThanOrEqual(7);
-    for (const bg of ["#f7c6c6", "#f5d9a8"]) expect(contrastRatio("#222222", bg)).toBeGreaterThanOrEqual(7);
-    expect(contrastRatio("#eef0ff", "#0f1226")).toBeGreaterThanOrEqual(7);
-    // brake jaw is a graphic object on the tape paper (SC 1.4.11)
-    for (const bg of ["#ede6d3", "#f6f1e3"]) expect(contrastRatio("#e5484d", bg)).toBeGreaterThanOrEqual(3);
-  });
-
-  it("pins the Pita Pindai tokens in globals.css", () => {
-    expect(block(DARK)).toContain("--tape-paper: #ede6d3;");
-    expect(block(LIGHT)).toContain("--tape-paper: #f6f1e3;");
-    const landing = block(".landing {");
-    for (const decl of [
-      "--tape-ink: #222222;",
-      "--finding-medium: #f7c6c6;",
-      "--finding-low: #f5d9a8;",
-      "--brake: #e5484d;",
-      "--odometer-bg: #0f1226;",
-    ])
-      expect(landing).toContain(decl);
+  it("FUSE high-contrast overrides use palette and reach 7:1", () => {
+    const hc = cssRules().filter(
+      (r) =>
+        (r.ctx.includes("@media (prefers-contrast: more)") || r.selector.includes('[data-contrast="high"]')) &&
+        /:has\(\.(landing|dashboard-surface)\)/.test(r.selector) &&
+        r.body.includes("--muted-foreground"),
+    );
+    const themes = [
+      { dark: true, body: block(DARK), muted: PALETTE.snow, border: PALETTE.mist },
+      { dark: false, body: block(LIGHT), muted: PALETTE.ink, border: PALETTE.deep },
+    ];
+    for (const t of themes) {
+      const rules = hc.filter((r) => r.selector.includes("html.dark") === t.dark);
+      // one OS-preference rule and one header-toggle rule per theme
+      expect(rules.length, `dark=${t.dark}`).toBeGreaterThanOrEqual(2);
+      for (const r of rules) {
+        expect(token(r.body, "--muted-foreground").toUpperCase(), r.selector).toBe(t.muted);
+        expect(token(r.body, "--border").toUpperCase(), r.selector).toBe(t.border);
+      }
+      for (const bg of ["--background", "--muted"]) expect(contrastRatio(t.muted, token(t.body, bg)), bg).toBeGreaterThanOrEqual(7);
+    }
   });
 
   it("matches a known pair", () => {
