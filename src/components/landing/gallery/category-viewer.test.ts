@@ -300,6 +300,9 @@ describe("category viewer", () => {
         for (const p of c.pages) expect(table).toContain(escape(item.pages[p.id]));
         for (const f of c.features) expect(table).toContain(escape(item.features[f]));
         for (const s of c.stack) expect(table).toContain(escape(s));
+        expect(table).toContain(c.pages.map((p) => escape(item.pages[p.id])).join(" · "));
+        expect(table).toContain(c.features.map((f) => escape(item.features[f])).join(" · "));
+        expect(table).toContain(c.stack.map((s) => escape(s)).join(" · "));
         expect(table).toContain(escape(fmt(copy.checksCount, { n: 3 })));
         expect(table).toContain(escape(copy.standardsValue));
         expect(table).toContain(escape(copy.scannerValue));
