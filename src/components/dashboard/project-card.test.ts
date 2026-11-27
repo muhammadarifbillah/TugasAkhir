@@ -181,6 +181,14 @@ describe("ProjectCard", () => {
     expect(count(inside, "</span>")).toBe(0);
   });
 
+  it("jarak di bawah bibir bezel cukup untuk kaki tombol", () => {
+    // Button foot ends ~28.8px below the bezel; mb-4 + gap-3 is only 28px, so the dotted rule got covered.
+    const bezel = tagWith(card(), 'data-card-part="bezel"');
+    const mb = bezel.match(/\bmb-(\d+)\b/);
+    expect(mb, "bezel mb-*").not.toBeNull();
+    expect(Number(mb![1])).toBeGreaterThanOrEqual(5);
+  });
+
   it("title is large on two lines and the gate row bolds the stage name", () => {
     const html = card();
     const h3 = tagWith(html, '<h3 id="project-p1-title"');
