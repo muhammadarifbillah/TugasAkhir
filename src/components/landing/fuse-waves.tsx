@@ -3,7 +3,7 @@ import { PALETTE } from "@/lib/palette";
 /** Layered ink waves from the Colors Ideas reference; decorative only, painted behind content. */
 export function FuseWaves({ className }: { className?: string }) {
   return (
-    <svg aria-hidden="true" focusable="false" viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" className={className}>
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 1440 320" preserveAspectRatio="none" className={className}>
       <path
         d="M0 150 C 180 90 360 90 540 140 C 720 190 900 200 1080 150 C 1260 100 1350 100 1440 120 L 1440 320 L 0 320 Z"
         fill={PALETTE.steel}
@@ -29,6 +29,7 @@ export function FuseWaves({ className }: { className?: string }) {
         stroke={PALETTE.mist}
         strokeOpacity={0.3}
         strokeWidth={1.5}
+        vectorEffect="non-scaling-stroke"
       />
       <path
         d="M0 212 C 220 170 420 178 620 214 C 820 250 1020 248 1220 212 C 1320 194 1390 192 1440 196"
@@ -36,6 +37,7 @@ export function FuseWaves({ className }: { className?: string }) {
         stroke={PALETTE.mist}
         strokeOpacity={0.3}
         strokeWidth={1.5}
+        vectorEffect="non-scaling-stroke"
       />
     </svg>
   );
