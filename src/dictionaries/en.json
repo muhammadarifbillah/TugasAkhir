@@ -209,7 +209,7 @@
       "searchPlaceholder": "Search: shop, course, clinic…",
       "count": "Templates found: {n}",
       "empty": "No template matches \"{q}\".",
-      "pagesCount": "3 pages",
+      "pagesCount": "3 templates",
       "seeAll": "See all",
       "seeAllShelf": "See every template on the {shelf} shelf",
       "shelfOnly": "Shelf: {shelf}",
@@ -1096,7 +1096,6 @@
   },
   "categories": {
     "galleryLabel": "Template illustration — not a client site",
-    "artLabel": "Illustration of the {page} page for the {category} template",
     "shelves": {
       "sell": "Selling online",
       "learn": "Learning & community",
@@ -1381,5 +1380,20 @@
     "docusaurus-openapi-docs": {
       "desc": "API documentation on Docusaurus with a light grey sidebar and green accents."
     }
+  },
+  "footer": {
+    "credits": "Template credits"
+  },
+  "credits": {
+    "title": "Open-source template credits",
+    "intro": "FUSE shows screenshots of open-source templates as examples of kinds of website. The templates and their content remain the property of their authors and are used under their licences.",
+    "columns": {
+      "category": "Category",
+      "template": "Template",
+      "license": "Licence",
+      "source": "Source",
+      "attribution": "Attribution"
+    },
+    "noAttribution": "—"
   }
 }

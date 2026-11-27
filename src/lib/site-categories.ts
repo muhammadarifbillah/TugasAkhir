@@ -1,19 +1,15 @@
 /**
  * Declarative library of the eight website categories FUSE builds: three
- * illustrated pages each, headline features, stack and three security checks.
- * Pure data, no React and no stages.ts import (the dashboard may import this;
- * site-categories.test.ts cross-checks the NIST/ISO codes against stages.ts).
+ * page names each (searched by the shelf), headline features, stack and three
+ * security checks. Pure data, no React and no stages.ts import (the dashboard
+ * may import this; site-categories.test.ts cross-checks the NIST/ISO codes
+ * against stages.ts).
  */
-import type { PaletteName } from "./palette";
-
-export const BLOCK_KINDS = ["nav", "hero", "cards", "list", "form", "table", "chart", "sidebar", "cart", "player", "schedule", "code"] as const;
-export type BlockKind = (typeof BLOCK_KINDS)[number];
 export type CategoryId = "marketplace" | "ecommerce" | "lms" | "saas" | "clinic" | "company" | "news" | "api";
 export type ShelfId = "sell" | "learn" | "business" | "tech";
 export type StageCode = "analysis" | "design" | "development" | "testing" | "handover";
 export interface SitePage {
   id: string;
-  blocks: readonly BlockKind[];
 }
 export interface SecurityCheck {
   id: string;
@@ -21,17 +17,10 @@ export interface SecurityCheck {
   nist: string;
   iso: string;
 }
-/** Palette roles of a category: page field, accent and soft fills, and the two hero gradient stops. */
-export interface CategoryTone {
-  field: "snow" | "mist";
-  accent: PaletteName;
-  soft: PaletteName;
-  hero: readonly [PaletteName, PaletteName];
-}
 export interface SiteCategory {
   id: CategoryId;
-  tone: CategoryTone;
   shelf: ShelfId;
+  /** Dictionary keys: categories.items.<id>.pages.<id> */
   pages: readonly [SitePage, SitePage, SitePage];
   /** Dictionary keys: categories.items.<id>.features.<key> */
   features: readonly [string, string, string];
@@ -45,14 +34,9 @@ export interface SiteCategory {
 export const SITE_CATEGORIES: readonly SiteCategory[] = [
   {
     id: "marketplace",
-    tone: { field: "snow", accent: "steel", soft: "deep", hero: ["deep", "steel"] },
     shelf: "sell",
     templates: [],
-    pages: [
-      { id: "home", blocks: ["nav", "hero", "cards"] },
-      { id: "sellerStore", blocks: ["nav", "sidebar", "cards"] },
-      { id: "cartCheckout", blocks: ["nav", "cart", "form"] },
-    ],
+    pages: [{ id: "home" }, { id: "sellerStore" }, { id: "cartCheckout" }],
     features: ["multiSeller", "reviews", "payments"],
     stack: ["Next.js", "PostgreSQL", "Prisma"],
     checks: [
@@ -63,14 +47,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "ecommerce",
-    tone: { field: "snow", accent: "deep", soft: "steel", hero: ["ink", "deep"] },
     shelf: "sell",
     templates: ["e-commerce"],
-    pages: [
-      { id: "catalog", blocks: ["nav", "sidebar", "cards"] },
-      { id: "product", blocks: ["nav", "hero", "cards"] },
-      { id: "checkout", blocks: ["nav", "form", "cart"] },
-    ],
+    pages: [{ id: "catalog" }, { id: "product" }, { id: "checkout" }],
     features: ["catalogSearch", "cart", "orders"],
     stack: ["Next.js", "PostgreSQL", "Tailwind CSS"],
     checks: [
@@ -81,14 +60,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "lms",
-    tone: { field: "mist", accent: "deep", soft: "steel", hero: ["deep", "ink"] },
     shelf: "learn",
     templates: ["lms"],
-    pages: [
-      { id: "courses", blocks: ["nav", "hero", "cards"] },
-      { id: "classroom", blocks: ["nav", "sidebar", "player"] },
-      { id: "quiz", blocks: ["nav", "list", "form"] },
-    ],
+    pages: [{ id: "courses" }, { id: "classroom" }, { id: "quiz" }],
     features: ["courses", "video", "quizzes"],
     stack: ["Next.js", "PostgreSQL", "Prisma"],
     checks: [
@@ -99,14 +73,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "saas",
-    tone: { field: "snow", accent: "deep", soft: "ink", hero: ["steel", "deep"] },
     shelf: "business",
     templates: ["saas"],
-    pages: [
-      { id: "overview", blocks: ["sidebar", "chart", "cards"] },
-      { id: "team", blocks: ["sidebar", "table"] },
-      { id: "billing", blocks: ["sidebar", "cards", "table"] },
-    ],
+    pages: [{ id: "overview" }, { id: "team" }, { id: "billing" }],
     features: ["tenants", "roles", "billing"],
     stack: ["Next.js", "PostgreSQL", "Prisma"],
     checks: [
@@ -117,14 +86,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "clinic",
-    tone: { field: "mist", accent: "ink", soft: "steel", hero: ["steel", "ink"] },
     shelf: "business",
     templates: [],
-    pages: [
-      { id: "doctors", blocks: ["nav", "schedule", "cards"] },
-      { id: "booking", blocks: ["nav", "form"] },
-      { id: "history", blocks: ["nav", "sidebar", "table"] },
-    ],
+    pages: [{ id: "doctors" }, { id: "booking" }, { id: "history" }],
     features: ["schedule", "appointments", "records"],
     stack: ["Next.js", "PostgreSQL", "Tailwind CSS"],
     checks: [
@@ -135,14 +99,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "company",
-    tone: { field: "snow", accent: "ink", soft: "steel", hero: ["ink", "steel"] },
     shelf: "business",
     templates: ["custom"],
-    pages: [
-      { id: "home", blocks: ["nav", "hero", "cards"] },
-      { id: "services", blocks: ["nav", "list", "cards"] },
-      { id: "contact", blocks: ["nav", "form", "list"] },
-    ],
+    pages: [{ id: "home" }, { id: "services" }, { id: "contact" }],
     features: ["profile", "services", "contactForm"],
     stack: ["Next.js", "Tailwind CSS"],
     checks: [
@@ -153,14 +112,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "news",
-    tone: { field: "mist", accent: "ink", soft: "deep", hero: ["ink", "deep"] },
     shelf: "learn",
     templates: [],
-    pages: [
-      { id: "home", blocks: ["nav", "hero", "list"] },
-      { id: "article", blocks: ["nav", "hero", "list"] },
-      { id: "editor", blocks: ["sidebar", "form", "table"] },
-    ],
+    pages: [{ id: "home" }, { id: "article" }, { id: "editor" }],
     features: ["articles", "editorRoles", "media"],
     stack: ["Next.js", "PostgreSQL", "Prisma"],
     checks: [
@@ -171,14 +125,9 @@ export const SITE_CATEGORIES: readonly SiteCategory[] = [
   },
   {
     id: "api",
-    tone: { field: "snow", accent: "steel", soft: "ink", hero: ["ink", "steel"] },
     shelf: "tech",
     templates: ["rest-api"],
-    pages: [
-      { id: "reference", blocks: ["sidebar", "list", "code"] },
-      { id: "examples", blocks: ["sidebar", "code"] },
-      { id: "keys", blocks: ["sidebar", "table", "form"] },
-    ],
+    pages: [{ id: "reference" }, { id: "examples" }, { id: "keys" }],
     features: ["endpoints", "apiKeys", "rateLimits"],
     stack: ["Node.js", "Express", "PostgreSQL"],
     checks: [
