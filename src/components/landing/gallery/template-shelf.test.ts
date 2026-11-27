@@ -211,11 +211,12 @@ describe("template shelf", () => {
 
   // R10: was "shelf covers use the larger sm:w-[12.5rem] width". The reference shows small books (~64×96 relative to the panel);
   // decision §1.3 = 96×144, mobile 88×132.
-  it("shelf covers are small upright books w-[5.5rem] sm:w-24", () => {
+  // R10 putaran 2: w-[5.5rem] sm:w-24 -> w-24 sm:w-28 so the SiteArt page on the cover stays legible (spec §11.2); ratio stays 2:3.
+  it("shelf covers are small upright books w-24 sm:w-28", () => {
     const html = renderShelf();
     const books = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => classOf(m[0]));
     expect(books).toHaveLength(8);
-    for (const c of books) for (const k of ["w-[5.5rem]", "sm:w-24", "aspect-[2/3]"]) expect(c).toContain(k);
+    for (const c of books) for (const k of ["w-24", "sm:w-28", "aspect-[2/3]"]) expect(c).toContain(k);
     expect(SRC()).not.toContain("sm:w-[12.5rem]");
   });
 
@@ -238,7 +239,8 @@ describe("template shelf", () => {
 
   // R10: overflow-x-auto + snap-x moved from the ul to data-shelf-scroll so the plank scrolls with the books; 96px books need not
   // shrink, so lg:min-w-0 lg:shrink is no longer required.
-  it("shelf row never wraps on desktop and book items may shrink at lg", () => {
+  // R10 putaran 2: renamed from "shelf row never wraps on desktop and book items may shrink at lg" to match what it checks.
+  it("shelf row scrolls in data-shelf-scroll, never wraps, and book items stay shrink-0", () => {
     const html = renderShelf();
     const rows = [...html.matchAll(/<section[^>]*data-shelf[^>]*>[\s\S]*?(<div[^>]*data-shelf-scroll[^>]*>)[\s\S]*?(<ul[^>]*>)([\s\S]*?)<\/ul>/g)];
     expect(rows).toHaveLength(4);
@@ -285,6 +287,8 @@ describe("template shelf", () => {
     for (const k of wrap![1].split(/\s+/)) expect(k).not.toMatch(/(^|:)grid-cols-2$/);
   });
 
+  // R10 putaran 2: the cover again carries the category's first SiteArt page (spec 11.2: the shelf shows website templates),
+  // so the "no <svg role=img>" ban is lifted; the art is aria-hidden inside the labelled button. Sizes follow w-24 sm:w-28.
   it("covers are small upright books with icon and name on the cover", () => {
     const html = renderShelf();
     const copy = DICTS.id.landing.shelf as ShelfCopy;
@@ -300,9 +304,33 @@ describe("template shelf", () => {
     }
     expect(titles.sort()).toEqual(SITE_CATEGORIES.map((c) => escape(itemOf("id", c.id).name)).sort());
     const books = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => classOf(m[0]));
-    for (const c of books) for (const k of ["w-[5.5rem]", "sm:w-24", "aspect-[2/3]"]) expect(c).toContain(k);
-    expect(html).not.toContain('<svg role="img"');
+    for (const c of books) for (const k of ["w-24", "sm:w-28", "aspect-[2/3]"]) expect(c).toContain(k);
     expect(html).not.toContain(escape(copy.pagesCount));
+  });
+
+  it("each cover shows the category's SiteArt, hidden from assistive tech", () => {
+    const covers = [...renderShelf().matchAll(/<button[^>]*data-shelf-cover[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1]);
+    expect(covers).toHaveLength(8);
+    const seen = covers.map((body) => {
+      const art = /<span[^>]*aria-hidden="true"[^>]*><svg[^>]*data-category="([^"]+)"/.exec(body);
+      expect(art, "SiteArt inside an aria-hidden wrapper").not.toBeNull();
+      return art![1];
+    });
+    expect(seen.sort()).toEqual(ids(SITE_CATEGORIES).sort());
+  });
+
+  it("deep covers stay visible on the dark deep panel", () => {
+    const books = [...renderShelf().matchAll(/<span data-book=""[^>]*data-cover-tone="deep"[\s\S]*?<\/button>/g)].map((m) => m[0]);
+    expect(books.length).toBeGreaterThan(0);
+    for (const b of books) for (const k of ["dark:ring-1", "dark:ring-[#B3CFE5]"]) expect(b).toContain(k);
+  });
+
+  it("search input keeps a usable width at 390px", () => {
+    const input = /<input[^>]*type="search"[^>]*>/.exec(renderShelf())?.[0];
+    const c = classOf(input!);
+    expect(c).toContain("min-w-[10rem]");
+    expect(c).not.toContain("min-w-0");
+    expect(c).toContain("min-h-11");
   });
 
   it("cover tones rotate through palette pairs", () => {
