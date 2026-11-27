@@ -45,12 +45,17 @@ export function ProjectCard({
 
   return (
     <article className="project-card flex h-full flex-col gap-3" aria-labelledby={titleId}>
-      <div data-card-part="bezel" className="project-card-bezel">
+      <div data-card-part="bezel" className="project-card-bezel mb-4">
         <div data-card-part="screen" className="project-card-screen" aria-hidden="true">
           <div className="project-card-art">
             <SiteArt category={category} pageIndex={0} labels={dict.categories} />
             <SiteArt category={category} pageIndex={1} labels={dict.categories} />
           </div>
+        </div>
+        <div data-card-part="lip" aria-hidden="true" className="project-card-lip">
+          {Array.from({ length: 24 }, (_, i) => (
+            <span key={i} data-lip-dot="" />
+          ))}
         </div>
         {/* Straddles the bezel's top edge (half outside the frame) so it never covers the screen. */}
         <span data-card-part="status" data-chip-edge="top" className="absolute left-4 top-0 z-10 -translate-y-1/2 rounded-md bg-card shadow-[0_1px_3px_rgb(10_25_49/0.1),0_1px_2px_-1px_rgb(10_25_49/0.1)]">
@@ -59,9 +64,10 @@ export function ProjectCard({
         <span
           data-card-part="category"
           aria-hidden="true"
-          className="absolute bottom-4 right-4 flex size-11 items-center justify-center rounded-full border bg-background text-foreground shadow-[0_1px_3px_rgb(10_25_49/0.1),0_1px_2px_-1px_rgb(10_25_49/0.1)]"
+          className="absolute bottom-0 right-5 z-10 flex size-[3.25rem] translate-y-[40%] items-center justify-center rounded-full bg-[#1A3D63] text-[#F6FAFD] shadow-[0_10px_18px_-8px_rgb(10_25_49/0.7)] ring-4 ring-[#F6FAFD] dark:bg-[#B3CFE5] dark:text-[#0A1931] dark:ring-[#1A3D63]"
         >
-          <CategoryIcon id={category.id} className="size-5" />
+          <CategoryIcon id={category.id} className="size-6" />
+          <span data-card-part="category-foot" className="absolute left-1/2 top-full h-2 w-5 -translate-x-1/2 rounded-b-md bg-[#1A3D63] dark:bg-[#B3CFE5]" />
         </span>
       </div>
 
@@ -69,7 +75,7 @@ export function ProjectCard({
 
       <div className="flex flex-col gap-2 px-1">
         {renderTitle(
-          <h3 id={titleId} className="line-clamp-2 break-words text-xl font-semibold">
+          <h3 id={titleId} className="line-clamp-2 break-words text-2xl font-semibold leading-tight">
             {p.name}
           </h3>,
         )}
@@ -93,13 +99,17 @@ export function ProjectCard({
 
       <div className="flex flex-1 flex-col gap-3 px-1">
         <div data-card-part="gate" className="flex items-center gap-2 text-sm">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted">
+          <span className="flex size-11 rounded-full shrink-0 items-center justify-center bg-muted">
             <Hallmark stage={activeIndex === null ? 5 : ((activeIndex + 1) as 1 | 2 | 3 | 4 | 5)} className="size-4" />
           </span>
           <span>
-            {activeIndex === null
-              ? dict.dashboard.gatesAllDone
-              : `${fmt(dict.dashboard.gateActive, { n: activeIndex + 1 })} · ${stageNames[activeIndex]}`}
+            {activeIndex === null ? (
+              dict.dashboard.gatesAllDone
+            ) : (
+              <>
+                {fmt(dict.dashboard.gateActive, { n: activeIndex + 1 })} · <strong>{stageNames[activeIndex]}</strong>
+              </>
+            )}
           </span>
         </div>
         {p.description && <p className="line-clamp-2 text-sm text-muted-foreground">{p.description}</p>}
