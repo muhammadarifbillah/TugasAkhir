@@ -263,6 +263,8 @@ describe("gate loop", () => {
     expect(read("src/components/landing/loop/gate-loop.tsx")).not.toContain("border-dashed");
   });
 
+  // Changed (fuse-v2-r11 putaran 2): the see-through glass (dark:bg-[#F6FAFD]/10, border /45) let the lane show through
+  // the station; the glass is now an opaque palette gradient with a /50 mist border, checked in the test after this one.
   it("stations are 88px glass boxes with a 32px icon", () => {
     const html = render("id");
     const { gates, labels } = propsOf("id");
@@ -270,11 +272,39 @@ describe("gate loop", () => {
     expect(buttons).toHaveLength(10);
     buttons.forEach((b, k) => {
       const tag = b.slice(0, b.indexOf(">") + 1);
-      for (const s of ["data-loop-glass", "size-22", "dark:bg-[#F6FAFD]/10", "dark:border-[#B3CFE5]/45", 'type="button"', "aria-pressed="])
+      for (const s of ["data-loop-glass", "size-22", "dark:border-[#B3CFE5]/50", 'type="button"', "aria-pressed="])
         expect(tag, s).toContain(s);
       expect(tag).toContain(`aria-label="${escape(fmt(labels.stationLabel, { n: (k % 5) + 1, title: gates[k % 5].title }))}"`);
       expect(b).toMatch(/<svg[^>]*class="[^"]*\bsize-8\b/);
     });
+  });
+
+  it("desktop stations stand on top of the lane with an opaque glass fill", () => {
+    const html = render("id");
+    const laneSvgEnd = html.indexOf("</svg>", html.indexOf('data-loop-lane="forward"'));
+    expect(laneSvgEnd).toBeGreaterThan(0);
+    const tags = [...html.matchAll(/<button[^>]*data-loop-station(-m)?=[^>]*>/g)];
+    expect(tags).toHaveLength(10);
+    for (const m of tags) {
+      const tag = m[0];
+      if (!tag.includes("data-loop-station-m")) expect(m.index, "station after lane layers").toBeGreaterThan(laneSvgEnd);
+      expect(tag).toContain("data-station-glass");
+      expect(tag).toContain("bg-[linear-gradient(180deg,#F6FAFD,#B3CFE5)]");
+      expect(tag).toContain("dark:bg-[linear-gradient(180deg,#1A3D63,#0A1931)]");
+      // No see-through fill: a palette hex with an alpha suffix as the background.
+      expect(tag).not.toMatch(/(^|\s)(dark:)?bg-\[#[0-9A-Fa-f]{6}\]\/\d+/);
+    }
+  });
+
+  it("mobile road closes the loop with top and bottom joints in the same layers", () => {
+    const html = render("id");
+    for (const joint of ["top", "bottom"]) {
+      const tag = html.match(new RegExp(`<div[^>]*data-lane-joint="${joint}"[^>]*>`))?.[0] ?? "";
+      expect(tag, joint).toContain('aria-hidden="true"');
+      const body = chunk(html, `data-lane-joint="${joint}"`, "</div>");
+      for (const k of ["side", "surface", "edge"])
+        expect(body.match(new RegExp(`<span[^>]*data-lane-layer="${k}"`, "g")), `${joint} ${k}`).toHaveLength(1);
+    }
   });
 
   it("text sits right of each station at its layout box", () => {
