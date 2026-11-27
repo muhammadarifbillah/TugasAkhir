@@ -77,7 +77,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
       className="rounded-[2rem] border border-[#B3CFE5] bg-[#F6FAFD] p-4 shadow-[0_24px_60px_-30px_rgb(26_61_99/0.35)] md:p-8 dark:border-transparent dark:bg-[#1A3D63]"
     >
       <div className="flex flex-wrap items-center gap-4">
-        <div data-shelf-toolbar="" className="flex min-w-0 flex-1 items-center gap-1 rounded-full border border-border p-1">
+        <div data-shelf-toolbar="" className="flex min-w-0 flex-1 basis-full items-center sm:basis-auto gap-1 rounded-full border border-border p-1">
           <div role="group" aria-label={copy.tabsLabel} className="flex shrink-0 gap-1">
             <button
               type="button"
