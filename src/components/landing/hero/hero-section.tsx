@@ -15,7 +15,7 @@ interface HeroSectionProps {
   ctaLabel: string;
 }
 
-/** Landing hero after herosection.jpeg: black room in both themes, moon sky, title with one button, concave wall, water floor, grass. */
+/** Landing hero after herosection.jpeg: black room in both themes, moon sky, title with one button, running card row, water floor, grass. */
 export function HeroSection({ headline, sub, ctaHref, ctaLabel }: HeroSectionProps) {
   const { copy, labels } = useGallery();
   return (
@@ -35,7 +35,7 @@ export function HeroSection({ headline, sub, ctaHref, ctaLabel }: HeroSectionPro
           {ctaLabel}
         </Link>
       </div>
-      {/* Desktop: the wall's art row is centred near 52 % (edge panels ±28-76 %); the wrapper also holds the reflections. */}
+      {/* Desktop: the card row (caption, wide cards, reflections) is centred at 55 % of the hero (hero.test.ts models it). */}
       <div className="relative z-[1] mt-8 lg:absolute lg:inset-x-0 lg:top-[55%] lg:mt-0 lg:-translate-y-1/2">
         <HeroWall />
       </div>

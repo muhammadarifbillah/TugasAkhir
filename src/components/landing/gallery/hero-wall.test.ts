@@ -7,7 +7,6 @@ import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
 import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { GalleryProvider } from "./gallery-provider";
-import { wallPose } from "./gallery-logic";
 import { HeroWall } from "./hero-wall";
 
 type Json = Record<string, unknown>;
@@ -15,10 +14,12 @@ type ProviderProps = Parameters<typeof GalleryProvider>[0];
 
 const ROOT = process.cwd();
 const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+const SRC = "src/components/landing/gallery/hero-wall.tsx";
 const id = JSON.parse(read("src/dictionaries/id.json")) as { landing: Json; categories: Json; app: { name: string } };
+const en = JSON.parse(read("src/dictionaries/en.json")) as { landing: Json };
 const copy = id.landing.gallery as ProviderProps["copy"];
 const labels = id.categories as unknown as ProviderProps["labels"];
-const names = (id.categories.items as Record<string, { name: string }>);
+const names = id.categories.items as Record<string, { name: string }>;
 
 const escape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
@@ -28,290 +29,146 @@ const html = () =>
     createElement(GalleryProvider, { lang: "id", appName: id.app.name, labels, copy } as ProviderProps, createElement(HeroWall)),
   );
 
-describe("hero wall", () => {
-  it("HeroWall renders eight labelled category panels as buttons", () => {
+/** Every <li> of the track; li never nest, so a lazy match is one item. */
+const items = () => [...html().matchAll(/<li[^>]*>[\s\S]*?<\/li>/g)].map((m) => m[0]);
+const openTag = (s: string) => s.slice(0, s.indexOf(">") + 1);
+/** The real (focusable) set: the marquee clone is aria-hidden and inert. */
+const real = () => items().filter((s) => !openTag(s).includes("inert"));
+const clones = () => items().filter((s) => openTag(s).includes("inert"));
+const buttonOf = (s: string) => s.match(/<button[^>]*data-gallery-panel[\s\S]*?<\/button>/)![0];
+const reflectionOf = (s: string) => s.slice(s.lastIndexOf("<", s.indexOf("data-panel-reflection")));
+const imgs = (s: string) => [...s.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
+const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
+const cls = (tag: string) => (tag.match(/class="([^"]*)"/)?.[1] ?? "").split(/\s+/);
+const page = (i: number) => SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].pages[0].src;
+
+describe("hero wall (r28: wide media cards in a running row, download.jpeg)", () => {
+  // 6A-1
+  it("each card is a landscape 16/10 screenshot of the category's first template page, no browser bar", () => {
+    const r = real();
+    expect(r).toHaveLength(8);
+    r.forEach((s, i) => {
+      const b = buttonOf(s);
+      const card = b.match(/<span[^>]*data-hero-card[^>]*>/)?.[0];
+      expect(card, `${i} card`).toBeTruthy();
+      for (const c of ["aspect-[16/10]", "w-[clamp(17rem,26vw,30rem)]", "overflow-hidden", "rounded-[10px]"]) expect(cls(card!), `${i} ${c}`).toContain(c);
+      const [img] = imgs(b);
+      expect(srcOf(img)).toContain(page(i));
+      expect(img).toContain('alt=""');
+      expect(img).toContain('draggable="false"');
+      expect(img).toContain('sizes="(min-width:1024px) 30vw, 80vw"');
+      expect(cls(img)).toEqual(expect.arrayContaining(["object-cover", "object-top"]));
+    });
     const out = html();
-    expect(out.match(/data-gallery-panel/g)?.length).toBe(8);
-    const panels = [...out.matchAll(/<button[^>]*data-gallery-panel[^>]*>/g)].map((m) => m[0]);
-    expect(panels).toHaveLength(8);
-    panels.forEach((tag, i) => {
+    for (const s of ["data-browser-bar", "data-browser-dot", ".fuse.dev"]) expect(out, s).not.toContain(s);
+  });
+
+  // 6A-2
+  it("an overlay inside the card holds an icon badge, the category name and a meta line", () => {
+    real().forEach((s, i) => {
+      const b = buttonOf(s);
+      const c = SITE_CATEGORIES[i].id;
+      const badge = b.indexOf("data-card-badge");
+      const title = b.match(/<[a-z]+[^>]*data-card-title[^>]*>([^<]*)</);
+      const meta = b.match(/<[a-z]+[^>]*data-card-meta[^>]*>([^<]*)</);
+      expect(badge, `${i} badge`).toBeGreaterThan(-1);
+      expect(b.slice(badge)).toContain("<svg");
+      expect(title?.[1]).toBe(escape(names[c].name));
+      expect(meta?.[1]).toBe(escape(fmt(copy.heroMeta, { n: SITE_TEMPLATES[c].length, license: SITE_TEMPLATES[c][0].license })));
+      expect(cls(title![0])).toContain("line-clamp-2");
+      expect(cls(meta![0])).toContain("truncate");
+      // The overlay sits inside the card, after the screenshot.
+      expect(badge).toBeGreaterThan(b.indexOf("<img"));
+      expect(b.indexOf("data-hero-card")).toBeLessThan(b.indexOf("<img"));
+    });
+    expect(fmt(copy.heroMeta, { n: 3, license: "MIT" })).toBe("3 template · MIT");
+  });
+
+  // 6A-3
+  it("the row runs on its own: a doubled track with an inert clone, a pause toggle and reduced-motion off", () => {
+    const out = html();
+    const track = out.match(/<ul[^>]*data-hero-track[^>]*>/)?.[0];
+    expect(track).toBeTruthy();
+    const t = cls(track!);
+    for (const c of ["flex", "w-max", "gap-5", "motion-reduce:animate-none", "hover:[animation-play-state:paused]", "focus-within:[animation-play-state:paused]"])
+      expect(t, c).toContain(c);
+    expect(t.some((c) => /animate-\[fuse-marquee_\d+s_linear_infinite\]$/.test(c) && c.includes("lg:pointer-fine:motion-safe:"))).toBe(true);
+    expect(clones()).toHaveLength(8);
+    for (const s of clones()) {
+      expect(openTag(s)).toContain('aria-hidden="true"');
+      for (const img of imgs(s)) expect(img).toContain('loading="lazy"');
+    }
+    const css = read("src/components/landing/hero/hero.css");
+    const kf = css.slice(css.indexOf("@keyframes fuse-marquee"));
+    expect(kf).toMatch(/translate3d\(0,\s*0,\s*0\)[\s\S]*translate3d\(-50%,\s*0,\s*0\)/);
+    const src = read(SRC);
+    for (const s of ["data-hero-pause", "aria-pressed={paused}", "useAmbientMotion", "copy.heroPause", "copy.heroPlay", "[animation-play-state:paused]", "motion-reduce:overflow-x-auto", "snap-x", "snap-mandatory", "min-h-11", "min-w-11"])
+      expect(src, s).toContain(s);
+    for (const s of ["setInterval", "setTimeout", "requestAnimationFrame", "backdrop"]) expect(src, s).not.toContain(s);
+    // The pause pill only exists where the row moves; the server snapshot renders none.
+    expect(out).not.toContain("data-hero-pause");
+  });
+
+  // 6A-4
+  it("the 3D wall and its pointer parallax are gone", () => {
+    const src = read(SRC);
+    for (const s of ["wallPose", "pointerTilt", "--tilt", "perspective", "data-browser-bar"]) expect(src, s).not.toContain(s);
+    const logic = read("src/components/landing/gallery/gallery-logic.ts");
+    for (const s of ["export function wallPose", "export function pointerTilt"]) expect(logic, s).not.toContain(s);
+  });
+
+  // 6A-5
+  it("panels stay buttons that open the viewer, in category order, with a rippled reflection and at most three eager images", () => {
+    const r = real();
+    r.forEach((s, i) => {
+      const tag = openTag(buttonOf(s));
       const name = names[SITE_CATEGORIES[i].id].name;
       expect(tag).toContain('type="button"');
       expect(tag).toContain(`aria-label="${escape(fmt(copy.openPanel, { category: name }))}"`);
-      expect(out).toContain(`>${escape(name)}<`);
+      const refl = reflectionOf(s);
+      const rt = openTag(refl);
+      for (const c of ['aria-hidden="true"', "url(#hero-ripple)", "opacity-35", "mask-image"]) expect(rt, c).toContain(c);
+      expect(refl).toContain("-scale-y-100");
+      const [img] = imgs(refl);
+      expect(srcOf(img)).toContain(page(i));
+      expect(img).toContain('loading="lazy"');
     });
+    const out = html();
     expect(out).toContain(`aria-label="${escape(copy.wallLabel)}"`);
-    // The hint and gallery label moved to HeroSection (herosection.jpeg: they sit above the water floor, hero.test.ts).
-    expect(out).not.toContain("backdrop");
-  });
-
-  // r22 round 2: x and z are in panel widths (--pw), so the projected wall keeps its gaps at every desktop width.
-  it("each panel carries its wallPose as CSS variables", () => {
-    const out = html();
-    for (const i of [0, 7]) {
-      const p = wallPose(i, 8);
-      expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--x:${p.x}`);
-      expect(out).toContain(`--z:${p.z}`);
-    }
-  });
-
-  // r22 round 2: nearer (edge) panels paint in front, symmetric; the hover is a visible lift, brighter, with a white edge glow.
-  it("edge panels stack in front and the hovered panel lifts 14px with a glow", () => {
-    const out = html();
-    const z = [...out.matchAll(/<li[^>]*style="[^"]*z-index:(\d+)/g)].map((m) => Number(m[1]));
-    expect(z).toHaveLength(8);
-    expect(z).toEqual([...z].reverse());
-    for (const i of [0, 1, 2]) expect(z[i], `z-index ${i}`).toBeGreaterThan(z[i + 1]);
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    expect(src).toContain("lg:pointer-fine:[transform-style:preserve-3d]");
-    for (const s of ["motion-safe:hover:-translate-y-3.5", "motion-safe:focus-visible:-translate-y-3.5", "brightness-115", "group-hover:shadow-[", "group-focus-visible:shadow-["])
-      expect(src, s).toContain(s);
-  });
-
-  // r25: the panels are browser cards with real template screenshots; the per-panel data-mood SVG scenes are gone.
-  it("HeroWall panels are portrait browser cards with a mirrored reflection", () => {
-    const out = html();
-    expect(out.match(/data-gallery-panel/g)?.length).toBe(8);
-    expect(out.match(/data-panel-art/g)?.length).toBe(8);
-    expect(out).not.toContain("data-panel-page");
-    expect(out.match(/data-panel-reflection/g)?.length).toBe(8);
-    expect(out).not.toContain("data-mood");
-    for (const attr of ["data-panel-art", "data-panel-reflection"]) {
-      const tags = [...out.matchAll(new RegExp(`<[a-z]+[^>]*${attr}[^>]*>`, "g"))].map((m) => m[0]);
-      expect(tags).toHaveLength(8);
-      for (const t of tags) expect(t, attr).toContain('aria-hidden="true"');
-    }
-    const panels = [...out.matchAll(/<button[^>]*data-gallery-panel[^>]*>/g)].map((m) => m[0]);
-    panels.forEach((tag, i) => {
-      const name = names[SITE_CATEGORIES[i].id].name;
-      expect(tag).toContain(`aria-label="${escape(fmt(copy.openPanel, { category: name }))}"`);
-    });
-  });
-
-  it("each panel carries its coverflow pose", () => {
-    const out = html();
-    for (const i of [0, 3, 7]) {
-      const p = wallPose(i, 8);
-      expect(out).toContain(`--ry:${p.rotateY}deg`);
-      expect(out).toContain(`--z:${p.z}`);
-      expect(out).toContain(`--s:${p.scale}`);
-    }
-  });
-
-  // herosection.jpeg: 62vw 2:3 carousel cards on touch; r23 round 2: the reference panels are slim (±1:1.9), so the
-  // desktop art is 10/19 and --pw grows with the viewport (gallery-logic.test.ts projects these widths).
-  it("wall and carousel sizes follow the panorama spec", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const pw = src.match(/\[--pw:clamp\(([\d.]+)rem,([\d.]+)vw_\+_([\d.]+)rem,([\d.]+)rem\)\]/);
-    expect(pw, "--pw clamp(min, A vw + B rem, max)").not.toBeNull();
-    const [min, a, b, max] = pw!.slice(1).map(Number);
-    for (const [vw, want] of [[1024, 160], [1440, 201.6], [1920, 249.6]])
-      expect(Math.min(max * 16, Math.max(min * 16, (a * vw) / 100 + b * 16)), `--pw at ${vw}`).toBeCloseTo(want, 1);
-    expect(src).toContain(`lg:pointer-fine:w-[var(--pw)]`);
-    for (const s of [
-      "lg:pointer-fine:aspect-[10/19]",
-      "aspect-[2/3]",
-      "w-[62vw]",
-      "gallery-carousel-item",
-      "scale(var(--s))",
-      "[perspective:1200px]",
-      "motion-safe:",
-      "snap-x",
-      "snap-mandatory",
-      "LANDING_MOTION_QUERY",
-      "pointerTilt",
-    ])
-      expect(src).toContain(s);
-    for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
-  });
-
-  // r25: HeroScene gave way to browser cards (tests below); gaps, labels and the rippled reflection stay.
-  it("panels keep a hairline gap, thin uppercase labels and a rippled mirrored reflection", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const row = src.match(/<ul className="([^"]+)"/)![1].split(/\s+/);
-    const gap = row.map((c) => c.match(/^lg:pointer-fine:gap-\[(\d+)px\]$/)).find(Boolean);
-    expect(gap, "desktop gap-[Npx]").toBeTruthy();
-    expect(Number(gap![1])).toBeLessThanOrEqual(8);
-    for (const c of ["snap-x", "snap-mandatory", "overflow-x-auto"]) expect(row, c).toContain(c);
-    // The concave curve is layout, not motion: it stays on desktop under reduced motion, so the row is centred and unclipped there.
-    for (const c of ["lg:pointer-fine:overflow-visible", "lg:pointer-fine:justify-center"]) expect(row, c).toContain(c);
-    // r22 round 2: translate first (in panel widths), then turn and scale in place; the old order pushed panels into each other.
-    expect(src).toContain(
-      "lg:pointer-fine:[transform:translateX(calc(var(--x)*var(--pw)))_translateZ(calc(var(--z)*var(--pw)))_rotateY(var(--ry))_scale(var(--s))]",
-    );
-
-    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/);
-    expect(label, "label span").not.toBeNull();
-    for (const c of ["uppercase", "font-light"]) expect(label![1].split(/\s+/), c).toContain(c);
-    expect(label![1]).toMatch(/(?<![\w:-])tracking-\[/);
-
-    const at = src.indexOf("data-panel-reflection");
-    const refl = src.slice(at, src.indexOf("</li>", at));
-    expect(refl).toContain("url(#hero-ripple)");
-    expect(refl).toMatch(/scaleY\(-1\)|-scale-y-100/);
+    expect(out).toContain(`>${escape(copy.heroRecent)}<`);
+    const all = items().flatMap((s) => imgs(s));
+    const eager = all.filter((t) => !t.includes('loading="lazy"'));
+    expect(eager.length).toBeGreaterThanOrEqual(1);
+    expect(eager.length).toBeLessThanOrEqual(3);
+    eager.forEach((t, i) => expect(t).toBe(imgs(buttonOf(r[i]))[0]));
+    const src = read(SRC);
     expect(src).toContain("open(c.id, e.currentTarget)");
     expect(src).toContain("fmt(copy.openPanel");
   });
 
-  // r25: owner wants real templates in browser-frame cards instead of the flat HeroScene art.
-  describe("browser cards with real template screenshots (r25)", () => {
-    const buttons = () => [...html().matchAll(/<button[^>]*data-gallery-panel[\s\S]*?<\/button>/g)].map((m) => m[0]);
-    const reflections = () => [...html().matchAll(/<span[^>]*data-panel-reflection[\s\S]*?<\/li>/g)].map((m) => m[0]);
-    const imgs = (s: string) => [...s.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
-    const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
-    const mobile = (i: number) => SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].mobile;
-
-    it("each panel has a browser bar with three dots and a <slug>.fuse.dev address above the content", () => {
-      const b = buttons();
-      expect(b).toHaveLength(8);
-      b.forEach((s, i) => {
-        const bar = s.indexOf("data-browser-bar");
-        expect(bar, `${i} bar`).toBeGreaterThan(-1);
-        expect(bar, `${i} bar above img`).toBeLessThan(s.indexOf("<img"));
-        expect(s.match(/data-browser-dot/g)?.length, `${i} dots`).toBe(3);
-        expect(s).toContain(`${SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].slug}.fuse.dev`);
-      });
-      const src = read("src/components/landing/gallery/hero-wall.tsx");
-      for (const c of ["#1b1d22", "#ff5f57", "#febc2e", "#28c840", "#2a2d34"]) expect(src, c).toContain(c);
-    });
-
-    it("panel content is a next/image of the category's first template mobile screenshot with empty alt", () => {
-      buttons().forEach((s, i) => {
-        const [img] = imgs(s);
-        expect(img, `${i} img`).toBeTruthy();
-        expect(SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].mood).toBe(true);
-        expect(srcOf(img)).toContain(mobile(i));
-        expect(img).toContain("/_next/image?url=");
-        expect(img).toContain('alt=""');
-        expect(img).toContain('draggable="false"');
-        expect(img).toContain('sizes="(min-width:1024px) 16vw, 62vw"');
-        expect(img).toMatch(/object-cover/);
-        expect(img).toMatch(/object-top/);
-      });
-    });
-
-    it("at most three centre panel images load with high priority, the rest lazily", () => {
-      const all = buttons().map((s) => imgs(s)[0]);
-      const hot = all.map((t, i) => (/fetchpriority="high"/i.test(t) ? i : -1)).filter((i) => i >= 0);
-      expect(hot.length).toBeGreaterThanOrEqual(1);
-      expect(hot.length).toBeLessThanOrEqual(3);
-      for (const i of hot) expect([2, 3, 4, 5], "centre panel").toContain(i);
-      all.forEach((t, i) => {
-        if (hot.includes(i)) expect(t).not.toContain('loading="lazy"');
-        else expect(t, `${i} lazy`).toContain('loading="lazy"');
-      });
-      for (const r of reflections()) expect(r).not.toMatch(/fetchpriority/i);
-    });
-
-    it("the wall no longer uses HeroScene or SiteArt and the scene files are gone", () => {
-      const src = read("src/components/landing/gallery/hero-wall.tsx");
-      for (const s of ["HeroScene", "SiteArt", "hero-scene", "moods"]) expect(src, s).not.toContain(s);
-      for (const f of ["hero-scene.tsx", "moods.ts", "hero-scene.test.ts"])
-        expect(existsSync(join(ROOT, "src/components/landing/hero", f)), f).toBe(false);
-    });
-
-    it("the reflection mirrors the same screenshot, lazy and hidden, with the ripple filter", () => {
-      const r = reflections();
-      expect(r).toHaveLength(8);
-      r.forEach((s, i) => {
-        const tag = s.slice(0, s.indexOf(">"));
-        for (const c of ['aria-hidden="true"', "url(#hero-ripple)", "opacity-45", "mask-image"]) expect(tag, `${i} ${c}`).toContain(c);
-        expect(s).toContain("-scale-y-100");
-        const [img] = imgs(s);
-        expect(srcOf(img)).toContain(mobile(i));
-        expect(img).toContain('loading="lazy"');
-        expect(s).toContain("data-browser-bar");
-      });
-    });
-
-    it("hovering scrolls the screenshot slowly, only when motion is allowed", () => {
-      const src = read("src/components/landing/gallery/hero-wall.tsx");
-      expect(src).toContain("motion-safe:group-hover:object-bottom");
-      expect(src).toContain("motion-safe:group-focus-visible:object-bottom");
-      expect(src).toContain("duration-[2400ms]");
-    });
-  });
-
-  // r22 round 3: on the desktop 3D wall only the panel buttons take the pointer; the mobile carousel keeps scrolling.
-  it("the desktop wall passes the pointer through to the panel buttons", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const cls = (re: RegExp) => src.match(re)![1].split(/\s+/);
-    const row = cls(/<ul className="([^"]+)"/);
-    const group = cls(/role="group"[\s\S]*?className="([^"]+)"/);
-    const button = cls(/data-gallery-panel=""[\s\S]*?className="([^"]+)"/);
-    expect(row).toContain("lg:pointer-fine:pointer-events-none");
-    expect(group).toContain("lg:pointer-fine:pointer-events-none");
-    expect(button).toContain("pointer-events-auto");
-    for (const list of [row, group]) expect(list).not.toContain("pointer-events-none");
-  });
-
-  // r22 round 3: "Dokumentasi REST API" was cut to "DOKUMENTASI REST …".
-  it("panel labels are never truncated", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/)![1].split(/\s+/);
-    for (const c of ["truncate", "text-ellipsis"]) expect(label, c).not.toContain(c);
-  });
-
-  // r23 round 2: on slim panels a label wraps to at most two lines inside its own panel (gallery-logic.test.ts checks the
-  // projected boxes); a fixed two-line box keeps every panel's art on the same baseline.
-  it("panel labels wrap inside the panel width at a fixed two-line height", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    const label = src.match(/<span[^>]*className=\{?[`"]([^`"]*)[`"]\}?[^>]*>\s*\{name\}/)![1].split(/\s+/);
-    // The desktop font size moved to the per-panel part (round 3, next test).
-    for (const c of ["text-center", "min-h-[2lh]", "items-end", "tracking-[0.2em]"]) expect(label, c).toContain(c);
-    expect(label.filter((c) => /whitespace-nowrap|(^|:)-mx-/.test(c))).toEqual([]);
-  });
-
-  // r23 round 3: the edge panels run off the screen, so on the desktop wall the first label aligns right and the last
-  // left (towards the inside, with pr-2/pl-2, and 30 % kept free on the off-screen side so they wrap inside what is
-  // visible); the rest stay centred (gallery-logic.test.ts projects the text boxes).
-  it("desktop edge labels align towards the inside, the others stay centred", () => {
-    const spans = [...html().matchAll(/<span aria-hidden="true" class="([^"]*)">([^<]*)<\/span>/g)].filter((m) => m[1].includes("min-h-[2lh]"));
-    expect(spans).toHaveLength(8);
-    spans.forEach(([, cls], i) => {
-      const c = cls.split(/\s+/);
-      for (const base of ["text-center", "justify-center"]) expect(c, `${i} ${base}`).toContain(base);
-      const want =
-        i === 0
-          ? ["lg:pointer-fine:justify-end", "lg:pointer-fine:text-right", "lg:pointer-fine:pr-2", "lg:pointer-fine:pl-[30%]"]
-          : i === 7
-            ? ["lg:pointer-fine:justify-start", "lg:pointer-fine:text-left", "lg:pointer-fine:pl-2", "lg:pointer-fine:pr-[30%]"]
-            : [];
-      for (const w of want) expect(c, `${i} ${w}`).toContain(w);
-      // Outer labels get a 0.7rem floor: at 1024 only 116 px of the cut edge panel is on screen.
-      const font = want.length ? "lg:text-[clamp(0.7rem,1vw,1rem)]" : "lg:text-[clamp(0.8rem,1vw,1rem)]";
-      expect(c.filter((x) => x.startsWith("lg:text-[")), `${i} font`).toEqual([font]);
-      expect(c.filter((x) => /^lg:pointer-fine:(justify-|text-(left|right)|p[lr]-)/.test(x) && !want.includes(x)), `${i}`).toEqual([]);
-    });
-  });
-
-  // r23: the group is pointer-events-none on desktop, so pointerleave fired in every gap between panels and reset the tilt.
-  it("parallax listens on the hero section, not on the pass-through wall", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    expect(src).toContain('closest<HTMLElement>("#mulai-hero")');
-    for (const e of ["pointermove", "pointerleave"]) {
-      expect(src).toContain(`area.addEventListener("${e}"`);
-      expect(src).toContain(`area.removeEventListener("${e}"`);
-      expect(src).not.toContain(`el.addEventListener("${e}"`);
+  // 6A-6
+  it("both dictionaries carry the new hero copy", () => {
+    for (const d of [id, en]) {
+      const g = d.landing.gallery as Record<string, string>;
+      for (const k of ["heroRecent", "heroPause", "heroPlay", "heroMeta"]) expect(g[k], k).toBeTruthy();
+      expect(g.heroMeta).toContain("{n}");
+      expect(g.heroMeta).toContain("{license}");
     }
+    expect((id.landing.gallery as Record<string, string>).heroMeta).toBe("{n} template · {license}");
+  });
+
+  it("the scene files stay gone", () => {
+    const src = read(SRC);
+    for (const s of ["HeroScene", "SiteArt", "hero-scene", "moods"]) expect(src, s).not.toContain(s);
+    for (const f of ["hero-scene.tsx", "moods.ts", "hero-scene.test.ts"])
+      expect(existsSync(join(ROOT, "src/components/landing/hero", f)), f).toBe(false);
   });
 
   it("the carousel centre grows with a scroll-driven animation only when motion is allowed", () => {
     const css = read("src/app/globals.css");
     for (const s of ["@keyframes gallery-focus", "animation-timeline: view(inline)", "@supports (animation-timeline: view())", "prefers-reduced-motion: no-preference"])
       expect(css).toContain(s);
-    const at = css.indexOf("@keyframes gallery-focus");
-    const block = css.slice(at, css.indexOf(".gallery-carousel-item", at) + 200);
-    expect(block).toContain("gallery-focus linear both");
-    expect(block).not.toContain("infinite");
-  });
-
-  it("HeroWall is a snap carousel on small screens and a 3D wall behind lg:pointer-fine", () => {
-    const src = read("src/components/landing/gallery/hero-wall.tsx");
-    for (const s of ["snap-x", "snap-mandatory", "lg:pointer-fine:", "motion-safe:", "motion-reduce:", "LANDING_MOTION_QUERY", "pointerTilt", "wallPose", "aria-hidden"])
-      expect(src).toContain(s);
-    for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
+    expect(read(SRC)).toContain("gallery-carousel-item");
   });
 
   it("GalleryProvider re-enables interaction motion and throws outside", () => {
@@ -323,13 +180,13 @@ describe("hero wall", () => {
 
   // Owner decision 2026-11-27: the hero is HeroSection (which renders HeroWall) with one button, no shelf link.
   it("page.tsx renders the gallery hero and no longer the tape", () => {
-    const page = read("src/app/[lang]/page.tsx");
-    expect(page).not.toContain("HeroTape");
+    const pageSrc = read("src/app/[lang]/page.tsx");
+    expect(pageSrc).not.toContain("HeroTape");
     for (const s of ["<GalleryProvider", "<HeroSection", "headline={l.gallery.headline}", "sub={l.gallery.sub}", "ctaHref={cta.href}", "ctaLabel={l[cta.label]}"])
-      expect(page).toContain(s);
-    expect(page).not.toContain('href="#rak"');
-    expect(page.indexOf("<HeroSection")).toBeGreaterThan(page.indexOf("<GalleryProvider"));
-    expect(page.indexOf("<HeroSection")).toBeLessThan(page.indexOf("</GalleryProvider>"));
-    expect(page.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(1);
+      expect(pageSrc).toContain(s);
+    expect(pageSrc).not.toContain('href="#rak"');
+    expect(pageSrc.indexOf("<HeroSection")).toBeGreaterThan(pageSrc.indexOf("<GalleryProvider"));
+    expect(pageSrc.indexOf("<HeroSection")).toBeLessThan(pageSrc.indexOf("</GalleryProvider>"));
+    expect(pageSrc.match(/href=\{cta\.href\}/g) ?? []).toHaveLength(1);
   });
 });

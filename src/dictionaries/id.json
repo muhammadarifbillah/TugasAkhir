@@ -196,7 +196,11 @@
       "viewerGalleryLabel": "Tangkapan layar template open-source — bukan situs klien",
       "viewerCreditLicense": "Lisensi",
       "viewerCreditSource": "Sumber",
-      "viewerCreditNewTab": "(membuka tab baru)"
+      "viewerCreditNewTab": "(membuka tab baru)",
+      "heroRecent": "Template terbaru",
+      "heroPause": "Jeda",
+      "heroPlay": "Putar",
+      "heroMeta": "{n} template · {license}"
     },
     "shelf": {
       "pill": "Rak template",
