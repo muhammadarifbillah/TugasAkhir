@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, MotionConfig, m, useInView } from "motion/react";
-import { CodeXml, CornerLeftUp, Download, PackageCheck, PencilRuler, ScanSearch, Search, Undo2 } from "lucide-react";
+import { ArrowUp, CodeXml, Download, PackageCheck, PencilRuler, ScanSearch, Search, Undo2 } from "lucide-react";
 import { Hallmark } from "@/components/landing/hallmark";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
@@ -33,7 +33,7 @@ const ICONS: Record<string, React.ElementType> = {
 };
 
 const STATION =
-  "relative flex size-22 items-center justify-center rounded-[1.5rem] border border-[#4A7FA7]/45 bg-[#B3CFE5]/25 text-[#1A3D63] shadow-[inset_0_1px_0_rgb(246_250_253/0.35),0_14px_24px_-12px_rgb(10_25_49/0.7)] transition-colors hover:border-[#1A3D63] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#1A3D63] aria-pressed:ring-2 aria-pressed:ring-[#4A7FA7]/50 dark:border-[#B3CFE5]/45 dark:bg-[#F6FAFD]/10 dark:text-[#B3CFE5] dark:hover:border-[#B3CFE5] dark:aria-pressed:border-[#B3CFE5] dark:aria-pressed:ring-[#B3CFE5]/40";
+  "relative flex size-22 items-center justify-center rounded-[1.5rem] border border-[#4A7FA7]/45 bg-[linear-gradient(180deg,#F6FAFD,#B3CFE5)] text-[#1A3D63] shadow-[inset_0_1px_0_rgb(246_250_253/0.18),0_14px_24px_-12px_rgb(10_25_49/0.7)] transition-colors hover:border-[#1A3D63] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#1A3D63] aria-pressed:ring-2 aria-pressed:ring-[#4A7FA7]/50 dark:border-[#B3CFE5]/50 dark:bg-[linear-gradient(180deg,#1A3D63,#0A1931)] dark:text-[#B3CFE5] dark:hover:border-[#B3CFE5] dark:aria-pressed:border-[#B3CFE5] dark:aria-pressed:ring-[#B3CFE5]/40";
 
 function StationButton({ gate, i, selected, label, onSelect, mobile }: {
   gate: LoopGate; i: number; selected: boolean; label: string; onSelect: () => void; mobile?: boolean;
@@ -41,7 +41,7 @@ function StationButton({ gate, i, selected, label, onSelect, mobile }: {
   const Icon = ICONS[gate.code] ?? Search;
   const data = mobile ? { "data-loop-station-m": i } : { "data-loop-station": i };
   return (
-    <button type="button" {...data} data-loop-glass="" aria-pressed={selected} aria-label={label} onClick={onSelect} className={STATION}>
+    <button type="button" {...data} data-loop-glass="" data-station-glass="" aria-pressed={selected} aria-label={label} onClick={onSelect} className={STATION}>
       <Icon className="size-8" aria-hidden="true" />
       <Hallmark stage={(i + 1) as Stage} className="absolute -right-1.5 -top-1.5 size-4 rounded-full bg-card" />
     </button>
@@ -79,13 +79,13 @@ function Lane({ d, kind, gradient }: { d: string; kind: "forward" | "back"; grad
   );
 }
 
-/** The same raised lane, vertical, for the mobile list. */
-function MobileLane({ kind, className }: { kind: "forward" | "back"; className: string }) {
+/** The same raised lane for the mobile list: vertical runs, or a horizontal joint (`across`) closing the loop. */
+function MobileLane({ data, className, across }: { data: Record<string, string>; className: string; across?: boolean }) {
   return (
-    <div data-loop-lane-m={kind} aria-hidden="true" className={`absolute w-6 ${className}`}>
-      <span data-lane-layer="side" className="absolute inset-y-0 left-0 w-6 translate-x-[4px] translate-y-[6px] rounded-full bg-[#0A1931]" />
-      <span data-lane-layer="surface" className="absolute inset-y-0 left-0 w-6 rounded-full bg-[linear-gradient(180deg,#4A7FA7,#1A3D63)]" />
-      <span data-lane-layer="edge" className="absolute inset-y-0 left-0 w-px bg-[#B3CFE5]/70" />
+    <div {...data} aria-hidden="true" className={`absolute ${across ? "h-6" : "w-6"} ${className}`}>
+      <span data-lane-layer="side" className={`absolute inset-0 rounded-full bg-[#0A1931] ${across ? "translate-y-[6px]" : "translate-x-[4px] translate-y-[6px]"}`} />
+      <span data-lane-layer="surface" className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,#4A7FA7,#1A3D63)]" />
+      <span data-lane-layer="edge" className={`absolute bg-[#B3CFE5]/70 ${across ? "inset-x-3 top-0 h-px" : "inset-y-3 left-0 w-px"}`} />
     </div>
   );
 }
@@ -211,8 +211,13 @@ export function GateLoop({ gates, labels, matrix }: { gates: LoopGate[]; labels:
         </div>
 
         <div className="lg:hidden">
-          <div className="relative pr-12">
-            <MobileLane kind="forward" className="bottom-11 left-8 top-11" />
+          {/* Joints run in the py-10 band above station 1 and below station 5 so they never cross the gate text. */}
+          <div className="relative py-10 pr-12">
+            <MobileLane data={{ "data-loop-lane-m": "forward" }} className="inset-y-0 left-8" />
+            <MobileLane data={{ "data-loop-lane-m": "back" }} className="inset-y-0 right-2" />
+            <MobileLane data={{ "data-lane-joint": "top" }} className="left-8 right-2 top-0" across />
+            <MobileLane data={{ "data-lane-joint": "bottom" }} className="bottom-0 left-8 right-2" across />
+            <ArrowUp aria-hidden="true" className="absolute right-2 top-1/2 size-6 -translate-y-1/2 text-[#F6FAFD]" />
             <ol className="space-y-6">
               {gates.map((gate, i) => (
                 <li key={gate.code} className="flex gap-4">
@@ -225,8 +230,6 @@ export function GateLoop({ gates, labels, matrix }: { gates: LoopGate[]; labels:
                 </li>
               ))}
             </ol>
-            <MobileLane kind="back" className="bottom-0 right-2 top-8" />
-            <CornerLeftUp aria-hidden="true" className="absolute right-1 top-0 size-6 text-[var(--ring)]" />
           </div>
           <p className="mt-4 flex items-center gap-2 text-sm font-medium">
             <Undo2 className="size-4 shrink-0 text-[var(--ring)]" aria-hidden="true" />
