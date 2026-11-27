@@ -167,12 +167,22 @@ describe("book shelf", () => {
     expect(src).toContain("[background:var(--fuse-card-bg)]");
   });
 
-  it("books stand on a plank that runs along each shelf", () => {
+  it("each shelf sits in a warm paper case, and the books stand inside it", () => {
     const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") }));
     expect(html).not.toContain("fuse-card-bg");
-    expect(html.match(/data-book-plank/g)).toHaveLength(2);
-    // The plank paints after the rail, so it covers the feet: the books sink into the shelf.
-    expect(html.indexOf("data-book-track")).toBeLessThan(html.indexOf("data-book-plank"));
+    const cases = [...html.matchAll(/<div[^>]*data-book-case=""[^>]*>/g)].map((m) => m[0]);
+    expect(cases).toHaveLength(2);
+    for (const c of cases) {
+      expect(c).toContain("bg-[#FAF3E9]");
+      expect(c).toContain("rounded-[1.5rem]");
+      expect(c).toContain("--foreground:#2A2118");
+    }
+    // Each rail lives inside a case, and the case's heading comes first.
+    for (const shelf of ["home", "studio"]) {
+      const at = html.indexOf(`data-book-shelf="${shelf}"`);
+      expect(html.indexOf("data-book-case", at)).toBeGreaterThan(at);
+      expect(html.indexOf("data-book-track", at)).toBeGreaterThan(html.indexOf("data-book-case", at));
+    }
   });
 
   it("each shelf paints three identical rails, and only the live one can be tabbed into", () => {
@@ -191,15 +201,16 @@ describe("book shelf", () => {
     }
   });
 
-  it("each book shows snow page thickness on the right and at the bottom", () => {
+  it("each book shows paper page thickness on the right and at the bottom", () => {
     const html = live(renderToStaticMarkup(createElement(BookShelf, { copy: copyOf("id"), stageNames: stageNames("id") })));
     for (const side of ["right", "bottom"]) {
       const tags = [...html.matchAll(new RegExp(`<div[^>]*data-book-pages="${side}"[^>]*>`, "g"))].map((m) => m[0]);
       expect(tags, side).toHaveLength(12);
-      for (const t of tags) expect(t.match(/style="([^"]*)"/)?.[1], side).toContain("#F6FAFD");
+      for (const t of tags) expect(t.match(/style="([^"]*)"/)?.[1], side).toContain("#FFFCF6");
     }
     const src = read("src/components/landing/books/book-shelf.tsx");
-    for (const s of ["#F6F1E6", "#DCD3C0"]) expect(src, s).not.toContain(s);
+    // Warm paper and bookmark accents, from the bookstore reference.
+    for (const s of ["#FAF3E9", "#FFFCF6", "#E4D6C4", "RIBBONS"]) expect(src, s).toContain(s);
   });
 
   it("a caption under each book gives its title and its source stage", () => {

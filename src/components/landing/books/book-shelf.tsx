@@ -27,6 +27,19 @@ type Tone = keyof typeof TONES;
 const TONE_ORDER: Tone[] = ["ink", "deep", "mist", "snow"];
 const toneOf = (b: ResultBook): Tone => TONE_ORDER[RESULT_BOOKS.indexOf(b) % 4];
 
+/** Warm paper case the shelf sits in, straight from the bookstore reference. */
+const PAPER = {
+  ink: "#2A2118",
+  muted: "#6E5D4B",
+  pages: "repeating-linear-gradient(90deg, #FFFCF6 0 2px, #E4D6C4 2px 3px)",
+  pagesBottom: "repeating-linear-gradient(180deg, #FFFCF6 0 2px, #E4D6C4 2px 3px)",
+} as const;
+const paperVars = { "--foreground": PAPER.ink, "--muted-foreground": PAPER.muted } as React.CSSProperties;
+
+/** Bookmark tabs: coral, green, amber, blue, the reference's accents rather than the icy mist. */
+const RIBBONS = ["#D9604F", "#3F8A70", "#D89B3F", "#5B6FA8"] as const;
+const ribbonOf = (b: ResultBook) => RIBBONS[RESULT_BOOKS.indexOf(b) % RIBBONS.length];
+
 const ICONS: Record<ResultBook["icon"], React.ElementType> = {
   files: Files, branch: GitBranch, manual: BookOpen, shield: ShieldCheck, matrix: Grid3x3, badge: Award,
   radar: Radar, devices: MonitorSmartphone, threat: TriangleAlert, play: Play, database: Database, history: History,
@@ -212,14 +225,13 @@ export function BookSpread({
   );
 }
 
-/** Cover box is 132px wide at 120:170, so books meet the plank at this offset. */
-const COVER_W = 132;
-const COVER_H = Math.round((COVER_W * 170) / 120);
+/** Cover is 125px wide; the page block beside it fills the 132px card. */
+const COVER_W = 125;
+const CARD_W = 132;
 
 function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: Copy; stageName: string; onOpen: (id: BookId, el: HTMLElement) => void }) {
   const title = itemOf(copy, book.id).title;
   const toneName = toneOf(book);
-  const tone = TONES[toneName];
   return (
     <button
       type="button"
@@ -228,59 +240,49 @@ function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: 
       data-cover-tone={toneName}
       aria-label={fmt(copy.open, { title })}
       onClick={(e) => onOpen(book.id, e.currentTarget)}
-      style={{ width: COVER_W }}
+      style={{ width: CARD_W }}
       className="group relative block shrink-0 text-start focus-visible:outline-none"
     >
-      <div className="relative aspect-[120/170] w-full rounded-l-sm rounded-r-md shadow-[4px_8px_14px_-6px_rgb(10_25_49/0.6)] transition-transform duration-300 ease-out group-hover:-translate-y-2 group-focus-visible:-translate-y-2 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-y-0">
-        <BookCover book={book} title={title} />
-        {book.shelf === "studio" && (
-          <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-[var(--fuse-snow)]">
-            {copy.studioBadge}
-          </span>
-        )}
-        {/* Same book grammar as the template shelf: dark spine on the left, snow page block on the right. */}
-        <div
-          data-book-spine=""
-          aria-hidden="true"
-          className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]"
-        />
+      <div className="relative transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-y-0" style={{ width: COVER_W }}>
+        <div className="relative aspect-[120/170] w-full overflow-hidden rounded-[3px] shadow-[0_10px_18px_-12px_rgb(43_33_24/0.85)]">
+          <BookCover book={book} title={title} />
+          {book.shelf === "studio" && (
+            <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-[var(--fuse-snow)]">
+              {copy.studioBadge}
+            </span>
+          )}
+          {/* Same book grammar as the template shelf: dark spine on the left, paper block on the right. */}
+          <div
+            data-book-spine=""
+            aria-hidden="true"
+            className="absolute inset-y-0 left-0 w-2.5 bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]"
+          />
+        </div>
         <div
           data-book-pages="right"
           aria-hidden="true"
-          className="absolute inset-y-1 right-0 w-[4px] rounded-r-sm motion-reduce:[transform:none] motion-reduce:w-[4px]"
-          style={{ background: "repeating-linear-gradient(90deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
+          className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[7px] rounded-e-[3px] motion-reduce:[transform:none] motion-reduce:w-[7px]"
+          style={{ background: PAPER.pages }}
         />
         <div
           data-book-pages="bottom"
           aria-hidden="true"
-          className="absolute left-[3px] top-full h-[6px] w-[calc(100%-3px)]"
-          style={{ background: "repeating-linear-gradient(180deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
+          className="absolute left-[3px] top-full h-[7px] w-[calc(100%-3px)] rounded-b-[2px]"
+          style={{ background: PAPER.pagesBottom }}
         />
         <div
           data-book-ribbon=""
           aria-hidden="true"
-          className="absolute left-6 top-full z-10 h-7 w-2.5 [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)]"
-          style={{ background: tone.ribbon }}
+          className="absolute left-5 top-full z-10 h-7 w-2.5 [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)]"
+          style={{ background: ribbonOf(book) }}
         />
       </div>
       {/* mt-9 clears the 28px ribbon hanging below the cover */}
-      <span data-book-caption="" className="mt-9 block text-center">
+      <span data-book-caption="" className="mt-9 block">
         <span className="block text-sm font-semibold text-foreground">{title}</span>
         <span className="block text-xs text-muted-foreground">{stageName}</span>
       </span>
     </button>
-  );
-}
-
-/** The plank the books stand on, same board as the template shelf. */
-function Plank() {
-  return (
-    <div
-      data-book-plank=""
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 -mx-2 h-3 rounded-sm bg-[#B3CFE5] ring-1 ring-inset ring-[#0A1931]/20 shadow-[0_14px_20px_-10px_rgb(10_25_49/0.55)] md:-mx-4"
-      style={{ top: COVER_H - 5 }}
-    />
   );
 }
 
@@ -293,25 +295,22 @@ function BookRow({
   items, copy, stageNames, onOpen,
 }: { items: ResultBook[]; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
   return (
-    <div data-book-case="" className="group/row relative mt-8">
-      <div className="relative overflow-x-auto [scrollbar-width:none] pointer-fine:motion-safe:overflow-hidden">
-        <div className="flex w-max animate-[book-scroll_48s_linear_infinite] group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] motion-reduce:animate-none">
-          {[0, 1, 2].map((copyIndex) => (
-            <div
-              key={copyIndex}
-              data-book-track={copyIndex === 0 ? "live" : "clone"}
-              aria-hidden={copyIndex === 0 ? undefined : true}
-              inert={copyIndex === 0 ? undefined : true}
-              className="flex shrink-0 gap-7 pe-7"
-            >
-              {items.map((b) => (
-                <ShelfBook key={b.id} book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
-              ))}
-            </div>
-          ))}
-        </div>
+    <div className="relative mt-6 overflow-x-auto [scrollbar-width:none] pointer-fine:motion-safe:overflow-hidden pointer-fine:motion-safe:[mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-20px),transparent)]">
+      <div className="flex w-max animate-[book-scroll_48s_linear_infinite] items-start py-2 group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] motion-reduce:animate-none">
+        {[0, 1, 2].map((copyIndex) => (
+          <div
+            key={copyIndex}
+            data-book-track={copyIndex === 0 ? "live" : "clone"}
+            aria-hidden={copyIndex === 0 ? undefined : true}
+            inert={copyIndex === 0 ? undefined : true}
+            className="flex shrink-0 gap-7 pe-7"
+          >
+            {items.map((b) => (
+              <ShelfBook key={b.id} book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
+            ))}
+          </div>
+        ))}
       </div>
-      <Plank />
     </div>
   );
 }
@@ -320,10 +319,16 @@ function Shelf({
   shelf, title, lede, copy, stageNames, onOpen,
 }: { shelf: ShelfId; title: string; lede: string; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
   return (
-    <section data-book-shelf={shelf} className="mt-14 first:mt-0">
-      <h3 className="font-wide text-xl md:text-2xl">{title}</h3>
-      <p className="mt-2 max-w-[60ch] text-muted-foreground">{lede}</p>
-      <BookRow items={booksOnShelf(shelf)} copy={copy} stageNames={stageNames} onOpen={onOpen} />
+    <section data-book-shelf={shelf} className="mt-10 first:mt-0">
+      <div
+        data-book-case=""
+        style={paperVars}
+        className="group/row rounded-[1.5rem] border border-[#E7D6C1] bg-[#FAF3E9] px-4 pb-2 pt-5 shadow-[0_30px_60px_-38px_rgb(10_25_49/0.9)] md:px-7 md:pt-6"
+      >
+        <h3 className="font-wide text-xl text-foreground md:text-2xl">{title}</h3>
+        <p className="mt-1 max-w-[60ch] text-sm text-muted-foreground">{lede}</p>
+        <BookRow items={booksOnShelf(shelf)} copy={copy} stageNames={stageNames} onOpen={onOpen} />
+      </div>
     </section>
   );
 }

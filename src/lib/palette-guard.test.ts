@@ -21,14 +21,20 @@ const STATUS_ALLOWED = ["src/components/project-list.tsx"];
 /** Status tokens are the §0 exception: their values are not palette colours and stay unchanged. */
 const STATUS_TOKENS = ["--destructive", "--destructive-foreground", "--success", "--success-foreground", "--warning", "--danger"];
 
-/** Keputusan pemilik 2026-11-27: hero meniru warna herosection.jpeg. Only these two paths leave the palette. */
+/** Keputusan pemilik 2026-11-27: hero meniru warna herosection.jpeg. Only these paths leave the palette. */
 const HERO_EXEMPT = ["src/components/landing/hero/", "src/components/landing/gallery/hero-wall.tsx"];
+/**
+ * Keputusan pemilik 2026-11-28: rak hasil meniru book.jpeg, jadi berkas ini memakai
+ * kertas krem dan empat warna pembatas buku dari referensi itu.
+ */
+const BOOK_REFERENCE_EXEMPT = "src/components/landing/books/book-shelf.tsx";
 const heroExempt = (rel: string) => HERO_EXEMPT.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
+const exempt = (rel: string) => heroExempt(rel) || rel === BOOK_REFERENCE_EXEMPT;
 
 function scopedFiles(): string[] {
   const out: string[] = [];
   const visit = (rel: string) => {
-    if (heroExempt(rel) || heroExempt(`${rel}/`)) return;
+    if (exempt(rel) || exempt(`${rel}/`)) return;
     const abs = path.join(ROOT, rel);
     if (fs.statSync(abs).isDirectory()) {
       for (const name of fs.readdirSync(abs)) visit(`${rel}/${name}`);
@@ -139,14 +145,18 @@ describe("palette guard", () => {
     expect(hits).toEqual([]);
   });
 
-  it("the hero exemption is exactly the hero folder and hero-wall.tsx; page.tsx stays palette-only", () => {
+  it("the reference exemptions are exactly the hero folder, hero-wall.tsx and the book shelf; page.tsx stays palette-only", () => {
     expect(HERO_EXEMPT).toEqual(["src/components/landing/hero/", "src/components/landing/gallery/hero-wall.tsx"]);
+    expect(BOOK_REFERENCE_EXEMPT).toBe("src/components/landing/books/book-shelf.tsx");
     const heroDir = "src/components/landing/hero";
     const heroFiles = fs.readdirSync(path.join(ROOT, heroDir)).filter((f) => /\.(ts|tsx|css)$/.test(f) && !/\.test\./.test(f));
     expect(heroFiles.length).toBeGreaterThan(0);
     const files = scopedFiles();
     for (const f of heroFiles) expect(files, f).not.toContain(`${heroDir}/${f}`);
     expect(files).not.toContain("src/components/landing/gallery/hero-wall.tsx");
+    expect(files).not.toContain(BOOK_REFERENCE_EXEMPT);
+    // The rest of the books folder (list + tests) stays inside the palette.
+    expect(files).toContain("src/components/landing/books/book-list.ts");
     for (const f of ["src/app/[lang]/page.tsx", "src/components/landing/gallery/template-shelf.tsx", "src/components/landing/gallery/category-viewer.tsx", "src/components/landing/fuse-waves.tsx"])
       expect(files, f).toContain(f);
   });
