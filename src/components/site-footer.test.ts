@@ -15,15 +15,15 @@ describe("SiteFooter", () => {
     pathname = "/en";
   });
 
-  it("links to the template credits page in the current language", () => {
+  it("links to the example templates page in the current language", () => {
     for (const [lang, d] of [["en", en], ["id", id]] as const) {
       pathname = `/${lang}/dashboard`;
       const html = render();
       expect(html).toMatch(new RegExp(`<a[^>]*href="/${lang}/credits"[^>]*>${d.footer.credits}</a>`));
       expect(html).toContain("FUSE footer");
     }
-    expect(en.footer.credits).toBe("Template credits");
-    expect(id.footer.credits).toBe("Kredit template");
+    expect(en.footer.credits).toBe("Example templates");
+    expect(id.footer.credits).toBe("Contoh template");
   });
 
   it("falls back to the default language for unknown paths and stays hidden in the studio", () => {

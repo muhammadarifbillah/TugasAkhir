@@ -10,51 +10,46 @@ import { SITE_TEMPLATES } from "@/lib/site-templates";
 import CreditsPage, { generateMetadata } from "./page";
 
 const DICTS = { en, id };
+type Descs = Record<string, { desc: string }>;
 const escape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
 const render = async (lang: "en" | "id") => renderToStaticMarkup(await CreditsPage({ params: Promise.resolve({ lang }) }));
 const ALL = SITE_CATEGORIES.flatMap((c) => SITE_TEMPLATES[c.id].map((t) => ({ c, t })));
 
-describe("credits page", () => {
-  it("lists all 24 templates grouped per category with licence and source links", async () => {
+describe("example templates page (/credits)", () => {
+  // R29 §6A-7
+  it("lists all 24 FUSE example templates grouped per category with name and description", async () => {
     expect(ALL).toHaveLength(24);
     for (const lang of ["en", "id"] as const) {
       const html = await render(lang);
       const d = DICTS[lang];
-      const rows = [...html.matchAll(/<tr[^>]*data-credit-row="([^"]+)"[^>]*>([\s\S]*?)<\/tr>/g)];
-      expect(rows.map((r) => r[1])).toEqual(ALL.map((x) => x.t.slug));
-      rows.forEach(([, , body], i) => {
-        const { c, t } = ALL[i];
-        expect(body).toContain(escape(d.categories.items[c.id].name));
-        expect(body).toContain(escape(t.name));
-        expect(body).toContain(`href="${escape(t.licenseUrl)}"`);
-        expect(body).toMatch(new RegExp(`<a[^>]*href="${escape(t.licenseUrl).replace(/[.?*+^$()[\]\\|{}]/g, "\\$&")}"[^>]*>${escape(t.license)}</a>`));
-        expect(body).toContain(`href="${escape(t.source)}"`);
-        if (t.attribution) expect(body).toContain("Designed by HTML Codex");
-      });
-      // grouped: one heading per category, in SITE_CATEGORIES order
-      const groups = [...html.matchAll(/<tbody[^>]*data-credit-group="([^"]+)"/g)].map((m) => m[1]);
+      const groups = [...html.matchAll(/<section[^>]*data-credit-group="([^"]+)"/g)].map((m) => m[1]);
       expect(groups).toEqual(SITE_CATEGORIES.map((c) => c.id));
+      const items = [...html.matchAll(/<li[^>]*data-credit-item="([^"]+)"[^>]*>([\s\S]*?)<\/li>/g)];
+      expect(items.map((r) => r[1])).toEqual(ALL.map((x) => x.t.slug));
+      items.forEach(([, , body], i) => {
+        const { t } = ALL[i];
+        expect(body).toContain(escape(t.name));
+        expect(body).toContain(escape((d.templates as Descs)[t.slug].desc));
+      });
+      for (const c of SITE_CATEGORIES) expect(html).toContain(escape(d.categories.items[c.id].name));
     }
   });
 
-  it("every external link opens safely and the page has one h1, the intro and the copyright sentence", async () => {
+  it("explains the templates are made by FUSE, with no third-party licence table or external links", async () => {
     for (const lang of ["en", "id"] as const) {
       const html = await render(lang);
       const d = DICTS[lang];
-      const links = [...html.matchAll(/<a[^>]*href="https?:[^"]*"[^>]*>/g)].map((m) => m[0]);
-      expect(links.length).toBeGreaterThanOrEqual(48);
-      for (const a of links) expect(a).toContain('rel="noopener noreferrer"');
       expect(html.match(/<h1/g)).toHaveLength(1);
       expect(html).toContain(escape(d.credits.title));
       expect(html).toContain(escape(d.credits.intro));
-      expect(d.credits.intro).toMatch(lang === "en" ? /remain the property of their authors/ : /tetap milik pembuatnya/);
-      for (const k of ["category", "template", "license", "source", "attribution"] as const)
-        expect(html).toContain(escape(d.credits.columns[k]));
+      expect(html).not.toContain("<table");
+      expect(html).not.toMatch(/href="https?:/);
+      expect(html).not.toMatch(/github\.com|htmlcodex|\bMIT\b|lisensi|licen[cs]e/i);
     }
-    expect(id.credits.intro).toBe(
-      "FUSE menampilkan tangkapan layar template open-source sebagai contoh jenis website. Template dan isinya tetap milik pembuatnya dan dipakai sesuai lisensinya.",
-    );
+    expect(id.credits.title).toBe("Contoh template");
+    expect(id.credits.intro).toMatch(/dibuat .*FUSE/);
+    expect(en.credits.intro).toMatch(/made by FUSE/);
   });
 
   it("generateMetadata returns the localised title", async () => {
