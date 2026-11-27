@@ -45,7 +45,7 @@ export function ProjectCard({
 
   return (
     <article className="project-card flex h-full flex-col gap-3" aria-labelledby={titleId}>
-      <div data-card-part="bezel" className="project-card-bezel mb-4">
+      <div data-card-part="bezel" className="project-card-bezel mb-5">
         <div data-card-part="screen" className="project-card-screen" aria-hidden="true">
           <div className="project-card-art">
             <SiteArt category={category} pageIndex={0} labels={dict.categories} />
