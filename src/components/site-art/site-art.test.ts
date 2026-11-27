@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import { fmt } from "@/lib/format";
+import { PALETTE } from "@/lib/palette";
 import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";
 import { CategoryIcon } from "./category-icon";
 import { SiteArt } from "./site-art";
@@ -51,11 +52,18 @@ describe("SiteArt", () => {
         }
   });
 
-  it("SiteArt uses the category hue, a 320x200 viewBox and no backdrop, blur or raster image", () => {
+  it("SiteArt paints all 24 pages with palette colours only", () => {
+    const allowed = new Set([...Object.values(PALETTE).map((h) => h.toLowerCase()), "none"]);
     for (const c of SITE_CATEGORIES)
       for (const i of PAGES) {
         const html = render(c, i, LANGS.en);
-        expect(html).toContain(`hsl(${c.hue} `);
+        for (const [, attr, value] of html.matchAll(/\s(fill|stroke|stop-color)="([^"]*)"/g))
+          expect(allowed.has(value.toLowerCase()) || /^url\(#[^)]+\)$/.test(value), `${c.id}/${i} ${attr}="${value}"`).toBe(true);
+        expect(html).not.toContain("hsl(");
+        expect(html).toContain(PALETTE[c.tone.accent]);
+        const stops = [...html.matchAll(/stop-color="([^"]*)"/g)].map((m) => m[1]);
+        expect(stops, `${c.id}/${i}`).toEqual([PALETTE[c.tone.hero[0]], PALETTE[c.tone.hero[1]]]);
+        expect(html.slice(0, html.indexOf(">"))).toContain(`data-category="${c.id}"`);
         expect(html).toContain('viewBox="0 0 320 200"');
         expect(html).not.toContain("backdrop");
         expect(html).not.toContain("blur");

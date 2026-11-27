@@ -4,7 +4,9 @@ import { describe, expect, it } from "vitest";
 import en from "@/dictionaries/en.json";
 import id from "@/dictionaries/id.json";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
-import { BLOCK_KINDS, SITE_CATEGORIES, categoryForTemplate } from "./site-categories";
+import { contrastRatio } from "./contrast";
+import { PALETTE } from "./palette";
+import { BLOCK_KINDS, SITE_CATEGORIES, categoryForTemplate, type CategoryTone } from "./site-categories";
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8");
 
@@ -20,10 +22,33 @@ function keys(tree: Tree, prefix = ""): string[] {
 }
 
 describe("site categories", () => {
-  it("has eight categories with unique ids and unique hues", () => {
+  it("site categories have a unique palette tone each", () => {
     expect(SITE_CATEGORIES).toHaveLength(8);
     expect(new Set(SITE_CATEGORIES.map((c) => c.id)).size).toBe(8);
-    expect(new Set(SITE_CATEGORIES.map((c) => c.hue)).size).toBe(8);
+    const expected: Record<string, CategoryTone> = {
+      marketplace: { field: "snow", accent: "steel", soft: "deep", hero: ["deep", "steel"] },
+      ecommerce: { field: "snow", accent: "deep", soft: "steel", hero: ["ink", "deep"] },
+      lms: { field: "mist", accent: "deep", soft: "steel", hero: ["deep", "ink"] },
+      saas: { field: "snow", accent: "deep", soft: "ink", hero: ["steel", "deep"] },
+      clinic: { field: "mist", accent: "ink", soft: "steel", hero: ["steel", "ink"] },
+      company: { field: "snow", accent: "ink", soft: "steel", hero: ["ink", "steel"] },
+      news: { field: "mist", accent: "ink", soft: "deep", hero: ["ink", "deep"] },
+      api: { field: "snow", accent: "steel", soft: "ink", hero: ["ink", "steel"] },
+    };
+    for (const c of SITE_CATEGORIES) {
+      expect(c.tone, c.id).toEqual(expected[c.id]);
+      expect("hue" in c, c.id).toBe(false);
+      const t = c.tone;
+      expect(["snow", "mist"]).toContain(t.field);
+      expect(t.accent, c.id).not.toBe(t.soft);
+      expect(contrastRatio(PALETTE[t.accent], PALETTE[t.field]), c.id).toBeGreaterThanOrEqual(3);
+      expect(t.hero[0], c.id).not.toBe(t.hero[1]);
+      for (const h of t.hero) {
+        expect(["ink", "deep", "steel"]).toContain(h);
+        expect(contrastRatio(PALETTE.snow, PALETTE[h]), `${c.id} ${h}`).toBeGreaterThanOrEqual(3);
+      }
+    }
+    expect(new Set(SITE_CATEGORIES.map((c) => JSON.stringify(c.tone))).size).toBe(8);
   });
 
   it("every category has three pages with unique ids and non-empty block lists", () => {
