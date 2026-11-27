@@ -132,6 +132,8 @@ describe("book shelf", () => {
     expect(html.match(/data-shelf="studio"/g)).toHaveLength(6);
     expect(html.match(/data-book-spine/g)).toHaveLength(12);
     expect(html.match(/data-book-ribbon/g)).toHaveLength(12);
+    // The opening animation measures this cover box, not the button (which includes the caption).
+    expect(html.match(/data-book-cover=/g)).toHaveLength(12);
     expect(html.split(escape(copy.studioBadge)).length - 1).toBeGreaterThanOrEqual(6);
     for (const s of ["alsoInStudio", "backdrop", "blur", "<image"]) expect(page, s).not.toContain(s);
   });
@@ -159,10 +161,10 @@ describe("book shelf", () => {
     for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "rotateY", "useReducedMotion", "bookReducer", "booksOnShelf", "skipAnimations={false}", "motion-reduce:"])
       expect(src, s).toContain(s);
     for (const s of ["backdrop", "<motion.", "useAnimate", "setInterval"]) expect(src, s).not.toContain(s);
-    // User-triggered motion: the spread flies out of the clicked cover, then that cover swings open.
-    expect(src).toContain("setOrigin({");
-    expect(src).toContain("delay: travel");
-    expect(src).toContain("data-book-open");
+    // User-triggered motion: the closed book lifts off the shelf, flies to the cover page, then that cover turns open.
+    expect(src).toContain("data-book-fly");
+    expect(src).toContain("animate={{ rotateY: [0, -34, -18, 0] }}");
+    expect(src).toContain("onAnimationComplete={() => setLanded(true)}");
     expect(src).toContain("reducedMotion=\"never\"");
   });
 
@@ -286,12 +288,14 @@ describe("book shelf", () => {
     });
   });
 
-  it("the open spread is snow with a mist crease", () => {
+  it("the open spread is snow with a mist crease, and its pages keep the cover's book shape", () => {
     const html = renderToStaticMarkup(createElement(BookSpread, { book: RESULT_BOOKS[0], copy: copyOf("en"), stageName: "x" }));
     const root = html.match(/^<div class="([^"]*)"/)?.[1] ?? "";
     expect(root.includes("bg-[#F6FAFD]") || root.includes("bg-[var(--fuse-snow)]")).toBe(true);
     expect(html).toContain("md:border-[#B3CFE5]");
     expect(html).not.toContain("#F6F1E6");
+    // 120/170 per page: the closed cover and the open page share one shape, so the flying book never stretches.
+    expect(root).toContain("md:aspect-[240/170]");
   });
 
   const pagesTags = (side: string) => {

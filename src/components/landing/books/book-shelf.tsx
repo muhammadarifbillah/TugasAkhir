@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useRef, useState } from "react";
+import { useCallback, useReducer, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MotionConfig, m, useReducedMotion } from "motion/react";
 import {
@@ -173,6 +173,18 @@ export function BookCover({ book, title }: { book: ResultBook; title: string }) 
   );
 }
 
+/** A closed book's board: tone faces, spine along the hinge, page block at the tail. The flying book and the opening cover are the same object, so the hand-off is invisible. */
+function CoverBoard({ book, title }: { book: ResultBook; title: string }) {
+  const tone = TONES[toneOf(book)];
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-[4px]" style={{ background: tone.bg }}>
+      <BookCover book={book} title={title} />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-3 bg-[linear-gradient(270deg,rgb(10_25_49/0.45),transparent)]" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-1.5 [background:repeating-linear-gradient(90deg,#F6FAFD_0_3px,#B3CFE5_3px_4px)]" />
+    </div>
+  );
+}
+
 /** Two-page spread of an open book. Pure, so it renders in tests; the dialog passes Radix's Title as a slot. */
 export function BookSpread({
   book,
@@ -195,8 +207,8 @@ export function BookSpread({
     [copy.stage, stageName],
   ];
   return (
-    <div className="grid overflow-hidden rounded-[1.5rem] bg-[var(--fuse-snow)] text-[#0A1931] shadow-[var(--fuse-shadow-soft)] md:grid-cols-2">
-      <div data-book-page="left" className="relative p-7 [background:linear-gradient(100deg,rgb(179_207_229/0.55),rgb(246_250_253/0))] md:border-r md:border-[#B3CFE5] md:p-9">
+    <div className="grid overflow-hidden rounded-[3px] bg-[var(--fuse-snow)] text-[#0A1931] md:aspect-[240/170] md:grid-cols-2">
+      <div data-book-page="left" className="relative p-7 md:flex md:flex-col md:justify-center md:border-r md:border-[#B3CFE5] md:p-9 md:[background:linear-gradient(90deg,rgb(246_250_253/0),rgb(179_207_229/0.5))]">
         <Icon className="size-14 text-[#1A3D63]" aria-hidden="true" />
         <Title className="font-wide mt-5 text-2xl md:text-3xl">{item.title}</Title>
         <p className="mt-2 text-sm text-[#0A1931]/75">{stageName}</p>
@@ -204,7 +216,7 @@ export function BookSpread({
           <span className="mt-4 inline-block rounded-full border border-[#1A3D63]/40 px-3 py-1 text-xs font-medium">{copy.studioBadge}</span>
         )}
       </div>
-      <dl className="space-y-4 p-7 text-sm md:p-9">
+      <dl className="space-y-4 p-7 text-sm md:flex md:flex-col md:justify-center md:p-9">
         {rows.map(([k, v]) => (
           <div key={k}>
             <dt className="font-narrow text-xs uppercase tracking-wide text-[#1A3D63]">{k}</dt>
@@ -236,7 +248,7 @@ function ShelfBook({ book, copy, stageName, onOpen, clone }: { book: ResultBook;
       className="group relative block shrink-0 text-start focus-visible:outline-none"
     >
       <div className="relative transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-y-0" style={{ width: COVER_W }}>
-        <div className="relative aspect-[120/170] w-full overflow-hidden rounded-[3px] shadow-[0_10px_18px_-12px_rgb(10_25_49/0.85)]">
+        <div data-book-cover="" className="relative aspect-[120/170] w-full overflow-hidden rounded-[3px] shadow-[0_10px_18px_-12px_rgb(10_25_49/0.85)]">
           <BookCover book={book} title={title} />
           {book.shelf === "studio" && (
             <span className="absolute inset-x-2 bottom-2 rounded-sm border border-[var(--ring)] bg-[#0A1931]/80 px-1 py-0.5 text-center text-[10px] font-medium leading-tight text-[var(--fuse-snow)]">
@@ -320,27 +332,40 @@ function Shelf({
   );
 }
 
-/** The two result shelves; a book opens into a dialog whose cover swings open (crossfade under reduced motion). */
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * The two result shelves. A click lifts the closed book off the shelf, flies it to the
+ * spread's cover page, and only then does that cover turn open.
+ */
 export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record<StageCode, string> }) {
   const [state, dispatch] = useReducer(bookReducer, BOOK_INITIAL);
   const trigger = useRef<HTMLElement | null>(null);
   const reduced = useReducedMotion();
-  const [origin, setOrigin] = useState<{ dx: number; dy: number; scale: number } | null>(null);
+  const [origin, setOrigin] = useState<Box | null>(null);
+  const [target, setTarget] = useState<Box | null>(null);
+  const [landed, setLanded] = useState(false);
   const book = RESULT_BOOKS.find((b) => b.id === state.open);
-  // The spread flies out of the cover that was clicked, so the click reads as opening that book.
+
   const open = (id: BookId, el: HTMLElement) => {
     trigger.current = el;
-    const r = el.getBoundingClientRect();
-    const finalW = Math.min(window.innerWidth * 0.94, 896);
-    setOrigin({
-      dx: r.left + r.width / 2 - window.innerWidth / 2,
-      dy: r.top + r.height / 2 - window.innerHeight / 2,
-      scale: Math.max(r.width / finalW, 0.14),
-    });
+    const r = (el.querySelector("[data-book-cover]") ?? el).getBoundingClientRect();
+    setOrigin({ x: r.left, y: r.top, w: r.width, h: r.height });
+    setTarget(null);
+    setLanded(false);
     dispatch({ type: "open", id });
   };
-  const travel = reduced ? 0.2 : 0.6;
-  const swing = reduced ? 0.4 : 0.9;
+
+  // Measured when the cover page attaches: Radix's portal mounts one commit after the dialog
+  // opens, so an effect keyed on `open` would still read a null ref.
+  const measureCover = useCallback((el: HTMLDivElement | null) => {
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setTarget({ x: r.left, y: r.top, w: r.width, h: r.height });
+  }, []);
+
+  const travel = reduced ? 0.24 : 0.7;
+  const swing = reduced ? 0.5 : 1;
 
   // LandingMotion skips animations below 1024px; opening a book animates at every width.
   return (
@@ -362,7 +387,7 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                 e.preventDefault();
                 trigger.current?.focus();
               }}
-              className="fixed inset-0 z-50 overflow-y-auto p-4 [perspective:1600px] focus:outline-none md:p-8"
+              className="fixed inset-0 z-50 overflow-y-auto p-4 [perspective:2400px] focus:outline-none md:p-8"
             >
               <DialogPrimitive.Close
                 aria-label={copy.close}
@@ -376,18 +401,18 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                 <m.div
                   key={book.id}
                   data-book-open=""
-                  className="relative w-full max-w-[56rem] [perspective:1600px] [transform-style:preserve-3d]"
-                  initial={origin ? { x: origin.dx, y: origin.dy, scale: origin.scale, opacity: 0 } : { opacity: 0, scale: 0.9 }}
-                  animate={{ x: 0, y: 0, scale: 1, opacity: 1 }}
-                  transition={{ duration: travel, ease: EASE }}
+                  className="relative w-full max-w-[56rem] [transform-style:preserve-3d]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: landed ? 1 : 0 }}
+                  transition={{ duration: reduced ? 0.12 : 0.2, ease: EASE }}
                 >
                   {/* Hardcover shell around the two pages: cover lip, page stack along the bottom. */}
-                  <div className="relative rounded-[14px] bg-[#0A1931] p-2 shadow-[0_50px_90px_-40px_rgb(10_25_49/0.95)] md:p-3">
-                    <div className="relative overflow-hidden rounded-[8px]">
+                  <div className="relative rounded-[6px] bg-[#0A1931] p-2 shadow-[0_50px_90px_-40px_rgb(10_25_49/0.95)] md:p-3">
+                    <div className="relative overflow-hidden rounded-[3px]">
                       <BookSpread book={book} copy={copy} stageName={stageNames[book.stage]} slots={{ Title: DialogPrimitive.Title }} />
                       <span
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-14 -translate-x-1/2 bg-[linear-gradient(90deg,transparent,rgb(10_25_49/0.18),transparent)] md:block"
+                        className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-16 -translate-x-1/2 [background:linear-gradient(90deg,transparent,rgb(10_25_49/0.22)_50%,transparent)] md:block"
                       />
                       <span
                         aria-hidden="true"
@@ -397,21 +422,49 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                   </div>
                   {!state.turned && (
                     <m.div
+                      ref={measureCover}
                       aria-hidden="true"
-                      className="absolute inset-2 origin-left overflow-hidden rounded-[10px] shadow-[0_18px_40px_-18px_rgb(10_25_49/0.9)] [backface-visibility:hidden] md:inset-3 md:w-[calc(50%-0.375rem)]"
+                      className="absolute inset-2 origin-left overflow-hidden rounded-[3px] shadow-[0_18px_40px_-18px_rgb(10_25_49/0.9)] [backface-visibility:hidden] md:inset-3 md:w-[calc(50%-0.375rem)]"
                       style={{ background: TONES[toneOf(book)].bg }}
                       initial={{ rotateY: 0 }}
-                      animate={{ rotateY: -168 }}
-                      // The cover waits for the book to land, then turns: a swing that reads as opening, not a popup.
-                      transition={{ duration: swing, delay: travel, ease: [0.45, 0, 0.15, 1] }}
-                      onAnimationComplete={() => dispatch({ type: "turn" })}
+                      animate={{ rotateY: landed ? -168 : 0 }}
+                      transition={{ duration: swing, ease: [0.45, 0, 0.15, 1] }}
+                      onAnimationComplete={() => {
+                        if (landed) dispatch({ type: "turn" });
+                      }}
                     >
-                      <BookCover book={book} title={itemOf(copy, book.id).title} />
+                      <CoverBoard book={book} title={itemOf(copy, book.id).title} />
                     </m.div>
                   )}
                 </m.div>
               </div>
             </DialogPrimitive.Content>
+          </DialogPrimitive.Portal>
+        )}
+
+        {/* The lifted book lives outside the dialog, on viewport coordinates. */}
+        {book && !landed && origin && target && (
+          <DialogPrimitive.Portal>
+            <m.div
+              aria-hidden="true"
+              data-book-fly=""
+              className="pointer-events-none fixed z-[60] shadow-[0_18px_40px_-18px_rgb(10_25_49/0.9)] [perspective:1600px]"
+              style={{ left: target.x, top: target.y, width: target.w, height: target.h }}
+              initial={{ x: origin.x - target.x, y: origin.y - target.y, scaleX: origin.w / target.w, scaleY: origin.h / target.h }}
+              animate={{ x: 0, y: 0, scaleX: 1, scaleY: 1 }}
+              transition={{ duration: travel, ease: EASE }}
+            >
+              {/* Tilting about the hinge: the book lifts, opens a crack, then lands flat. */}
+              <m.div
+                className="h-full w-full origin-left [transform-style:preserve-3d]"
+                initial={{ rotateY: 0 }}
+                animate={{ rotateY: [0, -34, -18, 0] }}
+                transition={{ duration: travel, times: [0, 0.32, 0.72, 1], ease: EASE }}
+                onAnimationComplete={() => setLanded(true)}
+              >
+                <CoverBoard book={book} title={itemOf(copy, book.id).title} />
+              </m.div>
+            </m.div>
           </DialogPrimitive.Portal>
         )}
       </DialogPrimitive.Root>
