@@ -196,7 +196,11 @@
       "viewerGalleryLabel": "Screenshots of open-source templates — not client sites",
       "viewerCreditLicense": "License",
       "viewerCreditSource": "Source",
-      "viewerCreditNewTab": "(opens in a new tab)"
+      "viewerCreditNewTab": "(opens in a new tab)",
+      "heroRecent": "Recent templates",
+      "heroPause": "Pause",
+      "heroPlay": "Play",
+      "heroMeta": "{n} templates · {license}"
     },
     "shelf": {
       "pill": "Template shelf",

@@ -62,61 +62,7 @@ export function tabKey(key: string, current: number, count: number): number | nu
   return null;
 }
 
-/** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */
-const noNegZero = (n: number) => n + 0;
-
-/** Perspective (1200px) and projected gap (6px) in desktop panel widths at 1440px (--pw = 10vw + 3.6rem = 201.6px). */
-const WALL_DEPTH = 1200 / 201.6;
-const WALL_GAP = 6 / 201.6;
-
-/**
- * Right-half pose at offset `a` (>= 0) from the centre (`a0` is the centre-most offset), x not yet placed.
- * z starts at 0: a panel behind the preserve-3d ul plane (z < 0) loses its hover and click to the ul.
- * Scale grows with √d so the inner neighbours widen the wall to the screen edges while the edge panels stay ±1.5-1.8×
- * the centre (herosection.jpeg); z grows with d² so the edges come forward.
- */
-const sidePose = (a: number, a0: number) => {
-  const d = a - a0;
-  return {
-    rotateY: noNegZero(-Math.round(12 * a)),
-    z: noNegZero(Math.round(0.07 * d * d * 1000) / 1000),
-    scale: Math.round((0.64 + 0.16 * Math.sqrt(d)) * 100) / 100,
-  };
-};
-
-/**
- * Concave wall (viewer inside the cylinder): towards the edges panels come closer, grow and turn to face the centre.
- * x and z are in panel widths for `translateX(x·pw) translateZ(z·pw) rotateY(ry) scale(s)`; x lays the panels out from
- * the centre so their projected edges sit WALL_GAP apart.
- */
-export function wallPose(i: number, n: number): { x: number; rotateY: number; z: number; scale: number } {
-  const o = i - (n - 1) / 2;
-  const a = Math.abs(o);
-  const D = WALL_DEPTH;
-  const a0 = n % 2 ? 0 : 0.5;
-  const centre = sidePose(0, a0);
-  // Outer projected edge of the previous panel; an odd wall starts from the centre panel's right edge.
-  let edge = n % 2 ? (0.5 * centre.scale * D) / (D - centre.z) : -WALL_GAP / 2;
-  let x = 0;
-  for (let k = n % 2 ? 1 : 0.5; k <= a; k++) {
-    const p = sidePose(k, a0);
-    const r = (p.rotateY * Math.PI) / 180;
-    const half = 0.5 * p.scale;
-    // Inner edge (u = -half) projects to edge + gap: solve X·D/(D-Z) for x.
-    x = ((edge + WALL_GAP) * (D - (p.z + half * Math.sin(r)))) / D + half * Math.cos(r);
-    x = Math.round(x * 1000) / 1000;
-    edge = ((x + half * Math.cos(r)) * D) / (D - (p.z - half * Math.sin(r)));
-  }
-  const pose = sidePose(a, a0);
-  return { x: noNegZero(Math.sign(o) * x), rotateY: noNegZero(Math.sign(o) * pose.rotateY), z: pose.z, scale: pose.scale };
-}
-
-/** Pointer position across `width` mapped to -1..1 (3 decimals). */
-export function pointerTilt(clientX: number, left: number, width: number): number {
-  if (width <= 0) return 0;
-  const t = Math.min(1, Math.max(-1, ((clientX - left) / width) * 2 - 1));
-  return noNegZero(Math.round(t * 1000) / 1000);
-}
+// r28: wallPose/pointerTilt (concave 3D hero wall + parallax) were removed; the hero is a running row of wide cards.
 
 export const SHELF_ORDER: readonly ShelfId[] = ["sell", "learn", "business", "tech"];
 
