@@ -395,6 +395,49 @@ describe("category viewer", () => {
     for (const c of cells) expect(c, c).toContain("max-sm:block");
   });
 
+  it("spec table keeps explicit ARIA table roles so WebKit does not drop semantics when stacked", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES) {
+        const table = section(render(lang, c), "data-viewer-specs");
+        const tag = (name: string) => [...table.matchAll(new RegExp(`<${name}[\\s>][^>]*>`, "g"))].map((m) => m[0]);
+        expect(tag("table")[0]).toContain('role="table"');
+        expect(tag("tbody")[0]).toContain('role="rowgroup"');
+        const rows = table.split("<tr").slice(1);
+        expect(rows).toHaveLength(3);
+        for (const r of rows) {
+          expect(r.slice(0, r.indexOf(">"))).toContain('role="row"');
+          expect(r.match(/<th[^>]*role="rowheader"/g)?.length, r).toBe(2);
+          expect(r.match(/<td[^>]*role="cell"/g)?.length, r).toBe(2);
+        }
+      }
+  });
+
+  it("each spec td points via headers to exactly its own th in the same row, and ids are unique", () => {
+    const html = render("id", SITE_CATEGORIES[0]);
+    const table = section(html, "data-viewer-specs");
+    const allIds = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
+    expect(new Set(allIds).size).toBe(allIds.length);
+    const rows = table.split("<tr").slice(1);
+    expect(rows).toHaveLength(3);
+    for (const r of rows) {
+      const cells = [...r.matchAll(/<(th|td)[\s>][^>]*>/g)].map((m) => m[0]);
+      const ths = cells.filter((t) => t.startsWith("<th")).map((t) => /\sid="([^"]+)"/.exec(t)?.[1]);
+      expect(ths.every(Boolean), r).toBe(true);
+      cells.forEach((t, i) => {
+        if (!t.startsWith("<td")) return;
+        const headers = /\sheaders="([^"]+)"/.exec(t)?.[1];
+        expect(headers, t).toBeDefined();
+        expect(ths.filter((id) => id === headers)).toHaveLength(1);
+        expect(/\sid="([^"]+)"/.exec(cells[i - 1])?.[1], "pairs with preceding th").toBe(headers);
+      });
+    }
+  });
+
+  it(".gitignore keeps the referensi/ design reference folder out of git", () => {
+    const lines = read(".gitignore").split(/\r?\n/).map((l) => l.trim());
+    expect(lines.some((l) => l === "/referensi/" || l === "referensi/")).toBe(true);
+  });
+
   it("page caption sits after the mist circle on an opaque snow panel above it", () => {
     for (const lang of LANGS) {
       const html = render(lang, SITE_CATEGORIES[0]);
