@@ -86,7 +86,8 @@ describe("ProjectCard", () => {
       expect(statusPart.slice(0, statusPart.indexOf("</span>") + 200)).toContain(text);
       const cat = tagWith(bezel, 'data-card-part="category"');
       expect(cat).toContain('aria-hidden="true"');
-      expect(cat).toContain("size-11");
+      // R13 §1.6: the round category button is 52px, like the reference's "webcam" (was size-11).
+      expect(cat).toContain("size-[3.25rem]");
       expect(tagWith(bezel, 'data-card-part="screen"')).toContain('aria-hidden="true"');
       const screen = bezel.slice(bezel.indexOf('data-card-part="screen"'), bezel.indexOf('data-card-part="status"'));
       expect(screen.match(/<svg[^>]*role="img"/g)).toHaveLength(2);
@@ -109,8 +110,10 @@ describe("ProjectCard", () => {
     // Badge is ~1.375rem tall; its lower half (~0.69rem) must fit in the bezel padding above the screen.
     expect(Number(top![1])).toBeGreaterThanOrEqual(0.875);
     const cat = tagWith(html, 'data-card-part="category"');
-    expect(cat).toContain("bottom-4");
-    expect(cat).toContain("right-4");
+    // R13: the button now hangs 40% out of the bezel instead of sitting inside the screen (was bottom-4 right-4).
+    expect(cat).toContain("bottom-0");
+    expect(cat).toContain("translate-y-[40%]");
+    expect(cat).toMatch(/\bright-/);
   });
 
   it("card anatomy: two dotted rules, title h3 labelled by the article, gate row once, compact rail and score", () => {
@@ -140,6 +143,52 @@ describe("ProjectCard", () => {
     expect(tagWith(done, 'href="/en/studio/p1/')).toContain("h-11");
     expect(tagWith(done, "<button")).toContain("h-11");
     expect(done).toContain(en.dashboard.gatesAllDone);
+  });
+
+  it("card background is two-toned, split at 55% of the bezel height", () => {
+    const css = readFileSync(join(process.cwd(), "src/components/dashboard/dashboard.css"), "utf8");
+    const block = (re: RegExp) => css.match(re)?.[0] ?? "";
+    const before = block(/^\.project-card-bezel::before \{[^}]*\}/m);
+    expect(before).toContain("55%");
+    expect(before).toContain("z-index: -1");
+    const light = block(/^\.project-card \{[^}]*\}/m);
+    expect(light).toContain("isolation: isolate");
+    expect(light).toContain("#B3CFE5");
+    expect(light).toContain("#F6FAFD");
+    const dark = block(/^\.dark \.project-card \{[^}]*\}/m);
+    for (const hex of ["#4A7FA7", "#1A3D63", "#0A1931"]) expect(dark, hex).toContain(hex);
+  });
+
+  it("bezel has a lip row of dots inside its bottom edge", () => {
+    const html = card();
+    const bezel = html.slice(html.indexOf('data-card-part="bezel"'), html.indexOf("border-dotted"));
+    expect(count(bezel, 'data-card-part="lip"')).toBe(1);
+    expect(bezel.indexOf('data-card-part="lip"')).toBeGreaterThan(bezel.indexOf('data-card-part="screen"'));
+    expect(tagWith(bezel, 'data-card-part="lip"')).toContain('aria-hidden="true"');
+    const lip = bezel.slice(bezel.indexOf('data-card-part="lip"'));
+    expect(count(lip.slice(0, lip.indexOf("</div>")), "data-lip-dot")).toBeGreaterThanOrEqual(16);
+    const css = readFileSync(join(process.cwd(), "src/components/dashboard/dashboard.css"), "utf8");
+    expect(css).toContain(".project-card-lip");
+  });
+
+  it("round category button hangs 40% out of the bezel on a small foot", () => {
+    const html = card();
+    const cat = tagWith(html, 'data-card-part="category"');
+    for (const c of ["size-[3.25rem]", "bottom-0", "translate-y-[40%]", "rounded-full", 'aria-hidden="true"'])
+      expect(cat, c).toContain(c);
+    const inside = html.slice(html.indexOf('data-card-part="category"'), html.indexOf('data-card-part="category-foot"'));
+    expect(html).toContain('data-card-part="category-foot"');
+    expect(count(inside, "</span>")).toBe(0);
+  });
+
+  it("title is large on two lines and the gate row bolds the stage name", () => {
+    const html = card();
+    const h3 = tagWith(html, '<h3 id="project-p1-title"');
+    expect(h3).toContain("text-2xl");
+    expect(h3).toContain("line-clamp-2");
+    const gate = html.slice(html.indexOf('data-card-part="gate"'));
+    expect(gate.slice(0, gate.indexOf("</div>"))).toContain(`<strong>${en.stages.development.name}</strong>`);
+    expect(tagWith(gate, "<span")).toMatch(/\bsize-11\b[^"]*\brounded-full\b|\brounded-full\b[^"]*\bsize-11\b/);
   });
 
   it("project-card.tsx imports no ViewTransition, stages, gsap or lenis", () => {
