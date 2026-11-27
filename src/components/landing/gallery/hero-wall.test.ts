@@ -1,10 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { GalleryProvider } from "./gallery-provider";
 import { wallPose } from "./gallery-logic";
 import { HeroWall } from "./hero-wall";
@@ -68,14 +69,14 @@ describe("hero wall", () => {
       expect(src, s).toContain(s);
   });
 
-  // herosection.jpeg: each panel is one mood scene with a website skeleton, no longer three stacked SiteArt pages.
-  it("HeroWall panels are portrait HeroScene frames with a mirrored reflection", () => {
+  // r25: the panels are browser cards with real template screenshots; the per-panel data-mood SVG scenes are gone.
+  it("HeroWall panels are portrait browser cards with a mirrored reflection", () => {
     const out = html();
     expect(out.match(/data-gallery-panel/g)?.length).toBe(8);
     expect(out.match(/data-panel-art/g)?.length).toBe(8);
     expect(out).not.toContain("data-panel-page");
     expect(out.match(/data-panel-reflection/g)?.length).toBe(8);
-    for (let i = 1; i <= 8; i++) expect(out.match(new RegExp(`data-mood="${i}"`, "g"))?.length, `mood ${i}`).toBe(2);
+    expect(out).not.toContain("data-mood");
     for (const attr of ["data-panel-art", "data-panel-reflection"]) {
       const tags = [...out.matchAll(new RegExp(`<[a-z]+[^>]*${attr}[^>]*>`, "g"))].map((m) => m[0]);
       expect(tags).toHaveLength(8);
@@ -125,11 +126,9 @@ describe("hero wall", () => {
     for (const s of ["setInterval", "requestAnimationFrame", "backdrop"]) expect(src).not.toContain(s);
   });
 
-  // herosection.jpeg replaces the sliding SiteArt column: HeroScene panels, hairline gaps, thin caps labels, rippled reflection.
-  it("panels use HeroScene with a hairline gap, thin uppercase labels and a rippled mirrored reflection", () => {
+  // r25: HeroScene gave way to browser cards (tests below); gaps, labels and the rippled reflection stay.
+  it("panels keep a hairline gap, thin uppercase labels and a rippled mirrored reflection", () => {
     const src = read("src/components/landing/gallery/hero-wall.tsx");
-    expect(src).toContain("<HeroScene");
-    expect(src).not.toContain("SiteArt");
     const row = src.match(/<ul className="([^"]+)"/)![1].split(/\s+/);
     const gap = row.map((c) => c.match(/^lg:pointer-fine:gap-\[(\d+)px\]$/)).find(Boolean);
     expect(gap, "desktop gap-[Npx]").toBeTruthy();
@@ -151,9 +150,87 @@ describe("hero wall", () => {
     const refl = src.slice(at, src.indexOf("</li>", at));
     expect(refl).toContain("url(#hero-ripple)");
     expect(refl).toMatch(/scaleY\(-1\)|-scale-y-100/);
-    expect(refl).toContain("<HeroScene");
     expect(src).toContain("open(c.id, e.currentTarget)");
     expect(src).toContain("fmt(copy.openPanel");
+  });
+
+  // r25: owner wants real templates in browser-frame cards instead of the flat HeroScene art.
+  describe("browser cards with real template screenshots (r25)", () => {
+    const buttons = () => [...html().matchAll(/<button[^>]*data-gallery-panel[\s\S]*?<\/button>/g)].map((m) => m[0]);
+    const reflections = () => [...html().matchAll(/<span[^>]*data-panel-reflection[\s\S]*?<\/li>/g)].map((m) => m[0]);
+    const imgs = (s: string) => [...s.matchAll(/<img[^>]*>/g)].map((m) => m[0]);
+    const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
+    const mobile = (i: number) => SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].mobile;
+
+    it("each panel has a browser bar with three dots and a <slug>.fuse.dev address above the content", () => {
+      const b = buttons();
+      expect(b).toHaveLength(8);
+      b.forEach((s, i) => {
+        const bar = s.indexOf("data-browser-bar");
+        expect(bar, `${i} bar`).toBeGreaterThan(-1);
+        expect(bar, `${i} bar above img`).toBeLessThan(s.indexOf("<img"));
+        expect(s.match(/data-browser-dot/g)?.length, `${i} dots`).toBe(3);
+        expect(s).toContain(`${SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].slug}.fuse.dev`);
+      });
+      const src = read("src/components/landing/gallery/hero-wall.tsx");
+      for (const c of ["#1b1d22", "#ff5f57", "#febc2e", "#28c840", "#2a2d34"]) expect(src, c).toContain(c);
+    });
+
+    it("panel content is a next/image of the category's first template mobile screenshot with empty alt", () => {
+      buttons().forEach((s, i) => {
+        const [img] = imgs(s);
+        expect(img, `${i} img`).toBeTruthy();
+        expect(SITE_TEMPLATES[SITE_CATEGORIES[i].id][0].mood).toBe(true);
+        expect(srcOf(img)).toContain(mobile(i));
+        expect(img).toContain("/_next/image?url=");
+        expect(img).toContain('alt=""');
+        expect(img).toContain('draggable="false"');
+        expect(img).toContain('sizes="(min-width:1024px) 16vw, 62vw"');
+        expect(img).toMatch(/object-cover/);
+        expect(img).toMatch(/object-top/);
+      });
+    });
+
+    it("at most three centre panel images load with high priority, the rest lazily", () => {
+      const all = buttons().map((s) => imgs(s)[0]);
+      const hot = all.map((t, i) => (/fetchpriority="high"/i.test(t) ? i : -1)).filter((i) => i >= 0);
+      expect(hot.length).toBeGreaterThanOrEqual(1);
+      expect(hot.length).toBeLessThanOrEqual(3);
+      for (const i of hot) expect([2, 3, 4, 5], "centre panel").toContain(i);
+      all.forEach((t, i) => {
+        if (hot.includes(i)) expect(t).not.toContain('loading="lazy"');
+        else expect(t, `${i} lazy`).toContain('loading="lazy"');
+      });
+      for (const r of reflections()) expect(r).not.toMatch(/fetchpriority/i);
+    });
+
+    it("the wall no longer uses HeroScene or SiteArt and the scene files are gone", () => {
+      const src = read("src/components/landing/gallery/hero-wall.tsx");
+      for (const s of ["HeroScene", "SiteArt", "hero-scene", "moods"]) expect(src, s).not.toContain(s);
+      for (const f of ["hero-scene.tsx", "moods.ts", "hero-scene.test.ts"])
+        expect(existsSync(join(ROOT, "src/components/landing/hero", f)), f).toBe(false);
+    });
+
+    it("the reflection mirrors the same screenshot, lazy and hidden, with the ripple filter", () => {
+      const r = reflections();
+      expect(r).toHaveLength(8);
+      r.forEach((s, i) => {
+        const tag = s.slice(0, s.indexOf(">"));
+        for (const c of ['aria-hidden="true"', "url(#hero-ripple)", "opacity-45", "mask-image"]) expect(tag, `${i} ${c}`).toContain(c);
+        expect(s).toContain("-scale-y-100");
+        const [img] = imgs(s);
+        expect(srcOf(img)).toContain(mobile(i));
+        expect(img).toContain('loading="lazy"');
+        expect(s).toContain("data-browser-bar");
+      });
+    });
+
+    it("hovering scrolls the screenshot slowly, only when motion is allowed", () => {
+      const src = read("src/components/landing/gallery/hero-wall.tsx");
+      expect(src).toContain("motion-safe:group-hover:object-bottom");
+      expect(src).toContain("motion-safe:group-focus-visible:object-bottom");
+      expect(src).toContain("duration-[2400ms]");
+    });
   });
 
   // r22 round 3: on the desktop 3D wall only the panel buttons take the pointer; the mobile carousel keeps scrolling.

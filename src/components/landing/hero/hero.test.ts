@@ -20,6 +20,7 @@ const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
 const id = JSON.parse(read("src/dictionaries/id.json")) as { landing: Json & { ctaPrimary: string }; categories: Json; app: { name: string } };
 const copy = id.landing.gallery as ProviderProps["copy"] & { headline: string; sub: string };
 
+// r25: React hoists a <link rel="preload"> for each fetchPriority="high" panel image (it lands in <head> in the app).
 const section = () =>
   renderToStaticMarkup(
     createElement(
@@ -27,7 +28,7 @@ const section = () =>
       { lang: "id", appName: id.app.name, labels: id.categories, copy } as unknown as ProviderProps,
       createElement(HeroSection, { headline: copy.headline, sub: copy.sub, ctaHref: "/id/register", ctaLabel: id.landing.ctaPrimary }),
     ),
-  );
+  ).replace(/^(?:<link rel="preload"[^>]*\/?>)+/, "");
 
 describe("hero backdrop", () => {
   it("HeroBackdrop is an aria-hidden sky with a moon, at least 40 stars and leaf silhouettes, identical on every render", () => {
@@ -198,7 +199,8 @@ describe("hero section", () => {
 
   it("no hero source uses backdrop-blur or raster images", () => {
     const files = readdirSync(join(ROOT, DIR)).filter((f) => /\.(tsx?|css)$/.test(f) && !f.includes(".test."));
-    expect(files.length).toBeGreaterThanOrEqual(7);
+    // r25: hero-scene.tsx and moods.ts were removed (the wall shows template screenshots), leaving five sources.
+    expect(files.length).toBeGreaterThanOrEqual(5);
     for (const f of files) {
       const text = read(`${DIR}/${f}`);
       for (const s of ["backdrop-blur", "backdrop-filter", "<image", "<img", ".png", ".jpg", "Math.random"]) expect(text, `${f} ${s}`).not.toContain(s);

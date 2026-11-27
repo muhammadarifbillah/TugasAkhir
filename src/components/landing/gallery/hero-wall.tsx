@@ -1,12 +1,45 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES } from "@/lib/site-categories";
-import { HeroScene } from "../hero/hero-scene";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { LANDING_MOTION_QUERY } from "../motion";
 import { pointerTilt, wallPose } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
+
+/** A browser window (dark bar, three dots, <slug>.fuse.dev) showing a real template's mobile screenshot. */
+function BrowserCard({ slug, image, hot, className, ...rest }: { slug: string; image: string; hot: boolean; className?: string; "data-panel-art"?: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      {...rest}
+      className={`flex aspect-[2/3] flex-col overflow-hidden rounded-[8px] border border-[rgb(255_255_255/0.14)] bg-[#000] shadow-[0_12px_32px_rgb(0_0_0/0.6)] transition-shadow motion-reduce:transition-none lg:pointer-fine:aspect-[10/19] ${className ?? ""}`}
+    >
+      <span data-browser-bar="" className="flex h-[7%] min-h-[14px] shrink-0 items-center gap-[3px] bg-[#1b1d22] px-[6%]">
+        {["#ff5f57", "#febc2e", "#28c840"].map((dot) => (
+          <span key={dot} data-browser-dot="" className="size-[5px] shrink-0 rounded-full" style={{ backgroundColor: dot }} />
+        ))}
+        <span className="ml-[6%] min-w-0 flex-1 truncate rounded-full bg-[#2a2d34] px-[6%] text-center text-[7px] leading-[1.6] text-[#9a9ea8]">
+          {slug}.fuse.dev
+        </span>
+      </span>
+      <span className="relative block min-h-0 flex-1">
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(min-width:1024px) 16vw, 62vw"
+          loading={hot ? "eager" : "lazy"}
+          fetchPriority={hot ? "high" : undefined}
+          draggable={false}
+          className="object-cover object-top motion-safe:transition-[object-position] motion-safe:duration-[2400ms] motion-safe:ease-in-out motion-safe:group-hover:object-bottom motion-safe:group-focus-visible:object-bottom"
+        />
+      </span>
+    </span>
+  );
+}
 
 /** Hero gallery (herosection.jpeg): snap carousel on touch/small screens, concave CSS 3D wall on desktop pointers. */
 export function HeroWall() {
@@ -45,6 +78,9 @@ export function HeroWall() {
         {SITE_CATEGORIES.map((c, i) => {
           const pose = wallPose(i, SITE_CATEGORIES.length);
           const name = (labels.items[c.id] as { name: string }).name;
+          const t = SITE_TEMPLATES[c.id][0];
+          // The two centre panels are the first thing seen on desktop; everything else loads lazily.
+          const hot = i === 3 || i === 4;
           // The outer panels run off the screen: their labels align towards the inside and wrap within the visible 70 %.
           const align =
             i === 0
@@ -78,23 +114,21 @@ export function HeroWall() {
                 <span aria-hidden="true" className={`mb-2 flex min-h-[2lh] items-end justify-center text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] ${align}`}>
                   {name}
                 </span>
-                <span
-                  aria-hidden="true"
+                <BrowserCard
+                  slug={t.slug}
+                  image={t.mobile}
+                  hot={hot}
                   data-panel-art=""
-                  className="block aspect-[2/3] overflow-hidden lg:pointer-fine:aspect-[10/19] rounded-[6px] bg-[#000] transition-shadow group-hover:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] group-focus-visible:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] motion-reduce:transition-none"
-                >
-                  <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
-                </span>
+                  className="group-hover:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)] group-focus-visible:shadow-[0_0_0_1px_rgb(255_255_255/0.55),0_0_28px_rgb(255_255_255/0.28)]"
+                />
               </button>
               {/* Water reflection: the panel's lower 40 % mirrored, rippled by #hero-ripple (HeroFloor) and faded out. */}
               <span
                 aria-hidden="true"
                 data-panel-reflection=""
-                className="mt-[6px] block aspect-[100/60] overflow-hidden rounded-[6px] opacity-45 [filter:url(#hero-ripple)] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.9),transparent_85%)]"
+                className="mt-[6px] block aspect-[100/60] overflow-hidden rounded-[8px] opacity-45 [filter:url(#hero-ripple)] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.9),transparent_85%)]"
               >
-                <span className="block aspect-[2/3] -scale-y-100 lg:pointer-fine:aspect-[10/19]">
-                  <HeroScene category={c} mood={i + 1} className="block h-full w-full" />
-                </span>
+                <BrowserCard slug={t.slug} image={t.mobile} hot={false} className="-scale-y-100" />
               </span>
             </li>
           );
