@@ -3,10 +3,8 @@
 import { ArrowRight } from "lucide-react";
 import { useId, useState } from "react";
 import { CategoryIcon } from "@/components/site-art/category-icon";
-import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
-import { PALETTE } from "@/lib/palette";
 import { SITE_CATEGORIES, type ShelfId, type SiteCategory } from "@/lib/site-categories";
 import { groupByShelf, searchCategories, visibleCategories } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
@@ -15,7 +13,15 @@ type Copy = Dictionary["landing"]["shelf"];
 
 const TAB =
   "min-h-11 rounded-full px-5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-foreground aria-pressed:text-background";
-const ROW = "flex snap-x items-end gap-5 overflow-x-auto px-2 pt-4";
+
+// Steel (#4A7FA7) is left out: small names on steel fail AA (4.1:1), so it stays an accent colour only.
+const TONE_ORDER = ["ink", "deep", "mist", "snow"] as const;
+const COVER_TONES: Record<(typeof TONE_ORDER)[number], { cover: string; edge: string }> = {
+  ink: { cover: "bg-[#0A1931] text-[#F6FAFD]", edge: "bg-[#F6FAFD]" },
+  deep: { cover: "bg-[#1A3D63] text-[#F6FAFD]", edge: "bg-[#F6FAFD]" },
+  mist: { cover: "bg-[#B3CFE5] text-[#0A1931]", edge: "bg-[#F6FAFD]" },
+  snow: { cover: "bg-[#F6FAFD] text-[#0A1931] ring-1 ring-[#B3CFE5]", edge: "bg-[#B3CFE5]" },
+};
 
 /** Template shelf: books grouped per shelf (or all in a grid), filtered client-side; each book opens the viewer. */
 export function TemplateShelf({ copy }: { copy: Copy }) {
@@ -29,8 +35,9 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
 
   const book = (c: SiteCategory, wide = false) => {
     const name = (gallery.labels.items[c.id] as { name: string }).name;
+    const tone = TONE_ORDER[SITE_CATEGORIES.indexOf(c) % TONE_ORDER.length];
     return (
-      <li key={c.id} className={wide ? "" : "shrink-0 snap-start lg:min-w-0 lg:shrink"}>
+      <li key={c.id} className={wide ? "" : "shrink-0 snap-start"}>
         <button
           type="button"
           data-shelf-cover=""
@@ -40,59 +47,60 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
         >
           <span
             data-book=""
-            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[6px_10px_18px_-6px_rgb(10_25_49/0.55)] ${wide ? "w-full" : "w-[8.5rem] max-w-full sm:w-[12.5rem]"}`}
+            data-cover-tone={tone}
+            className={`relative block aspect-[2/3] rounded-l-sm rounded-r-md shadow-[4px_8px_14px_-6px_rgb(10_25_49/0.6)] ${wide ? "w-full" : "w-[5.5rem] sm:w-24"}`}
           >
             <span
-              className="absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-3 overflow-hidden rounded-l-sm rounded-r-md bg-card pl-4 pr-2 pt-4"
-              style={{ backgroundImage: `linear-gradient(160deg, ${PALETTE[c.tone.hero[0]]}, ${PALETTE[c.tone.hero[1]]})` }}
+              className={`absolute inset-y-0 left-0 right-1 flex flex-col items-center gap-2 overflow-hidden rounded-l-sm rounded-r-md pl-3.5 pr-1.5 pt-4 ${COVER_TONES[tone].cover}`}
             >
-              <CategoryIcon id={c.id} className="size-6 text-[var(--fuse-snow)]" />
-              <span className="flex aspect-square w-full items-center overflow-hidden rounded-sm border-2 border-[var(--fuse-snow)] bg-[var(--fuse-snow)]">
-                <SiteArt category={c} pageIndex={0} labels={gallery.labels} className="block h-auto w-[160%] max-w-none -translate-x-[18.75%]" />
+              <CategoryIcon id={c.id} className="size-5" />
+              <span data-book-title="" className="line-clamp-3 text-center text-[11px] font-semibold leading-tight">
+                {name}
               </span>
             </span>
             <span data-book-spine="" className="absolute inset-y-0 left-0 w-2.5 rounded-l-sm bg-[linear-gradient(90deg,rgb(10_25_49/0.5),rgb(10_25_49/0.2))]" />
-            <span className="absolute inset-y-1 right-0 w-1 rounded-r-sm bg-[var(--fuse-snow)]" />
+            <span className={`absolute inset-y-1 right-0 w-1 rounded-r-sm ${COVER_TONES[tone].edge}`} />
           </span>
-          <span data-book-title="" className="mt-3 block text-sm font-medium text-foreground">
-            {name}
-          </span>
-          <span className="block text-xs text-muted-foreground">{copy.pagesCount}</span>
         </button>
       </li>
     );
   };
 
   return (
-    <div>
+    <div
+      data-shelf-panel=""
+      className="rounded-[2rem] border border-[#B3CFE5] bg-[#F6FAFD] p-4 shadow-[0_24px_60px_-30px_rgb(26_61_99/0.35)] md:p-8 dark:border-transparent dark:bg-[#1A3D63]"
+    >
       <div className="flex flex-wrap items-center gap-4">
-        <div role="group" aria-label={copy.tabsLabel} className="flex gap-1 rounded-full border border-border p-1">
-          <button
-            type="button"
-            aria-pressed={view === "shelves"}
-            onClick={() => {
-              setView("shelves");
-              setShelf(null);
-            }}
-            className={TAB}
-          >
-            {copy.tabShelves}
-          </button>
-          <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} className={TAB}>
-            {copy.tabAll}
-          </button>
+        <div data-shelf-toolbar="" className="flex min-w-0 flex-1 items-center gap-1 rounded-full border border-border p-1">
+          <div role="group" aria-label={copy.tabsLabel} className="flex shrink-0 gap-1">
+            <button
+              type="button"
+              aria-pressed={view === "shelves"}
+              onClick={() => {
+                setView("shelves");
+                setShelf(null);
+              }}
+              className={TAB}
+            >
+              {copy.tabShelves}
+            </button>
+            <button type="button" aria-pressed={view === "all"} onClick={() => setView("all")} className={TAB}>
+              {copy.tabAll}
+            </button>
+          </div>
+          <label htmlFor={searchId} className="sr-only">
+            {copy.searchLabel}
+          </label>
+          <input
+            type="search"
+            id={searchId}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={copy.searchPlaceholder}
+            className="min-h-11 min-w-0 flex-1 border-0 bg-transparent px-4 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
         </div>
-        <label htmlFor={searchId} className="sr-only">
-          {copy.searchLabel}
-        </label>
-        <input
-          type="search"
-          id={searchId}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={copy.searchPlaceholder}
-          className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-transparent px-5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
         <p aria-live="polite" className="text-sm text-muted-foreground">
           {fmt(copy.count, { n: visible.length })}
         </p>
@@ -101,7 +109,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
       {results.length === 0 ? (
         <p className="mt-10 text-center text-muted-foreground">{fmt(copy.empty, { q: query.trim() })}</p>
       ) : view === "shelves" ? (
-        <div className="mt-10 grid gap-x-10 gap-y-12 lg:grid-cols-2">
+        <div className="mt-8 grid gap-y-10">
           {groupByShelf(results).map((g) => {
             const name = gallery.labels.shelves[g.shelf];
             return (
@@ -122,13 +130,15 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
                     <ArrowRight aria-hidden="true" className="size-4" />
                   </button>
                 </div>
-                <div className="w-fit max-w-full">
-                  <ul className={ROW}>{g.items.map((c) => book(c))}</ul>
-                  <div
-                    aria-hidden="true"
-                    data-shelf-plank=""
-                    className="h-3.5 w-full rounded-sm bg-card bg-[image:linear-gradient(180deg,rgb(246_250_253/0.14),transparent)] shadow-[0_16px_22px_-12px_rgb(10_25_49/0.6),inset_0_1px_0_rgb(246_250_253/0.18)]"
-                  />
+                <div data-shelf-scroll="" className="overflow-x-auto snap-x pb-5">
+                  <div className="w-max min-w-full">
+                    <ul className="flex items-end gap-4 px-3 pt-4 md:gap-6">{g.items.map((c) => book(c))}</ul>
+                    <div
+                      aria-hidden="true"
+                      data-shelf-plank=""
+                      className="h-3 w-full rounded-sm bg-[#B3CFE5] shadow-[0_14px_20px_-10px_rgb(10_25_49/0.55)] dark:bg-[#F6FAFD]"
+                    />
+                  </div>
                 </div>
               </section>
             );

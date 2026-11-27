@@ -142,9 +142,10 @@ describe("template shelf", () => {
     });
   });
 
+  // R10: lg:grid-cols-2 and bg-card dropped — the reference puts one shelf per row and the plank now uses explicit palette colours (see "plank is painted with opaque palette colours").
   it("shelf source lays shelves side by side and paints planks opaquely", () => {
     const src = read("src/components/landing/gallery/template-shelf.tsx");
-    for (const s of ["lg:grid-cols-2", "aspect-[2/3]", "visibleCategories", "data-shelf-plank", "bg-card", "motion-reduce:"]) expect(src).toContain(s);
+    for (const s of ["aspect-[2/3]", "visibleCategories", "data-shelf-plank", "data-shelf-panel", "data-shelf-toolbar", "motion-reduce:"]) expect(src).toContain(s);
     for (const s of ["bg-[var(--fuse-card-bg)]", "backdrop", "setInterval"]) expect(src).not.toContain(s);
   });
 
@@ -196,58 +197,129 @@ describe("template shelf", () => {
     for (const c of seeAll) for (const k of ["shrink-0", "whitespace-nowrap"]) expect(c).toContain(k);
   });
 
-  it("shelf covers use the larger sm:w-[12.5rem] width", () => {
+  const SRC = () => read("src/components/landing/gallery/template-shelf.tsx");
+  const sectionBodies = (html: string) => [...html.matchAll(/<section[^>]*data-shelf[^>]*>([\s\S]*?)<\/section>/g)].map((m) => m[1]);
+  /** Length of the first balanced <span>…</span> at the start of `s`. */
+  const firstSpanLength = (s: string) => {
+    let depth = 0;
+    for (const m of s.matchAll(/<span[\s>]|<\/span>/g)) {
+      depth += m[0] === "</span>" ? -1 : 1;
+      if (depth === 0) return m.index + m[0].length;
+    }
+    return -1;
+  };
+
+  // R10: was "shelf covers use the larger sm:w-[12.5rem] width". The reference shows small books (~64×96 relative to the panel);
+  // decision §1.3 = 96×144, mobile 88×132.
+  it("shelf covers are small upright books w-[5.5rem] sm:w-24", () => {
     const html = renderShelf();
     const books = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => classOf(m[0]));
     expect(books).toHaveLength(8);
-    for (const c of books) {
-      expect(c).toContain("w-[8.5rem]");
-      expect(c).toContain("sm:w-[12.5rem]");
-      expect(c).toContain("aspect-[2/3]");
-    }
-    expect(read("src/components/landing/gallery/template-shelf.tsx")).not.toContain("sm:w-[8.5rem]");
+    for (const c of books) for (const k of ["w-[5.5rem]", "sm:w-24", "aspect-[2/3]"]) expect(c).toContain(k);
+    expect(SRC()).not.toContain("sm:w-[12.5rem]");
   });
 
-  it("book list and plank share a w-fit max-w-full wrapper so the plank is as wide as its covers", () => {
+  // R10: replaces the R7 tests "book list and plank share a w-fit max-w-full wrapper..." and "plank follows the single book row
+  // inside a w-fit...". R7 made the plank as wide as the covers on purpose; the reference spans the plank across the FULL panel
+  // even with 1-3 books. min-w-full fills the panel on desktop, w-max lets the plank follow the scrolled row on mobile.
+  it("plank spans the full panel width and scrolls with the row on mobile", () => {
     const html = renderShelf();
-    const sections = [...html.matchAll(/<section[^>]*data-shelf[^>]*>([\s\S]*?)<\/section>/g)].map((m) => m[1]);
-    expect(sections).toHaveLength(4);
-    for (const body of sections) {
-      const m = /<div class="([^"]*)"><ul[^>]*>[\s\S]*?<\/ul>(<div[^>]*data-shelf-plank[^>]*>)<\/div><\/div>$/.exec(body);
-      expect(m, "wrapper around ul + plank").not.toBeNull();
-      const wrap = m![1].split(/\s+/);
-      for (const k of ["w-fit", "max-w-full"]) expect(wrap).toContain(k);
-      expect(classOf(m![2])).toContain("w-full");
+    const bodies = sectionBodies(html);
+    expect(bodies).toHaveLength(4);
+    for (const body of bodies) {
+      const m = /(<div[^>]*data-shelf-scroll[^>]*>)<div class="([^"]*)"><ul[^>]*>[\s\S]*?<\/ul>(<div[^>]*data-shelf-plank[^>]*>)<\/div><\/div><\/div>$/.exec(body);
+      expect(m, "scroll > wrapper > ul + plank").not.toBeNull();
+      for (const k of ["overflow-x-auto", "snap-x"]) expect(classOf(m![1])).toContain(k);
+      for (const k of ["w-max", "min-w-full"]) expect(m![2].split(/\s+/)).toContain(k);
+      expect(classOf(m![3])).toContain("w-full");
     }
+    expect(bodies.join("")).not.toContain("w-fit");
   });
 
+  // R10: overflow-x-auto + snap-x moved from the ul to data-shelf-scroll so the plank scrolls with the books; 96px books need not
+  // shrink, so lg:min-w-0 lg:shrink is no longer required.
   it("shelf row never wraps on desktop and book items may shrink at lg", () => {
     const html = renderShelf();
-    const rows = [...html.matchAll(/<section[^>]*data-shelf[^>]*>[\s\S]*?(<ul[^>]*>)([\s\S]*?)<\/ul>/g)];
+    const rows = [...html.matchAll(/<section[^>]*data-shelf[^>]*>[\s\S]*?(<div[^>]*data-shelf-scroll[^>]*>)[\s\S]*?(<ul[^>]*>)([\s\S]*?)<\/ul>/g)];
     expect(rows).toHaveLength(4);
-    for (const [, ul, body] of rows) {
+    for (const [, scroll, ul, body] of rows) {
+      for (const k of ["overflow-x-auto", "snap-x"]) expect(classOf(scroll)).toContain(k);
       const c = classOf(ul);
       expect(c).not.toContain("lg:flex-wrap");
       expect(c).not.toContain("flex-wrap");
-      for (const k of ["overflow-x-auto", "snap-x"]) expect(c).toContain(k);
       const lis = [...body.matchAll(/<li[\s>][^>]*>/g)].map((m) => classOf(m[0]));
       expect(lis.length).toBeGreaterThan(0);
-      for (const li of lis) for (const k of ["shrink-0", "snap-start", "lg:min-w-0", "lg:shrink"]) expect(li).toContain(k);
+      for (const li of lis) for (const k of ["shrink-0", "snap-start"]) expect(li).toContain(k);
     }
-    expect(read("src/components/landing/gallery/template-shelf.tsx")).not.toContain("lg:flex-wrap");
+    expect(SRC()).not.toContain("lg:flex-wrap");
   });
 
-  it("plank follows the single book row inside a w-fit max-w-full wrapper with w-full", () => {
+  it("shelves sit inside one rounded panel", () => {
     const html = renderShelf();
-    const sections = [...html.matchAll(/<section[^>]*data-shelf[^>]*>([\s\S]*?)<\/section>/g)].map((m) => m[1]);
+    const panels = [...html.matchAll(/<div[^>]*data-shelf-panel[^>]*>/g)];
+    expect(panels).toHaveLength(1);
+    for (const k of ["rounded-[2rem]", "bg-[#F6FAFD]", "border-[#B3CFE5]", "dark:bg-[#1A3D63]"]) expect(classOf(panels[0][0])).toContain(k);
+    const sections = [...html.matchAll(/<section[^>]*data-shelf/g)];
     expect(sections).toHaveLength(4);
-    for (const body of sections) {
-      const m = /<div class="([^"]*)">(<ul[^>]*>)[\s\S]*?<\/ul>(<div[^>]*data-shelf-plank[^>]*>)<\/div><\/div>$/.exec(body);
-      expect(m, "wrapper around ul + plank").not.toBeNull();
-      const wrap = m![1].split(/\s+/);
-      for (const k of ["w-fit", "max-w-full"]) expect(wrap).toContain(k);
-      expect(classOf(m![2]), "row must not wrap or the plank sits under row 2").not.toContain("lg:flex-wrap");
-      expect(classOf(m![3])).toContain("w-full");
+    // the panel is the root element, so every section is inside it
+    expect(panels[0].index).toBe(0);
+    expect(html.endsWith("</div>")).toBe(true);
+  });
+
+  it("tabs and search share one pill toolbar", () => {
+    const html = renderShelf();
+    const bars = [...html.matchAll(/<div[^>]*data-shelf-toolbar[^>]*>/g)];
+    expect(bars).toHaveLength(1);
+    expect(classOf(bars[0][0])).toContain("rounded-full");
+    const inside = html.slice(bars[0].index, html.indexOf('aria-live="polite"'));
+    expect(inside).toContain('role="group"');
+    const input = /<input[^>]*type="search"[^>]*>/.exec(inside)?.[0];
+    expect(input, "search input inside the pill").toBeDefined();
+    for (const k of ["rounded-full", "border-border"]) expect(classOf(input!)).not.toContain(k);
+  });
+
+  it("one shelf per row", () => {
+    expect(SRC()).not.toContain("lg:grid-cols-2");
+    const wrap = /<div class="([^"]*)"><section[^>]*data-shelf/.exec(renderShelf());
+    expect(wrap).not.toBeNull();
+    for (const k of wrap![1].split(/\s+/)) expect(k).not.toMatch(/(^|:)grid-cols-2$/);
+  });
+
+  it("covers are small upright books with icon and name on the cover", () => {
+    const html = renderShelf();
+    const copy = DICTS.id.landing.shelf as ShelfCopy;
+    const bodies = [...html.matchAll(/<button[^>]*data-shelf-cover[^>]*>([\s\S]*?)<\/button>/g)].map((m) => m[1]);
+    expect(bodies).toHaveLength(8);
+    const titles: string[] = [];
+    for (const body of bodies) {
+      expect(body.startsWith("<span data-book=")).toBe(true);
+      expect(firstSpanLength(body), "title sits inside the book").toBe(body.length);
+      const t = /<span[^>]*data-book-title[^>]*>([^<]*)<\/span>/.exec(body)?.[1];
+      expect(t).toBeDefined();
+      titles.push(t!);
+    }
+    expect(titles.sort()).toEqual(SITE_CATEGORIES.map((c) => escape(itemOf("id", c.id).name)).sort());
+    const books = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => classOf(m[0]));
+    for (const c of books) for (const k of ["w-[5.5rem]", "sm:w-24", "aspect-[2/3]"]) expect(c).toContain(k);
+    expect(html).not.toContain('<svg role="img"');
+    expect(html).not.toContain(escape(copy.pagesCount));
+  });
+
+  it("cover tones rotate through palette pairs", () => {
+    const html = renderShelf();
+    const tones = [...html.matchAll(/<span[^>]*data-book=""[^>]*>/g)].map((m) => /data-cover-tone="([^"]*)"/.exec(m[0])?.[1]);
+    expect(tones).toHaveLength(8);
+    for (const t of tones) expect(["ink", "deep", "mist", "snow"]).toContain(t);
+    expect(new Set(tones).size).toBeGreaterThanOrEqual(3);
+    for (const s of ["hsl(", "#F3EBD8"]) expect(SRC()).not.toContain(s);
+  });
+
+  it("plank is painted with opaque palette colours", () => {
+    const planks = [...renderShelf().matchAll(/<div[^>]*data-shelf-plank[^>]*>/g)].map((m) => classOf(m[0]));
+    expect(planks).toHaveLength(4);
+    for (const c of planks) {
+      for (const k of ["bg-[#B3CFE5]", "dark:bg-[#F6FAFD]"]) expect(c).toContain(k);
+      for (const k of c) if (/(^|:)bg-/.test(k)) expect(k, "opaque plank").not.toContain("/");
     }
   });
 
