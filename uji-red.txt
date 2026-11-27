@@ -1,0 +1,23 @@
+$ npx vitest run src/components/landing/carrier.test.ts src/components/landing/section-entrance.test.ts src/components/landing/books/books.test.ts src/components/landing/gallery/category-viewer.test.ts
+(ringkasan: baris FAIL/AssertionError/ringkasan dari --reporter=verbose; diff berkas penuh dipotong)
+
+ FAIL  src/components/landing/carrier.test.ts > gsap/lenis import discipline > no gsap or lenis import anywhere in src
+AssertionError: expected [ Array(1) ] to deeply equal []
+ FAIL  src/components/landing/carrier.test.ts > gsap/lenis import discipline > no data-lenis-prevent anywhere in src
+AssertionError: expected [ …(2) ] to deeply equal []
+ FAIL  src/components/landing/carrier.test.ts > gsap/lenis import discipline > package.json has no gsap or lenis dependency
+AssertionError: expected [ 'gsap', 'lenis' ] to deeply equal []
+ FAIL  src/components/landing/carrier.test.ts > design blueprint > blueprint documents CSS entrance and native scroll, no GSAP/Lenis
+AssertionError: Landing scroll (GSAP + Lenis): expected '# Saksi Design Blueprint (sebelumnya …' not to contain 'Landing scroll (GSAP + Lenis)'
+ FAIL  src/components/landing/section-entrance.test.ts > section heading entrance > globals.css runs the heading entrance only inside @supports view() and the motion query
+AssertionError: @keyframes section-entrance: expected undefined to be defined
+ FAIL  src/components/landing/section-entrance.test.ts > section heading entrance > reduced motion turns off smooth scroll and the entrance
+AssertionError: expected 0 to be greater than 0
+ FAIL  src/components/landing/books/books.test.ts > book shelf > book dialog uses Radix, returns focus, scrolls natively and swaps rotation for a crossfade
+AssertionError: expected '"use client";\n\nimport { useEffect, …' not to contain 'data-lenis-prevent'
+ FAIL  src/components/landing/gallery/category-viewer.test.ts > category viewer > CategoryViewer uses the Radix dialog, returns focus, handles arrows and scrolls natively
+AssertionError: expected '"use client";\n\nimport * as DialogPr…' not to contain 'data-lenis-prevent'
+
+ Test Files  4 failed (4)
+      Tests  8 failed | 46 passed (54)
+exit: 1

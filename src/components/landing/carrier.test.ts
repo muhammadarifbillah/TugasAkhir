@@ -45,19 +45,18 @@ describe("gsap/lenis import discipline", () => {
     /^\s*import\s*["'](gsap|lenis)(\/[^"']*)?["']/m,
     /^\s*export\s+[^;]*?\bfrom\s*["'](gsap|lenis)(\/[^"']*)?["']/m,
     /require\(\s*["'](gsap|lenis)/,
+    /import\(\s*["'](gsap|lenis|@gsap\/)/,
   ];
 
-  it("no static gsap/lenis import anywhere in src", () => {
+  it("no gsap or lenis import anywhere in src", () => {
     const offenders = walk("src").filter((file) =>
       staticPatterns.some((pattern) => pattern.test(read(file))),
     );
     expect(offenders).toEqual([]);
   });
 
-  it("dynamic gsap/lenis import only in landing-motion.tsx", () => {
-    const dynamicImport = /import\(\s*["'](gsap|lenis)(\/[^"']*)?["']\s*\)/;
-    const offenders = walk("src").filter((file) => dynamicImport.test(read(file)));
-    expect(offenders).toEqual(["src/components/landing/landing-motion.tsx"]);
+  it("no data-lenis-prevent anywhere in src", () => {
+    expect(walk("src").filter((file) => read(file).includes("data-lenis-prevent"))).toEqual([]);
   });
 
   it("LandingMotion is mounted only by the landing page", () => {
@@ -67,12 +66,13 @@ describe("gsap/lenis import discipline", () => {
     expect(users).toEqual(["src/app/[lang]/page.tsx"]);
   });
 
-  it("package.json pins gsap 3.15.x and lenis 1.3.x", () => {
+  it("package.json has no gsap or lenis dependency", () => {
     const pkg = JSON.parse(read("package.json")) as {
-      dependencies: Record<string, string>;
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
     };
-    expect(pkg.dependencies.gsap).toMatch(/^\^?3\.15\./);
-    expect(pkg.dependencies.lenis).toMatch(/^\^?1\.3\./);
+    const names = [...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.devDependencies ?? {})];
+    expect(names.filter((n) => n === "gsap" || n === "lenis" || n.startsWith("@gsap/"))).toEqual([]);
   });
 });
 
@@ -96,19 +96,13 @@ describe("anatomy kit", () => {
 });
 
 describe("design blueprint", () => {
-  it("blueprint 7.1 allows landing GSAP + Lenis under PRD rules", () => {
+  it("blueprint documents CSS entrance and native scroll, no GSAP/Lenis", () => {
     const blueprint = read("DESIGN-BLUEPRINT.md");
-    expect(blueprint).not.toContain("No smooth-scroll library, no GSAP");
-    expect(blueprint).not.toContain("No scroll-linked animation.");
-    for (const phrase of [
-      "Landing scroll (GSAP + Lenis)",
-      "LANDING_MOTION_QUERY",
-      "#main-content",
-      "Standard no-charge",
-      ".pin-spacer",
-      "reduce, not remove",
-    ]) {
-      expect(blueprint).toContain(phrase);
+    for (const phrase of ["Landing scroll (GSAP + Lenis)", "gsap.ticker", "GSAP and Lenis are allowed"]) {
+      expect(blueprint, phrase).not.toContain(phrase);
+    }
+    for (const phrase of ["animation-timeline: view()", "LANDING_MOTION_QUERY", "reduce, not remove", "#main"]) {
+      expect(blueprint, phrase).toContain(phrase);
     }
   });
 });

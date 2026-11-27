@@ -1,74 +1,29 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join, relative } from "node:path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ClaySection } from "./clay-section";
-import { entranceScene } from "./section-entrance";
+import { LANDING_MOTION_QUERY } from "./motion";
 
 const ROOT = process.cwd();
 const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
-const MOTION = "src/components/landing/landing-motion.tsx";
+const css = read("src/app/globals.css").replace(/\/\*[\s\S]*?\*\//g, "");
 
-type Scene = (deps: unknown, root: { querySelectorAll(s: string): ArrayLike<unknown> }) => () => void;
-const run = entranceScene as unknown as Scene;
-
-function setup(count: number) {
-  const els = Array.from({ length: count }, (_, i) => ({ name: `h2-${i}` }));
-  const root = { querySelectorAll: vi.fn((s: string) => (s === "[data-entrance]" ? els : [])) };
-  const tweens: { kill: ReturnType<typeof vi.fn> }[] = [];
-  const gsap = {
-    from: vi.fn(() => {
-      const t = { kill: vi.fn() };
-      tweens.push(t);
-      return t;
-    }),
-    set: vi.fn(),
-  };
-  return { els, root, gsap, tweens, ScrollTrigger: {} };
+/** The at-rule starting at `start` up to its matching closing brace. */
+function blockAt(start: number): string {
+  let depth = 0;
+  for (let i = css.indexOf("{", start); i < css.length; i++) {
+    if (css[i] === "{") depth++;
+    else if (css[i] === "}" && --depth === 0) return css.slice(start, i + 1);
+  }
+  throw new Error(`unbalanced block at ${start}`);
 }
 
-function sources(dir: string): string[] {
-  return readdirSync(join(ROOT, dir), { withFileTypes: true, recursive: true })
-    .filter((e) => e.isFile() && /\.tsx?$/.test(e.name) && !/\.test\.tsx?$/.test(e.name))
-    .map((e) => relative(ROOT, join(e.parentPath, e.name)).replace(/\\/g, "/"))
-    .filter((f) => !f.startsWith("src/generated/"));
-}
+const indicesOf = (s: string) => [...css.matchAll(new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))].map((m) => m.index);
+const blocks = (head: string) => indicesOf(head).map((i) => ({ start: i, text: blockAt(i) }));
 
 describe("section heading entrance", () => {
-  it("entrance animates each section heading once on scroll", () => {
-    const { els, root, gsap, ScrollTrigger } = setup(3);
-    run({ gsap, ScrollTrigger }, root);
-    expect(gsap.from).toHaveBeenCalledTimes(3);
-    els.forEach((el, i) => {
-      const [target, vars] = gsap.from.mock.calls[i] as unknown as [unknown, Record<string, unknown>];
-      expect(target).toBe(el);
-      expect(vars).toMatchObject({ opacity: 0, y: 16, duration: 0.4, ease: "power2.out" });
-      expect(vars.scrollTrigger).toMatchObject({ trigger: el, start: "top 80%", once: true });
-      for (const key of ["pin", "scrub", "snap", "repeat"]) {
-        expect(vars, key).not.toHaveProperty(key);
-        expect(vars.scrollTrigger, key).not.toHaveProperty(key);
-      }
-    });
-  });
-
-  it("entrance cleanup kills tweens and clears inline styles", () => {
-    const { els, root, gsap, tweens, ScrollTrigger } = setup(3);
-    const cleanup = run({ gsap, ScrollTrigger }, root);
-    cleanup();
-    expect(tweens).toHaveLength(3);
-    for (const t of tweens) expect(t.kill).toHaveBeenCalledTimes(1);
-    for (const el of els) expect(gsap.set).toHaveBeenCalledWith(el, { clearProps: "opacity,transform" });
-  });
-
-  it("entrance is a no-op without headings", () => {
-    const { root, gsap, ScrollTrigger } = setup(0);
-    const cleanup = run({ gsap, ScrollTrigger }, root);
-    expect(gsap.from).not.toHaveBeenCalled();
-    expect(() => cleanup()).not.toThrow();
-    expect(gsap.set).not.toHaveBeenCalled();
-  });
-
   it("section heading SSR is visible without JavaScript", () => {
     // eslint-disable-next-line react/no-children-prop -- ClaySection types children as a required prop
     const html = renderToStaticMarkup(createElement(ClaySection, { id: "x", pill: "p", title: "T", children: "c" }));
@@ -79,42 +34,45 @@ describe("section heading entrance", () => {
     for (const s of ["style=", "opacity", "invisible", "hidden"]) expect(tag, s).not.toContain(s);
   });
 
-  it("entrance module is gated and has no runtime imports", () => {
-    const src = read("src/components/landing/section-entrance.ts");
-    expect(src).not.toContain('"use client"');
-    expect(src).not.toMatch(/^\s*import\s+(?!type\b)/m);
-    expect(src).not.toMatch(/\bimport\s*\(/);
-    expect(src).not.toMatch(/\brequire\s*\(/);
+  it("globals.css runs the heading entrance only inside @supports view() and the motion query", () => {
+    const [keyframes] = blocks("@keyframes section-entrance");
+    expect(keyframes, "@keyframes section-entrance").toBeDefined();
+    expect(keyframes.text).toContain("opacity: 0");
+    expect(keyframes.text).toContain("translate: 0 16px");
 
-    const files = sources("src");
-    const loader = 'import("./section-entrance")';
-    expect(files.filter((f) => read(f).includes(loader))).toEqual([MOTION]);
-    const motion = read(MOTION);
-    const at = motion.indexOf(loader);
-    expect(motion.indexOf("shouldLoadLandingMotion(")).toBeGreaterThan(-1);
-    expect(motion.indexOf("shouldLoadLandingMotion(")).toBeLessThan(at);
-    const all = motion.lastIndexOf("Promise.all([", at);
-    expect(all).toBeGreaterThan(-1);
-    const group = motion.slice(all, motion.indexOf("])", all) + 2);
-    expect(group).toContain('import("gsap")');
-    expect(group).toContain(loader);
+    const supports = blocks("@supports (animation-timeline: view())").find((b) =>
+      b.text.includes("@media " + LANDING_MOTION_QUERY),
+    );
+    expect(supports, "@supports block with the motion query").toBeDefined();
+    const media = supports!.text.slice(supports!.text.indexOf("@media " + LANDING_MOTION_QUERY));
+    expect(media).toContain("[data-entrance]");
+    expect(media).toContain("animation-timeline: view()");
+    expect(media).toContain("animation-range: entry 0% entry 40%");
 
-    const staticImport = /^\s*import\s+(?!type\b)[^;]*from\s*["'][^"']*section-entrance["']/m;
-    expect(files.filter((f) => staticImport.test(read(f)))).toEqual([]);
+    const outside = css.slice(0, supports!.start) + css.slice(supports!.start + supports!.text.length);
+    expect(outside).not.toContain("[data-entrance]");
   });
 
-  it("LandingMotion loads only gsap, ScrollTrigger, lenis and the entrance scene", () => {
-    const motion = read(MOTION);
-    const all = motion.indexOf("Promise.all([");
-    expect(all).toBeGreaterThan(-1);
-    const group = motion.slice(all, motion.indexOf("])", all) + 2);
-    const loaded = [...group.matchAll(/import\(\s*"([^"]+)"\s*\)/g)].map((m) => m[1]);
-    expect(group.match(/import\(/g)).toHaveLength(4);
-    expect(loaded).toEqual(["gsap", "gsap/ScrollTrigger", "lenis", "./section-entrance"]);
-    const call = motion.indexOf("initLandingScroll(", all);
-    expect(call).toBeGreaterThan(-1);
-    const args = motion.slice(call, motion.indexOf(");", call));
-    expect(args).toContain("entranceScene");
-    expect(args).not.toContain("heroTapeScene");
+  it("reduced motion turns off smooth scroll and the entrance", () => {
+    const smooth = indicesOf("scroll-behavior: smooth");
+    expect(smooth.length).toBeGreaterThan(0);
+    const noPref = blocks("@media (prefers-reduced-motion: no-preference) {");
+    for (const i of smooth) {
+      const owner = noPref.find((b) => i > b.start && i < b.start + b.text.length);
+      expect(owner, `scroll-behavior: smooth at ${i}`).toBeDefined();
+      expect(owner!.text.slice(0, i - owner!.start)).toMatch(/[{}]\s*#main\s*\{\s*$/);
+    }
+
+    const [reduce] = blocks("@media (prefers-reduced-motion: reduce)");
+    expect(reduce.text).toContain("scroll-behavior: auto !important");
+
+    const entrance = indicesOf("[data-entrance]");
+    expect(entrance.length).toBeGreaterThan(0);
+    for (const i of entrance) {
+      const at = css.lastIndexOf("@media", i);
+      expect(at).toBeGreaterThan(-1);
+      expect(at + blockAt(at).length).toBeGreaterThan(i);
+      expect(css.slice(at, css.indexOf("{", at))).toContain("prefers-reduced-motion: no-preference");
+    }
   });
 });
