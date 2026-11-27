@@ -419,7 +419,9 @@ describe("template shelf", () => {
     const planks = [...renderShelf().matchAll(/<div[^>]*data-shelf-plank[^>]*>/g)].map((m) => classOf(m[0]));
     expect(planks).toHaveLength(4);
     for (const c of planks) {
-      for (const k of ["bg-[#B3CFE5]", "dark:bg-[#F6FAFD]"]) expect(c).toContain(k);
+      // R27: the plank stays mist in both themes; snow read as a bright empty strip under two books.
+      expect(c).toContain("bg-[#B3CFE5]");
+      expect(c).not.toContain("dark:bg-");
       for (const k of c) if (/(^|:)bg-/.test(k)) expect(k, "opaque plank").not.toContain("/");
     }
   });

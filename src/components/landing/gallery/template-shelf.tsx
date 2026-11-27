@@ -68,7 +68,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
               <span
                 aria-hidden="true"
                 data-cover-scrim=""
-                className="absolute inset-0 bg-[linear-gradient(180deg,rgb(10_25_49/0.85)_0%,rgb(10_25_49/0.85)_55%,rgb(10_25_49/0)_85%)]"
+                className="absolute inset-0 bg-[linear-gradient(180deg,rgb(10_25_49/0.85)_0%,rgb(10_25_49/0.85)_32%,rgb(10_25_49/0)_65%)]"
               />
               <CategoryIcon id={c.id} className="relative size-4 shrink-0 text-[#F6FAFD]" />
               <span data-book-title="" className="relative line-clamp-3 text-center text-[11px] font-semibold leading-tight text-[#F6FAFD]">
@@ -153,7 +153,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
                     <div
                       aria-hidden="true"
                       data-shelf-plank=""
-                      className="h-3 w-full rounded-sm bg-[#B3CFE5] shadow-[0_14px_20px_-10px_rgb(10_25_49/0.55)] dark:bg-[#F6FAFD]"
+                      className="h-3 w-full rounded-sm bg-[#B3CFE5] shadow-[0_14px_20px_-10px_rgb(10_25_49/0.55)]"
                     />
                   </div>
                 </div>
