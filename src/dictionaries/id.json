@@ -1098,7 +1098,7 @@
     "shortcutsHint": "Alt+1–5 pindah stage · Ctrl/⌘+K perintah"
   },
   "categories": {
-    "galleryLabel": "Ilustrasi template — bukan situs klien",
+    "galleryLabel": "Contoh template buatan FUSE — bukan situs klien",
     "shelves": {
       "sell": "Jualan online",
       "learn": "Belajar & komunitas",
@@ -1389,6 +1389,6 @@
   },
   "credits": {
     "title": "Contoh template",
-    "intro": "Ke-24 contoh template di galeri ini dibuat sendiri oleh FUSE untuk menggambarkan jenis website yang bisa Anda bangun. Semua teksnya berbahasa Indonesia, ilustrasinya digambar dengan CSS, tanpa foto atau kode dari pihak lain."
+    "intro": "Kedua puluh empat contoh template di galeri ini dibuat sendiri oleh FUSE untuk menggambarkan jenis website yang bisa Anda bangun. Semua teksnya berbahasa Indonesia, ilustrasinya digambar dengan CSS, tanpa foto atau kode dari pihak lain."
   }
 }
