@@ -43,24 +43,32 @@ describe("gallery logic", () => {
     for (const k of ["Enter", "a", "ArrowUp"]) expect(keyToAction(k)).toBeNull();
   });
 
-  it("wallPose builds a coverflow panorama with a prominent centre", () => {
+  // Owner decision 2026-11-27 (herosection.jpeg): the wall is concave, the viewer stands inside the cylinder.
+  it("wallPose builds a concave wall: edge panels larger and closer, all turned to face the centre", () => {
     const n = 8;
     const poses = Array.from({ length: n }, (_, i) => wallPose(i, n));
-    expect(poses.map((p) => p.rotateY)).toEqual([39, 24, 12, 3, -3, -12, -24, -39]);
-    expect(poses.map((p) => p.z)).toEqual([-216, -108, -36, 0, 0, -36, -108, -216]);
-    expect(poses.map((p) => p.scale)).toEqual([1, 1, 1, 1.06, 1.06, 1, 1, 1]);
+    for (const edge of [0, 7])
+      for (const mid of [3, 4]) {
+        expect(poses[edge].scale, `scale ${edge}>${mid}`).toBeGreaterThan(poses[mid].scale);
+        expect(poses[edge].z, `z ${edge}>${mid}`).toBeGreaterThan(poses[mid].z);
+      }
+    // Monotonic towards the edges on the left half (the right half mirrors it).
+    for (const i of [0, 1, 2]) {
+      expect(poses[i].scale).toBeGreaterThan(poses[i + 1].scale);
+      expect(poses[i].z).toBeGreaterThan(poses[i + 1].z);
+      expect(poses[i].rotateY).toBeGreaterThan(poses[i + 1].rotateY);
+    }
     poses.forEach((p, i) => {
+      if (i < (n - 1) / 2) expect(p.rotateY, `rotateY ${i}`).toBeGreaterThan(0);
+      else expect(p.rotateY, `rotateY ${i}`).toBeLessThan(0);
       const mirror = poses[n - 1 - i];
       expect(p.rotateY).toBe(-mirror.rotateY);
       expect(p.z).toBe(mirror.z);
       expect(p.scale).toBe(mirror.scale);
       for (const v of [p.rotateY, p.z, p.scale]) expect(Object.is(v, -0)).toBe(false);
     });
-    // Step between neighbours grows towards the edges (left half, mirrored on the right).
-    const steps = [0, 1, 2].map((i) => Math.abs(poses[i].rotateY) - Math.abs(poses[i + 1].rotateY));
-    expect(steps[0]).toBeGreaterThan(steps[1]);
-    expect(steps[1]).toBeGreaterThan(steps[2]);
     const odd = wallPose(1, 3);
+    expect(odd.rotateY).toBe(0);
     for (const v of [odd.rotateY, odd.z, odd.scale]) expect(Object.is(v, -0)).toBe(false);
   });
 
