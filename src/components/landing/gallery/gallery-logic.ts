@@ -41,19 +41,24 @@ export function keyToAction(key: string): "next" | "prev" | null {
 /** `+ 0` turns -0 into 0 so inline styles never print "-0deg". */
 const noNegZero = (n: number) => n + 0;
 
-/** Perspective (1200px) and projected gap (6px) in desktop panel widths at 1440px (13vw = 187px). */
-const WALL_DEPTH = 1200 / 187;
-const WALL_GAP = 6 / 187;
+/** Perspective (1200px) and projected gap (6px) in desktop panel widths at 1440px (--pw = 10vw + 3.6rem = 201.6px). */
+const WALL_DEPTH = 1200 / 201.6;
+const WALL_GAP = 6 / 201.6;
 
 /**
  * Right-half pose at offset `a` (>= 0) from the centre (`a0` is the centre-most offset), x not yet placed.
  * z starts at 0: a panel behind the preserve-3d ul plane (z < 0) loses its hover and click to the ul.
+ * Scale grows with √d so the inner neighbours widen the wall to the screen edges while the edge panels stay ±1.5-1.8×
+ * the centre (herosection.jpeg); z grows with d² so the edges come forward.
  */
-const sidePose = (a: number, a0: number) => ({
-  rotateY: noNegZero(-Math.round(8 * a)),
-  z: noNegZero(Math.round(0.059 * (a * a - a0 * a0) * 1000) / 1000),
-  scale: Math.round((0.65 + 0.023 * Math.max(0, a * a - 0.25)) * 100) / 100,
-});
+const sidePose = (a: number, a0: number) => {
+  const d = a - a0;
+  return {
+    rotateY: noNegZero(-Math.round(12 * a)),
+    z: noNegZero(Math.round(0.07 * d * d * 1000) / 1000),
+    scale: Math.round((0.64 + 0.16 * Math.sqrt(d)) * 100) / 100,
+  };
+};
 
 /**
  * Concave wall (viewer inside the cylinder): towards the edges panels come closer, grow and turn to face the centre.

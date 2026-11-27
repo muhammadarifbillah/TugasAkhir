@@ -3,7 +3,11 @@ import type { BlockKind, SiteCategory } from "@/lib/site-categories";
 import { HERO_MOODS, type HeroMood } from "./moods";
 
 const W = 200;
+/** The scene is drawn in a 200x300 frame placed at y=40 of a slim 200x380 (10/19) view: the desktop wall shows all of it,
+ * the 2:3 touch carousel's slice keeps exactly the frame. */
 const H = 300;
+const VH = 380;
+const FRAME_Y = (VH - H) / 2;
 const HORIZON = 190;
 const WHITE = "#ffffff";
 const INK = "#0b0f19";
@@ -279,7 +283,7 @@ export function HeroScene({ category, mood, className }: { category: SiteCategor
 
   return (
     <svg
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`0 0 ${W} ${VH}`}
       preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
       focusable="false"
@@ -296,33 +300,37 @@ export function HeroScene({ category, mood, className }: { category: SiteCategor
           <stop offset="1" stopColor={m.light} stopOpacity="0" />
         </radialGradient>
       </defs>
-      <rect width={W} height={H} fill={`url(#${ids.sky})`} />
-      <Scenery m={m} ids={ids} />
+      <rect width={W} height={VH} fill={`url(#${ids.sky})`} />
+      {/* Every scenery reaches the frame bottom with its ground; continue it below the frame. */}
+      <rect y={FRAME_Y + H - 1} width={W} height={VH - FRAME_Y - H + 1} fill={m.ground} />
+      <g transform={`translate(0 ${FRAME_Y})`}>
+        <Scenery m={m} ids={ids} />
 
-      <g data-scene-nav="">
-        <rect x={6} y={8} width={W - 12} height={16} rx={3} fill={WHITE} opacity={0.85} />
-        <rect x={12} y={13} width={20} height={6} rx={1.5} fill={m.accent} />
-        {[96, 118, 140].map((x) => (
-          <rect key={x} x={x} y={15} width={16} height={2.4} rx={1.2} fill={INK} opacity={0.45} />
-        ))}
-        <rect x={164} y={12} width={24} height={8} rx={4} fill={m.accent} />
-      </g>
-      {sidebar && (
-        <g>
-          <rect x={6} y={30} width={36} height={H - 40} rx={3} fill={WHITE} opacity={0.7} />
-          {[40, 52, 64, 76, 88].map((y, i) => (
-            <rect key={y} x={11} y={y} width={i === 0 ? 26 : 20} height={2.4} rx={1.2} fill={i === 0 ? m.accent : INK} opacity={i === 0 ? 1 : 0.4} />
+        <g data-scene-nav="">
+          <rect x={6} y={8} width={W - 12} height={16} rx={3} fill={WHITE} opacity={0.85} />
+          <rect x={12} y={13} width={20} height={6} rx={1.5} fill={m.accent} />
+          {[96, 118, 140].map((x) => (
+            <rect key={x} x={x} y={15} width={16} height={2.4} rx={1.2} fill={INK} opacity={0.45} />
           ))}
+          <rect x={164} y={12} width={24} height={8} rx={4} fill={m.accent} />
         </g>
-      )}
-      <g data-scene-cta="">
-        <rect x={x0 + 4} y={blocks.includes("hero") ? 70 : 52} width={(W - x0) * 0.66} height={8} rx={4} fill={WHITE} opacity={0.95} />
-        <rect x={x0 + 4} y={blocks.includes("hero") ? 84 : 66} width={(W - x0) * 0.44} height={8} rx={4} fill={WHITE} opacity={0.95} />
-        <rect x={x0 + 4} y={blocks.includes("hero") ? 104 : 82} width={44} height={13} rx={6.5} fill={WHITE} />
+        {sidebar && (
+          <g>
+            <rect x={6} y={30} width={36} height={H - 40} rx={3} fill={WHITE} opacity={0.7} />
+            {[40, 52, 64, 76, 88].map((y, i) => (
+              <rect key={y} x={11} y={y} width={i === 0 ? 26 : 20} height={2.4} rx={1.2} fill={i === 0 ? m.accent : INK} opacity={i === 0 ? 1 : 0.4} />
+            ))}
+          </g>
+        )}
+        <g data-scene-cta="">
+          <rect x={x0 + 4} y={blocks.includes("hero") ? 70 : 52} width={(W - x0) * 0.66} height={8} rx={4} fill={WHITE} opacity={0.95} />
+          <rect x={x0 + 4} y={blocks.includes("hero") ? 84 : 66} width={(W - x0) * 0.44} height={8} rx={4} fill={WHITE} opacity={0.95} />
+          <rect x={x0 + 4} y={blocks.includes("hero") ? 104 : 82} width={44} height={13} rx={6.5} fill={WHITE} />
+        </g>
+        {content.map((k, i) => (
+          <g key={k}>{block(k, { x: x0, y: top + i * (each + 5), w: W - x0 - 8, h: each }, m.accent)}</g>
+        ))}
       </g>
-      {content.map((k, i) => (
-        <g key={k}>{block(k, { x: x0, y: top + i * (each + 5), w: W - x0 - 8, h: each }, m.accent)}</g>
-      ))}
     </svg>
   );
 }
