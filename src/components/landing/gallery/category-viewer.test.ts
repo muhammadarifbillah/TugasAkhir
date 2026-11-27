@@ -5,19 +5,22 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { fmt } from "@/lib/format";
 import { SITE_CATEGORIES, type SiteCategory } from "@/lib/site-categories";
+import { SITE_TEMPLATES } from "@/lib/site-templates";
 import { STAGE_DEFINITIONS } from "@/lib/stages";
 import { FuseLockup } from "@/components/brand/fuse-lockup";
 import { ViewerBody } from "./category-viewer";
+import { tabKey } from "./gallery-logic";
 
 type Json = Record<string, unknown>;
 type Props = Parameters<typeof ViewerBody>[0];
 type Item = { name: string; desc: string; pages: Record<string, string>; features: Record<string, string>; checks: Record<string, string> };
+type Dict = { landing: Json; categories: Json; app: { name: string }; templatePages: Record<string, string>; templates: Record<string, { desc: string }> };
 
 const ROOT = process.cwd();
 const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
 const DICTS = {
-  id: JSON.parse(read("src/dictionaries/id.json")) as { landing: Json; categories: Json; app: { name: string } },
-  en: JSON.parse(read("src/dictionaries/en.json")) as { landing: Json; categories: Json; app: { name: string } },
+  id: JSON.parse(read("src/dictionaries/id.json")) as Dict,
+  en: JSON.parse(read("src/dictionaries/en.json")) as Dict,
 };
 const LANGS = ["id", "en"] as const;
 
@@ -28,21 +31,27 @@ const copyOf = (lang: "id" | "en") => (DICTS[lang].landing.gallery ?? {}) as Pro
 const labelsOf = (lang: "id" | "en") => DICTS[lang].categories as unknown as Props["labels"];
 const itemOf = (lang: "id" | "en", c: SiteCategory) => (DICTS[lang].categories.items as Record<string, Item>)[c.id];
 
-const render = (lang: "id" | "en", c: SiteCategory, page: 0 | 1 | 2 = 0) =>
+const render = (lang: "id" | "en", c: SiteCategory, page = 0, template = 0) =>
   renderToStaticMarkup(
     createElement(ViewerBody, {
       category: c,
+      template,
       page,
       dir: 1,
       lang,
       appName: DICTS[lang].app.name,
       labels: labelsOf(lang),
       copy: copyOf(lang),
+      onTemplate: noop,
       onPage: noop,
       onNext: noop,
       onPrev: noop,
     }),
   );
+const tplOf = (c: SiteCategory, t = 0) => SITE_TEMPLATES[c.id][t];
+const pageNamesOf = (lang: "id" | "en", c: SiteCategory, t = 0) => tplOf(c, t).pages.map((p) => DICTS[lang].templatePages[p.id]);
+const licenseOf = (license: string) => license.replace(/-/g, " ");
+const srcOf = (tag: string) => decodeURIComponent(tag.match(/ src="([^"]*)"/)![1].replace(/&amp;/g, "&"));
 
 function keys(value: unknown, prefix = ""): string[] {
   if (value === null || typeof value !== "object" || Array.isArray(value)) return [prefix];
@@ -109,24 +118,176 @@ const FORBIDDEN = [
 ];
 
 describe("category viewer", () => {
-  it("ViewerBody shows the category, its three pages and the current page", () => {
+  it("ViewerBody shows the category, every page of the active template and the current page", () => {
     for (const lang of LANGS) {
-      const copy = copyOf(lang);
-      const labels = labelsOf(lang);
       for (const c of SITE_CATEGORIES)
         for (const page of [0, 1] as const) {
           const html = render(lang, c, page);
           const item = itemOf(lang, c);
           expect(html).toContain(escape(item.name));
           expect(html).toContain(escape(item.desc));
-          expect(html.match(/data-viewer-thumb/g)?.length, `${lang}/${c.id}`).toBe(3);
+          expect(html.match(/data-viewer-thumb/g)?.length, `${lang}/${c.id}`).toBe(tplOf(c).pages.length);
           expect(html.match(/aria-current="true"/g)?.length).toBe(1);
-          const art = fmt(labels.artLabel, { page: item.pages[c.pages[page].id], category: item.name });
-          expect(html).toContain(`aria-label="${escape(art)}"`);
-          expect(html).toContain(escape(fmt(copy.pageOf, { n: page + 1, total: 3 })));
-          expect(html).toContain(escape(labels.galleryLabel));
         }
     }
+  });
+
+  // R26 §6A-2: three template tabs (name + small licence), the active one aria-selected, wired to a tabpanel.
+  it("template tabs: tablist with three tabs, aria-selected on the active one, tabpanel wired both ways", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const t of [0, 2]) {
+          const html = render(lang, c, 0, t);
+          const list = section(html, 'role="tablist"');
+          expect(tagOf(list, 'role="tablist"')).toContain(`aria-label="${escape(copyOf(lang).viewerTemplatesLabel)}"`);
+          const tabs = [...list.matchAll(/<button[^>]*role="tab"[^>]*>[\s\S]*?<\/button>/g)].map((m) => m[0]);
+          expect(tabs, `${lang}/${c.id}`).toHaveLength(3);
+          const panelTag = tagOf(html, 'role="tabpanel"');
+          const panelId = /\sid="([^"]+)"/.exec(panelTag)![1];
+          tabs.forEach((tab, i) => {
+            const tpl = tplOf(c, i);
+            const open = tab.slice(0, tab.indexOf(">") + 1);
+            expect(tab).toContain(escape(tpl.name));
+            expect(tab).toContain(escape(licenseOf(tpl.license)));
+            expect(open).toContain(`aria-selected="${i === t}"`);
+            expect(open).toContain(`aria-controls="${panelId}"`);
+            expect(open).toContain(`tabindex="${i === t ? 0 : -1}"`);
+            expect(open, "44 px touch target").toContain("min-h-11");
+            if (i === t) {
+              const tabId = /\sid="([^"]+)"/.exec(open)![1];
+              expect(panelTag).toContain(`aria-labelledby="${tabId}"`);
+              for (const k of ["aria-selected:bg-[#1A3D63]", "aria-selected:text-[#F6FAFD]"]) expect(open, k).toContain(k);
+            }
+            for (const k of ["border-[#B3CFE5]", "text-[#0A1931]"]) expect(open, k).toContain(k);
+          });
+        }
+  });
+
+  it("tabKey moves between the three tabs with the arrows (wrapping), Home and End", () => {
+    expect(tabKey("ArrowRight", 0, 3)).toBe(1);
+    expect(tabKey("ArrowRight", 2, 3)).toBe(0);
+    expect(tabKey("ArrowLeft", 0, 3)).toBe(2);
+    expect(tabKey("ArrowLeft", 2, 3)).toBe(1);
+    expect(tabKey("Home", 2, 3)).toBe(0);
+    expect(tabKey("End", 0, 3)).toBe(2);
+    for (const k of ["Enter", " ", "ArrowUp", "a"]) expect(tabKey(k, 1, 3)).toBeNull();
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    expect(src).toContain("tabKey(");
+    expect(src).toContain("stopPropagation");
+  });
+
+  // R26 §6A-3: a real screenshot of the active page inside a palette browser frame.
+  it("preview is a next/image screenshot of the active template page inside a browser frame", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const [t, page] of [[0, 0], [1, 2]] as const) {
+          const html = render(lang, c, page, t);
+          const tpl = tplOf(c, t);
+          const frame = section(html, "data-viewer-browser");
+          const bar = section(frame, "data-viewer-browser-bar");
+          expect(bar.match(/data-viewer-dot/g)?.length).toBe(3);
+          expect(bar).toContain(`${tpl.slug}.fuse.dev`);
+          const img = /<img[^>]*>/.exec(frame)![0];
+          expect(frame.indexOf("data-viewer-browser-bar")).toBeLessThan(frame.indexOf("<img"));
+          expect(srcOf(img)).toContain(tpl.pages[page].src);
+          expect(img).toContain("/_next/image?url=");
+          expect(img).toContain(`alt="${escape(`${tpl.name} — ${pageNamesOf(lang, c, t)[page]}`)}"`);
+          expect(img).toContain('sizes="(min-width:1024px) 34vw, 92vw"');
+          for (const k of ["object-cover", "object-top"]) expect(img, k).toContain(k);
+          expect(frame).toContain("aspect-[16/10]");
+        }
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    expect(src).toContain('from "next/image"');
+  });
+
+  // R26 §6A-4: the rail holds every page of the active template.
+  it("thumbnail rail lists every page of the active template by name, with its thumb image", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const t of [0, 1, 2]) {
+          const page = 1;
+          const html = render(lang, c, page, t);
+          const tpl = tplOf(c, t);
+          const names = pageNamesOf(lang, c, t);
+          const thumbs = [...html.matchAll(/<button[^>]*data-viewer-thumb[^>]*>[\s\S]*?<\/button>/g)].map((m) => m[0]);
+          expect(thumbs, `${lang}/${c.id}/${t}`).toHaveLength(tpl.pages.length);
+          thumbs.forEach((th, i) => {
+            expect(th).toContain(`aria-label="${escape(names[i])}"`);
+            expect(srcOf(/<img[^>]*>/.exec(th)![0])).toContain(tpl.pages[i].thumb);
+            expect(th.slice(0, th.indexOf(">")).includes('aria-current="true"')).toBe(i === page);
+          });
+        }
+    const rail = tagOf(render("id", SITE_CATEGORIES[0]), `aria-label="${escape(copyOf("id").thumbsLabel)}"`);
+    for (const k of ["overflow-x-auto", "lg:overflow-y-auto", "lg:max-h-"]) expect(rail, k).toContain(k);
+  });
+
+  // R26 §6A-5: caption and spec row use the real page count and names.
+  it("page caption counts the template's real pages and the spec Pages row lists their names", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const t of [0, 2]) {
+          const html = render(lang, c, 1, t);
+          const names = pageNamesOf(lang, c, t);
+          expect(html).toContain(escape(fmt(copyOf(lang).pageOf, { n: 2, total: names.length })));
+          const table = section(html, "data-viewer-specs");
+          expect(table).toContain(names.map(escape).join(" · "));
+        }
+  });
+
+  // R26 §6A-6: licence attribution under the preview.
+  it("credit line names the template, links its licence and source in a new tab, and shows CC-BY attribution", () => {
+    let ccby = 0;
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const t of [0, 1, 2]) {
+          const tpl = tplOf(c, t);
+          const html = render(lang, c, 0, t);
+          const credit = section(html, "data-viewer-credit");
+          const copy = copyOf(lang);
+          expect(credit).toContain(escape(tpl.name));
+          const links = [...credit.matchAll(/<a[^>]*>[\s\S]*?<\/a>/g)].map((m) => m[0]);
+          const lic = links.find((a) => a.includes(`href="${tpl.licenseUrl}"`));
+          const srcLink = links.find((a) => a.includes(`href="${tpl.source}"`));
+          expect(lic, `${c.id}/${tpl.slug} licence`).toBeDefined();
+          expect(srcLink, `${c.id}/${tpl.slug} source`).toBeDefined();
+          expect(lic).toContain(escape(licenseOf(tpl.license)));
+          expect(srcLink).toContain(escape(copy.viewerCreditSource));
+          for (const a of [lic!, srcLink!]) {
+            expect(a).toContain('target="_blank"');
+            expect(a).toContain('rel="noopener noreferrer"');
+          }
+          expect(credit).toContain(escape(copy.viewerCreditLicense));
+          if (tpl.license.startsWith("CC-BY")) {
+            ccby++;
+            expect(credit).toContain(escape(tpl.attribution!));
+          }
+          expect(html.indexOf("data-viewer-credit")).toBeGreaterThan(html.indexOf("data-viewer-browser"));
+        }
+    expect(ccby).toBeGreaterThan(0);
+  });
+
+  // R26 §6A-7: the lede is the active template's description; the category description follows.
+  it("lede is the active template's description and the gallery label says screenshots of open-source templates", () => {
+    for (const lang of LANGS)
+      for (const c of SITE_CATEGORIES)
+        for (const t of [0, 1]) {
+          const html = render(lang, c, 0, t);
+          const lede = escape(DICTS[lang].templates[tplOf(c, t).slug].desc);
+          const at = html.indexOf(lede);
+          expect(at, `${lang}/${c.id}/${t}`).toBeGreaterThan(-1);
+          const before = html.slice(0, at);
+          expect(before.slice(before.lastIndexOf("<")), "italic lede").toMatch(/class="[^"]*\bitalic\b/);
+          expect(html.indexOf(escape(itemOf(lang, c).desc))).toBeGreaterThan(at);
+        }
+    expect(copyOf("id").viewerGalleryLabel).toBe("Tangkapan layar template open-source — bukan situs klien");
+    expect(copyOf("en").viewerGalleryLabel).toBe("Screenshots of open-source templates — not client sites");
+    for (const lang of LANGS) expect(render(lang, SITE_CATEGORIES[0])).toContain(escape(copyOf(lang).viewerGalleryLabel));
+  });
+
+  it("the viewer no longer uses SiteArt", () => {
+    const src = read("src/components/landing/gallery/category-viewer.tsx");
+    expect(src).not.toContain("SiteArt");
+    expect(src).not.toContain("site-art");
   });
 
   it("ViewerBody lists three checks whose NIST and ISO codes exist in stages.ts", () => {
@@ -156,7 +317,7 @@ describe("category viewer", () => {
         const html = render(lang, c);
         const item = itemOf(lang, c);
         expect(html).toContain("<table");
-        for (const p of c.pages) expect(html).toContain(escape(item.pages[p.id]));
+        for (const name of pageNamesOf(lang, c)) expect(html).toContain(escape(name));
         for (const f of c.features) expect(html).toContain(escape(item.features[f]));
         for (const s of c.stack) expect(html).toContain(escape(s));
         expect(html).toContain(`href="/${lang}/projects/new"`);
@@ -273,7 +434,7 @@ describe("category viewer", () => {
         const html = render(lang, c);
         const copy = copyOf(lang);
         expect(section(html, "data-viewer-byline")).toContain(escape(fmt(copy.byline, { name: DICTS[lang].app.name, n: 3 })));
-        const desc = escape(itemOf(lang, c).desc);
+        const desc = escape(DICTS[lang].templates[tplOf(c).slug].desc);
         const before = html.slice(0, html.indexOf(desc));
         const open = before.slice(before.lastIndexOf("<"));
         expect(open, `${lang}/${c.id}`).toMatch(/class="[^"]*\bitalic\b/);
@@ -299,10 +460,9 @@ describe("category viewer", () => {
         for (const k of ["specPages", "specFeatures", "specStack", "specChecks", "specStandards", "specScanner"] as const)
           expect(table, k).toContain(escape(copy[k]));
         const item = itemOf(lang, c);
-        for (const p of c.pages) expect(table).toContain(escape(item.pages[p.id]));
         for (const f of c.features) expect(table).toContain(escape(item.features[f]));
         for (const s of c.stack) expect(table).toContain(escape(s));
-        expect(table).toContain(c.pages.map((p) => escape(item.pages[p.id])).join(" · "));
+        expect(table).toContain(pageNamesOf(lang, c).map(escape).join(" · "));
         expect(table).toContain(c.features.map((f) => escape(item.features[f])).join(" · "));
         expect(table).toContain(c.stack.map((s) => escape(s)).join(" · "));
         expect(table).toContain(escape(fmt(copy.checksCount, { n: 3 })));
@@ -330,7 +490,7 @@ describe("category viewer", () => {
     for (const page of [0, 2] as const) {
       const html = render("id", SITE_CATEGORIES[0], page);
       const thumbs = html.match(/<button[^>]*data-viewer-thumb[^>]*>/g) ?? [];
-      expect(thumbs).toHaveLength(3);
+      expect(thumbs).toHaveLength(tplOf(SITE_CATEGORIES[0]).pages.length);
       for (const t of thumbs)
         for (const k of ["aria-[current=true]:bg-[#B3CFE5]", "aria-[current=true]:border-l-[3px]", "aria-[current=true]:border-l-[#4A7FA7]"])
           expect(t, k).toContain(k);
@@ -443,7 +603,7 @@ describe("category viewer", () => {
   it("page caption sits after the mist circle on an opaque snow panel above it", () => {
     for (const lang of LANGS) {
       const html = render(lang, SITE_CATEGORIES[0]);
-      const text = escape(fmt(copyOf(lang).pageOf, { n: 1, total: 3 }));
+      const text = escape(fmt(copyOf(lang).pageOf, { n: 1, total: tplOf(SITE_CATEGORIES[0]).pages.length }));
       const at = html.indexOf(`>${text}<`);
       expect(at, text).toBeGreaterThan(html.indexOf("data-viewer-circle"));
       const tag = html.slice(html.lastIndexOf("<", at), at + 1);
