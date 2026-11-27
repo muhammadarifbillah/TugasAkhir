@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MotionConfig, m, useReducedMotion } from "motion/react";
 import {
@@ -8,17 +8,24 @@ import {
 } from "lucide-react";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
-import { cn } from "@/lib/utils";
 import { EASE } from "../motion";
 import { BOOK_INITIAL, RESULT_BOOKS, bookReducer, booksOnShelf, type BookId, type ResultBook, type ShelfId, type StageCode } from "./book-list";
 
 type Copy = Dictionary["landing"]["books"];
 type Item = { title: string; contents: string; format: string; when: string };
 
-const STAGE_N: Record<StageCode, number> = { analysis: 1, design: 2, development: 3, testing: 4, handover: 5 };
-const stageVar = (b: ResultBook) => `var(--stage-${STAGE_N[b.stage]})`;
-const accentOf = (b: ResultBook) => (b.shelf === "studio" ? "var(--ring)" : stageVar(b));
 const itemOf = (copy: Copy, id: BookId) => (copy.items as Record<BookId, Item>)[id];
+
+/** Cover tones: steel stays off small text (fails AA), so it only paints ribbons and lines. */
+const TONES = {
+  ink: { bg: "#0A1931", fg: "#F6FAFD", ribbon: "#B3CFE5" },
+  deep: { bg: "#1A3D63", fg: "#F6FAFD", ribbon: "#B3CFE5" },
+  mist: { bg: "#B3CFE5", fg: "#0A1931", ribbon: "#1A3D63" },
+  snow: { bg: "#F6FAFD", fg: "#0A1931", ribbon: "#4A7FA7" },
+} as const;
+type Tone = keyof typeof TONES;
+const TONE_ORDER: Tone[] = ["ink", "deep", "mist", "snow"];
+const toneOf = (b: ResultBook): Tone => TONE_ORDER[RESULT_BOOKS.indexOf(b) % 4];
 
 const ICONS: Record<ResultBook["icon"], React.ElementType> = {
   files: Files, branch: GitBranch, manual: BookOpen, shield: ShieldCheck, matrix: Grid3x3, badge: Award,
@@ -35,8 +42,8 @@ function titleLines(title: string): string[] {
 }
 
 /** Line art for each result, drawn in the cover's 120 × 170 box (centre ≈ 60, 108). */
-function CoverArt({ icon, accent }: { icon: ResultBook["icon"]; accent: string }) {
-  const line = { fill: "none", stroke: "#B3CFE5", strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+function CoverArt({ icon, line: ink, accent, dark }: { icon: ResultBook["icon"]; line: string; accent: string; dark: string }) {
+  const line = { fill: "none", stroke: ink, strokeWidth: 2, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
   switch (icon) {
     case "files":
       return (
@@ -101,7 +108,7 @@ function CoverArt({ icon, accent }: { icon: ResultBook["icon"]; accent: string }
         <g {...line}>
           <rect x="30" y="88" width="48" height="32" rx="3" />
           <path d="M46 128 h16 M54 120 v8" />
-          <rect x="72" y="100" width="18" height="32" rx="3" fill="#0A1931" />
+          <rect x="72" y="100" width="18" height="32" rx="3" fill={dark} />
           <path d="M79 127 h4" />
         </g>
       );
@@ -144,28 +151,20 @@ function CoverArt({ icon, accent }: { icon: ResultBook["icon"]; accent: string }
 }
 
 export function BookCover({ book, title }: { book: ResultBook; title: string }) {
-  const gid = `book-cover-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  const accent = stageVar(book);
-  const edge = accentOf(book);
+  const tone = TONES[toneOf(book)];
   const lines = titleLines(title);
   return (
     <svg viewBox="0 0 120 170" aria-hidden="true" className="block h-full w-full">
-      <defs>
-        <linearGradient id={gid} x1="0" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stopColor="#1A3D63" />
-          <stop offset="1" stopColor="#0A1931" />
-        </linearGradient>
-      </defs>
-      <rect width="120" height="170" rx="4" fill={`url(#${gid})`} />
-      <rect x="1" y="1" width="118" height="168" rx="3.5" fill="none" stroke={edge} strokeWidth={book.shelf === "studio" ? 2 : 1} strokeOpacity={0.8} />
-      <rect x="0" y="0" width="6" height="170" fill={accent} opacity={0.85} />
+      <rect width="120" height="170" rx="4" fill={tone.bg} />
+      <rect x="1" y="1" width="118" height="168" rx="3.5" fill="none" stroke={tone.ribbon} strokeWidth={book.shelf === "studio" ? 2 : 1} strokeOpacity={0.8} />
+      <rect x="0" y="0" width="6" height="170" fill={tone.ribbon} opacity={0.85} />
       {lines.map((l, i) => (
-        <text key={l} x="60" y={lines.length === 1 ? 44 : 38 + i * 15} textAnchor="middle" fill="#F6FAFD" fontSize="12" fontWeight="600">
+        <text key={l} x="60" y={lines.length === 1 ? 44 : 38 + i * 15} textAnchor="middle" fill={tone.fg} fontSize="12" fontWeight="600">
           {l}
         </text>
       ))}
-      <path d="M30 62 h60" stroke={accent} strokeWidth={2} strokeLinecap="round" />
-      <CoverArt icon={book.icon} accent={accent} />
+      <path d="M30 62 h60" stroke={tone.ribbon} strokeWidth={2} strokeLinecap="round" />
+      <CoverArt icon={book.icon} line={tone.fg} accent={tone.ribbon} dark={tone.bg} />
     </svg>
   );
 }
@@ -193,7 +192,7 @@ export function BookSpread({
   ];
   return (
     <div className="grid overflow-hidden rounded-[1.5rem] bg-[var(--fuse-snow)] text-[#0A1931] shadow-[var(--fuse-shadow-soft)] md:grid-cols-2">
-      <div data-book-page="left" className="relative p-7 md:border-r md:border-[#0A1931]/15 md:p-9">
+      <div data-book-page="left" className="relative p-7 md:border-r md:border-[#B3CFE5] md:p-9">
         <Icon className="size-14 text-[#1A3D63]" aria-hidden="true" />
         <Title className="font-wide mt-5 text-2xl md:text-3xl">{item.title}</Title>
         <p className="mt-2 text-sm text-[#0A1931]/75">{stageName}</p>
@@ -204,7 +203,7 @@ export function BookSpread({
       <dl className="space-y-4 p-7 text-sm md:p-9">
         {rows.map(([k, v]) => (
           <div key={k}>
-            <dt className="font-narrow text-xs uppercase tracking-wide text-[#0A1931]/70">{k}</dt>
+            <dt className="font-narrow text-xs uppercase tracking-wide text-[#1A3D63]">{k}</dt>
             <dd className="mt-1 leading-relaxed">{v}</dd>
           </div>
         ))}
@@ -213,16 +212,19 @@ export function BookSpread({
   );
 }
 
-function ShelfBook({ book, copy, onOpen }: { book: ResultBook; copy: Copy; onOpen: (id: BookId, el: HTMLElement) => void }) {
+function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: Copy; stageName: string; onOpen: (id: BookId, el: HTMLElement) => void }) {
   const title = itemOf(copy, book.id).title;
+  const toneName = toneOf(book);
+  const tone = TONES[toneName];
   return (
     <button
       type="button"
       data-book={book.id}
       data-shelf={book.shelf}
+      data-cover-tone={toneName}
       aria-label={fmt(copy.open, { title })}
       onClick={(e) => onOpen(book.id, e.currentTarget)}
-      className="group relative mx-auto block w-full max-w-[120px] pb-8 [perspective:900px] focus-visible:outline-none"
+      className="group relative mx-auto block w-full max-w-[120px] [perspective:900px] focus-visible:outline-none"
     >
       <div className="relative aspect-[120/170] w-full transition-[transform,translate] duration-300 ease-out [transform-style:preserve-3d] group-hover:-translate-y-2 group-focus-visible:-translate-y-2 group-focus-visible:ring-2 group-focus-visible:ring-ring motion-safe:[transform:rotateY(-18deg)] motion-safe:group-hover:[transform:rotateY(-8deg)] motion-safe:group-focus-visible:[transform:rotateY(-8deg)] motion-reduce:translate-none motion-reduce:[transform:none]">
         <BookCover book={book} title={title} />
@@ -235,44 +237,52 @@ function ShelfBook({ book, copy, onOpen }: { book: ResultBook; copy: Copy; onOpe
           data-book-spine=""
           aria-hidden="true"
           className="absolute right-full top-0 flex h-full w-[18px] origin-right items-center justify-center overflow-hidden [transform:rotateY(-90deg)]"
-          style={{ background: "var(--fuse-deep)" }}
+          style={{ background: `linear-gradient(90deg, rgb(10 25 49 / 0.45), rgb(10 25 49 / 0.15)), ${tone.bg}` }}
         >
-          <span className="whitespace-nowrap text-[9px] font-semibold text-[var(--fuse-snow)] [writing-mode:vertical-rl]">{title}</span>
+          <span className="whitespace-nowrap text-[9px] font-semibold [writing-mode:vertical-rl]" style={{ color: tone.fg }}>{title}</span>
         </div>
         <div
+          data-book-pages="right"
           aria-hidden="true"
           className="absolute left-full top-[3px] h-[calc(100%-6px)] w-[14px] origin-left [transform:rotateY(90deg)]"
           style={{ background: "repeating-linear-gradient(90deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
         />
         <div
+          data-book-pages="bottom"
+          aria-hidden="true"
+          className="absolute left-[3px] top-full h-[10px] w-[calc(100%-6px)] origin-top [transform:rotateX(-90deg)]"
+          style={{ background: "repeating-linear-gradient(180deg, #F6FAFD 0 2px, #B3CFE5 2px 3px)" }}
+        />
+        <div
           data-book-ribbon=""
           aria-hidden="true"
-          className="absolute left-6 top-full h-7 w-2.5 [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)]"
-          style={{ background: accentOf(book) }}
+          className="absolute left-6 top-full z-10 h-7 w-2.5 [clip-path:polygon(0_0,100%_0,100%_100%,50%_78%,0_100%)]"
+          style={{ background: tone.ribbon }}
         />
       </div>
+      {/* mt-9 clears the 28px ribbon hanging below the cover */}
+      <span data-book-caption="" className="mt-9 block text-center">
+        <span className="block text-sm font-semibold text-foreground">{title}</span>
+        <span className="block text-xs text-muted-foreground">{stageName}</span>
+      </span>
     </button>
   );
 }
 
-const BOARD = "h-3 rounded-sm [background:var(--fuse-card-bg)] shadow-[var(--fuse-shadow-soft),var(--fuse-sheen)]";
-
-function Shelf({ shelf, title, lede, copy, onOpen }: { shelf: ShelfId; title: string; lede: string; copy: Copy; onOpen: (id: BookId, el: HTMLElement) => void }) {
+function Shelf({
+  shelf, title, lede, copy, stageNames, onOpen,
+}: { shelf: ShelfId; title: string; lede: string; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
   return (
     <section data-book-shelf={shelf} className="mt-14 first:mt-0">
       <h3 className="font-wide text-xl md:text-2xl">{title}</h3>
       <p className="mt-2 max-w-[60ch] text-muted-foreground">{lede}</p>
-      <div className="mt-8">
-        <ul className="grid grid-cols-2 gap-x-6 gap-y-2 md:grid-cols-6">
-          {booksOnShelf(shelf).map((b) => (
-            <li key={b.id}>
-              <ShelfBook book={b} copy={copy} onOpen={onOpen} />
-              <div aria-hidden="true" className={cn(BOARD, "-mt-8 md:hidden")} />
-            </li>
-          ))}
-        </ul>
-        <div aria-hidden="true" className={cn(BOARD, "-mt-8 hidden md:block")} />
-      </div>
+      <ul className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-6">
+        {booksOnShelf(shelf).map((b) => (
+          <li key={b.id}>
+            <ShelfBook book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -295,8 +305,8 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
   // LandingMotion skips animations below 1024px; opening a book animates at every width.
   return (
     <MotionConfig skipAnimations={false}>
-      <Shelf shelf="home" title={copy.shelfHome} lede={copy.shelfHomeLede} copy={copy} onOpen={open} />
-      <Shelf shelf="studio" title={copy.shelfStudio} lede={copy.shelfStudioLede} copy={copy} onOpen={open} />
+      <Shelf shelf="home" title={copy.shelfHome} lede={copy.shelfHomeLede} copy={copy} stageNames={stageNames} onOpen={open} />
+      <Shelf shelf="studio" title={copy.shelfStudio} lede={copy.shelfStudioLede} copy={copy} stageNames={stageNames} onOpen={open} />
 
       <DialogPrimitive.Root
         open={state.open !== null}
@@ -334,8 +344,8 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                 {!state.turned && !reduced && (
                   <m.div
                     aria-hidden="true"
-                    className="absolute inset-y-0 left-0 w-full overflow-hidden rounded-[1.5rem] bg-[#0A1931] [backface-visibility:hidden] md:w-1/2"
-                    style={{ transformOrigin: "left center" }}
+                    className="absolute inset-y-0 left-0 w-full overflow-hidden rounded-[1.5rem] [backface-visibility:hidden] md:w-1/2"
+                    style={{ transformOrigin: "left center", background: TONES[toneOf(book)].bg }}
                     initial={{ rotateY: 0 }}
                     animate={{ rotateY: -165 }}
                     transition={{ duration: 0.7, ease: EASE }}
