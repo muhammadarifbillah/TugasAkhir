@@ -45,6 +45,13 @@ export function HeroWall() {
         {SITE_CATEGORIES.map((c, i) => {
           const pose = wallPose(i, SITE_CATEGORIES.length);
           const name = (labels.items[c.id] as { name: string }).name;
+          // The outer panels run off the screen: their labels align towards the inside and wrap within the visible 70 %.
+          const align =
+            i === 0
+              ? "lg:pointer-fine:justify-end lg:pointer-fine:text-right lg:pointer-fine:pr-2 lg:pointer-fine:pl-[30%] lg:text-[clamp(0.7rem,1vw,1rem)]"
+              : i === SITE_CATEGORIES.length - 1
+                ? "lg:pointer-fine:justify-start lg:pointer-fine:text-left lg:pointer-fine:pl-2 lg:pointer-fine:pr-[30%] lg:text-[clamp(0.7rem,1vw,1rem)]"
+                : "lg:text-[clamp(0.8rem,1vw,1rem)]";
           return (
             <li
               key={c.id}
@@ -68,7 +75,7 @@ export function HeroWall() {
                 className="group pointer-events-auto block min-h-11 w-full rounded-[6px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#000] hover:brightness-115 focus-visible:brightness-115 motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:hover:-translate-y-3.5 motion-safe:focus-visible:-translate-y-3.5 motion-reduce:transition-none"
               >
                 {/* Wraps inside the panel (at most two lines on desktop); the fixed two-line box keeps all art on one baseline. */}
-                <span aria-hidden="true" className="mb-2 flex min-h-[2lh] items-end justify-center text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] lg:text-[clamp(0.8rem,1vw,1rem)]">
+                <span aria-hidden="true" className={`mb-2 flex min-h-[2lh] items-end justify-center text-center text-[0.7rem] font-light uppercase tracking-[0.2em] text-[#fff] ${align}`}>
                   {name}
                 </span>
                 <span
