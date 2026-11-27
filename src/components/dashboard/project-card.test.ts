@@ -93,6 +93,26 @@ describe("ProjectCard", () => {
     }
   });
 
+  it("status chip straddles the top edge of the bezel, outside the screen, and the screen gets top room", () => {
+    const html = card();
+    const chip = tagWith(html, 'data-card-part="status"');
+    expect(chip).toContain('data-chip-edge="top"');
+    // Centred on the bezel's top edge: half above the frame, half on the bezel padding.
+    expect(chip).toMatch(/\btop-0\b/);
+    expect(chip).toContain("-translate-y-1/2");
+    expect(chip).toMatch(/\bshadow-/);
+    expect(chip).not.toMatch(/\btop-4\b/);
+    const css = readFileSync(join(process.cwd(), "src/components/dashboard/dashboard.css"), "utf8");
+    const bezel = css.slice(css.indexOf(".project-card-bezel {"), css.indexOf("}", css.indexOf(".project-card-bezel {")));
+    const top = bezel.match(/padding-top:\s*([\d.]+)rem/);
+    expect(top, "bezel padding-top").not.toBeNull();
+    // Badge is ~1.375rem tall; its lower half (~0.69rem) must fit in the bezel padding above the screen.
+    expect(Number(top![1])).toBeGreaterThanOrEqual(0.875);
+    const cat = tagWith(html, 'data-card-part="category"');
+    expect(cat).toContain("bottom-4");
+    expect(cat).toContain("right-4");
+  });
+
   it("card anatomy: two dotted rules, title h3 labelled by the article, gate row once, compact rail and score", () => {
     const html = card({ score: 91, scoreSource: "scanner", scannedAt: "2026-11-24T08:00:00.000Z" });
     expect(count(html, "border-dotted")).toBe(2);

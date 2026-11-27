@@ -1,4 +1,9 @@
-export const LOOP_VIEW = { width: 1000, height: 520, margin: 90, yTop: 110, yBottom: 230, yReturn: 470 } as const;
+/** Half the width of a station's text column, in viewBox units; the return lane bends around it. */
+export const LOOP_LABEL_HALF = 80;
+/** How far the return lane's control points reach past the end stations (the drawn curve reaches 3/4 of it). */
+const BEND = 150;
+
+export const LOOP_VIEW = { width: 1000, height: 520, margin: 165, yTop: 110, yBottom: 230, yReturn: 470 } as const;
 
 export interface LoopLayout {
   stations: { x: number; y: number }[];
@@ -36,8 +41,8 @@ export function loopLayout(n: number, view: typeof LOOP_VIEW = LOOP_VIEW): LoopL
   const first = stations[0];
   const last = stations[n - 1];
   const back =
-    `M${pt(last.x, last.y)} C${pt(last.x + 60, last.y)}, ${pt(last.x + 60, yReturn)}, ${pt(last.x, yReturn)}` +
-    ` L${pt(first.x, yReturn)} C${pt(first.x - 60, yReturn)}, ${pt(first.x - 60, first.y)}, ${pt(first.x, first.y)}`;
+    `M${pt(last.x, last.y)} C${pt(last.x + BEND, last.y)}, ${pt(last.x + BEND, yReturn)}, ${pt(last.x, yReturn)}` +
+    ` L${pt(first.x, yReturn)} C${pt(first.x - BEND, yReturn)}, ${pt(first.x - BEND, first.y)}, ${pt(first.x, first.y)}`;
   arrows.push({ x: width / 2, y: yReturn, angle: 180, dir: "back" });
 
   return { stations, forward, back, arrows, returnLabel: { x: width / 2, y: yReturn + 28 } };

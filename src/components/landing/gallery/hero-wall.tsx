@@ -41,7 +41,7 @@ export function HeroWall() {
         aria-label={copy.wallLabel}
         className="transition-transform duration-700 [transform-style:preserve-3d] lg:pointer-fine:motion-safe:[transform:rotateY(calc(var(--tilt,0)*3deg))]"
       >
-        <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[10vw] pb-4 lg:pointer-fine:justify-center lg:pointer-fine:gap-3 lg:pointer-fine:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:[perspective:1200px]">
+        <ul className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-[10vw] pb-4 lg:pointer-fine:motion-safe:justify-center lg:pointer-fine:gap-3 lg:pointer-fine:motion-safe:overflow-visible lg:pointer-fine:px-0 lg:pointer-fine:[perspective:1200px]">
           {SITE_CATEGORIES.map((c, i) => {
             const pose = wallPose(i, SITE_CATEGORIES.length);
             const name = (labels.items[c.id] as { name: string }).name;
@@ -67,11 +67,12 @@ export function HeroWall() {
                   <span aria-hidden="true" className="font-narrow mb-2 block truncate text-center text-sm uppercase tracking-wider text-foreground">
                     {name}
                   </span>
+                  {/* Three 16:10 pages are 1.875w tall; a 2:3 frame shows 1.5w, so the slide stops at 20 %. */}
                   <span className={`block aspect-[3/4] lg:pointer-fine:aspect-[2/3] ${FRAME}`}>
                     <span
                       aria-hidden="true"
                       data-panel-art=""
-                      className="flex flex-col motion-safe:transition-transform motion-safe:duration-[1200ms] motion-safe:ease-out motion-safe:group-hover:-translate-y-[30%] motion-safe:group-focus-visible:-translate-y-[30%]"
+                      className="flex flex-col motion-safe:transition-transform motion-safe:duration-[1200ms] motion-safe:ease-out motion-safe:group-hover:-translate-y-[20%] motion-safe:group-focus-visible:-translate-y-[20%]"
                     >
                       {pages(true)}
                     </span>

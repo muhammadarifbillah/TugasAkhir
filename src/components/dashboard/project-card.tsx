@@ -52,7 +52,8 @@ export function ProjectCard({
             <SiteArt category={category} pageIndex={1} labels={dict.categories} />
           </div>
         </div>
-        <span data-card-part="status" className="absolute left-4 top-4">
+        {/* Straddles the bezel's top edge (half outside the frame) so it never covers the screen. */}
+        <span data-card-part="status" data-chip-edge="top" className="absolute left-4 top-0 z-10 -translate-y-1/2 rounded-md bg-card shadow-sm">
           <Badge variant={status.variant}>{status.text}</Badge>
         </span>
         <span
