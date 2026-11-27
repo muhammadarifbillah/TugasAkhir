@@ -152,13 +152,16 @@ describe("book shelf", () => {
     }
   });
 
-  it("book dialog uses Radix, returns focus, scrolls natively and swaps rotation for a crossfade", () => {
+  it("book dialog uses Radix, returns focus, scrolls natively and always swings the cover", () => {
     const src = read("src/components/landing/books/book-shelf.tsx");
     expect(src).not.toContain("data-lenis-prevent");
     expect(src).toContain("overflow-y-auto");
     for (const s of ["@radix-ui/react-dialog", "onCloseAutoFocus", "rotateY", "useReducedMotion", "bookReducer", "booksOnShelf", "skipAnimations={false}", "motion-reduce:"])
       expect(src, s).toContain(s);
     for (const s of ["backdrop", "<motion.", "useAnimate", "setInterval"]) expect(src, s).not.toContain(s);
+    // User-triggered motion: the cover swing plays for everyone, reduce motion only shortens it.
+    expect(src).toContain("{!state.turned && (");
+    expect(src).toContain("reduced ? 0.4 : 0.95");
   });
 
   it("shelf boards and the book dialog paint the gradient card surface as a background, not a colour", () => {
@@ -185,7 +188,7 @@ describe("book shelf", () => {
     }
   });
 
-  it("each shelf paints three identical rails, and only the live one can be tabbed into", () => {
+  it("each shelf paints three identical rails; clones are untabbable but still open their book", () => {
     for (const lang of LANGS) {
       const html = renderToStaticMarkup(createElement(BookShelf, { copy: copyOf(lang), stageNames: stageNames(lang) }));
       const rails = html.split(/<div[^>]*data-book-track=/).slice(1);
@@ -196,9 +199,25 @@ describe("book shelf", () => {
         const ids = group.map((r) => [...r.matchAll(/data-book="([^"]+)"/g)].map((m) => m[1]));
         expect(ids[1]).toEqual(ids[0]);
         expect(ids[2]).toEqual(ids[0]);
-        for (const clone of group.slice(1)) expect(clone).toContain("inert");
+        // Two of the three visible books are clones: inert would swallow the click, so they stay clickable and only leave the tab order.
+        for (const clone of group.slice(1)) {
+          expect(clone).toContain('aria-hidden="true"');
+          expect(clone).not.toContain("inert");
+          const buttons = [...clone.matchAll(/<button\b[^>]*>/g)].map((m) => m[0]);
+          expect(buttons).toHaveLength(ids[0].length);
+          for (const b of buttons) expect(b).toContain('tabindex="-1"');
+        }
+        expect(group[0]).not.toContain("inert");
       }
     }
+  });
+
+  it("the shelf loops for everyone: the row always animates and the dialog never skips the swing", () => {
+    const src = read("src/components/landing/books/book-shelf.tsx");
+    expect(src).toContain("animate-[book-scroll_30s_linear_infinite]");
+    expect(src).not.toContain("motion-reduce:animate-none");
+    // motion/react drops transform animations when the OS asks for less motion; the swing is user-triggered, so opt out.
+    expect(src).toContain('reducedMotion="never"');
   });
 
   it("each book shows paper page thickness on the right and at the bottom", () => {

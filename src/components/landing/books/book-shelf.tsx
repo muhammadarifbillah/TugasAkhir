@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useRef } from "react";
+import { useReducer, useRef } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { MotionConfig, m, useReducedMotion } from "motion/react";
 import {
@@ -229,7 +229,7 @@ export function BookSpread({
 const COVER_W = 125;
 const CARD_W = 132;
 
-function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: Copy; stageName: string; onOpen: (id: BookId, el: HTMLElement) => void }) {
+function ShelfBook({ book, copy, stageName, onOpen, clone }: { book: ResultBook; copy: Copy; stageName: string; onOpen: (id: BookId, el: HTMLElement) => void; clone?: boolean }) {
   const title = itemOf(copy, book.id).title;
   const toneName = toneOf(book);
   return (
@@ -241,6 +241,7 @@ function ShelfBook({ book, copy, stageName, onOpen }: { book: ResultBook; copy: 
       aria-label={fmt(copy.open, { title })}
       onClick={(e) => onOpen(book.id, e.currentTarget)}
       style={{ width: CARD_W }}
+      tabIndex={clone ? -1 : undefined}
       className="group relative block shrink-0 text-start focus-visible:outline-none"
     >
       <div className="relative transition-transform duration-300 ease-out group-hover:-translate-y-1.5 group-focus-visible:-translate-y-1.5 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0 motion-reduce:group-focus-visible:translate-y-0" style={{ width: COVER_W }}>
@@ -295,18 +296,17 @@ function BookRow({
   items, copy, stageNames, onOpen,
 }: { items: ResultBook[]; copy: Copy; stageNames: Record<StageCode, string>; onOpen: (id: BookId, el: HTMLElement) => void }) {
   return (
-    <div className="relative mt-6 overflow-x-auto [scrollbar-width:none] pointer-fine:motion-safe:overflow-hidden pointer-fine:motion-safe:[mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-20px),transparent)]">
-      <div className="flex w-max animate-[book-scroll_48s_linear_infinite] items-start py-2 group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused] motion-reduce:animate-none">
+    <div className="relative mt-6 overflow-x-auto [scrollbar-width:none] pointer-fine:overflow-hidden pointer-fine:[mask-image:linear-gradient(to_right,transparent,black_20px,black_calc(100%-20px),transparent)]">
+      <div className="flex w-max animate-[book-scroll_30s_linear_infinite] items-start py-2 group-hover/row:[animation-play-state:paused] group-focus-within/row:[animation-play-state:paused]">
         {[0, 1, 2].map((copyIndex) => (
           <div
             key={copyIndex}
             data-book-track={copyIndex === 0 ? "live" : "clone"}
             aria-hidden={copyIndex === 0 ? undefined : true}
-            inert={copyIndex === 0 ? undefined : true}
             className="flex shrink-0 gap-7 pe-7"
           >
             {items.map((b) => (
-              <ShelfBook key={b.id} book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} />
+              <ShelfBook key={b.id} book={b} copy={copy} stageName={stageNames[b.stage]} onOpen={onOpen} clone={copyIndex !== 0} />
             ))}
           </div>
         ))}
@@ -344,13 +344,9 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
     dispatch({ type: "open", id });
   };
 
-  useEffect(() => {
-    if (reduced && state.open !== null && !state.turned) dispatch({ type: "turn" });
-  }, [reduced, state.open, state.turned]);
-
   // LandingMotion skips animations below 1024px; opening a book animates at every width.
   return (
-    <MotionConfig skipAnimations={false}>
+    <MotionConfig skipAnimations={false} reducedMotion="never">
       <Shelf shelf="home" title={copy.shelfHome} lede={copy.shelfHomeLede} copy={copy} stageNames={stageNames} onOpen={open} />
       <Shelf shelf="studio" title={copy.shelfStudio} lede={copy.shelfStudioLede} copy={copy} stageNames={stageNames} onOpen={open} />
 
@@ -386,7 +382,7 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                 >
                   <BookSpread book={book} copy={copy} stageName={stageNames[book.stage]} slots={{ Title: DialogPrimitive.Title }} />
                 </m.div>
-                {!state.turned && !reduced && (
+                {!state.turned && (
                   <m.div
                     aria-hidden="true"
                     className="absolute inset-y-0 left-0 w-full overflow-hidden rounded-[1.5rem] [backface-visibility:hidden] md:w-1/2"
@@ -394,7 +390,7 @@ export function BookShelf({ copy, stageNames }: { copy: Copy; stageNames: Record
                     initial={{ rotateY: 0 }}
                     animate={{ rotateY: -165 }}
                     // Expo-out hides the swing in the first frames; the cover needs a steady turn to read as an opening book.
-                    transition={{ duration: 0.95, ease: [0.45, 0, 0.15, 1] }}
+                    transition={{ duration: reduced ? 0.4 : 0.95, ease: [0.45, 0, 0.15, 1] }}
                     onAnimationComplete={() => dispatch({ type: "turn" })}
                   >
                     <BookCover book={book} title={itemOf(copy, book.id).title} />
