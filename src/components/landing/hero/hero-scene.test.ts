@@ -44,6 +44,23 @@ describe("hero scene", () => {
     });
   });
 
+  // r23 round 2: desktop panels are 10/19, the touch carousel stays 2:3. One 200x380 scene: the 2:3 slice keeps the
+  // middle 200x300 band, so the skeleton lives in that band (a translate(0 40) frame) and both shapes show it whole.
+  it("HeroScene is a slim 200x380 portrait with the website skeleton inside the 2:3 middle band", () => {
+    SITE_CATEGORIES.forEach((c, i) => {
+      const html = scene(i);
+      expect(html.slice(0, html.indexOf(">")), c.id).toContain('viewBox="0 0 200 380"');
+      const at = html.indexOf('<g transform="translate(0 40)">');
+      expect(at, c.id).toBeGreaterThan(-1);
+      const frame = html.slice(at);
+      expect(frame.indexOf("data-scene-nav"), c.id).toBeGreaterThan(-1);
+      for (const [, y, h] of frame.slice(frame.indexOf("data-scene-nav")).matchAll(/<rect[^>]* y="([\d.-]+)"[^>]* height="([\d.]+)"/g)) {
+        expect(Number(y), `${c.id} y`).toBeGreaterThanOrEqual(0);
+        expect(Number(y) + Number(h), `${c.id} y+h`).toBeLessThanOrEqual(300);
+      }
+    });
+  });
+
   it("the skeleton follows the first page's blocks, so categories with different blocks differ", () => {
     const strip = (h: string) => h.replace(/data-mood="\d"/, "").replace(/id="[^"]*"|url\(#[^)]*\)/g, "");
     // Same mood, different categories: only the skeleton can tell them apart.
