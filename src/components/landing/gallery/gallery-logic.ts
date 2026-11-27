@@ -70,6 +70,11 @@ export function filterByShelf(cats: readonly SiteCategory[], shelf: ShelfId | nu
   return shelf === null ? [...cats] : cats.filter((c) => c.shelf === shelf);
 }
 
+/** What the shelf actually shows: the shelf filter applies only in the "all" grid. */
+export function visibleCategories(results: readonly SiteCategory[], view: "shelves" | "all", shelf: ShelfId | null): readonly SiteCategory[] {
+  return view === "all" ? filterByShelf(results, shelf) : results;
+}
+
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 type SearchItem = { name: string; desc: string; pages: Record<string, string>; features: Record<string, string> };
 

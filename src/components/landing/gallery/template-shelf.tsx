@@ -7,7 +7,7 @@ import { SiteArt } from "@/components/site-art/site-art";
 import { fmt } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { SITE_CATEGORIES, type ShelfId, type SiteCategory } from "@/lib/site-categories";
-import { filterByShelf, groupByShelf, searchCategories } from "./gallery-logic";
+import { groupByShelf, searchCategories, visibleCategories } from "./gallery-logic";
 import { useGallery } from "./gallery-provider";
 
 type Copy = Dictionary["landing"]["shelf"];
@@ -24,6 +24,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
   const [query, setQuery] = useState("");
   const searchId = useId();
   const results = searchCategories(SITE_CATEGORIES, query, gallery.labels);
+  const visible = visibleCategories(results, view, shelf);
 
   const book = (c: SiteCategory, wide = false) => {
     const name = (gallery.labels.items[c.id] as { name: string }).name;
@@ -92,7 +93,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
           className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-transparent px-5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         />
         <p aria-live="polite" className="text-sm text-muted-foreground">
-          {fmt(copy.count, { n: results.length })}
+          {fmt(copy.count, { n: visible.length })}
         </p>
       </div>
 
@@ -147,7 +148,7 @@ export function TemplateShelf({ copy }: { copy: Copy }) {
             </div>
           )}
           <ul className="mt-10 grid grid-cols-3 gap-x-4 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
-            {filterByShelf(results, shelf).map((c) => book(c, true))}
+            {visible.map((c) => book(c, true))}
           </ul>
         </>
       )}
