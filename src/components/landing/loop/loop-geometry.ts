@@ -1,9 +1,16 @@
-/** Half the width of a station's text column, in viewBox units; the return lane bends around it. */
-export const LOOP_LABEL_HALF = 80;
 /** How far the return lane's control points reach past the end stations (the drawn curve reaches 3/4 of it). */
-const BEND = 150;
+// 143 = margin - LANE_HALF: the control points, lane width included, stay inside the viewBox.
+const BEND = 143;
 
-export const LOOP_VIEW = { width: 1000, height: 520, margin: 165, yTop: 110, yBottom: 230, yReturn: 470 } as const;
+export const LOOP_VIEW = { width: 1000, height: 680, margin: 165, pitch: 155, yTop: 200, yBottom: 330, yReturn: 600 } as const;
+/** Half a station box (88 px glass box at the lg width), in viewBox units. */
+export const STATION_HALF = 45;
+/** Half the lane surface stroke (strokeWidth 44). */
+export const LANE_HALF = 22;
+/** How far the dark side of the raised lane drops below its surface. */
+export const LANE_DROP = 10;
+/** Text box beside each station: sized for the smallest desktop width (lg, about 1 px per unit). */
+export const LOOP_TEXT = { w: 140, h: 160, gap: 12 } as const;
 
 export interface LoopLayout {
   stations: { x: number; y: number }[];
@@ -12,6 +19,8 @@ export interface LoopLayout {
   /** Path d from the last station, round below, back to the first. */
   back: string;
   arrows: { x: number; y: number; angle: number; dir: "forward" | "back" }[];
+  /** Text box right of each station: above the lane on top rows, below it on bottom rows. */
+  labels: { x: number; y: number; w: number; h: number }[];
   returnLabel: { x: number; y: number };
 }
 
@@ -20,9 +29,9 @@ const pt = (x: number, y: number) => `${r(x)} ${r(y)}`;
 
 /** Winding left-to-right path through `n` (>= 2) gate stations with a return lane underneath. */
 export function loopLayout(n: number, view: typeof LOOP_VIEW = LOOP_VIEW): LoopLayout {
-  const { width, margin, yTop, yBottom, yReturn } = view;
+  const { width, margin, pitch, yTop, yBottom, yReturn } = view;
   const stations = Array.from({ length: n }, (_, i) => ({
-    x: margin + (i * (width - 2 * margin)) / (n - 1),
+    x: margin + i * pitch,
     y: i % 2 === 0 ? yTop : yBottom,
   }));
 
@@ -45,5 +54,12 @@ export function loopLayout(n: number, view: typeof LOOP_VIEW = LOOP_VIEW): LoopL
     ` L${pt(first.x, yReturn)} C${pt(first.x - BEND, yReturn)}, ${pt(first.x - BEND, first.y)}, ${pt(first.x, first.y)}`;
   arrows.push({ x: width / 2, y: yReturn, angle: 180, dir: "back" });
 
-  return { stations, forward, back, arrows, returnLabel: { x: width / 2, y: yReturn + 28 } };
+  const labels = stations.map((s, i) => ({
+    x: s.x + STATION_HALF + LOOP_TEXT.gap,
+    y: i % 2 === 0 ? s.y - LANE_HALF - LOOP_TEXT.gap - LOOP_TEXT.h : s.y + LANE_HALF + LANE_DROP + LOOP_TEXT.gap,
+    w: LOOP_TEXT.w,
+    h: LOOP_TEXT.h,
+  }));
+
+  return { stations, forward, back, arrows, labels, returnLabel: { x: width / 2, y: yReturn + LANE_HALF + LANE_DROP + 8 } };
 }
