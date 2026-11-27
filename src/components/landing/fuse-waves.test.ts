@@ -16,14 +16,51 @@ const sectionFrom = (src: string, marker: string) => {
   return src.slice(at, src.indexOf("</section>", at));
 };
 
+const pageSrc = () => readFileSync(join(process.cwd(), "src/app/[lang]/page.tsx"), "utf8");
+/** Tailwind `h-N` step on the FuseWaves tag inside the section carrying `marker`. */
+const wavesHeight = (marker: string) => {
+  const part = sectionFrom(pageSrc(), marker);
+  const tag = tagAt(part, part.indexOf("<FuseWaves"));
+  expect(tag, `${marker} h-[...]`).not.toMatch(/(?<![\w:-])h-\[/);
+  const h = tag.match(/(?<![\w:-])h-(\d+)\b/);
+  expect(h, `${marker} h-*`).not.toBeNull();
+  return { tag, h: Number(h![1]) };
+};
+
 describe("FuseWaves", () => {
+  it('FuseWaves uses preserveAspectRatio="none" so the waves stretch instead of being cropped', () => {
+    const root = tagAt(renderToStaticMarkup(createElement(FuseWaves)), 0);
+    expect(root).toContain('preserveAspectRatio="none"');
+  });
+
+  it("hero waves are h-28 or lower and shorter than the hero bottom padding", () => {
+    const src = pageSrc();
+    const { tag, h } = wavesHeight('id="mulai-hero"');
+    expect(tag).not.toContain("h-[40%]");
+    expect(h).toBeLessThanOrEqual(28);
+    const heroAt = src.indexOf('id="mulai-hero"');
+    const heroTag = src.slice(src.lastIndexOf("<section", heroAt), src.indexOf(">", heroAt) + 1);
+    const pb = Number(heroTag.match(/(?<![\w:-])pb-(\d+)\b/)![1]);
+    expect(h).toBeLessThan(pb);
+  });
+
+  it("CTA waves stay bottom-0 inside an overflow-hidden card and are at most h-24", () => {
+    const { tag, h } = wavesHeight('id="mulai"');
+    expect(tag).toContain("bottom-0");
+    expect(h).toBeLessThanOrEqual(24);
+    const cta = sectionFrom(pageSrc(), 'id="mulai"');
+    const card = tagAt(cta, cta.lastIndexOf("<div", cta.indexOf("<FuseWaves")));
+    expect(card).toContain("overflow-hidden");
+    expect(card).toMatch(/(?<![\w:-])rounded-/);
+  });
+
   it("FuseWaves is an aria-hidden layered palette SVG", () => {
     const html = renderToStaticMarkup(createElement(FuseWaves, { className: "x-test" }));
     expect(html.startsWith("<svg")).toBe(true);
     const root = tagAt(html, 0);
     expect(root).toContain('aria-hidden="true"');
     expect(root).toContain('focusable="false"');
-    expect(root).toMatch(/preserveAspectRatio="[^"]* slice"/);
+    expect(root).not.toContain("slice");
     expect(root).toContain('class="x-test"');
     expect(count(html, "<path")).toBeGreaterThanOrEqual(4);
     const allowed = new Set([...Object.values(PALETTE).map((h) => h.toLowerCase()), "none"]);
